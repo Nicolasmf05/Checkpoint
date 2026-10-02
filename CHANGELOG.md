@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.6 — 2026-10-02
+
+- Miniature keyboard navigation with Up/Down/Home/End and Enter/Space state-menu access.
+- Visible keyboard focus outline and focus restoration after menu closure/state changes; normal views retain their styles and shortcuts.
+
 ## 0.6.5 — 2026-10-02
 
 - Miniature game context menu: five localized states with the current one checked; persist changes without leaving the view.

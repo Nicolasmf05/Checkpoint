@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.6 — teclado en Miniatura
+
+Han pasado 255 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 118 WPF. Los eventos de teclado prueban Fin/↑/Inicio, límites de fila, menú con Enter/Espacio, recuperación del foco al cerrar/cambiar estado y salto a una fila virtualizada entre 1.003 juegos con menos de 30 filas creadas. El foco espera al diseño diferido y la prueba espera a su recuperación. Captura nativa incluida. No sustituye pruebas físicas de teclado/lector de pantalla; siguen pendientes instalación y cuentas reales.
+
 ## 0.6.5 — estados en Miniatura
 
 Han pasado 247 comprobaciones locales: 108 de biblioteca, 15 Node, 14 Edge y 110 WPF. Las pruebas abren los menús reales de las filas, comprueban cinco estados y selección actual, guardan historia terminada sin salir de Miniatura, reabren la historia eliminando la fecha y verifican etiquetas inglesas. Capturas nativas del menú en ambos idiomas. Siguen pendientes las pruebas físicas de teclado/arrastre, paquetes instalados y cuentas reales.

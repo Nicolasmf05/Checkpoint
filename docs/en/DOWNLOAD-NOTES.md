@@ -25,6 +25,8 @@ Choose **Settings → Collection view → Miniature**, or cycle with F6. Shows o
 
 In Miniature, **right-click a game** to select pending, playing, paused, story finished or abandoned. The menu checks the current state and also offers Exit miniature view and Settings. Changes persist and follow the normal progress/sharing rules: changing a state does not share a new game. The list still shows only name and state.
 
+Miniature also supports keyboard controls: **Up/Down** select games, **Home/End** jump to the first/last and **Enter/Space** open the active game menu. A focus outline marks the active row. Closing the menu or changing state returns focus to that game. Other views retain their existing shortcuts.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

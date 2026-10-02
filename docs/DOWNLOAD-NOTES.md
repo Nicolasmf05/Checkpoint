@@ -25,6 +25,8 @@ Selecciona **Ajustes → Vista de la colección → Miniatura**, o pulsa F6 hast
 
 En Miniatura, **clic derecho sobre un juego** permite cambiar entre pendiente, jugando, pausado, historia terminada y abandonado. El menú marca el estado actual y también permite salir de Miniatura o abrir Ajustes. Los cambios se guardan y siguen las reglas habituales de progreso y compartición: no se comparte un juego nuevo por cambiar su estado. La lista continúa mostrando solo nombre y estado.
 
+También puedes usar el teclado en Miniatura: **↑/↓** para recorrer los juegos, **Inicio/Fin** para ir al primero/último y **Enter/Espacio** para abrir el menú del juego activo. El contorno resalta la fila enfocada. Al cerrar el menú o cambiar el estado, el foco vuelve a ese juego. No afecta a los atajos de las otras vistas.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.

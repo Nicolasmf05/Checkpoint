@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.6 — miniature keyboard controls
+
+255 checks passed: 108 core, 15 Node, 14 Edge and 118 native WPF. Routed key tests exercise End/Up/Home, first-row boundaries, Enter/Space menus, focus restoration on menu closure and state change, and an End jump to a distant virtualized row among 1,003 games with fewer than 30 realized rows. Container focus waits for deferred layout; the test waits for that focus change. Native focus screenshot included. These automated key events do not replace physical keyboard/screen-reader validation. Installed/real-account limitations remain pending.
+
 ## 0.6.5 — miniature state menu
 
 247 local checks passed: 108 core, 15 Node, 14 Edge and 110 native WPF. Tests open real row context menus, check all five states/current selection, persist story completion without leaving Miniature, reopen a story and clear its date, and verify English menu labels. Native menu captures are included in both languages. Physical keyboard/drag, installed-package and real-account limitations remain pending.

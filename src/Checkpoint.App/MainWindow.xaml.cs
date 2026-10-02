@@ -247,6 +247,42 @@ public partial class MainWindow : Window
     private void AddClick(object sender, RoutedEventArgs e) => Dialogs.Edit(this, null);
     private void SettingsClick(object sender, RoutedEventArgs e) => Dialogs.Settings(this);
     private void ViewClick(object sender, RoutedEventArgs e) => CycleView();
+    private void FocusMiniatureCard(CardView card, int retry = 0)
+    {
+        GameList.SelectedItem = card; GameList.ScrollIntoView(card); GameList.UpdateLayout();
+        if (GameList.ItemContainerGenerator.ContainerFromItem(card) is ListBoxItem container && FindVisual<Grid>(container) is { } row && row.DataContext == card)
+        { row.Focus(); return; }
+        // A distant virtualized container may be created on the next layout pass.
+        if (retry < 3) Dispatcher.BeginInvoke(() =>
+        {
+            if (Preferences.MiniatureView && GameList.SelectedItem == card) FocusMiniatureCard(card, retry + 1);
+        }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+    }
+    private void MiniatureKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!Preferences.MiniatureView || !GameList.IsKeyboardFocusWithin || visibleCards.Count == 0) return;
+        var current = (Keyboard.FocusedElement as FrameworkElement)?.DataContext as CardView ?? GameList.SelectedItem as CardView;
+        int index = current is null ? -1 : visibleCards.IndexOf(current);
+        if (e.Key is Key.Up or Key.Down or Key.Home or Key.End)
+        {
+            int target = e.Key switch { Key.Home => 0, Key.End => visibleCards.Count - 1, Key.Up => Math.Max(0,index - 1), _ => Math.Min(visibleCards.Count - 1,index + 1) };
+            FocusMiniatureCard(visibleCards[target]); e.Handled = true;
+        }
+        else if (e.Key is Key.Enter or Key.Space)
+        {
+            var card = index < 0 ? visibleCards[0] : visibleCards[index]; FocusMiniatureCard(card);
+            if (GameList.ItemContainerGenerator.ContainerFromItem(card) is ListBoxItem container && FindVisual<Grid>(container) is { ContextMenu: { } menu } row)
+            { menu.PlacementTarget = row; menu.IsOpen = true; e.Handled = true; }
+        }
+    }
+    private void MiniatureMenuClosed(object sender, RoutedEventArgs e)
+    {
+        if (((System.Windows.Controls.ContextMenu)sender).PlacementTarget is not FrameworkElement { DataContext: CardView previous }) return;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (Preferences.MiniatureView && visibleCards.FirstOrDefault(c => c.Model.Id == previous.Model.Id) is { } current) FocusMiniatureCard(current);
+        }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+    }
     private void MiniatureMenuOpened(object sender, RoutedEventArgs e)
     {
         var menu = (System.Windows.Controls.ContextMenu)sender;
@@ -282,6 +318,7 @@ public partial class MainWindow : Window
     private void BindCards()
     {
         gridColumns = CalculateColumns();
+        GameList.ItemContainerStyle = Preferences.MiniatureView ? (Style)Resources["MiniatureItemStyle"] : (Style)Application.Current.Resources[typeof(ListBoxItem)];
         GameList.ItemTemplate = (DataTemplate)Resources[Preferences.MiniatureView ? "MiniatureTemplate" : Preferences.GridView ? "GridRowTemplate" : "GameTemplate"];
         // Virtualize rows so a large library does not create a control for every cover.
         GameList.ItemsSource = Preferences.GridView && !Preferences.MiniatureView

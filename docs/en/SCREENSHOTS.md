@@ -51,3 +51,9 @@ Only name and state. Enable from Settings or F6; right-click to exit.
 Right-click a game. Its current state is checked; rows still show only name and state.
 
 ![State menu](../screenshots/miniature-state-menu-en.png)
+
+## Keyboard in Miniature — 0.6.6
+
+The outline marks the focused row. Up/Down and Home/End select games; Enter/Space open the menu. Capture uses Spanish.
+
+![Keyboard focus](../screenshots/widget-miniature-keyboard.png)

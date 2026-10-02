@@ -52,12 +52,18 @@
     </DataTemplate>
     <DataTemplate x:Key="MiniatureTemplate">
       <Grid Margin="2,3" Height="28" Background="Transparent" Focusable="True" AutomationProperties.Name="{Binding MiniatureName}">
-        <Grid.ContextMenu><ContextMenu Opened="MiniatureMenuOpened"/></Grid.ContextMenu>
+        <Grid.ContextMenu><ContextMenu Opened="MiniatureMenuOpened" Closed="MiniatureMenuClosed"/></Grid.ContextMenu>
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" ToolTip="{Binding Model.Title}"/>
         <TextBlock Grid.Column="1" Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" VerticalAlignment="Center"/>
       </Grid>
     </DataTemplate>
+    <Style x:Key="MiniatureItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem">
+        <Border x:Name="FocusBorder" CornerRadius="5" BorderThickness="1" BorderBrush="Transparent"><ContentPresenter/></Border>
+        <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="FocusBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
   </Window.Resources>
   <Border x:Name="Shell" CornerRadius="20" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" Padding="22,17,22,16">
     <Grid>
@@ -86,7 +92,7 @@
         <ComboBox x:Name="StatusFilter" Grid.Column="1" SelectionChanged="FilterChanged" SelectedIndex="0" AutomationProperties.Name="{DynamicResource Loc_74580843ea91}"><ComboBoxItem Content="{DynamicResource Loc_bd02b9a7d71d}"/><ComboBoxItem Content="{DynamicResource Loc_2ef68536d8e2}"/><ComboBoxItem Content="{DynamicResource Loc_185ac6464620}"/><ComboBoxItem Content="{DynamicResource Loc_d455cfb682d3}"/><ComboBoxItem Content="{DynamicResource Loc_4a76229cd4a2}"/><ComboBoxItem Content="{DynamicResource Loc_e82e91150650}"/></ComboBox>
       </Grid>
       <Grid x:Name="GameArea" Grid.Row="4">
-        <ListBox x:Name="GameList" ItemTemplate="{StaticResource GameTemplate}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True" SizeChanged="GameListSizeChanged"/>
+        <ListBox x:Name="GameList" PreviewKeyDown="MiniatureKeyDown" ItemTemplate="{StaticResource GameTemplate}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True" SizeChanged="GameListSizeChanged"/>
         <StackPanel x:Name="EmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="290" Margin="6">
           <Border Width="64" Height="64" Background="{DynamicResource PanelBrush}" CornerRadius="18" HorizontalAlignment="Center" Margin="0,0,0,18"><TextBlock Text="✦" Foreground="{DynamicResource AccentBrush}" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
           <TextBlock x:Name="EmptyTitle" Text="{DynamicResource Loc_d92a258c51ea}" TextAlignment="Center" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap"/>

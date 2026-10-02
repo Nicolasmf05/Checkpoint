@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.6 — 2026-10-02
+
+- Navegación con ↑/↓/Inicio/Fin y menú de estados con Enter/Espacio en Miniatura.
+- Contorno de foco y recuperación del foco al cerrar el menú/cambiar estado; conserva estilos y atajos de otras vistas.
+
 ## 0.6.5 — 2026-10-02
 
 - Menú contextual de juego en Miniatura: cinco estados traducidos, estado actual marcado y guardado sin salir de la vista.

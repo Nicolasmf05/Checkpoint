@@ -47,3 +47,9 @@ Solo nombre y estado. Se activa en Ajustes o con F6; clic derecho para salir.
 Clic derecho en un juego. El estado actual aparece marcado; las filas siguen mostrando solo nombre y estado.
 
 ![Menú de estados](screenshots/miniature-state-menu.png)
+
+## Teclado en Miniatura — 0.6.6
+
+El contorno indica la fila enfocada. ↑/↓ e Inicio/Fin recorren juegos; Enter/Espacio abren su menú.
+
+![Foco de teclado](screenshots/widget-miniature-keyboard.png)

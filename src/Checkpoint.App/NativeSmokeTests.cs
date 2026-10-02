@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -306,6 +307,36 @@ public partial class MainWindow
             Check(VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.Title == t.Text)).All(t =>
                 t.Foreground is SolidColorBrush brush && brush.Color == ((SolidColorBrush)Application.Current.Resources["TextBrush"]).Color), "miniature names use the readable theme foreground");
             Render(this,"widget-miniature.png");
+            void MiniatureKey(Key key)
+            {
+                GameList.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice,PresentationSource.FromVisual(GameList),0,key) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
+            }
+            FocusMiniatureCard(visibleCards[0]); MiniatureKey(Key.End);
+            Check(GameList.SelectedItem == visibleCards[^1] && (Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1], "miniature End selects and focuses the last game");
+            MiniatureKey(Key.Up);
+            Check(GameList.SelectedItem == visibleCards[^2], "miniature Up moves to the previous game");
+            MiniatureKey(Key.Home); MiniatureKey(Key.Up);
+            Check(GameList.SelectedItem == visibleCards[0], "miniature Home and Up stop at the first game");
+            Render(this,"widget-miniature-keyboard.png");
+            MiniatureKey(Key.Enter);
+            var keyboardRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu?.IsOpen == true);
+            Check(keyboardRow.ContextMenu.Items.OfType<MenuItem>().Count(i => i.Tag is GameStatus) == 5, "miniature Enter opens the selected game state menu");
+            keyboardRow.ContextMenu.IsOpen = false;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check((Keyboard.FocusedElement as FrameworkElement)?.DataContext is CardView focused && focused.Model.Id == visibleCards[0].Model.Id, "closing miniature menu restores row focus");
+            MiniatureKey(Key.Space);
+            keyboardRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu?.IsOpen == true);
+            Check(keyboardRow.ContextMenu.IsOpen, "miniature Space also opens the state menu");
+            keyboardRow.ContextMenu.IsOpen = false;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            var keyboardBulk = Enumerable.Range(0,1000).Select(i => new Game { Title = $"Keyboard game {i:0000}", SortOrder = i + 100 }).ToList();
+            Games.AddRange(keyboardBulk); Refresh(); FocusMiniatureCard(visibleCards[0]); MiniatureKey(Key.End);
+            for (int i = 0; i < 10 && (Keyboard.FocusedElement as FrameworkElement)?.DataContext != visibleCards[^1]; i++)
+            { await Task.Delay(10); await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle); }
+            Console.WriteLine($"Virtual keyboard: selected={GameList.SelectedItem == visibleCards[^1]}, focused={(Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1]}, realized={VisualChildren(GameList).OfType<ListBoxItem>().Count()}");
+            Check(GameList.SelectedItem == visibleCards[^1] && (Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1] &&
+                VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "miniature End focuses a distant virtualized row in a large collection");
+            Games.RemoveAll(g => keyboardBulk.Contains(g)); Refresh(); FocusMiniatureCard(visibleCards[0]);
             var miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
             var miniatureGame = ((CardView)miniatureRow.DataContext).Model;
             var priorState = miniatureGame.Status;
@@ -319,6 +350,7 @@ public partial class MainWindow
             Check(miniatureGame.Status == GameStatus.Finished && miniatureGame.FinishedAt.HasValue &&
                 Store.LoadGames().Single(g => g.Id == miniatureGame.Id).Status == GameStatus.Finished && Preferences.MiniatureView, "miniature state action persists story completion without leaving the view");
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check((Keyboard.FocusedElement as FrameworkElement)?.DataContext is CardView updatedFocus && updatedFocus.Model.Id == miniatureGame.Id, "miniature keeps keyboard focus on the game after its state changes");
             miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView c && c.Model.Id == miniatureGame.Id);
             miniatureRow.ContextMenu.PlacementTarget = miniatureRow; miniatureRow.ContextMenu.IsOpen = true;
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
