@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.10 — edición desde Miniatura
+
+Han pasado 280 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 143 WPF. Cinco nuevas prueban apertura de la ficha del juego desde el menú, guardado de notas y foco en el mismo juego, F2/cancelación, retirada de Mi lista con selección limpia y traducción inglesa/atajo. Se usan diálogos y controles reales con datos aislados; no sustituye teclado físico. Capturas nativas de menús en ambos idiomas. Siguen pendientes instalación y cuentas reales.
+
 ## 0.6.9 — búsqueda visible
 
 Han pasado 275 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 138 WPF. Cinco nuevas pruebas comprueban selección de la consulta actual, búsqueda visible desde Amigos, salida/guardado de vista normal desde el menú de Miniatura sin perder su tamaño, foco tras cerrar el menú del juego y etiqueta/atajo en inglés. Se prueba el mismo método usado por Ctrl+F; no se simula la pulsación física con modificadores. Capturas nativas actualizadas en ambos idiomas. Siguen pendientes teclado físico, instalación y cuentas reales.

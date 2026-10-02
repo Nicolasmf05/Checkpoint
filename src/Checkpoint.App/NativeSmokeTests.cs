@@ -392,6 +392,36 @@ public partial class MainWindow
                 miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == priorState).IsChecked, "miniature menu exposes all states and checks the current one");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu.png"));
             var miniatureMenu = miniatureRow.ContextMenu;
+            var editGameId = miniatureGame.Id;
+            string priorNotes = miniatureGame.Notes;
+            RunModal(() => MiniatureAction(miniatureMenu,"Editar juego").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)), window =>
+            {
+                Check(Input(window,"Nombre del juego").Text == miniatureGame.Title && Preferences.MiniatureView, "miniature edit menu opens the selected game's editor without changing view");
+                Input(window,"Notas · dónde lo dejaste").Text = "Nota desde Miniatura";
+                Click(window,"Guardar");
+            });
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(Games.Single(g => g.Id == editGameId).Notes == "Nota desde Miniatura" && Store.LoadGames().Single(g => g.Id == editGameId).Notes == "Nota desde Miniatura" &&
+                (Keyboard.FocusedElement as FrameworkElement)?.DataContext is CardView editedFocus && editedFocus.Model.Id == editGameId,
+                "miniature editor persists notes and returns focus to the same game");
+            RunModal(() => MiniatureKey(Key.F2), window =>
+            {
+                Input(window,"Notas · dónde lo dejaste").Text = "No guardar desde F2";
+                Click(window,"Cancelar");
+            });
+            Check(Preferences.MiniatureView && Games.Single(g => g.Id == editGameId).Notes == "Nota desde Miniatura", "miniature F2 opens the editor and cancellation preserves saved data");
+            RunModal(() => MiniatureKey(Key.F2), window =>
+            {
+                Controls<CheckBox>(window).Single(c => (string?)c.Content == "Mostrar en Mi lista").IsChecked = false;
+                Click(window,"Guardar");
+            });
+            Check(Preferences.MiniatureView && !visibleCards.Any(c => c.Model.Id == editGameId) && GameList.SelectedItem is null &&
+                !Store.LoadGames().Single(g => g.Id == editGameId).Tracked, "miniature editor untracking removes the row and clears stale selection");
+            miniatureGame = Games.Single(g => g.Id == editGameId); miniatureGame.Tracked = true; miniatureGame.Notes = priorNotes; Persist(); Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView c && c.Model.Id == editGameId);
+            miniatureMenu = miniatureRow.ContextMenu; miniatureMenu.PlacementTarget = miniatureRow; miniatureMenu.IsOpen = true;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             quickPin = MiniatureAction(miniatureMenu,"Mantener siempre visible");
             Check(quickPin.IsChecked == Preferences.AlwaysOnTop && MiniatureAction(miniatureMenu,"Bloquear posición y tamaño").IsChecked == Preferences.PositionLocked,
                 "miniature game menu reflects quick window settings");
@@ -430,6 +460,8 @@ public partial class MainWindow
                 MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño").Header.Equals("Lock position and size"), "miniature quick window actions switch to English in both menus");
             Check((string?)MiniatureAction(miniatureRow.ContextMenu,"Buscar juego").Header == "Search games" &&
                 MiniatureAction(Shell.ContextMenu,"Buscar juego").InputGestureText == "Ctrl+F", "miniature search action is localized and exposes its shortcut");
+            Check((string?)MiniatureAction(miniatureRow.ContextMenu,"Editar juego").Header == "Edit game" &&
+                MiniatureAction(miniatureRow.ContextMenu,"Editar juego").InputGestureText == "F2", "miniature edit action switches to English and exposes F2");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu-en.png"));
             miniatureRow.ContextMenu.IsOpen = false;
             Preferences.Language = "es"; ApplyLanguage();

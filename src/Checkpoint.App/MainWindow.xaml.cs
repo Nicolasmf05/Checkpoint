@@ -282,6 +282,15 @@ public partial class MainWindow : Window
             if (GameList.ItemContainerGenerator.ContainerFromItem(card) is ListBoxItem container && FindVisual<Grid>(container) is { ContextMenu: { } menu } row)
             { menu.PlacementTarget = row; menu.IsOpen = true; e.Handled = true; }
         }
+        else if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None && current is not null)
+        { e.Handled = true; EditMiniatureGame(current.Model.Id); }
+    }
+    private void EditMiniatureGame(Guid gameId)
+    {
+        if (Games.FirstOrDefault(g => g.Id == gameId) is not { } game) return;
+        Dialogs.Edit(this, game);
+        if (Preferences.MiniatureView && visibleCards.FirstOrDefault(c => c.Model.Id == gameId) is { } current)
+            FocusMiniatureCard(current, expectedFocus: Keyboard.FocusedElement, guardFocus: true);
     }
     private void MiniatureMenuClosed(object sender, RoutedEventArgs e)
     {
@@ -318,6 +327,9 @@ public partial class MainWindow : Window
             menu.Items.Add(item);
         }
         menu.Items.Add(new Separator());
+        var edit = new System.Windows.Controls.MenuItem { Header = I18n.T("Editar juego"), InputGestureText = "F2" };
+        edit.Click += (_, _) => { menu.IsOpen = false; EditMiniatureGame(card.Model.Id); };
+        menu.Items.Add(edit); menu.Items.Add(new Separator());
         AddMiniatureWindowActions(menu);
     }
     private void AddMiniatureWindowActions(System.Windows.Controls.ContextMenu menu)

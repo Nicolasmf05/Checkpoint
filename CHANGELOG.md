@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.10 — 2026-10-03
+
+- Miniature game menus add Edit game; F2 opens the selected game editor. Notes/tasks and normal editor actions are available without changing view or adding row controls.
+- Closing the editor restores focus by game identity when the game remains visible; untracking it clears selection.
+
 ## 0.6.9 — 2026-10-03
 
 - Ctrl+F opens visible collection search from Miniature or Friends; it selects the current query instead of focusing a hidden field.

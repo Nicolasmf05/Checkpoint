@@ -33,6 +33,8 @@ Updates preserve the selected game and restore its keyboard focus only if the li
 
 **Ctrl+F or right-click → Search games** opens the normal collection view and focuses search. It saves that view while preserving Miniature dimensions for your next visit. From Friends, Ctrl+F also returns to the visible collection search. Any existing query is selected so you can replace it by typing; its text is preserved until you change it. Miniature itself keeps the names/states-only list.
 
+**Right-click a game → Edit game, or F2 on the selected game** opens its normal editor while keeping Miniature active. Edit notes, tasks and other normal editor fields. Save applies changes; Cancel preserves the saved data. Closing restores game focus if it remains visible. Unchecking Show in My list removes its Miniature row without deleting the library entry. Rows still show only name and state.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

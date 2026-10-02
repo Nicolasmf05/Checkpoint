@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.10 — editing from Miniature
+
+280 checks passed: 108 core, 15 Node, 14 Edge and 143 native WPF. Five new checks exercise the game-menu editor, persisted notes and same-game focus, F2/cancellation, untracking with cleared selection and English label/shortcut. Real dialogs and controls use isolated data; this does not replace physical keyboard testing. Native menus captured in both languages. Installed packages and real accounts remain pending.
+
 ## 0.6.9 — visible search
 
 275 checks passed: 108 core, 15 Node, 14 Edge and 138 native WPF. Five new checks cover current-query selection, visible collection search from Friends, saved normal view from the Miniature menu without losing its dimensions, search focus after closing the game menu and the English label/shortcut hint. Tests exercise the same method used by Ctrl+F; physical modifier-key input is not simulated. Native menu screenshots updated in both languages. Physical keyboard, installed packages and real accounts remain pending.

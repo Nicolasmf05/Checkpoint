@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.10 — 2026-10-03
+
+- Menú de juego de Miniatura incluye Editar juego; F2 abre la ficha seleccionada. Notas/tareas y acciones habituales del editor sin cambiar de vista ni añadir controles a las filas.
+- Al cerrar la ficha se recupera el foco por identidad si el juego sigue visible; retirarlo de Mi lista limpia la selección.
+
 ## 0.6.9 — 2026-10-03
 
 - Ctrl+F abre la búsqueda visible de la colección desde Miniatura o Amigos y selecciona la consulta actual, en lugar de intentar enfocar un campo oculto.
