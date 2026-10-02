@@ -33,3 +33,9 @@ Captured from actual WPF controls through `RenderTargetBitmap` during isolated n
 ![Spanish settings](../screenshots/dialog-settings.png)
 
 Regenerate with `./scripts/Build.ps1 -Installer` on Windows. Output: `.qa/package-…/render`. Publish selected PNGs only, excluding libraries, sessions and local logs. See [validation](VALIDATION.md).
+
+## Lightweight mode — 0.6.3
+
+Covers are hidden while games and progress remain. This test capture uses Spanish; the setting is also available in English.
+
+![Lightweight mode, Spanish capture](../screenshots/widget-lightweight.png)

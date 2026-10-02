@@ -86,6 +86,7 @@ public sealed class Settings
     public bool Compact { get; set; }
     public bool GridView { get; set; }
     public bool LightTheme { get; set; }
+    public bool LightweightMode { get; set; }
     public bool CloseToTray { get; set; } = true;
     public bool StartWithWindows { get; set; }
     public int SyncMinutes { get; set; } = 30;

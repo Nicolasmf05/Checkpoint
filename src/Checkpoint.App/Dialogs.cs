@@ -230,6 +230,8 @@ internal static class Dialogs
         var view = new ComboBox { ItemsSource = new[] { I18n.T("Lista"), I18n.T("Compacta"), I18n.T("Cuadrícula de carátulas") }, SelectedIndex = prefs.GridView ? 2 : prefs.Compact ? 1 : 0 };
         System.Windows.Automation.AutomationProperties.SetName(view, I18n.T("Vista de la colección")); body.Children.Add(view);
         var light = Check(body, I18n.T("Tema claro"), prefs.LightTheme);
+        var lightweight = Check(body, I18n.T("Modo ligero (sin carátulas)"), prefs.LightweightMode);
+        body.Children.Add(new TextBlock { Text = I18n.T("Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         var tray = Check(body, I18n.T("Ocultar en la bandeja al cerrar"), prefs.CloseToTray); var startup = Check(body, I18n.T("Iniciar con Windows"), prefs.StartWithWindows);
         Label(body, I18n.T("Atajos")); body.Children.Add(new TextBlock { Text = I18n.T("Ctrl+Alt+C · mostrar / ocultar\nCtrl+N · añadir juego     Ctrl+F · buscar\nF6 · cambiar vista     Escape · ocultar\nAlt+↑ / Alt+↓ · reordenar desde el asa ⠿\nCtrl+Z · recuperar el último juego eliminado"), FontSize = 12, LineHeight = 20 });
         Label(body, "Steam"); var steamSummary = new TextBlock { Text = owner.Steam.Session is null ? I18n.T("Cuenta sin vincular. El inicio de sesión se realiza en Steam.") : I18n.T("Cuenta vinculada: ") + owner.Steam.Session.SteamId, TextWrapping = TextWrapping.Wrap, FontSize = 12 }; body.Children.Add(steamSummary);
@@ -281,6 +283,7 @@ internal static class Dialogs
                 prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; prefs.LightTheme = light.IsChecked == true; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
+                prefs.LightweightMode = lightweight.IsChecked == true;
                 owner.ApplyPreferences(); owner.Persist(); saved = true; window.Close(); owner.ApplyLanguage();
             }
             catch (Exception ex) { MessageBox.Show(window, ex.Message, I18n.T("No se pudieron guardar los ajustes")); }

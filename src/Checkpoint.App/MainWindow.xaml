@@ -4,7 +4,7 @@
       <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="13" Padding="12" Tag="{Binding Model}" AllowDrop="True" DragOver="CardDragOver" DragLeave="CardDragLeave" Drop="CardDrop">
         <Grid>
           <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="32"/></Grid.ColumnDefinitions>
-          <Border Width="{Binding CoverWidth}" Height="{Binding CoverHeight}" Margin="0,0,13,0" CornerRadius="7" Background="{Binding CoverBackground}" ClipToBounds="True" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
+          <Border Width="{Binding CoverWidth}" Height="{Binding CoverHeight}" Margin="0,0,13,0" CornerRadius="7" Visibility="{Binding CoverVisibility}" Background="{Binding CoverBackground}" ClipToBounds="True" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
             <Grid><TextBlock Text="{Binding Initial}" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#DDF1F5FF"/><Image Source="{Binding Cover}" Stretch="UniformToFill" Loaded="CoverLoaded" Unloaded="CoverUnloaded" DataContextChanged="CoverContextChanged"/></Grid>
           </Border>
           <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,6,0" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
@@ -26,7 +26,7 @@
     <DataTemplate x:Key="GridCardTemplate">
       <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="13" Padding="9" Margin="0,0,9,0" Tag="{Binding Model}" AllowDrop="True" DragOver="CardDragOver" DragLeave="CardDragLeave" Drop="CardDrop">
         <StackPanel>
-          <Border Height="190" CornerRadius="7" Background="{Binding CoverBackground}" ClipToBounds="True" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
+          <Border Height="190" CornerRadius="7" Visibility="{Binding CoverVisibility}" Background="{Binding CoverBackground}" ClipToBounds="True" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
             <Grid><TextBlock Text="{Binding Initial}" FontSize="45" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#DDF1F5FF"/><Image Source="{Binding Cover}" Stretch="UniformToFill" Loaded="CoverLoaded" Unloaded="CoverUnloaded" DataContextChanged="CoverContextChanged"/></Grid>
           </Border>
           <StackPanel MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand" Margin="0,10,0,0">

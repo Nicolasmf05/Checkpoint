@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.3 — modo ligero
+
+Han pasado 233 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 96 WPF. La casilla real de Ajustes se prueba al guardar, persistir, cancelar y desactivar; las imágenes de colección permanecen ocultas con caché vacía. Las peticiones simuladas de Storage privado demuestran que el progreso de amigos sigue visible sin descargar carátulas y que estas vuelven al desactivar el modo. Traducción inglesa validada. Generados ZIP/MSI y MSIX sin firma validado con SDK. Se conservan las limitaciones de instalación y cuentas reales indicadas abajo.
+
 ## 0.6.2 — menor consumo
 
 Han pasado 222 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 85 WPF. Se prueban liberación/recarga de carátulas, caché con 40 imágenes y cuadrícula de 1.003 juegos con comprobación de referencias fuera de pantalla. Generados ZIP/MSI sin firma y MSIX de prueba; se verificaron los 283 archivos de este último. Frente a 0.6.1, la app extraída baja de 173,72 a 158,00 MiB y el ZIP de 73,85 a 68,44 MiB. Los paquetes contienen los avisos de primer uso en inglés/español. No se afirma haber medido mínimos RAM/CPU en hardware antiguo ni haber validado instalación MSI/MSIX o cuentas reales.

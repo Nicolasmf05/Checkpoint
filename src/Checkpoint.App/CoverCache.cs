@@ -21,6 +21,15 @@ public sealed class CoverCache : IDisposable
     private readonly Queue<string> memoryOrder = new();
     internal const long MaxMemoryBytes = 8 * 1024 * 1024;
     private long memoryBytes;
+    private volatile bool enabled = true;
+    internal void SetEnabled(bool value)
+    {
+        lock (memory)
+        {
+            enabled = value;
+            if (!value) { memory.Clear(); memoryOrder.Clear(); memoryBytes = 0; }
+        }
+    }
     internal long MemoryBytes { get { lock (memory) return memoryBytes; } }
     private static long ImageBytes(BitmapImage bitmap) => (long)bitmap.PixelWidth * bitmap.PixelHeight * Math.Max(4, (bitmap.Format.BitsPerPixel + 7) / 8);
     internal string DirectoryPath => folder;
@@ -48,7 +57,7 @@ public sealed class CoverCache : IDisposable
     {
         lock (memory)
         {
-            if (memory.ContainsKey(path)) return;
+            if (!enabled || memory.ContainsKey(path)) return;
             long bytes = ImageBytes(bitmap);
             if (bytes > MaxMemoryBytes) return;
             memory[path] = bitmap; memoryOrder.Enqueue(path); memoryBytes += bytes;
@@ -91,6 +100,7 @@ public sealed class CoverCache : IDisposable
     }
     public async Task<BitmapImage?> Get(Game game)
     {
+        if (!enabled) return null;
         var custom = game.CustomCover;
         if (BackupFiles.IsCustomCoverName(custom))
         {
@@ -114,6 +124,7 @@ public sealed class CoverCache : IDisposable
                 if (File.Exists(path)) return ReadCached(path);
                 foreach (var asset in new[] { "library_600x900.jpg", "header.jpg" })
                 {
+                    if (!enabled) return null;
                     using var response = await http.GetAsync($"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appId}/{asset}");
                     if (!response.IsSuccessStatusCode) continue;
                     var bytes = await response.Content.ReadAsByteArrayAsync(); if (bytes.Length > 8_000_000) continue;

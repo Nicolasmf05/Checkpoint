@@ -159,6 +159,7 @@ public partial class MainWindow : Window
         Topmost = Preferences.AlwaysOnTop; PinButton.Content = Topmost ? "◆" : "◇";
         ResizeGrip.Visibility = Preferences.PositionLocked ? Visibility.Collapsed : Visibility.Visible;
         timer.Interval = TimeSpan.FromMinutes(Math.Clamp(Preferences.SyncMinutes, 15, 120));
+        Covers.SetEnabled(!Preferences.LightweightMode);
         ViewButton.Content = Preferences.GridView ? "▦" : Preferences.Compact ? "≡" : "▤";
         string view = Preferences.GridView ? I18n.T("Cuadrícula") : Preferences.Compact ? I18n.T("Compacta") : I18n.T("Lista");
         ViewButton.ToolTip = (I18n.IsEnglish ? $"View: {view} · switch with F6" : $"Vista: {view} · cambiar con F6");
@@ -179,7 +180,7 @@ public partial class MainWindow : Window
         var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || g.Tracked)
             .Where(g => g.Title.Contains(Search.Text, StringComparison.CurrentCultureIgnoreCase))
             .Where(g => StatusFilter.SelectedIndex <= 0 || (int)g.Status == StatusFilter.SelectedIndex - 1)).ToList();
-        visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Preferences.LightTheme)).ToList();
+        visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Preferences.LightTheme, Preferences.LightweightMode)).ToList();
         BindCards();
         EmptyPanel.Visibility = filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         EmptyTitle.Text = Games.Count == 0 ? I18n.T("Aquí empieza tu próxima partida") : I18n.T("Tu lista tiene espacio para otra aventura");
@@ -197,6 +198,7 @@ public partial class MainWindow : Window
     private async void CoverLoaded(object sender, RoutedEventArgs e)
     {
         var image = (FrameworkElement)sender;
+        if (Preferences.LightweightMode) { CoverUnloaded(sender, e); return; }
         if (image.Tag is CardView previous && previous != image.DataContext) previous.ReleaseCover();
         if (image.DataContext is CardView card) { image.Tag = card; await card.LoadCover(Covers); }
     }
@@ -441,6 +443,7 @@ public partial class MainWindow : Window
         public double CoverWidth { get; }
         public double CoverHeight { get; }
         public Visibility DetailVisibility { get; }
+        public Visibility CoverVisibility { get; }
         public System.Windows.Media.Brush CoverBackground { get; }
         public System.Windows.Media.Brush StatusBrush { get; }
         public string Meta => (Model.Favorite ? "★  " : "") + Model.Platform + (Model.PlaytimeMinutes > 0 ? $"  ·  {Model.PlaytimeMinutes / 60d:0.#} h" : "");
@@ -454,8 +457,9 @@ public partial class MainWindow : Window
         public string FinishIcon => Model.Status == GameStatus.Finished ? "✓" : "○";
         public BitmapImage? Cover { get; private set; }
         public event PropertyChangedEventHandler? PropertyChanged;
-        public CardView(Game game, bool compact, bool light)
+        public CardView(Game game, bool compact, bool light, bool lightweight = false)
         {
+            CoverVisibility = lightweight ? Visibility.Collapsed : Visibility.Visible;
             Model = game; CoverWidth = compact ? 43 : 60; CoverHeight = compact ? 66 : 94;
             StatusBrush = Brush(Model.Status switch { GameStatus.Playing => light ? "#FF0B7554" : "#FF8CEBC6", GameStatus.Finished => light ? "#FF4F5CC1" : "#FFA9B9FF", GameStatus.Paused => light ? "#FF866328" : "#FFE6CB90", _ => light ? "#FF58677F" : "#FFADB6CA" });
             DetailVisibility = compact ? Visibility.Collapsed : Visibility.Visible;
@@ -463,7 +467,7 @@ public partial class MainWindow : Window
         }
         private Task? loading;
         private int coverGeneration;
-        public Task LoadCover(CoverCache cache) => loading ??= LoadOnce(cache);
+        public Task LoadCover(CoverCache cache) => CoverVisibility == Visibility.Collapsed ? Task.CompletedTask : loading ??= LoadOnce(cache);
         private async Task LoadOnce(CoverCache cache)
         {
             int current = coverGeneration;

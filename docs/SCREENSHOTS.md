@@ -29,3 +29,9 @@ Estas imágenes proceden de los controles WPF reales mediante `RenderTargetBitma
 ## Regenerar
 
 En Windows, `./scripts/Build.ps1 -Installer` ejecuta las pruebas contra el ZIP extraído y guarda las imágenes en `.qa/package-…/render`. Publica únicamente las capturas seleccionadas en `docs/screenshots`, sin subir bases de datos, sesiones o registros locales. Los límites de estas pruebas están en [VALIDATION.md](VALIDATION.md).
+
+## Modo ligero — 0.6.3
+
+Sin carátulas; la colección y el progreso se conservan. Captura de prueba en español.
+
+![Modo ligero](screenshots/widget-lightweight.png)

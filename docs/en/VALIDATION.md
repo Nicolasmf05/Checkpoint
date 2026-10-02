@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.3 — lightweight mode
+
+233 checks passed: 108 core, 15 Node, 14 Edge and 96 native WPF. The actual Settings checkbox is tested for save, persistence, cancel and disabling; collection images remain hidden with an empty decoded cache. Simulated private Storage requests prove that friend progress remains visible without cover downloads in lightweight mode and that covers return when disabled. English localization is verified. ZIP/MSI and an SDK-validated unsigned MSIX preview were generated. Installed-package and real-account limitations remain as described below.
+
 ## 0.6.2 — lower resource usage
 
 222 checks passed: 108 core, 15 Node, 14 Edge and 85 native WPF. Native checks include cover release/reload, a 40-image cache stress case and a 1,003-game grid with offscreen reference checks. Unsigned ZIP/MSI and the MSIX packaging preview were generated. The preview matches all 283 application files. Compared with 0.6.1, extracted files fell from 173.72 to 158.00 MiB and ZIP size from 73.85 to 68.44 MiB. Both packages include first-run notices in English/Spanish. No minimum RAM/CPU benchmark on older hardware, installed MSI/MSIX test or real-account validation is claimed.

@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.3 — 2026-10-02
+
+- Optional saved lightweight mode: no collection/friend cover rendering or new image requests; clears decoded cache without deleting library/cover files or changing sharing.
+- Immediate restoration when disabled; Spanish/English setting and cancellation behavior covered by native tests.
+
 ## 0.6.2 — 2026-10-02
 
 - Decoded cover cache capped at an estimated 8 MiB/32 entries; recycled cards release images and reload correctly.

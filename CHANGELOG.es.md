@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.3 — 2026-10-02
+
+- Modo ligero opcional y persistente: oculta carátulas de colección/amigos, evita nuevas consultas de imágenes y vacía la caché sin borrar juegos/archivos ni cambiar la compartición.
+- Restauración al desactivarlo; ajuste bilingüe y cancelación comprobados con pruebas nativas.
+
 ## 0.6.2 — 2026-10-02
 
 - Caché de carátulas limitada a un presupuesto estimado de 8 MiB/32 entradas; las tarjetas recicladas liberan imágenes y las vuelven a cargar.

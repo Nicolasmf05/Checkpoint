@@ -19,6 +19,10 @@ La vía alternativa es Microsoft Store con MSIX, donde Microsoft firma tras apro
 
 Portable: extrae el ZIP y abre `Checkpoint.exe` dentro de `Checkpoint`. Conserva todos los archivos juntos. El MSI instala para tu usuario. Ambas ediciones incluyen este aviso y su traducción inglesa.
 
+## Modo ligero opcional
+
+Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.
+
 ## Consumo y límites
 
 La interfaz virtualiza las listas; las carátulas recicladas liberan sus referencias y la caché de imágenes decodificadas tiene un presupuesto estimado de 8 MiB y un máximo de 32 entradas. Ese presupuesto no es la memoria total de la app. Los recursos de .NET no utilizados de otros idiomas no se distribuyen. El progreso de amigos no se consulta periódicamente mientras el widget está oculto o minimizado; las publicaciones pendientes siguen pudiendo enviarse.

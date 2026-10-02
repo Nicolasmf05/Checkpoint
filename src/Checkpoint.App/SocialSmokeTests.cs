@@ -25,6 +25,7 @@ public partial class MainWindow
         var shared = new Dictionary<Guid,SocialPublication>();
         string? lastPublishedBody = null;
         bool privateCoverAuthenticated = false;
+        int privateCoverRequests = 0;
         byte[] sharedCover = File.ReadAllBytes(Directory.GetFiles(Covers.DirectoryPath,"custom-*.png").First());
         var project = new SocialProject("https://fixture.supabase.co","sb_publishable_native_fixture");
         var handler = new NativeSocialHandler(async request =>
@@ -35,6 +36,7 @@ public partial class MainWindow
             if (path.EndsWith("/logout")) return new(HttpStatusCode.NoContent);
             if (path.Contains("/storage/v1/object/authenticated/"))
             {
+                privateCoverRequests++;
                 privateCoverAuthenticated = request.Headers.Authorization?.Parameter == "NATIVE-ACCESS-FIXTURE";
                 return new(HttpStatusCode.OK) { Content = new ByteArrayContent(sharedCover) };
             }
@@ -110,6 +112,14 @@ public partial class MainWindow
         check(Texts(this).Contains("Celeste") && Texts(this).Contains("Historia: 60%"),"friend view shows progress from Checkpoint publications");
         check(privateCoverAuthenticated && VisualChildren(FriendsView).OfType<Image>().Any(i => i.Source is not null),"private friend cover downloads with account authorization and renders");
         RenderElement(this,Path.Combine(output,"widget-friends-progress.png"));
+        int requestsBeforeLightweight = privateCoverRequests;
+        Preferences.LightweightMode = true; ApplyPreferences(); FriendsView.RefreshLanguage();
+        await ClickSocial("Ver progreso de Ana");
+        check(privateCoverRequests == requestsBeforeLightweight && Texts(this).Contains("Historia: 60%") &&
+            !VisualChildren(FriendsView).OfType<Image>().Any(i => i.IsVisible || i.Source is not null), "lightweight friends preserve progress without requesting private covers");
+        Preferences.LightweightMode = false; ApplyPreferences(); FriendsView.RefreshLanguage();
+        await ClickSocial("Ver progreso de Ana");
+        check(privateCoverRequests > requestsBeforeLightweight && VisualChildren(FriendsView).OfType<Image>().Any(i => i.Source is not null), "disabling lightweight mode restores friend covers");
         var publicationBeforeLanguage = shared[game.Id].Payload;
         Preferences.Language = "en"; ApplyLanguage(); await ClickSocial("View progress for Ana");
         check(Texts(this).Contains("Story: 60%") && Texts(this).Contains("Goal: finish the story"), "English friend progress translates status, goal and counters");

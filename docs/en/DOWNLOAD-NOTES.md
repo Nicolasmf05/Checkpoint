@@ -19,6 +19,10 @@ Microsoft Store MSIX is an alternative: Microsoft signs approved apps without bu
 
 Portable: extract the ZIP and run `Checkpoint.exe` inside `Checkpoint`. Keep the files together. MSI installs for the current user. Both editions include this notice and its Spanish translation.
 
+## Optional lightweight mode
+
+Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.
+
 ## Resource usage and limits
 
 Lists are virtualized; recycled cover cards release image references and the decoded image cache has an estimated 8 MiB budget with at most 32 entries. That budget is not the application's total memory. Unused framework language resources are omitted. Friend progress does not refresh periodically while the widget is hidden or minimized; pending publications can still be delivered.

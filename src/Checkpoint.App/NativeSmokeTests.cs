@@ -174,6 +174,10 @@ public partial class MainWindow
             Check(coverCard.Cover is null, "recycled card releases its cover reference");
             await coverCard.LoadCover(Covers);
             Check(coverCard.Cover is not null, "recycled card can reload its cover");
+            Covers.SetEnabled(false); coverCard.ReleaseCover(); await coverCard.LoadCover(Covers);
+            Check(Covers.MemoryBytes == 0 && coverCard.Cover is null, "disabled covers clear decoded cache and skip local image loading");
+            Covers.SetEnabled(true); coverCard.ReleaseCover(); await coverCard.LoadCover(Covers);
+            Check(coverCard.Cover is not null, "reenabling covers restores local image loading");
             var cacheFixtures = new List<string>();
             try
             {
@@ -240,6 +244,28 @@ public partial class MainWindow
             Check(Store.LoadGames().Count == 3, "dialog fixtures do not remain in the persisted library");
             RunModal(() => Dialogs.Settings(this), window =>
             {
+                Controls<CheckBox>(window).Single(c => (string?)c.Content == "Modo ligero (sin carátulas)").IsChecked = true;
+                Click(window, "Guardar");
+            });
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(Preferences.LightweightMode && Store.LoadSettings().LightweightMode && Covers.MemoryBytes == 0, "lightweight mode persists and clears image cache");
+            Check(visibleCards.All(c => c.CoverVisibility == Visibility.Collapsed && c.Cover is null) &&
+                !VisualChildren(GameList).OfType<Image>().Any(i => i.IsVisible), "lightweight mode hides collection images and preserves game count");
+            Render(this, "widget-lightweight.png");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Controls<CheckBox>(window).Single(c => (string?)c.Content == "Modo ligero (sin carátulas)").IsChecked = false;
+                Click(window, "Cancelar");
+            });
+            Check(Preferences.LightweightMode && Store.LoadSettings().LightweightMode, "canceling settings preserves lightweight mode");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Controls<CheckBox>(window).Single(c => (string?)c.Content == "Modo ligero (sin carátulas)").IsChecked = false;
+                Click(window, "Guardar");
+            });
+            Check(!Preferences.LightweightMode && visibleCards.All(c => c.CoverVisibility == Visibility.Visible) && Store.LoadGames().Count == 3, "disabling lightweight mode restores cover layout without changing games");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
                 Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Language / Idioma").SelectedIndex = 1;
                 Click(window,"Guardar");
             });
@@ -254,6 +280,7 @@ public partial class MainWindow
             RunModal(() => Dialogs.Settings(this),window =>
             {
                 Check(Texts(window).Contains("Language") && Texts(window).Contains("Background opacity"), "English settings translate labels");
+                Check(Controls<CheckBox>(window).Any(c => (string?)c.Content == "Lightweight mode (no covers)"), "English lightweight setting is localized");
                 Render(window,"dialog-settings-en.png");
                 Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Language / Idioma").SelectedIndex = 0;
                 Click(window,"Save");
