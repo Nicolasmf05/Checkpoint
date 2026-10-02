@@ -22,7 +22,7 @@ Current version: **0.5.0**. Build outputs in `dist`:
 - `Checkpoint-0.5.0-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Build from source below or use the **Build and verify** GitHub Actions artifacts after a successful run. A GitHub release has not been published yet. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI is unsigned; no private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.5.0), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI is unsigned; no private certificates are included.
 
 ## Features
 

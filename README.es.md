@@ -18,7 +18,7 @@ Capturas de la aplicación Windows 0.5.0 renderizadas durante las pruebas nativa
 
 La versión actual es **0.5.0**. En la carpeta `dist` se generan:
 
-También puedes compilarla con las instrucciones de este repositorio. El workflow **Build and verify** genera el ZIP y MSI en los artefactos de GitHub Actions cuando finaliza correctamente; todavía no hay una release publicada.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.5.0), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
 - `Checkpoint-0.5.0-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
 - `Checkpoint-0.5.0-win-x64.zip`: edición portable. Extrae toda la carpeta y ejecuta `Checkpoint.exe`.
