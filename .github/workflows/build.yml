@@ -1,0 +1,44 @@
+name: Build and verify
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install local MSI compiler
+        run: dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGet.config
+      - name: Build, test, and package
+        shell: pwsh
+        env:
+          CHECKPOINT_SERVICE_URL: ${{ vars.CHECKPOINT_SERVICE_URL }}
+        run: ./scripts/Build.ps1 -Installer -ServiceUrl $env:CHECKPOINT_SERVICE_URL
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Checkpoint-windows-x64
+          path: |
+            dist/*.zip
+            dist/*.msi
+            dist/*.sha256
+      - name: Upload native test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Checkpoint-native-validation
+          if-no-files-found: ignore
+          path: |
+            .qa/package-*/native.*.log
+            .qa/package-*/render/*.png
+            .qa/package-*/render/smoke.json

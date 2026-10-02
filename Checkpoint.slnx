@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Checkpoint.Core/Checkpoint.Core.csproj" />
+  <Project Path="src/Checkpoint.App/Checkpoint.App.csproj" />
+  <Project Path="tests/Checkpoint.Tests/Checkpoint.Tests.csproj" />
+</Solution>

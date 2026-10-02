@@ -1,0 +1,97 @@
+<Window x:Class="Checkpoint.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Checkpoint" Width="510" Height="740" MinWidth="365" MinHeight="440" WindowStyle="None" AllowsTransparency="True" Background="Transparent" Foreground="{DynamicResource TextBrush}" ResizeMode="CanResize" WindowStartupLocation="CenterScreen" FontFamily="Segoe UI">
+  <Window.Resources>
+    <DataTemplate x:Key="GameTemplate">
+      <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="13" Padding="12" Tag="{Binding Model}" AllowDrop="True" DragOver="CardDragOver" DragLeave="CardDragLeave" Drop="CardDrop">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="32"/></Grid.ColumnDefinitions>
+          <Border Width="{Binding CoverWidth}" Height="{Binding CoverHeight}" Margin="0,0,13,0" CornerRadius="7" Background="{Binding CoverBackground}" ClipToBounds="True" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
+            <Grid><TextBlock Text="{Binding Initial}" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#DDF1F5FF"/><Image Source="{Binding Cover}" Stretch="UniformToFill" Loaded="CoverLoaded"/></Grid>
+          </Border>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,6,0" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
+            <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding Meta}" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+            <TextBlock Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" FontWeight="SemiBold" Margin="0,5,0,0"/>
+            <TextBlock Text="{Binding Model.NextTask}" Foreground="{DynamicResource TextBrush}" FontSize="11" Margin="0,5,0,0" TextTrimming="CharacterEllipsis" Visibility="{Binding DetailVisibility}"/>
+            <Grid Margin="0,7,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding ProgressCaption}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis"/><TextBlock Grid.Column="1" Text="{Binding PercentText}" FontSize="10" Foreground="{DynamicResource AccentBrush}" Margin="6,0,0,0"/></Grid>
+            <ProgressBar Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,5,0,0" Visibility="{Binding ProgressVisibility}"/>
+          </StackPanel>
+          <StackPanel Grid.Column="2" VerticalAlignment="Center">
+            <Button Content="{Binding FinishIcon}" Tag="{Binding Model}" Click="FinishClick" Padding="0" Width="29" Height="29" FontSize="17" ToolTip="Marcar o desmarcar historia terminada" AutomationProperties.Name="Marcar historia terminada"/>
+            <Button Content="⋯" Tag="{Binding Model}" Click="EditClick" Padding="0" Width="29" Height="26" FontSize="19" Margin="0,8,0,0" ToolTip="Editar juego y consultar logros" AutomationProperties.Name="Editar juego"/>
+            <Button Content="⠿" Tag="{Binding Model}" Padding="0" Width="29" Height="20" Margin="0,4,0,0" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandleDown" PreviewKeyDown="DragHandleKey" ToolTip="Arrastra para reordenar · Alt+↑ / Alt+↓" AutomationProperties.Name="{Binding ReorderName}"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+    <DataTemplate x:Key="GridCardTemplate">
+      <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="13" Padding="9" Margin="0,0,9,0" Tag="{Binding Model}" AllowDrop="True" DragOver="CardDragOver" DragLeave="CardDragLeave" Drop="CardDrop">
+        <StackPanel>
+          <Border Height="190" CornerRadius="7" Background="{Binding CoverBackground}" ClipToBounds="True" MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand">
+            <Grid><TextBlock Text="{Binding Initial}" FontSize="45" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#DDF1F5FF"/><Image Source="{Binding Cover}" Stretch="UniformToFill" Loaded="CoverLoaded"/></Grid>
+          </Border>
+          <StackPanel MouseLeftButtonUp="CardClick" Tag="{Binding Model}" Cursor="Hand" Margin="0,10,0,0">
+            <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding Model.Title}"/>
+            <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource MutedBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+            <TextBlock Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" FontWeight="SemiBold" Margin="0,5,0,0"/>
+            <TextBlock Text="{Binding Model.NextTask}" Foreground="{DynamicResource TextBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,5,0,0"/>
+            <TextBlock Text="{Binding GridProgressCaption}" Foreground="{DynamicResource MutedBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,6,0,0"/>
+            <ProgressBar Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,5,0,0"/>
+          </StackPanel>
+          <Grid Margin="0,9,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Button Content="⠿" Tag="{Binding Model}" Padding="0" Width="28" Height="25" HorizontalAlignment="Left" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandleDown" PreviewKeyDown="DragHandleKey" ToolTip="Arrastra para reordenar · Alt+↑ / Alt+↓" AutomationProperties.Name="{Binding ReorderName}"/>
+            <Button Grid.Column="1" Content="{Binding FinishIcon}" Tag="{Binding Model}" Click="FinishClick" Padding="0" Width="28" Height="25" FontSize="17" ToolTip="Marcar o desmarcar historia terminada" AutomationProperties.Name="Marcar historia terminada"/>
+            <Button Grid.Column="2" Content="⋯" Tag="{Binding Model}" Click="EditClick" Padding="0" Width="28" Height="25" FontSize="19" Margin="5,0,0,0" ToolTip="Editar juego y consultar logros" AutomationProperties.Name="Editar juego"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+    <DataTemplate x:Key="GridRowTemplate">
+      <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource GridCardTemplate}" Margin="0,0,-9,0">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="{Binding Columns}"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+      </ItemsControl>
+    </DataTemplate>
+  </Window.Resources>
+  <Border x:Name="Shell" CornerRadius="20" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" Padding="22,17,22,16">
+    <Grid>
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <Grid Margin="0,0,0,23">
+        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" MouseLeftButtonDown="DragTitle" Cursor="SizeAll">
+          <Border Width="29" Height="29" CornerRadius="8" Background="{DynamicResource AccentFillBrush}" Margin="0,0,9,0"><Path Data="M8,19 L8,7 L19,7 L16,11 L19,15 L10,15" Stroke="#FF102D27" StrokeThickness="2" StrokeLineJoin="Round"/></Border>
+          <StackPanel VerticalAlignment="Center"><TextBlock Text="checkpoint" FontWeight="Bold" FontSize="17"/><TextBlock Text="UN JUEGO CADA VEZ" Foreground="{DynamicResource MutedBrush}" FontSize="8"/></StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+          <Button x:Name="PinButton" Content="◇" Click="PinClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="Mantener siempre visible" AutomationProperties.Name="Mantener siempre visible"/>
+          <Button Content="⚙" Click="SettingsClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="Ajustes" AutomationProperties.Name="Ajustes"/>
+          <Button Content="−" Click="HideClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="Ocultar en la bandeja · Ctrl+Alt+C" AutomationProperties.Name="Ocultar widget"/>
+          <Button Content="×" Click="CloseClick" Width="29" Height="29" Padding="0" ToolTip="Cerrar" AutomationProperties.Name="Cerrar"/>
+        </StackPanel>
+      </Grid>
+      <StackPanel Grid.Row="1" Margin="0,0,0,18"><TextBlock x:Name="SummaryTitle" Text="Tu próxima aventura" FontSize="25" FontWeight="SemiBold"/><TextBlock x:Name="Summary" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,7,0,0"/></StackPanel>
+      <Grid Grid.Row="2" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal"><Button x:Name="TrackedButton" Content="Mi lista" Click="TrackedClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="LibraryButton" Content="Biblioteca" Click="LibraryClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="FriendsButton" Content="Amigos" Click="FriendsClick" Padding="10,7"/></StackPanel>
+        <Button Grid.Column="1" Content="+ Añadir" Style="{StaticResource AccentButton}" Click="AddClick" Padding="11,7" ToolTip="Añadir un juego · Ctrl+N"/>
+      </Grid>
+      <Grid x:Name="FilterArea" Grid.Row="3" Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="125"/></Grid.ColumnDefinitions>
+        <Grid Margin="0,0,8,0"><TextBox x:Name="Search" TextChanged="FilterChanged" ToolTip="Buscar un juego" AutomationProperties.Name="Buscar juego" Padding="10,7"/><TextBlock Text="Buscar un juego…" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="11,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=Search}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
+        <ComboBox x:Name="StatusFilter" Grid.Column="1" SelectionChanged="FilterChanged" SelectedIndex="0" AutomationProperties.Name="Filtrar por estado"><ComboBoxItem Content="Todos"/><ComboBoxItem Content="Pendiente"/><ComboBoxItem Content="Jugando"/><ComboBoxItem Content="Pausado"/><ComboBoxItem Content="Terminados"/><ComboBoxItem Content="Abandonados"/></ComboBox>
+      </Grid>
+      <Grid x:Name="GameArea" Grid.Row="4">
+        <ListBox x:Name="GameList" ItemTemplate="{StaticResource GameTemplate}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True" SizeChanged="GameListSizeChanged"/>
+        <StackPanel x:Name="EmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="290" Margin="6">
+          <Border Width="64" Height="64" Background="{DynamicResource PanelBrush}" CornerRadius="18" HorizontalAlignment="Center" Margin="0,0,0,18"><TextBlock Text="✦" Foreground="{DynamicResource AccentBrush}" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
+          <TextBlock x:Name="EmptyTitle" Text="Aquí empieza tu próxima partida" TextAlignment="Center" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap"/>
+          <TextBlock x:Name="EmptyText" Text="Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,18" LineHeight="19"/>
+          <Button Content="Conectar Steam" Click="ConnectClick" Style="{StaticResource AccentButton}" Margin="15,0,15,8"/>
+          <Button x:Name="ExampleButton" Content="Ver ejemplo" Click="ExampleClick" Margin="15,0,15,0"/>
+        </StackPanel>
+      </Grid>
+      <Border x:Name="FriendsHost" Grid.Row="3" Grid.RowSpan="2" Visibility="Collapsed"/>
+      <Grid Grid.Row="5" Margin="0,15,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ConnectionText" Text="● Biblioteca local" Foreground="{DynamicResource MutedBrush}" FontSize="10"/><TextBlock x:Name="NoticeText" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,4,8,0" TextWrapping="Wrap" MaxWidth="290"/></StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="UndoButton" Content="↶" Click="UndoClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" Visibility="Collapsed" ToolTip="Recuperar el último juego eliminado · Ctrl+Z" AutomationProperties.Name="Recuperar último juego eliminado"/><Button x:Name="ViewButton" Content="▤" Click="ViewClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" ToolTip="Cambiar vista · F6" AutomationProperties.Name="Cambiar vista"/><Button x:Name="SyncButton" Content="↻" Click="SyncClick" Width="30" Padding="0" Height="30" ToolTip="Sincronizar Steam" AutomationProperties.Name="Sincronizar Steam"/></StackPanel>
+      </Grid>
+      <Thumb x:Name="ResizeGrip" Grid.RowSpan="6" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-17,-12" Cursor="SizeNWSE" DragDelta="ResizeDrag"><Thumb.Template><ControlTemplate><Path Data="M4,12 L12,4 M9,13 L13,9" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.5"/></ControlTemplate></Thumb.Template></Thumb>
+    </Grid>
+  </Border>
+</Window>

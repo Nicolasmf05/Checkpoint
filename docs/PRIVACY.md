@@ -1,0 +1,25 @@
+# Privacidad
+
+Checkpoint guarda en el equipo del usuario títulos, estados, notas, tareas, preferencias, carátulas y el último progreso de Steam. No utiliza publicidad ni telemetría.
+
+Desde la versión 0.4.0, entrar en Checkpoint permite usar Amigos mediante Supabase en Irlanda. El registro utiliza un nombre de usuario y una contraseña; no solicita correo real ni confirmación. Internamente, el nombre normalizado se representa como `usuario@accounts.checkpoint.invalid` para Supabase Auth. El identificador de cuenta, nombre visible, código de amigo, solicitudes, amistades, bloqueos y publicaciones se conservan en el servicio. La contraseña se envía por HTTPS al sistema de autenticación; la app no la guarda ni la incluye en copias.
+
+Solo se publican los juegos elegidos en Amigos → Compartir: título, plataforma, estado, objetivo, porcentaje manual de historia, contadores de tareas/logros, referencia de carátula y fecha de finalización. Las notas, etiquetas de tareas y detalles individuales de logros quedan en el PC. El nombre visible también se muestra a los participantes de solicitudes pendientes. Los juegos compartidos requieren una amistad aceptada.
+
+Las publicaciones pendientes y el consentimiento se guardan por cuenta en una cola local. Retirar un juego elimina su contenido publicado cuando el servidor confirma el cambio; sin conexión, la última publicación puede seguir visible hasta que se complete la retirada. Se conserva una revisión para evitar que un cliente antiguo vuelva a publicar sin detectar el conflicto. Cerrar sesión conserva publicaciones y pendientes de esa cuenta; no equivale a retirar contenido.
+
+Las carátulas personalizadas compartidas se suben a un bucket privado. Los amigos solo pueden leer imágenes referenciadas por datos a los que tengan permiso. Bloquear o quitar una amistad retira el acceso en el servidor; la interfaz vuelve a consultar periódicamente y elimina la vista anterior cuando detecta la retirada o falla la consulta. Las imágenes privadas consultadas se mantienen en memoria, sin caché en disco del cliente. Esto no elimina capturas, descargas hechas por otros clientes, imágenes sin referencia que permanezcan en Storage ni copias y registros del proveedor. La eliminación completa de una cuenta y sus archivos aún requiere gestión del operador.
+
+Las carátulas automáticas requieren peticiones a la CDN de Steam, que recibe la dirección de conexión y el ID del juego consultado. Las carátulas personalizadas se copian en la carpeta local de datos.
+
+La app conserva los últimos 20 juegos eliminados en un historial local de recuperación, con sus notas, tareas y progreso. Se mantienen después de reiniciar y hasta que otras eliminaciones los desplazan del historial. Eliminar un juego no borra inmediatamente sus imágenes de la caché local.
+
+Al solicitar la vinculación y sincronización, el servicio del operador consulta a Steam el identificador autenticado, biblioteca, tiempo jugado y logros visibles. No recibe contraseñas. Las sesiones se mantienen en memoria hasta siete días; la caché de datos consultados dura 15 minutos. Las definiciones de logros, que no identifican usuarios, se cachean 24 horas. Desvincular revoca la sesión y elimina la caché del usuario en esa instancia.
+
+El operador debe completar el nombre, contacto y país de alojamiento en las variables del servicio antes de distribuirlo. `/privacy` publica estos datos. El proveedor de alojamiento puede conservar registros de conexión según su propia política.
+
+La biblioteca local permanece después de desvincular o desinstalar. Puedes exportarla desde Ajustes y eliminar la carpeta `%LOCALAPPDATA%\Checkpoint` cuando la app esté cerrada para retirar todos los datos locales. Las copias exportadas son archivos propios del usuario, incluyen sus notas y deben compartirse solo cuando lo desee.
+
+Las sesiones de Steam y Checkpoint se protegen mediante DPAPI de Windows para la cuenta del usuario actual. Los tokens no se incluyen en los archivos exportados. Checkpoint es una aplicación independiente de Valve.
+
+Las copias completas `.checkpoint` contienen la colección actual y sus carátulas personalizadas; no contienen sesiones, consentimiento de publicación, cola social ni historial de juegos eliminados. Los JSON compatibles incluyen la colección sin imágenes. Ningún formato de copia lleva cifrado propio.

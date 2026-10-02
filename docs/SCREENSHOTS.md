@@ -1,0 +1,29 @@
+# Capturas de Checkpoint 0.4.0
+
+Estas imágenes proceden de los controles WPF reales mediante `RenderTargetBitmap`, durante la validación del ZIP de distribución. Utilizan una biblioteca aislada y respuestas HTTP simuladas. Los nombres y progresos de amigos son ficticios y la carátula privada de ejemplo es una imagen de color plano. No son una prueba de registro con cuentas reales.
+
+## Biblioteca y carátulas
+
+![Cuadrícula de carátulas en tema oscuro](screenshots/widget-grid-wide-dark.png)
+
+## Lista y vista compacta
+
+| Lista oscura | Compacta clara |
+| --- | --- |
+| ![Lista oscura](screenshots/widget-dark.png) | ![Compacta clara](screenshots/widget-compact-light.png) |
+
+## Cuentas y amigos de Checkpoint
+
+| Usuario y contraseña | Progreso compartido de ejemplo |
+| --- | --- |
+| ![Registro e inicio de sesión](screenshots/widget-friends-login.png) | ![Progreso de un amigo](screenshots/widget-friends-progress.png) |
+
+## Edición y ajustes
+
+![Editor de juego](screenshots/dialog-editor.png)
+
+![Preferencias del widget](screenshots/dialog-settings.png)
+
+## Regenerar
+
+En Windows, `./scripts/Build.ps1 -Installer` ejecuta las pruebas contra el ZIP extraído y guarda las imágenes en `.qa/package-…/render`. Publica únicamente las capturas seleccionadas en `docs/screenshots`, sin subir bases de datos, sesiones o registros locales. Los límites de estas pruebas están en [VALIDATION.md](VALIDATION.md).

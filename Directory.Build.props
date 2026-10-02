@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Version>0.4.0</Version>
+    <Authors>Checkpoint contributors</Authors>
+    <Product>Checkpoint</Product>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+</Project>

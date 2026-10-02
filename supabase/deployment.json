@@ -1,0 +1,20 @@
+{
+  "projectRef": "fumdnvvvoiwoiziwtmsu",
+  "appliedOn": "2026-10-02",
+  "method": "Supabase SQL Editor",
+  "migration": "202610020001_checkpoint_social.sql",
+  "checks": {
+    "socialRls": 23,
+    "storageRlsAndRequestLimits": 10,
+    "unauthenticatedRestStatus": 401,
+    "publicApiPermissionChecks": 7,
+    "remainingSyntheticUsers": 0,
+    "remainingSyntheticAssets": 0,
+    "bucketPublic": false
+  },
+  "nativeIntegration": "implemented-native-tested",
+  "clientVersion": "0.4.0",
+  "authMode": "username-password",
+  "confirmEmail": false,
+  "steamEdgeFunctions": "pending"
+}
