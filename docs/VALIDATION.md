@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.8 — acciones de ventana en Miniatura
+
+Han pasado 270 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 133 WPF. Las siete nuevas comprueban valores marcados, aplicación/guardado de siempre visible desde fondo y juego, bloqueo de redimensionado, cursor de arrastre, desbloqueo y traducción inmediata a inglés. Los menús nativos se capturan en ambos idiomas. No se afirma haber probado gestos físicos de arrastre, instalación/actualización ni cuentas reales.
+
 ## 0.6.7 — selección y ventana estables
 
 Han pasado 263 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 126 WPF. Las pruebas conservan selección/foco al actualizar y reordenar, comprueban que una actualización sin foco no lo adquiere, limpian selecciones retiradas y recuperan filas virtualizadas entre 1.003 juegos sin crear 30 filas. Se prueba salir de Miniatura desde la esquina de la pantalla, entrar desde una posición parcialmente exterior y mostrar una ventana fuera del área de trabajo. La restauración de tamaño se limita al espacio disponible, también en escritorios pequeños. Estas pruebas usan el monitor actual: varios monitores y cambios de DPI físicos siguen pendientes, junto con instalación y cuentas reales.

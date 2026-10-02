@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.8 — 2026-10-02
+
+- Los menús de Miniatura incluyen Mantener siempre visible y Bloquear posición y tamaño, con estado marcado, aplicación inmediata y guardado.
+- Fondo y juegos comparten las acciones de ventana. El borde para arrastrar usa cursor normal cuando está bloqueado; las filas siguen mostrando nombre/estado.
+
 ## 0.6.7 — 2026-10-02
 
 - Miniatura conserva el juego seleccionado y el foco al actualizar o reordenar, incluso en filas virtualizadas. Actualizar sin foco en la lista no lo adquiere; al retirar el juego se limpia la selección.

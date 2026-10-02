@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.8 — 2026-10-02
+
+- Miniature menus expose checked Always on top and Lock position and size actions; changes apply immediately and persist.
+- Background and game menus share the same window actions. A locked drag strip uses a normal cursor; names/state rows remain unchanged.
+
 ## 0.6.7 — 2026-10-02
 
 - Miniature retains selected game and keyboard focus across refreshes and ordering changes, including virtualized rows. Refresh without list focus does not acquire it; removed games clear selection.

@@ -29,6 +29,8 @@ Miniature also supports keyboard controls: **Up/Down** select games, **Home/End*
 
 Updates preserve the selected game and restore its keyboard focus only if the list had focus. Removing it from My list clears selection. Changing view or showing the widget keeps the window within the current monitor work area.
 
+**Right-click the background or a game → Always on top / Lock position and size.** Checked options reflect your saved settings; changes apply immediately and persist. Unlock from the same menu to move or resize again. The drag strip uses a normal cursor while locked. The list keeps only names and states.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

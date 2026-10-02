@@ -307,6 +307,27 @@ public partial class MainWindow
             Check(VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.Title == t.Text)).All(t =>
                 t.Foreground is SolidColorBrush brush && brush.Color == ((SolidColorBrush)Application.Current.Resources["TextBrush"]).Color), "miniature names use the readable theme foreground");
             Render(this,"widget-miniature.png");
+            MenuItem MiniatureAction(System.Windows.Controls.ContextMenu menu, string text) => menu.Items.OfType<MenuItem>().Single(i => (string?)i.Header == I18n.T(text));
+            bool priorPin = Preferences.AlwaysOnTop, priorLock = Preferences.PositionLocked;
+            Check(MiniatureAction(Shell.ContextMenu,"Mantener siempre visible").IsChecked == priorPin &&
+                MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño").IsChecked == priorLock, "miniature quick window actions reflect saved settings");
+            var quickPin = MiniatureAction(Shell.ContextMenu,"Mantener siempre visible");
+            quickPin.IsChecked = !priorPin; quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Check(Preferences.AlwaysOnTop == !priorPin && Topmost == !priorPin && Store.LoadSettings().AlwaysOnTop == !priorPin && Preferences.MiniatureView,
+                "miniature pin action applies and persists without leaving the view");
+            quickPin = MiniatureAction(Shell.ContextMenu,"Mantener siempre visible");
+            quickPin.IsChecked = priorPin; quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            var quickLock = MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño");
+            quickLock.IsChecked = true; quickLock.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            double lockedWidth = Width, lockedHeight = Height;
+            ResizeDrag(ResizeGrip,new System.Windows.Controls.Primitives.DragDeltaEventArgs(30,20));
+            Check(Preferences.PositionLocked && Store.LoadSettings().PositionLocked && ResizeGrip.Visibility == Visibility.Collapsed &&
+                MiniDragHandle.Cursor == Cursors.Arrow && Width == lockedWidth && Height == lockedHeight, "miniature lock persists and prevents resize with an accurate drag cursor");
+            quickLock = MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño");
+            quickLock.IsChecked = false; quickLock.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Check(!Preferences.PositionLocked && !Store.LoadSettings().PositionLocked && ResizeGrip.Visibility == Visibility.Visible && MiniDragHandle.Cursor == Cursors.SizeAll,
+                "miniature unlock restores resize and drag controls");
+            Preferences.PositionLocked = priorLock; ApplyPreferences(); Persist();
             void MiniatureKey(Key key)
             {
                 GameList.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice,PresentationSource.FromVisual(GameList),0,key) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
@@ -371,6 +392,13 @@ public partial class MainWindow
                 miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == priorState).IsChecked, "miniature menu exposes all states and checks the current one");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu.png"));
             var miniatureMenu = miniatureRow.ContextMenu;
+            quickPin = MiniatureAction(miniatureMenu,"Mantener siempre visible");
+            Check(quickPin.IsChecked == Preferences.AlwaysOnTop && MiniatureAction(miniatureMenu,"Bloquear posición y tamaño").IsChecked == Preferences.PositionLocked,
+                "miniature game menu reflects quick window settings");
+            quickPin.IsChecked = !priorPin; quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Check(Topmost == !priorPin && Store.LoadSettings().AlwaysOnTop == !priorPin && MiniatureAction(Shell.ContextMenu,"Mantener siempre visible").IsChecked == !priorPin,
+                "miniature game menu pin action persists and updates the background menu");
+            quickPin.IsChecked = priorPin; quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             var finishState = miniatureMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Finished);
             finishState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureMenu.IsOpen = false;
             Check(miniatureGame.Status == GameStatus.Finished && miniatureGame.FinishedAt.HasValue &&
@@ -398,6 +426,8 @@ public partial class MainWindow
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             Check(miniatureRow.ContextMenu.Items.OfType<MenuItem>().Any(i => (string?)i.Header == "Story finished") &&
                 miniatureRow.ContextMenu.Items.OfType<MenuItem>().Any(i => (string?)i.Header == "Exit miniature view"), "miniature game menu opens with localized English states and exit");
+            Check(MiniatureAction(miniatureRow.ContextMenu,"Mantener siempre visible").Header.Equals("Always on top") &&
+                MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño").Header.Equals("Lock position and size"), "miniature quick window actions switch to English in both menus");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu-en.png"));
             miniatureRow.ContextMenu.IsOpen = false;
             Preferences.Language = "es"; ApplyLanguage();

@@ -162,16 +162,13 @@ public partial class MainWindow : Window
         bool miniature = Preferences.MiniatureView;
         HeaderArea.Visibility = SummaryArea.Visibility = NavigationArea.Visibility = FooterArea.Visibility = miniature ? Visibility.Collapsed : Visibility.Visible;
         MiniDragHandle.Visibility = miniature ? Visibility.Visible : Visibility.Collapsed;
+        MiniDragHandle.Cursor = Preferences.PositionLocked ? Cursors.Arrow : Cursors.SizeAll;
         Shell.Padding = miniature ? new Thickness(10) : new Thickness(22,17,22,16);
         ResizeGrip.Margin = miniature ? new Thickness(0,0,-6,-6) : new Thickness(0,0,-17,-12);
         if (miniature)
         {
             var menu = new System.Windows.Controls.ContextMenu();
-            var restore = new System.Windows.Controls.MenuItem { Header = I18n.T("Salir de miniatura") };
-            restore.Click += (_, _) => { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; ApplyPreferences(); Persist(); Refresh(); };
-            var settings = new System.Windows.Controls.MenuItem { Header = I18n.T("Ajustes") };
-            settings.Click += (_, _) => Dialogs.Settings(this);
-            menu.Items.Add(restore); menu.Items.Add(settings); Shell.ContextMenu = menu;
+            AddMiniatureWindowActions(menu); Shell.ContextMenu = menu;
         }
         else Shell.ContextMenu = null;
         var resources = Application.Current.Resources;
@@ -321,11 +318,21 @@ public partial class MainWindow : Window
             menu.Items.Add(item);
         }
         menu.Items.Add(new Separator());
+        AddMiniatureWindowActions(menu);
+    }
+    private void AddMiniatureWindowActions(System.Windows.Controls.ContextMenu menu)
+    {
         var restore = new System.Windows.Controls.MenuItem { Header = I18n.T("Salir de miniatura") };
         restore.Click += (_, _) => { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; ApplyPreferences(); Persist(); Refresh(); };
         var settings = new System.Windows.Controls.MenuItem { Header = I18n.T("Ajustes") };
         settings.Click += (_, _) => Dialogs.Settings(this);
         menu.Items.Add(restore); menu.Items.Add(settings);
+        menu.Items.Add(new Separator());
+        var pin = new System.Windows.Controls.MenuItem { Header = I18n.T("Mantener siempre visible"), IsCheckable = true, IsChecked = Preferences.AlwaysOnTop };
+        pin.Click += (_, _) => { Preferences.AlwaysOnTop = pin.IsChecked; ApplyPreferences(); Persist(); };
+        var position = new System.Windows.Controls.MenuItem { Header = I18n.T("Bloquear posición y tamaño"), IsCheckable = true, IsChecked = Preferences.PositionLocked };
+        position.Click += (_, _) => { Preferences.PositionLocked = position.IsChecked; ApplyPreferences(); Persist(); };
+        menu.Items.Add(pin); menu.Items.Add(position);
     }
     private void CycleView()
     {
