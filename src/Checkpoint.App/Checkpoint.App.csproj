@@ -9,6 +9,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets/checkpoint.ico</ApplicationIcon>
     <PublishSingleFile>false</PublishSingleFile>
+    <!-- Keep both supported UI languages without shipping unrelated satellite assemblies. -->
+    <SatelliteResourceLanguages>en;es</SatelliteResourceLanguages>
     <!-- This is a WPF entry point; only NotifyIcon uses Forms. DPI is managed by the WPF manifest. -->
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
   </PropertyGroup>

@@ -1,0 +1,28 @@
+# Checkpoint: lee esto antes de utilizarla
+
+## AVISO IMPORTANTE: WINDOWS SMARTSCREEN
+
+**El EXE y el MSI de GitHub NO tienen firma digital ni certificado de editor. Por eso, y por no tener todavía reputación suficiente, Windows SmartScreen puede mostrar «Windows protegió su PC» o «Editor desconocido».**
+
+**El desarrollador no dispone de certificado de firma de código porque obtenerlo para estas descargas supone un coste. No se adquirirá hasta que los ingresos del proyecto cubran al menos lo que cueste. Hasta entonces, las descargas de GitHub seguirán sin ese certificado.**
+
+SmartScreen evalúa reputación: incluso una firma válida no garantiza que desaparezca el aviso inmediatamente. Esta explicación se refiere al aviso de aplicación/editor no reconocido; una detección de virus con nombre concreto es otro caso y debe investigarse. No desactives Defender ni añadas exclusiones para ejecutar la app.
+
+La vía alternativa es Microsoft Store con MSIX, donde Microsoft firma tras aprobar la app sin comprar un certificado propio. Está preparada parcialmente, pero todavía no se ha publicado en la tienda.
+
+## Requisitos para usarla
+
+- Un PC Windows x64. Windows 11 es la plataforma probada. Windows 10 no está validado; Windows 7/8/8.1 no son compatibles. ARM64 requiere su paquete específico y validación en ese hardware.
+- Una carpeta donde tu usuario pueda escribir y espacio para la app, biblioteca, carátulas y copias.
+- **No necesitas instalar .NET, Node.js, Python, Visual Studio, Supabase ni un servidor. El runtime viene incluido. No pide permisos de administrador.**
+- **No necesitas cuenta ni Internet para añadir y organizar juegos manualmente, utilizar carátulas locales o importar/exportar copias.** Internet solo se necesita para descargar carátulas y las funciones de Steam/amigos; Steam y Checkpoint se vinculan por separado y son opcionales. Hace falta un navegador para iniciar sesión en Steam.
+
+Portable: extrae el ZIP y abre `Checkpoint.exe` dentro de `Checkpoint`. Conserva todos los archivos juntos. El MSI instala para tu usuario. Ambas ediciones incluyen este aviso y su traducción inglesa.
+
+## Consumo y límites
+
+La interfaz virtualiza las listas; las carátulas recicladas liberan sus referencias y la caché de imágenes decodificadas tiene un presupuesto estimado de 8 MiB y un máximo de 32 entradas. Ese presupuesto no es la memoria total de la app. Los recursos de .NET no utilizados de otros idiomas no se distribuyen. El progreso de amigos no se consulta periódicamente mientras el widget está oculto o minimizado; las publicaciones pendientes siguen pudiendo enviarse.
+
+No hay un mínimo de RAM/CPU medido en equipos antiguos. No se promete una cifra inventada: el consumo depende del tamaño de la biblioteca, la ventana y las imágenes. Las carátulas y copias pueden aumentar el espacio utilizado; el usuario controla sus datos.
+
+Código, documentación y descargas: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). Guía: [seguridad de Windows](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/WINDOWS-SECURITY.md). [Reputación de SmartScreen según Microsoft](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).

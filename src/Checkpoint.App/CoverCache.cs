@@ -19,6 +19,10 @@ public sealed class CoverCache : IDisposable
     private readonly ConcurrentDictionary<int, DateTimeOffset> retryAfter = new();
     private readonly Dictionary<string, BitmapImage> memory = new(StringComparer.OrdinalIgnoreCase);
     private readonly Queue<string> memoryOrder = new();
+    internal const long MaxMemoryBytes = 8 * 1024 * 1024;
+    private long memoryBytes;
+    internal long MemoryBytes { get { lock (memory) return memoryBytes; } }
+    private static long ImageBytes(BitmapImage bitmap) => (long)bitmap.PixelWidth * bitmap.PixelHeight * Math.Max(4, (bitmap.Format.BitsPerPixel + 7) / 8);
     internal string DirectoryPath => folder;
     public CoverCache(string directory) { folder = Path.Combine(directory, "covers"); Directory.CreateDirectory(folder); }
     private static BitmapImage Read(string path)
@@ -45,8 +49,14 @@ public sealed class CoverCache : IDisposable
         lock (memory)
         {
             if (memory.ContainsKey(path)) return;
-            memory[path] = bitmap; memoryOrder.Enqueue(path);
-            while (memory.Count > 96) memory.Remove(memoryOrder.Dequeue());
+            long bytes = ImageBytes(bitmap);
+            if (bytes > MaxMemoryBytes) return;
+            memory[path] = bitmap; memoryOrder.Enqueue(path); memoryBytes += bytes;
+            while (memory.Count > 32 || memoryBytes > MaxMemoryBytes)
+            {
+                string oldest = memoryOrder.Dequeue();
+                if (memory.Remove(oldest, out var removed)) memoryBytes -= ImageBytes(removed);
+            }
         }
     }
     public string Import(string source)

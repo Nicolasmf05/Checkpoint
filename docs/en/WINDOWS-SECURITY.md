@@ -4,6 +4,10 @@
 
 Checkpoint preview EXE/MSI packages are unsigned. ZIP extraction does not change the executable's signature or reputation.
 
+## No certificate: funding pending
+
+**GitHub EXE/MSI files are unsigned because I have no code-signing certificate. Obtaining one costs money and I will not purchase it until Checkpoint income covers at least that cost. Until then, downloads will remain without a certificate.** Missing signature/reputation can trigger the SmartScreen unrecognized app/publisher warning. This does not mean a malware detection is automatically a false positive. A valid signature does not guarantee immediate reputation either.
+
 ## Identify the message
 
 - **“Windows protected your PC” / unknown publisher:** Microsoft Defender SmartScreen evaluates file/publisher reputation. A new unsigned release can trigger a warning. A trusted code-signing certificate and consistent signed releases are part of proper distribution; signing alone does not guarantee immediate reputation.

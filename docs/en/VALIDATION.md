@@ -1,6 +1,10 @@
 # Validation
 
-## Unreleased — MSIX preparation
+## 0.6.2 — lower resource usage
+
+222 checks passed: 108 core, 15 Node, 14 Edge and 85 native WPF. Native checks include cover release/reload, a 40-image cache stress case and a 1,003-game grid with offscreen reference checks. Unsigned ZIP/MSI and the MSIX packaging preview were generated. The preview matches all 283 application files. Compared with 0.6.1, extracted files fell from 173.72 to 158.00 MiB and ZIP size from 73.85 to 68.44 MiB. Both packages include first-run notices in English/Spanish. No minimum RAM/CPU benchmark on older hardware, installed MSI/MSIX test or real-account validation is claimed.
+
+## MSIX preparation before 0.6.2
 
 MakeAppx schema/content validation passed for the unsigned x64 preview. Unpack verification matched all 485 application files by SHA-256 and checked icon sizes, languages, manifest and PE architecture. Five invalid identity/version input cases were rejected. The extracted MSIX payload passed 79 native WPF assertions using an isolated data folder and the real Windows profile for DPAPI. This does not test installed MSIX behavior, upgrades, uninstall, startup or Store certification. No package was installed or submitted to Store.
 

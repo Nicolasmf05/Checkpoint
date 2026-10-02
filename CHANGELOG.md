@@ -2,7 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
-## Unreleased
+## 0.6.2 — 2026-10-02
+
+- Decoded cover cache capped at an estimated 8 MiB/32 entries; recycled cards release images and reload correctly.
+- Skip periodic friend-progress refresh while hidden/minimized, preserving publication retries.
+- Keep only English/Spanish framework resources and include bilingual first-run notices in ZIP/MSI.
+- Prominent SmartScreen/certificate funding policy and no-runtime/no-admin/offline manual-library requirements.
 
 - Microsoft Store preparation: unsigned MSIX packaging with explicit preview/Store identities, reproducible icons, SDK validation and payload/architecture verification.
 - English/Spanish Store submission and migration guidance; CI builds a packaging preview. Store certification and installed testing remain pending.

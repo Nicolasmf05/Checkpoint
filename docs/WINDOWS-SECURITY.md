@@ -4,6 +4,10 @@
 
 Los EXE/MSI preliminares de Checkpoint no tienen firma digital. Extraer el ZIP no cambia la firma ni la reputación del ejecutable.
 
+## Sin certificado: coste pendiente
+
+**Los EXE/MSI de GitHub no están firmados porque no tengo certificado de firma de código. Obtenerlo tiene un coste y no lo compraré hasta que los ingresos de Checkpoint cubran al menos ese importe. Hasta entonces, las descargas seguirán sin certificado.** Esta ausencia de firma y reputación puede provocar el aviso de SmartScreen de aplicación/editor no reconocido. No significa que una detección de malware sea automáticamente un falso positivo. Una firma válida tampoco garantiza reputación inmediata.
+
 ## Identificar el mensaje
 
 - **«Windows protegió su PC» / editor desconocido:** SmartScreen evalúa la reputación del archivo/editor. Una versión nueva sin firma puede generar el aviso. La distribución adecuada requiere firma con un certificado de confianza y continuidad entre versiones; firmar no garantiza reputación inmediata.

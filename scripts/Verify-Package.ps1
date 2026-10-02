@@ -16,9 +16,11 @@ if ($topLevel.Count -ne 1 -or !$topLevel[0].PSIsContainer -or $topLevel[0].Name 
     throw 'El portable debe contener una única carpeta Checkpoint en la raíz.'
 }
 $exe = Join-Path $extracted 'Checkpoint.exe'
-foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt')) {
+foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt','READ-ME-FIRST.md','LEEME-PRIMERO.md')) {
     if (!(Test-Path -LiteralPath (Join-Path $extracted $relative))) { throw "El paquete no incluye $relative." }
 }
+$unexpectedLanguages = @(Get-ChildItem -LiteralPath $extracted -Directory | Where-Object { $_.Name -in @('cs','de','fr','it','ja','ko','pl','pt-BR','ru','tr','zh-Hans','zh-Hant') })
+if ($unexpectedLanguages.Count) { throw 'The package contains unused framework language resources.' }
 $fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exe).ProductVersion.Split('+')[0]
 if (!$fileVersion.StartsWith($version + '.') -and $fileVersion -ne $version) { throw "Versión inesperada en el paquete: $fileVersion" }
 if ($Runtime -eq 'win-arm64' -and [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString() -ne 'Arm64') {
@@ -38,5 +40,5 @@ if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $stderr; throw "Falló l
 $reportPath = Join-Path $render 'smoke.json'
 if (!(Test-Path -LiteralPath $reportPath)) { throw 'La app no produjo el informe de comprobación.' }
 $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json
-if (!$report.ok -or $report.checks -lt 79) { throw 'La comprobación nativa del paquete quedó incompleta.' }
+if (!$report.ok -or $report.checks -lt 85) { throw 'La comprobación nativa del paquete quedó incompleta.' }
 Write-Output "Paquete validado: $($report.checks) comprobaciones. Imágenes e informe: $render"

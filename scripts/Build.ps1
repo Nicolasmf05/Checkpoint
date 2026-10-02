@@ -35,6 +35,8 @@ $output = Join-Path $checkpointRoot "dist\$version\$Runtime\Checkpoint"
 if ($LASTEXITCODE -ne 0) { throw 'Falló publish.' }
 @{ serviceUrl = $ServiceUrl } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'service-config.json') -Encoding utf8
 Copy-Item -LiteralPath LICENSE,THIRD-PARTY-NOTICES.md -Destination $output
+Copy-Item -LiteralPath docs/DOWNLOAD-NOTES.md -Destination (Join-Path $output 'LEEME-PRIMERO.md')
+Copy-Item -LiteralPath docs/en/DOWNLOAD-NOTES.md -Destination (Join-Path $output 'READ-ME-FIRST.md')
 Copy-Item -LiteralPath licenses -Destination $output -Recurse -Force
 $zip = Join-Path $checkpointRoot "dist\Checkpoint-$version-$Runtime.zip"
 Compress-Archive -LiteralPath $output -DestinationPath $zip -Force

@@ -195,7 +195,21 @@ public partial class MainWindow : Window
         ApplySocialTab();
     }
     private async void CoverLoaded(object sender, RoutedEventArgs e)
-    { if (((FrameworkElement)sender).DataContext is CardView card) await card.LoadCover(Covers); }
+    {
+        var image = (FrameworkElement)sender;
+        if (image.Tag is CardView previous && previous != image.DataContext) previous.ReleaseCover();
+        if (image.DataContext is CardView card) { image.Tag = card; await card.LoadCover(Covers); }
+    }
+    private void CoverUnloaded(object sender, RoutedEventArgs e)
+    {
+        var image = (FrameworkElement)sender;
+        if (image.Tag is CardView card) card.ReleaseCover();
+        image.Tag = null;
+    }
+    private void CoverContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (((FrameworkElement)sender).IsLoaded) CoverLoaded(sender, new RoutedEventArgs());
+    }
     internal void Notice(string text) => NoticeText.Text = text;
     private void FilterChanged(object sender, RoutedEventArgs e) => Refresh();
     private void TrackedClick(object sender, RoutedEventArgs e) { friendsVisible = false; allLibrary = false; Refresh(); }
@@ -448,7 +462,19 @@ public partial class MainWindow : Window
             CoverBackground = Brush(new[] { "#FF344C61", "#FF4D385C", "#FF3C5951" }[(int)((uint)game.Id.GetHashCode() % 3)]);
         }
         private Task? loading;
+        private int coverGeneration;
         public Task LoadCover(CoverCache cache) => loading ??= LoadOnce(cache);
-        private async Task LoadOnce(CoverCache cache) { Cover = await cache.Get(Model); PropertyChanged?.Invoke(this, new(nameof(Cover))); }
+        private async Task LoadOnce(CoverCache cache)
+        {
+            int current = coverGeneration;
+            var image = await cache.Get(Model);
+            if (current != coverGeneration) return;
+            Cover = image; PropertyChanged?.Invoke(this, new(nameof(Cover)));
+        }
+        internal void ReleaseCover()
+        {
+            coverGeneration++; loading = null; Cover = null;
+            PropertyChanged?.Invoke(this, new(nameof(Cover)));
+        }
     }
 }

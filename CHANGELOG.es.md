@@ -2,7 +2,12 @@
 
 # Historial de cambios
 
-## Sin publicar
+## 0.6.2 — 2026-10-02
+
+- Caché de carátulas limitada a un presupuesto estimado de 8 MiB/32 entradas; las tarjetas recicladas liberan imágenes y las vuelven a cargar.
+- Sin consulta periódica de progreso de amigos estando oculto/minimizado; se conservan reintentos de publicaciones.
+- Solo recursos de framework en inglés/español y avisos bilingües de primer uso dentro de ZIP/MSI.
+- Aviso destacado de SmartScreen y política de financiación del certificado; requisitos sin runtime externo/administrador ni Internet para uso manual.
 
 - Preparación para Microsoft Store: MSIX sin firma con identidades separadas de prueba/tienda, iconos reproducibles, validación SDK y comprobación de archivos/arquitectura.
 - Guías de publicación y migración en inglés/español; CI genera una prueba de empaquetado. Pendientes certificación y pruebas instaladas.

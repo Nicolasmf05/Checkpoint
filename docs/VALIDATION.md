@@ -2,7 +2,11 @@
 
 # Validación
 
-## Sin publicar — preparación MSIX
+## 0.6.2 — menor consumo
+
+Han pasado 222 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 85 WPF. Se prueban liberación/recarga de carátulas, caché con 40 imágenes y cuadrícula de 1.003 juegos con comprobación de referencias fuera de pantalla. Generados ZIP/MSI sin firma y MSIX de prueba; se verificaron los 283 archivos de este último. Frente a 0.6.1, la app extraída baja de 173,72 a 158,00 MiB y el ZIP de 73,85 a 68,44 MiB. Los paquetes contienen los avisos de primer uso en inglés/español. No se afirma haber medido mínimos RAM/CPU en hardware antiguo ni haber validado instalación MSI/MSIX o cuentas reales.
+
+## Preparación MSIX anterior a 0.6.2
 
 MakeAppx validó esquema y contenido del MSIX x64 de prueba sin firma. La extracción verificó por SHA-256 los 485 archivos de la app, tamaños de iconos, idiomas, manifiesto y arquitectura PE. Se rechazaron cinco casos de identidad/versión inválidos. La app extraída del MSIX pasó 79 comprobaciones WPF con datos aislados y el perfil real de Windows para DPAPI. Esto no valida MSIX instalado, actualizaciones, desinstalación, arranque ni certificación. No se instaló ni se envió el paquete a Store.
 

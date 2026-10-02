@@ -167,6 +167,25 @@ public partial class MainWindow
             var result = ImportBackup(completeBackup); added = Games.Single(g => g.Id == added.Id);
             var restoredCover = await Covers.Get(added);
             Check(result.Added == 1 && result.Skipped == 3 && added.CustomCover != originalCover && restoredCover?.PixelWidth == 220 && restoredCover.PixelHeight == 330, "complete import restores an offline cover under a new local name");
+            var coverCard = new CardView(added, false, false);
+            await coverCard.LoadCover(Covers);
+            Check(coverCard.Cover is not null, "visible card loads its offline cover");
+            coverCard.ReleaseCover();
+            Check(coverCard.Cover is null, "recycled card releases its cover reference");
+            await coverCard.LoadCover(Covers);
+            Check(coverCard.Cover is not null, "recycled card can reload its cover");
+            var cacheFixtures = new List<string>();
+            try
+            {
+                byte[] png = File.ReadAllBytes(Path.Combine(Covers.DirectoryPath, originalCover!));
+                for (int i = 0; i < 40; i++)
+                {
+                    string name = Covers.SavePrepared(png); cacheFixtures.Add(name);
+                    await Covers.Get(new Game { Title = "Cache fixture", CustomCover = name });
+                }
+                Check(Covers.MemoryBytes > 0 && Covers.MemoryBytes <= CoverCache.MaxMemoryBytes, "decoded cover cache stays within 8 MiB across many images");
+            }
+            finally { foreach (string name in cacheFixtures) Covers.RemoveCreated(name); }
             added.Notes = "Conservar estos datos actuales"; Persist();
             int filesBefore = Directory.GetFiles(Covers.DirectoryPath, "custom-*.png").Length;
             result = ImportBackup(completeBackup);
@@ -206,13 +225,15 @@ public partial class MainWindow
             await RenderSteamSmokeTest(outputDirectory,Check);
             await RenderSocialSmokeTest(outputDirectory,Check);
 
-            var bulk = Enumerable.Range(0, 1000).Select(i => new Game { Title = $"Virtual game {i:0000}", SortOrder = i + 3 }).ToList();
+            var bulk = Enumerable.Range(0, 1000).Select(i => new Game { Title = $"Virtual game {i:0000}", SortOrder = i + 3, CustomCover = originalCover }).ToList();
             Games.AddRange(bulk); await SetView(true, false, false, 510, 740);
             int realized = VisualChildren(GameList).OfType<ListBoxItem>().Count();
             Check(GameList.Items.Count > 300 && realized is > 0 and < 30, "large grid virtualizes rows");
+            Check(visibleCards.Count(c => c.Cover is not null) is > 0 and < 100, "large grid only retains covers for realized cards");
             GameList.ScrollIntoView(GameList.Items[^1]);
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             Check(VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "grid recycling stays bounded after scrolling");
+            Check(visibleCards.Count(c => c.Cover is not null) < 100, "scrolling releases offscreen cover references");
             Games.RemoveAll(g => bulk.Contains(g));
             await SetView(false, true, true, 375, 540);
             Render(this, "widget-compact-light.png");

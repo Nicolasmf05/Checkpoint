@@ -43,8 +43,9 @@ public partial class MainWindow
         catch (Exception ex) when (ex is IOException or JsonException or ArgumentException) { socialStartupError = I18n.T("Amigos: ") + ex.Message; }
         FriendsView = new(this); FriendsHost.Child = FriendsView;
         publicationTimer.Tick += async (_, _) => { publicationTimer.Stop(); await PublishSocial(); };
-        socialTimer.Tick += async (_, _) => { await PublishSocial(); if (friendsVisible && !FriendsView.Busy) await FriendsView.Reload(); };
+        socialTimer.Tick += async (_, _) => { await PublishSocial(); if (ShouldRefreshFriends && !FriendsView.Busy) await FriendsView.Reload(); };
     }
+    internal bool ShouldRefreshFriends => friendsVisible && IsVisible && WindowState != WindowState.Minimized;
     internal void AttachSocial(SocialApi api)
     {
         Social?.Dispose(); Social = api;
