@@ -7,6 +7,9 @@ if (origin.protocol !== 'https:' || origin.hostname !== `${project.projectRef}.s
     || origin.pathname !== '/' || origin.search || origin.hash || origin.username || origin.password
     || !project.publishableKey.startsWith('sb_publishable_')) throw new Error('Invalid public project configuration');
 const checks = [
+  { name: 'Anonymous Steam state RPC', path: 'rest/v1/rpc/cp_steam_state', body: {
+    p_action: 'get', p_kind: 'session', p_id: 'public-permission-check', p_value: {}, p_ttl: 600
+  } },
   ...['cp_profiles','cp_friend_requests','cp_friendships','cp_blocks','cp_game_publications']
     .map(table => ({ name: `Anonymous ${table}`, path: `rest/v1/${table}?select=*&limit=1` })),
   { name: 'Anonymous friend lookup', path: 'rest/v1/rpc/cp_find_friend', body: { p_code: 'cp-000000000000' } },

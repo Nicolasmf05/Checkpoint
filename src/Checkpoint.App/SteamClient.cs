@@ -21,12 +21,13 @@ public sealed record SavedSession(string ServiceUrl, string Token, string SteamI
 
 public sealed class SteamClient : IDisposable
 {
-    private readonly HttpClient http = new(new HttpClientHandler { AllowAutoRedirect = false })
-        { Timeout = TimeSpan.FromSeconds(35), MaxResponseContentBufferSize = 12_000_000 };
+    private readonly HttpClient http;
     private readonly string tokenFile;
     public SavedSession? Session { get; private set; }
-    public SteamClient(string directory)
+    public SteamClient(string directory, HttpMessageHandler? handler = null)
     {
+        http = new HttpClient(handler ?? new HttpClientHandler { AllowAutoRedirect = false })
+            { Timeout = TimeSpan.FromSeconds(35), MaxResponseContentBufferSize = 12_000_000 };
         tokenFile = Path.Combine(directory, "steam-session.dat");
         try
         {
@@ -41,7 +42,9 @@ public sealed class SteamClient : IDisposable
             || !string.IsNullOrEmpty(uri.UserInfo) || !string.IsNullOrEmpty(uri.Query) || !string.IsNullOrEmpty(uri.Fragment)
             || (uri.Scheme != "https" && !(uri.Scheme == "http" && uri.IsLoopback)))
             throw new ArgumentException(I18n.T("Usa la dirección HTTPS del servicio. HTTP solo se permite para un servidor local."));
-        if (uri.AbsolutePath != "/") throw new ArgumentException(I18n.T("La dirección del servicio debe ser su origen, sin rutas adicionales."));
+        if (uri.AbsolutePath != "/" && !(uri.Scheme == "https" && uri.Host.EndsWith(".supabase.co", StringComparison.OrdinalIgnoreCase)
+            && uri.AbsolutePath == "/functions/v1/checkpoint-steam/"))
+            throw new ArgumentException(I18n.T("La dirección del servicio debe ser su origen, sin rutas adicionales."));
         return uri;
     }
     private async Task<T> Request<T>(string service, string path, object? body = null, bool authenticated = true, CancellationToken cancellation = default)
@@ -79,12 +82,18 @@ public sealed class SteamClient : IDisposable
     public Task<LoginResult> Poll(string service, LoginStart flow, CancellationToken cancellation) => Request<LoginResult>(service, "v1/auth/poll", new { flow.FlowId, flow.PollSecret }, false, cancellation);
     public void SaveSession(string service, LoginResult result)
     {
-        if (result.Token is null || result.SteamId is null) throw new InvalidDataException(I18n.T("La sesión recibida no es válida."));
-        Session = new SavedSession(ValidateServiceUrl(service).AbsoluteUri, result.Token, result.SteamId);
-        File.WriteAllBytes(tokenFile, ProtectedData.Protect(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(Session, DataJson.Options)), null, DataProtectionScope.CurrentUser));
+        if (result.Status != "complete" || result.Token is null || result.SteamId is null
+            || !System.Text.RegularExpressions.Regex.IsMatch(result.Token, "^[A-Za-z0-9_-]{43}$")
+            || !System.Text.RegularExpressions.Regex.IsMatch(result.SteamId, "^7656119[0-9]{10}$"))
+            throw new InvalidDataException(I18n.T("La sesión recibida no es válida."));
+        var session = new SavedSession(ValidateServiceUrl(service).AbsoluteUri, result.Token, result.SteamId);
+        var protectedBytes = ProtectedData.Protect(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(session, DataJson.Options)), null, DataProtectionScope.CurrentUser);
+        var temporary = tokenFile + ".tmp";
+        try { File.WriteAllBytes(temporary, protectedBytes); File.Move(temporary, tokenFile, true); Session = session; }
+        finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
     public Task<LibraryResult> Library(string service, CancellationToken cancellation) => Request<LibraryResult>(service, "v1/library", cancellation: cancellation);
-    public Task<AchievementsResult> Achievements(string service, int appId, CancellationToken cancellation) => Request<AchievementsResult>(service, $"v1/games/{appId}/achievements", cancellation: cancellation);
+    public Task<AchievementsResult> Achievements(string service, int appId, CancellationToken cancellation) => Request<AchievementsResult>(service, $"v1/games/{appId}/achievements?lang={(I18n.IsEnglish ? "en" : "es")}", cancellation: cancellation);
     public async Task Disconnect()
     {
         try { if (Session is not null) await Request<JsonElement>(Session.ServiceUrl, "v1/auth/logout", new { }); }

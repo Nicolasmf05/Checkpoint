@@ -1,6 +1,6 @@
 [English](en/SCREENSHOTS.md) · **Español**
 
-# Capturas de Checkpoint 0.5.0
+# Capturas de Checkpoint 0.6.0
 
 Estas imágenes proceden de los controles WPF reales mediante `RenderTargetBitmap`, durante la validación del ZIP de distribución. Utilizan una biblioteca aislada y respuestas HTTP simuladas. Los nombres y progresos de amigos son ficticios y la carátula privada de ejemplo es una imagen de color plano. No son una prueba de registro con cuentas reales.
 

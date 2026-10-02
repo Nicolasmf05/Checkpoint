@@ -126,12 +126,13 @@ export function createService({ apiKey = '', publicUrl = 'http://127.0.0.1:34871
         if (appId > 2147483647) throw new ApiError(400, 'Juego no válido.');
         const owned = await library(session.steamId);
         if (!owned.games.some(game => game.appId === appId)) throw new ApiError(403, 'Este juego no está en tu biblioteca visible de Steam.');
-        const result = await cached(`achievements:${session.steamId}:${appId}`, async () => {
-          const schema = await cached('schema:' + appId, () => steam('ISteamUserStats/GetSchemaForGame/v2/', { appid: appId, l: 'spanish' }), 24 * 60 * 60_000);
+        const language = url.searchParams.get('lang') === 'en' ? 'english' : 'spanish';
+        const result = await cached(`achievements:${session.steamId}:${appId}:${language}`, async () => {
+          const schema = await cached(`schema:${appId}:${language}`, () => steam('ISteamUserStats/GetSchemaForGame/v2/', { appid: appId, l: language }), 24 * 60 * 60_000);
           if (!schema.game || typeof schema.game !== 'object') throw new ApiError(502, 'Steam no ha devuelto la definición de logros de este juego.');
           const definitions = schema.game.availableGameStats?.achievements;
           if (!definitions?.length) return { achievements: [] };
-          const progress = await steam('ISteamUserStats/GetPlayerAchievements/v1/', { steamid: session.steamId, appid: appId, l: 'spanish' });
+          const progress = await steam('ISteamUserStats/GetPlayerAchievements/v1/', { steamid: session.steamId, appid: appId, l: language });
           if (progress.playerstats?.success !== true || !Array.isArray(progress.playerstats.achievements))
             throw new ApiError(403, 'Steam no permite consultar estos logros. Revisa la privacidad de tus detalles de juegos.');
           const unlocks = new Map(progress.playerstats.achievements.map(item => [item.apiname, item]));

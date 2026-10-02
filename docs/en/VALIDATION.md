@@ -1,4 +1,12 @@
-# Validation of 0.5.0
+# Validation
+
+## 0.6.0 Steam integration
+
+Local distribution checks passed: 108 core, 15 legacy Node, 14 Supabase Edge HTTP/security and 79 native WPF assertions (216 total). Native checks include Supabase URL validation, bound authorization, DPAPI restoration, malformed-session preservation, language parameters and unlinking. ZIP and MSI were generated; the MSI remains unsigned and installation/uninstallation is untested.
+
+The `checkpoint-steam` function and private-state migration were deployed to the project. Twenty PostgreSQL assertions passed with rolled-back fixtures: anonymous/authenticated permissions, atomic flow consumption, nonce replay, expiry, limits and revocation. HTTP Steam state permission checks use only the public publishable key. The legacy JWT gateway setting is disabled for this function only, following approval. Live health reports Steam configured; unauthenticated library/achievements return 401, invalid callbacks return 400, login start/pending polling return 200 and a wrong polling secret returns 400. The operator key stays in Supabase secrets. Real Steam account sign-in, upstream key validity and actual library/achievement imports still require a person completing the link.
+
+## 0.5.0
 
 **English** · [Español](../VALIDATION.md)
 

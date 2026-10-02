@@ -203,6 +203,7 @@ public partial class MainWindow
             Games.RemoveAll(g => g.Id == legacyGame.Id);
             // Return the fixture to the three real demo games; no simulated logs are delivered in the app.
             Games.Remove(added); Persist();
+            await RenderSteamSmokeTest(outputDirectory,Check);
             await RenderSocialSmokeTest(outputDirectory,Check);
 
             var bulk = Enumerable.Range(0, 1000).Select(i => new Game { Title = $"Virtual game {i:0000}", SortOrder = i + 3 }).ToList();

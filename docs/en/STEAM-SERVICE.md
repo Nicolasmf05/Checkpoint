@@ -2,7 +2,20 @@
 
 **English** · [Español](../STEAM-SERVICE.md)
 
-Node uses built-in modules; no `npm install`. Steam hosting on Supabase Edge Functions is pending.
+Version 0.6 source includes a dependency-free Supabase Edge Function. Node remains available for local development; no `npm install` is needed.
+
+## Supabase deployment
+
+1. Apply `supabase/migrations/202610020002_checkpoint_steam.sql` after the social migration. Run `supabase/tests/steam.sql`; fixtures roll back.
+2. Deploy `supabase/functions/checkpoint-steam/index.ts` as `checkpoint-steam`. Only the server uses automatic `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` variables. Never distribute privileged keys.
+3. Obtain a key from [Steam](https://steamcommunity.com/dev/apikey), accepting Valve's terms personally. Save it as `STEAM_WEB_API_KEY` in Supabase → Edge Functions → Secrets. Never paste it in chat/source.
+4. Disable **Verify JWT with legacy secret** for this function only. Public login/callback routes verify OpenID directly with Steam; library/achievement routes require their own random, expiring session token. Social Auth/RLS remain independent.
+5. Verify `/health` reports `steamConfigured: true`, press Link Steam in the app and finish sign-in yourself on Steam. Review Game details visibility if Steam denies access.
+6. The default build endpoint is `https://fumdnvvvoiwoiziwtmsu.supabase.co/functions/v1/checkpoint-steam/`. Fork operators must supply their own public project/service configuration.
+
+Flows, session/nonce hashes, limits and caches persist in a private schema, accessible only through a service-role RPC. Polling atomically consumes the flow and creates a session; losing a successful polling response requires relinking. Flows expire after 10 minutes, sessions after seven days; expired rows are purged during later requests. Unlink revokes the session and removes its game cache. Library/progress cache lasts 15 minutes, language-specific public definitions 24 hours. Shared limits: 30 links/minute, 2,000 requests/minute, 90 requests/session/minute and 90,000 upstream calls/day. Caller-supplied IP headers are not trusted. Review capacity before broad distribution. Hosting logs/backups follow Supabase retention. The browser callback is readable bilingual text because Supabase rewrites HTML responses.
+
+Run `node --test supabase/tests/steam.test.mjs` for simulated HTTP/security checks. Live Steam validation requires the server secret and a person completing sign-in.
 
 ## Local development
 
@@ -15,7 +28,7 @@ Node uses built-in modules; no `npm install`. Steam hosting on Supabase Edge Fun
 
 Keep the server running. Imports go to Library; enable Show in My list from each card.
 
-## Distribution
+## Alternative Node hosting
 
 1. Host Node/the Dockerfile behind HTTPS.
 2. Set the exact external HTTPS origin in `PUBLIC_URL`, `HOST=0.0.0.0` and provider port.
@@ -27,7 +40,7 @@ Keep the server running. Imports go to Library; enable Show in My list from each
 
 Uses `api.steampowered.com` and `x-webapi-key`. The partner host does not accept an ordinary key.
 
-## Limits
+## Node limits
 
 - OpenID verifies provider, origin, callback, identity, signed fields, nonce and expiry directly with Steam.
 - Sessions bind to authenticated SteamID; clients cannot substitute another user. A polling secret protects callback-based session acquisition.

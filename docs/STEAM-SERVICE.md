@@ -2,7 +2,20 @@
 
 # Servicio de Steam
 
-El servicio Node.js utiliza únicamente módulos integrados. No necesita `npm install`.
+El código de 0.6 incluye una función de Supabase sin dependencias externas. Node sigue disponible para desarrollo local y no necesita `npm install`.
+
+## Despliegue en Supabase
+
+1. Aplica `supabase/migrations/202610020002_checkpoint_steam.sql` después de la migración social. Ejecuta `supabase/tests/steam.sql`; las pruebas terminan con ROLLBACK.
+2. Despliega `supabase/functions/checkpoint-steam/index.ts` como `checkpoint-steam`. Solo el servidor usa `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`; nunca distribuyas la clave privilegiada.
+3. Crea personalmente una clave en [Steam](https://steamcommunity.com/dev/apikey), acepta las condiciones de Valve y guárdala como `STEAM_WEB_API_KEY` en Supabase → Edge Functions → Secrets. No la pegues en el chat ni en el código.
+4. Desactiva **Verify JWT with legacy secret** solo para esta función. Las rutas públicas de vinculación verifican OpenID con Steam; biblioteca y logros exigen una sesión propia, aleatoria y con caducidad. Auth y permisos sociales siguen independientes.
+5. Comprueba que `/health` indica `steamConfigured: true`. Pulsa Vincular Steam en la app y termina tú el acceso en Steam. Si Steam deniega acceso, revisa Detalles de juegos.
+6. El endpoint predeterminado es `https://fumdnvvvoiwoiziwtmsu.supabase.co/functions/v1/checkpoint-steam/`. Para distribuir un fork, configura tu propio proyecto y servicio.
+
+Vinculaciones, hashes de sesiones/respuestas, límites y caché persisten en un esquema privado, accesible solo por RPC privilegiada. El sondeo consume la vinculación y crea una sesión en una transacción; si se pierde su respuesta correcta, hay que volver a vincular. Vinculaciones: 10 minutos; sesiones: siete días; registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y limpia su caché de juegos. Biblioteca/logros: 15 minutos; definiciones por idioma: 24 horas. Límites compartidos: 30 vinculaciones/minuto, 2.000 peticiones/minuto, 90 peticiones/sesión/minuto y 90.000 consultas Steam/día. No se confía en cabeceras IP del cliente. Revisa capacidad antes de distribución amplia. Registros/copias siguen la retención de Supabase. El callback muestra texto bilingüe porque Supabase convierte HTML a texto.
+
+Pruebas simuladas: `node --test supabase/tests/steam.test.mjs`. La prueba con Steam real requiere configurar el secreto y completar personalmente el inicio de sesión.
 
 ## Desarrollo local
 
@@ -15,7 +28,7 @@ El servicio Node.js utiliza únicamente módulos integrados. No necesita `npm in
 
 El servicio debe seguir ejecutándose para sincronizar. Importar no llena el widget: los juegos nuevos aparecen en Biblioteca y puedes activar Mostrar en Mi lista en su ficha.
 
-## Distribución
+## Alternativa de alojamiento Node
 
 1. Aloja el servicio en una instancia Node.js o con el Dockerfile incluido, detrás de HTTPS.
 2. Configura `PUBLIC_URL` con el **origen HTTPS externo exacto**, `HOST=0.0.0.0` y el puerto requerido por el proveedor.
@@ -27,7 +40,7 @@ El servicio debe seguir ejecutándose para sincronizar. Importar no llena el wid
 
 Solo se usa el host público `api.steampowered.com`, con la clave en `x-webapi-key`. El host para partners no acepta una clave estándar.
 
-## Diseño y límites
+## Diseño y límites de Node
 
 - OpenID se verifica directamente contra el proveedor oficial de Steam. Se verifican origen, callback, identidad, campos firmados, nonce y caducidad.
 - La app recibe un token aleatorio vinculado al SteamID autenticado; no puede indicar otro SteamID para consultar información.

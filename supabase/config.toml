@@ -1,0 +1,4 @@
+[functions.checkpoint-steam]
+# Steam OpenID callbacks and custom Steam bearer sessions are validated inside the function.
+verify_jwt = false
+entrypoint = "./functions/checkpoint-steam/index.ts"

@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.0 — 2026-10-02
+
+- Supabase Steam Edge Function: verified OpenID, durable private session hashes, atomic polling, nonce replay protection, shared limits and caches.
+- Default Supabase Steam endpoint; English/Spanish achievements with separate caches.
+- Atomic DPAPI persistence and native HTTP checks. Live Steam validation requires the server secret and personal sign-in.
+
 ## 0.5.0 — 2026-10-02
 
 - English/Spanish interface, saved Settings → Language selector and immediate updates to navigation, dialogs, labels, tooltips, accessible names and built-in errors.

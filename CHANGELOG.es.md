@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.6.0 — 2026-10-02
+
+- Función Steam de Supabase: OpenID verificado, hashes privados persistentes, sondeo atómico, protección contra respuestas repetidas, límites y caché compartidos.
+- Endpoint Steam predeterminado y logros en español/inglés con cachés separados.
+- Guardado atómico mediante DPAPI y pruebas HTTP nativas. La prueba real requiere el secreto del servidor y el acceso personal a Steam.
+
 ## 0.5.0 — 2026-10-02
 
 - Interfaz en español e inglés, selector en Ajustes y cambio inmediato persistente.

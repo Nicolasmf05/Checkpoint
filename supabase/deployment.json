@@ -13,8 +13,27 @@
     "bucketPublic": false
   },
   "nativeIntegration": "implemented-native-tested",
-  "clientVersion": "0.5.0",
+  "clientVersion": "0.6.0",
   "authMode": "username-password",
   "confirmEmail": false,
-  "steamEdgeFunctions": "pending"
+  "steamEdgeFunctions": "deployed-custom-auth-enabled-live-endpoints-checked",
+  "steam": {
+    "function": "checkpoint-steam",
+    "endpoint": "https://fumdnvvvoiwoiziwtmsu.supabase.co/functions/v1/checkpoint-steam/",
+    "migration": "202610020002_checkpoint_steam.sql",
+    "databaseAssertions": 20,
+    "httpMockAssertions": 14,
+    "nativeClientAssertions": 15,
+    "gatewayVerifyJwt": false,
+    "apiKeyConfigured": true,
+    "realSteamLoginValidated": false,
+    "anonymousStateRpcStatus": 401,
+    "healthStatus": 200,
+    "unauthenticatedLibraryStatus": 401,
+    "unauthenticatedAchievementsStatus": 401,
+    "loginStartStatus": 200,
+    "pendingPollStatus": 200,
+    "invalidPollSecretStatus": 400,
+    "remainingSyntheticSteamEntriesAfterDatabaseTests": 0
+  }
 }

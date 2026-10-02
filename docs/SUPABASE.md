@@ -41,7 +41,7 @@ El cliente consulta las carátulas privadas con autorización y mantiene esas im
 
 La distribución 0.4.0 utiliza SQLite para la colección privada y Supabase para las cuentas y el contenido social seleccionado. No sincroniza automáticamente toda la biblioteca privada. Quedan pendientes avatares, recuperación de cuenta y una prueba completa con dos cuentas reales.
 
-El servicio Node de Steam necesita una adaptación separada si también se quiere alojar en Supabase Edge Functions. Cambiar de proveedor no permite ejecutar ese servidor sin modificarlo. La clave de Steam debe seguir en el servidor.
+El código de 0.6 incluye la función Steam de Supabase. Su clave debe permanecer como secreto del servidor y debe activarse la autenticación propia de la función antes de vincular.
 
 ## Comprobaciones preparadas
 
@@ -50,3 +50,5 @@ Las pruebas SQL cubren creación de perfil, permisos anónimos, escrituras direc
 `supabase/project.json` contiene solo la URL, la referencia, la región y la clave publishable que se puede distribuir con el cliente. No contiene la contraseña de Postgres ni claves privilegiadas. Al aplicar SQL manualmente, el panel de historial de migraciones de Supabase no registra automáticamente esta versión; conservar el archivo de migración y su registro local de despliegue.
 
 La verificación HTTP se puede repetir con `node scripts/Verify-Supabase.mjs` (Node 22 o posterior, acceso a Internet). La auditoría SQL de despliegue está en `supabase/tests/deployment_audit.sql`.
+
+El código de 0.6 añade una migración privada y una función Edge para Steam. Consulta [despliegue Steam](STEAM-SERVICE.md) para secretos, autenticación y validación.

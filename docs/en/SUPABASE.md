@@ -36,6 +36,8 @@ The client uploads normalized PNGs and downloads private images with authorizati
 
 `supabase/project.json` is public config only. SQL Editor does not automatically populate migration history; preserve migration files and `deployment.json`.
 
-SQLite stores the private collection; Supabase stores selected social data. Full cloud restore, avatar editing and recovery are pending. Moving the Node Steam server to Edge Functions requires separate work and a server-side Steam secret.
+SQLite stores the private collection; Supabase stores selected social data. Full cloud restore, avatar editing and recovery are pending. Version 0.6 adds the Steam Edge Function; its server-side key and custom-auth setting must be configured before linking.
 
 Tests cover anonymous/direct-write permissions, profiles, publications/retries/conflicts, private/invalid fields, consent, third-party isolation, blocking and withdrawal. Storage tests exercise metadata permissions/request limits, not live Storage upload/download or multi-connection concurrency. Native HTTP responses are simulated. Repeat HTTP checks with `node scripts/Verify-Supabase.mjs`; audit: `supabase/tests/deployment_audit.sql`. See [validation](VALIDATION.md).
+
+Version 0.6 source adds a private Steam-state migration and Edge Function. See [Steam deployment](STEAM-SERVICE.md) for secrets, custom authentication and validation.

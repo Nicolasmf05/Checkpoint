@@ -16,13 +16,13 @@ Captures use real WPF controls rendered during native tests. Games, users and fr
 
 ## Download and run
 
-Current version: **0.5.0**. Build outputs in `dist`:
+Current version: **0.6.0**. Build outputs in `dist`:
 
-- `Checkpoint-0.5.0-win-x64.zip`: portable edition. Extract the entire folder and run `Checkpoint.exe`.
-- `Checkpoint-0.5.0-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.6.0-win-x64.zip`: portable edition. Extract the entire folder and run `Checkpoint.exe`.
+- `Checkpoint-0.6.0-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.5.0), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI is unsigned; no private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.6.0), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI is unsigned; no private certificates are included.
 
 ## Features
 
@@ -71,7 +71,7 @@ Version 0.3 introduced SQLite schema 2. Version 0.5 opens older libraries; use 0
 
 ## Steam service
 
-The local library works without Steam. The distribution's Steam URL is empty: the operator must host `server` and supply its URL at build time. Moving Steam to Supabase Edge Functions is pending.
+The local library works without Steam. The Supabase Steam service is deployed and configured. The distribution includes its public endpoint and the Checkpoint public project configuration; end users do not need API keys or development tools. Press Link Steam and finish sign-in on Steam; imports appear in Library. Friends remain independent Checkpoint accounts. See [Steam setup](docs/en/STEAM-SERVICE.md). Open the app, select Link Steam and finish sign-in on the official Steam page. Game details must be visible to import the library and achievements.
 
 Keep the Steam API key in a server environment secret, never the app or GitHub. Users sign in on Steam through OpenID; private game details remain inaccessible. See [Steam setup and limits](docs/en/STEAM-SERVICE.md). Advanced connection supports a local development server.
 
@@ -100,13 +100,13 @@ dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PW
 
 Native tests reject existing libraries/sessions/publications and exercise real controls with simulated Steam/social responses. Demo adds examples only to an empty library. Build extracts and tests its self-contained ZIP, including language switching and virtualized rendering of 1,003 games. Reports and captures: `.qa/package-…/render`.
 
-Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.5.0-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
+Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.6.0-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
 
 ## GitHub
 
 MIT license, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
-`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.5.0.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
+`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.6.0.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 
 See [roadmap](docs/en/ROADMAP.md) and [changelog](CHANGELOG.md). Notifications, monthly statistics and private-library cloud sync are future work.
 

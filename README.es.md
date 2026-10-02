@@ -8,7 +8,7 @@ Un juego cada vez. Widget nativo y translúcido para organizar los juegos que qu
 
 ## Capturas
 
-Capturas de la aplicación Windows 0.5.0 renderizadas durante las pruebas nativas. Los juegos, usuarios y progresos son datos de ejemplo; las carátulas privadas de prueba usan una imagen de color plano. Consulta la [galería de capturas](docs/SCREENSHOTS.md) para ver lista, vista compacta, amigos y ajustes.
+Capturas de la aplicación Windows 0.6.0 renderizadas durante las pruebas nativas. Los juegos, usuarios y progresos son datos de ejemplo; las carátulas privadas de prueba usan una imagen de color plano. Consulta la [galería de capturas](docs/SCREENSHOTS.md) para ver lista, vista compacta, amigos y ajustes.
 
 | Biblioteca | Amigos de Checkpoint |
 | --- | --- |
@@ -16,12 +16,12 @@ Capturas de la aplicación Windows 0.5.0 renderizadas durante las pruebas nativa
 
 ## Descargar y utilizar
 
-La versión actual es **0.5.0**. En la carpeta `dist` se generan:
+La versión actual es **0.6.0**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.5.0), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.6.0), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.5.0-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.5.0-win-x64.zip`: edición portable. Extrae toda la carpeta y ejecuta `Checkpoint.exe`.
+- `Checkpoint-0.6.0-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.6.0-win-x64.zip`: edición portable. Extrae toda la carpeta y ejecuta `Checkpoint.exe`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -76,11 +76,11 @@ La versión 0.3.0 abre las bibliotecas 0.1.0/0.2.0 y añade la tabla de recupera
 
 ## Steam para una aplicación distribuida
 
-**La aplicación funciona como biblioteca local sin configurar nada.** Para que cualquier usuario pueda vincular Steam, el responsable de la distribución debe alojar el servicio `server` y proporcionar su dirección al generar la edición.
+**La aplicación funciona como biblioteca local sin configurar nada.** El servicio Steam de Supabase está desplegado y configurado. Los paquetes incluyen su dirección y la configuración pública de Checkpoint; el usuario no necesita claves API ni herramientas de desarrollo.
 
 La clave de Steam permanece en una variable de entorno del servidor; **no se incluye ni en el ejecutable ni en GitHub**. Cada usuario se identifica mediante Steam OpenID en la web oficial. OpenID no concede acceso a datos privados: Steam debe permitir consultar sus detalles de juegos.
 
-Consulta [docs/STEAM-SERVICE.md](docs/STEAM-SERVICE.md) para configurarlo. El paquete local inicial lleva una dirección de servicio vacía: no presenta una integración conectada o progreso inventado. En Ajustes → Conexión avanzada puedes establecer la dirección de tu servidor de desarrollo.
+Consulta [docs/STEAM-SERVICE.md](docs/STEAM-SERVICE.md) para configurarlo. Pulsa Vincular Steam y termina el acceso en Steam; los juegos se importan a Biblioteca. En Ajustes → Conexión avanzada puedes usar el servidor Node local para desarrollo. Amigos sigue usando cuentas propias de Checkpoint.
 
 ## Compilar
 
@@ -122,7 +122,7 @@ dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PW
 
 Usa siempre una carpeta nueva para `--smoke-test`: esta comprobación modifica su biblioteca de prueba y rechaza una carpeta con biblioteca o sesión existentes. El modo `--demo` añade tres juegos de ejemplo únicamente a una biblioteca vacía. No inventa logros. Las pruebas de Steam y las pruebas del diálogo de logros usan respuestas simuladas y no necesitan contraseñas ni claves reales.
 
-`Build.ps1` comprueba también el ZIP recién generado: lo extrae a `.qa`, ejecuta su app autocontenida y valida búsqueda, vistas, reordenación, persistencia, diálogos, secretos, recuperación, copias con imágenes, cuentas y amistades simuladas, y virtualización con 1.003 juegos. Puedes repetir solo esa comprobación con `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.5.0-win-x64.zip`. Las imágenes y el informe quedan en `.qa/package-…/render`. La ejecución ARM64 necesita un equipo Windows ARM64; en otros equipos se comprueba la estructura del paquete.
+`Build.ps1` comprueba también el ZIP recién generado: lo extrae a `.qa`, ejecuta su app autocontenida y valida búsqueda, vistas, reordenación, persistencia, diálogos, secretos, recuperación, copias con imágenes, cuentas y amistades simuladas, y virtualización con 1.003 juegos. Puedes repetir solo esa comprobación con `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.6.0-win-x64.zip`. Las imágenes y el informe quedan en `.qa/package-…/render`. La ejecución ARM64 necesita un equipo Windows ARM64; en otros equipos se comprueba la estructura del paquete.
 
 La integración con una cuenta real y la instalación/desinstalación del MSI deben validarse en un entorno de lanzamiento antes de publicar. Consulta [docs/VALIDATION.md](docs/VALIDATION.md).
 
@@ -132,12 +132,16 @@ El proyecto incluye `.gitignore`, licencia MIT, documentación, pruebas y un wor
 
 Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
 
-También se entrega `dist/Checkpoint-source-0.5.0.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
+También se entrega `dist/Checkpoint-source-0.6.0.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
 
 ## Próximas versiones
 
-El backend de cuentas y amistades está desplegado en Supabase y la app 0.5.0 incorpora la pestaña Amigos. Han pasado 33 comprobaciones SQL y 7 HTTP del backend; queda validar el registro y el intercambio de imágenes con dos cuentas reales. El estado, configuración pública y pasos pendientes están en [docs/SUPABASE.md](docs/SUPABASE.md).
+El backend de cuentas y amistades está desplegado en Supabase y la app 0.6.0 incorpora la pestaña Amigos. Han pasado 33 comprobaciones SQL y 7 HTTP del backend; queda validar el registro y el intercambio de imágenes con dos cuentas reales. El estado, configuración pública y pasos pendientes están en [docs/SUPABASE.md](docs/SUPABASE.md).
 
 Notificaciones, estadísticas mensuales y sincronización de la biblioteca entre equipos quedan para futuras versiones. Consulta [docs/ROADMAP.md](docs/ROADMAP.md) y [CHANGELOG.md](CHANGELOG.md).
 
 Checkpoint es independiente de Valve. Los juegos, carátulas y marcas pertenecen a sus titulares. [Licencia](LICENSE) · [Avisos de terceros](THIRD-PARTY-NOTICES.md) · [Privacidad](docs/PRIVACY.md).
+
+## Conectar Steam
+
+La app incluye la dirección del servicio Steam de Supabase, ya desplegado y configurado, y la configuración pública para Amigos. Pulsa Vincular Steam y termina el acceso en Steam; los juegos se importan a Biblioteca. Amigos sigue usando cuentas propias de Checkpoint. [Configuración detallada](docs/STEAM-SERVICE.md). Los detalles de juegos de Steam deben ser visibles para importar biblioteca y logros.

@@ -1,6 +1,6 @@
 param(
     [ValidateSet('win-x64','win-arm64')][string]$Runtime = 'win-x64',
-    [string]$ServiceUrl = '',
+    [string]$ServiceUrl = 'https://fumdnvvvoiwoiziwtmsu.supabase.co/functions/v1/checkpoint-steam/',
     [switch]$Installer
 )
 $ErrorActionPreference = 'Stop'
@@ -14,9 +14,11 @@ $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $env:DOTNET_ADD_GLOBAL_TOOLS_TO_PATH = '0'
 $env:DOTNET_GENERATE_ASPNET_CERTIFICATE = 'false'
 $env:NUGET_PACKAGES = Join-Path $checkpointRoot '.tools\nuget'
+if (!$ServiceUrl) { $ServiceUrl = (Get-Content src/Checkpoint.App/service-config.json -Raw | ConvertFrom-Json).serviceUrl }
 if ($ServiceUrl) {
     $uri = [Uri]$ServiceUrl
-    if (!$uri.IsAbsoluteUri -or $uri.Scheme -ne 'https' -or $uri.AbsolutePath -ne '/' -or $uri.UserInfo -or $uri.Query -or $uri.Fragment) { throw 'ServiceUrl debe ser un origen HTTPS.' }
+    $allowedPath = $uri.AbsolutePath -eq '/' -or ($uri.Host.EndsWith('.supabase.co') -and $uri.AbsolutePath.TrimEnd('/') -eq '/functions/v1/checkpoint-steam')
+    if (!$uri.IsAbsoluteUri -or $uri.Scheme -ne 'https' -or !$allowedPath -or $uri.UserInfo -or $uri.Query -or $uri.Fragment) { throw 'ServiceUrl debe ser un origen HTTPS o el endpoint checkpoint-steam de Supabase.' }
 }
 & $dotnet restore Checkpoint.slnx --configfile NuGet.config
 if ($LASTEXITCODE -ne 0) { throw 'Falló restore.' }
@@ -26,6 +28,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación.' }
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas de la biblioteca.' }
 & node --test server/test/service.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas del servicio.' }
+& node --test supabase/tests/steam.test.mjs
+if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas Steam de Supabase.' }
 $output = Join-Path $checkpointRoot "dist\$version\$Runtime"
 & $dotnet publish src/Checkpoint.App/Checkpoint.App.csproj -c Release -r $Runtime --self-contained true -o $output --nologo -p:RestoreConfigFile="$checkpointRoot\NuGet.config" -p:DebugType=None -p:DebugSymbols=false
 if ($LASTEXITCODE -ne 0) { throw 'Falló publish.' }

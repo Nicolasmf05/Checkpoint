@@ -1,6 +1,14 @@
 [English](en/VALIDATION.md) · **Español**
 
-# Validación de 0.5.0
+# Validación
+
+## Integración Steam de 0.6.0
+
+Han pasado 108 comprobaciones de biblioteca, 15 del servidor Node, 14 HTTP/seguridad de la función Supabase y 79 nativas WPF (216 en total). Las pruebas Steam nativas verifican dirección Supabase, autorización vinculada al servicio, restauración DPAPI, rechazo de sesiones incorrectas, idioma y desvinculación. ZIP y MSI generados; el MSI sigue sin firma y sin prueba de instalación/desinstalación.
+
+La función `checkpoint-steam` y su migración privada están desplegadas. Han pasado 20 comprobaciones PostgreSQL, con datos de prueba revertidos: permisos, consumo atómico, respuestas repetidas, caducidad, límites y revocación. El ajuste JWT del gateway se ha desactivado solo para esta función tras aprobación. El servicio real detecta la clave configurada: health 200, biblioteca/logros sin sesión 401, callback inválido 400, inicio/sondeo pendiente 200 y secreto de sondeo incorrecto 400. La clave permanece en los secretos de Supabase. La vinculación con una cuenta real, validez de la clave ante Steam e importación de juegos/logros requieren completar personalmente el acceso.
+
+## 0.5.0
 
 Comprobaciones realizadas durante la preparación local del 2 de octubre de 2026:
 
