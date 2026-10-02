@@ -19,3 +19,7 @@ Host/validate Steam with a real account; complete operator identity/contact/coun
 ## Optional
 
 Monthly statistics, next-game picker, play sessions, cross-PC private-library sync and more catalogs. Deadlines remain optional.
+
+## Microsoft Store preparation
+
+Unsigned MSIX preview packaging, icons, SDK/payload validation and bilingual submission guidance are implemented. Partner Center identity, installed-package/data/startup tests, Windows App Certification Kit and Store submission remain pending. See [Store preparation](MICROSOFT-STORE.md).

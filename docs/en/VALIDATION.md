@@ -1,5 +1,9 @@
 # Validation
 
+## Unreleased — MSIX preparation
+
+MakeAppx schema/content validation passed for the unsigned x64 preview. Unpack verification matched all 485 application files by SHA-256 and checked icon sizes, languages, manifest and PE architecture. Five invalid identity/version input cases were rejected. The extracted MSIX payload passed 79 native WPF assertions using an isolated data folder and the real Windows profile for DPAPI. This does not test installed MSIX behavior, upgrades, uninstall, startup or Store certification. No package was installed or submitted to Store.
+
 ## 0.6.1 packaging
 
 The portable archive contains one top-level `Checkpoint` folder. Verification enforces that layout and launches the extracted application from it. The EXE/MSI remain unsigned; the reported SmartScreen block requires a trusted signing/distribution route. No suitable code-signing certificate was found in the current-user certificate store. Functional tests do not validate SmartScreen reputation.

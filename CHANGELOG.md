@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## Unreleased
+
+- Microsoft Store preparation: unsigned MSIX packaging with explicit preview/Store identities, reproducible icons, SDK validation and payload/architecture verification.
+- English/Spanish Store submission and migration guidance; CI builds a packaging preview. Store certification and installed testing remain pending.
+
 ## 0.6.1 — 2026-10-02
 
 - Portable ZIP extracts into one `Checkpoint` folder, containing the executable, runtime, configuration and licenses.

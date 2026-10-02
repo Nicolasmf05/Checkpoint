@@ -28,6 +28,8 @@ Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herram
 
 El MSI y el EXE aún no tienen firma digital. Windows puede mostrar un aviso o bloqueo: [mensajes de seguridad](docs/WINDOWS-SECURITY.md). Firma los artefactos antes de una distribución pública amplia si quieres ofrecer un editor verificado. El proyecto no incluye certificados privados.
 
+La distribución por Microsoft Store se prepara por separado: [guía de MSIX y publicación](docs/MICROSOFT-STORE.md). El MSIX de prueba sin firma es para validar el empaquetado; no elimina los avisos de las descargas actuales de GitHub.
+
 ## Incluido
 
 - Widget sin marco, movible, redimensionable, con posición guardada y opacidad del **fondo** ajustable entre 35 % y 100 %.

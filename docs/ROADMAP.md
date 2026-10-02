@@ -37,3 +37,7 @@ La versión 0.5.0 añade interfaz, documentación y capturas en inglés, conserv
 ## Opcional
 
 Estadísticas mensuales, selector de siguiente juego, sesiones de juego, sincronización entre equipos y otros catálogos. Las fechas límite permanecerán opcionales.
+
+## Preparación para Microsoft Store
+
+Implementados el empaquetado MSIX de prueba sin firma, iconos, validación SDK/archivos y guía bilingüe. Pendientes identidad de Partner Center, pruebas instaladas/datos/arranque, Windows App Certification Kit y publicación. Consulta [preparación de Store](MICROSOFT-STORE.md).

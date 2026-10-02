@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## Sin publicar
+
+- Preparación para Microsoft Store: MSIX sin firma con identidades separadas de prueba/tienda, iconos reproducibles, validación SDK y comprobación de archivos/arquitectura.
+- Guías de publicación y migración en inglés/español; CI genera una prueba de empaquetado. Pendientes certificación y pruebas instaladas.
+
 ## 0.6.1 — 2026-10-02
 
 - El ZIP portable se extrae en una sola carpeta `Checkpoint`, con el ejecutable, runtime, configuración y licencias.

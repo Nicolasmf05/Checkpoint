@@ -15,3 +15,7 @@ Do not disable protection, add exclusions or restore a quarantined executable to
 No public-trust code-signing certificate is configured for this project. Signing requires a suitable certificate/service and publisher identity verification. Security reviews and certificate provisioning are separate from the packaging fix.
 
 Sources: [Microsoft SmartScreen developer guidance](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation), [Smart App Control](https://learn.microsoft.com/windows/security/book/application-security-application-and-driver-control), [Microsoft file analysis submissions](https://learn.microsoft.com/unified-secops/submission-guide).
+
+## Microsoft Store alternative
+
+MSIX Store distribution lets Microsoft sign the package after certification, without a personal code-signing certificate. The project has a validated unsigned packaging preview, not a published Store app. See [Store preparation and remaining steps](MICROSOFT-STORE.md).

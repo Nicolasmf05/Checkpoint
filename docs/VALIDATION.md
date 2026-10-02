@@ -2,6 +2,10 @@
 
 # Validación
 
+## Sin publicar — preparación MSIX
+
+MakeAppx validó esquema y contenido del MSIX x64 de prueba sin firma. La extracción verificó por SHA-256 los 485 archivos de la app, tamaños de iconos, idiomas, manifiesto y arquitectura PE. Se rechazaron cinco casos de identidad/versión inválidos. La app extraída del MSIX pasó 79 comprobaciones WPF con datos aislados y el perfil real de Windows para DPAPI. Esto no valida MSIX instalado, actualizaciones, desinstalación, arranque ni certificación. No se instaló ni se envió el paquete a Store.
+
 ## Empaquetado de 0.6.1
 
 El portable contiene una sola carpeta `Checkpoint` en la raíz. La verificación exige esa estructura y ejecuta la app desde ella. EXE/MSI siguen sin firma: el bloqueo comunicado de SmartScreen necesita una vía de firma/distribución de confianza. No se encontró un certificado adecuado en el almacén del usuario Windows. Las pruebas funcionales no validan reputación de SmartScreen.

@@ -15,3 +15,7 @@ No desactives la protección, añadas exclusiones ni restaures un ejecutable en 
 El proyecto no tiene un certificado de firma de confianza pública configurado. Hace falta un certificado/servicio adecuado y verificación de identidad del editor. La revisión de seguridad y la obtención del certificado son trabajos separados del arreglo del paquete.
 
 Fuentes: [Guía SmartScreen para desarrolladores](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation), [Control inteligente de aplicaciones](https://learn.microsoft.com/windows/security/book/application-security-application-and-driver-control), [Revisión de archivos por Microsoft](https://learn.microsoft.com/unified-secops/submission-guide).
+
+## Alternativa Microsoft Store
+
+La distribución MSIX por Store permite que Microsoft firme el paquete tras la certificación, sin un certificado propio. El proyecto tiene una prueba de empaquetado sin firma validada; aún no está publicado en Store. Consulta [preparación y pasos pendientes](MICROSOFT-STORE.md).
