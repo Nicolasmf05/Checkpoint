@@ -14,7 +14,7 @@ $exe = Join-Path $extracted 'Checkpoint.exe'
 foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt')) {
     if (!(Test-Path -LiteralPath (Join-Path $extracted $relative))) { throw "El paquete no incluye $relative." }
 }
-$fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exe).ProductVersion
+$fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exe).ProductVersion.Split('+')[0]
 if (!$fileVersion.StartsWith($version + '.') -and $fileVersion -ne $version) { throw "Versión inesperada en el paquete: $fileVersion" }
 if ($Runtime -eq 'win-arm64' -and [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString() -ne 'Arm64') {
     Write-Output 'Estructura ARM64 comprobada. Ejecuta Verify-Package.ps1 en Windows ARM64 para validar la app nativa.'
@@ -33,5 +33,5 @@ if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $stderr; throw "Falló l
 $reportPath = Join-Path $render 'smoke.json'
 if (!(Test-Path -LiteralPath $reportPath)) { throw 'La app no produjo el informe de comprobación.' }
 $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json
-if (!$report.ok -or $report.checks -lt 55) { throw 'La comprobación nativa del paquete quedó incompleta.' }
+if (!$report.ok -or $report.checks -lt 64) { throw 'La comprobación nativa del paquete quedó incompleta.' }
 Write-Output "Paquete validado: $($report.checks) comprobaciones. Imágenes e informe: $render"

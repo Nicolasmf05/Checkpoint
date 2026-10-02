@@ -1,3 +1,5 @@
+[English](en/ROADMAP.md) · **Español**
+
 # Roadmap
 
 ## 0.3.0 — incluida
@@ -16,6 +18,8 @@ Widget translúcido, vistas de lista/compacta/cuadrícula, reordenación por arr
 Implementada en el cliente y conectada a Supabase. Pendiente de validar con dos cuentas reales antes de una publicación general. Registro con usuario y contraseña, sin correo ni confirmación. Alcance y limitaciones: [Amigos de Checkpoint](FRIENDS-PLAN.md) y [Supabase](SUPABASE.md).
 
 ## Experiencia de colección
+
+La versión 0.5.0 añade interfaz, documentación y capturas en inglés, conservando el español y la elección de idioma en Ajustes.
 
 - Prioridades con nombres en lugar de orden numérico.
 - Notificaciones opcionales al detectar nuevos logros.

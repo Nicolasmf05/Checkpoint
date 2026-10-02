@@ -59,6 +59,7 @@ public partial class MainWindow : Window
                 if (json.RootElement.TryGetProperty("serviceUrl", out var url)) Preferences.ServiceUrl = url.GetString() ?? "";
             }
         }
+        LoadLanguageResources(Preferences.Language);
         InitializeComponent();
         InitializeSocial();
         boundsTimer.Tick += (_, _) => { boundsTimer.Stop(); CaptureBounds(); Store.SaveSettings(Preferences); };
@@ -92,9 +93,9 @@ public partial class MainWindow : Window
         }
         tray = new Forms.NotifyIcon { Text = "Checkpoint · Ctrl+Alt+C", Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!) ?? System.Drawing.SystemIcons.Application, Visible = true };
         var menu = new Forms.ContextMenuStrip();
-        menu.Items.Add("Mostrar / ocultar", null, (_, _) => Dispatcher.Invoke(ToggleVisible));
-        menu.Items.Add("Añadir juego", null, (_, _) => Dispatcher.Invoke(() => { ShowWidget(); Dialogs.Edit(this, null); }));
-        menu.Items.Add("Salir", null, (_, _) => Dispatcher.Invoke(Exit));
+        menu.Items.Add(I18n.T("Mostrar / ocultar"), null, (_, _) => Dispatcher.Invoke(ToggleVisible));
+        menu.Items.Add(I18n.T("Añadir juego"), null, (_, _) => Dispatcher.Invoke(() => { ShowWidget(); Dialogs.Edit(this, null); }));
+        menu.Items.Add(I18n.T("Salir"), null, (_, _) => Dispatcher.Invoke(Exit));
         tray.ContextMenuStrip = menu; tray.DoubleClick += (_, _) => Dispatcher.Invoke(ShowWidget);
         Loaded += (_, _) =>
         {
@@ -104,7 +105,7 @@ public partial class MainWindow : Window
             if (Preferences.StartWithWindows)
             {
                 try { Dialogs.RestoreStartupIfMissing(); }
-                catch (Exception ex) { Notice("No se pudo restaurar el inicio con Windows: " + ex.Message); }
+                catch (Exception ex) { Notice(I18n.T("No se pudo restaurar el inicio con Windows: ") + ex.Message); }
             }
             timer.Tick += async (_, _) => { if (Steam.Session is not null && !syncing) await Sync(false); };
             timer.Start();
@@ -159,9 +160,9 @@ public partial class MainWindow : Window
         ResizeGrip.Visibility = Preferences.PositionLocked ? Visibility.Collapsed : Visibility.Visible;
         timer.Interval = TimeSpan.FromMinutes(Math.Clamp(Preferences.SyncMinutes, 15, 120));
         ViewButton.Content = Preferences.GridView ? "▦" : Preferences.Compact ? "≡" : "▤";
-        string view = Preferences.GridView ? "Cuadrícula" : Preferences.Compact ? "Compacta" : "Lista";
-        ViewButton.ToolTip = $"Vista: {view} · cambiar con F6";
-        System.Windows.Automation.AutomationProperties.SetName(ViewButton, $"Cambiar vista, actual: {view}");
+        string view = Preferences.GridView ? I18n.T("Cuadrícula") : Preferences.Compact ? I18n.T("Compacta") : I18n.T("Lista");
+        ViewButton.ToolTip = (I18n.IsEnglish ? $"View: {view} · switch with F6" : $"Vista: {view} · cambiar con F6");
+        System.Windows.Automation.AutomationProperties.SetName(ViewButton, (I18n.IsEnglish ? $"Change view, current: {view}" : $"Cambiar vista, actual: {view}"));
     }
     internal static SolidColorBrush Brush(string color) => (SolidColorBrush)new BrushConverter().ConvertFromString(color)!;
     internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); }
@@ -174,21 +175,21 @@ public partial class MainWindow : Window
     {
         if (!ready) return;
         int finished = Games.Count(g => g.Status == GameStatus.Finished);
-        Summary.Text = $"{Games.Count(g => g.Tracked)} en tu lista  ·  {finished} historias terminadas";
+        Summary.Text = I18n.IsEnglish ? $"{Games.Count(g => g.Tracked)} in your list  ·  {finished} stories finished" : $"{Games.Count(g => g.Tracked)} en tu lista  ·  {finished} historias terminadas";
         var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || g.Tracked)
             .Where(g => g.Title.Contains(Search.Text, StringComparison.CurrentCultureIgnoreCase))
             .Where(g => StatusFilter.SelectedIndex <= 0 || (int)g.Status == StatusFilter.SelectedIndex - 1)).ToList();
         visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Preferences.LightTheme)).ToList();
         BindCards();
         EmptyPanel.Visibility = filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        EmptyTitle.Text = Games.Count == 0 ? "Aquí empieza tu próxima partida" : "Tu lista tiene espacio para otra aventura";
-        EmptyText.Text = Games.Count == 0 ? "Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano."
-            : allLibrary ? "No hay juegos con esos filtros. Prueba otra búsqueda o añade un juego." : "Añade juegos a Mi lista desde su ficha en la biblioteca, o prueba otra búsqueda.";
+        EmptyTitle.Text = Games.Count == 0 ? I18n.T("Aquí empieza tu próxima partida") : I18n.T("Tu lista tiene espacio para otra aventura");
+        EmptyText.Text = Games.Count == 0 ? I18n.T("Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano.")
+            : allLibrary ? I18n.T("No hay juegos con esos filtros. Prueba otra búsqueda o añade un juego.") : I18n.T("Añade juegos a Mi lista desde su ficha en la biblioteca, o prueba otra búsqueda.");
         ExampleButton.Visibility = Games.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         TrackedButton.Foreground = (System.Windows.Media.Brush)Application.Current.Resources[allLibrary ? "TextBrush" : "AccentBrush"];
         LibraryButton.Foreground = (System.Windows.Media.Brush)Application.Current.Resources[allLibrary ? "AccentBrush" : "TextBrush"];
-        ConnectionText.Text = Steam.Session is null ? "● Biblioteca local" : "● Steam vinculado";
-        if (Social?.Session is not null) ConnectionText.Text = Steam.Session is null ? "● Checkpoint conectado" : "● Checkpoint y Steam conectados";
+        ConnectionText.Text = Steam.Session is null ? I18n.T("● Biblioteca local") : I18n.T("● Steam vinculado");
+        if (Social?.Session is not null) ConnectionText.Text = Steam.Session is null ? I18n.T("● Checkpoint conectado") : I18n.T("● Checkpoint y Steam conectados");
         SyncButton.IsEnabled = !syncing;
         UndoButton.Visibility = DeletedGames.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         ApplySocialTab();
@@ -261,7 +262,7 @@ public partial class MainWindow : Window
             border.BorderThickness = after ? new Thickness(1, 1, 1, 3) : new Thickness(1, 3, 1, 1);
         }
         else if (draggingId is Guid id && border.Tag is Game game && Games.Any(g => g.Id == id && g.Favorite != game.Favorite))
-            Notice("Los favoritos permanecen arriba. Reordena dentro del mismo grupo.");
+            Notice(I18n.T("Los favoritos permanecen arriba. Reordena dentro del mismo grupo."));
     }
     private void ClearDropHint()
     {
@@ -282,7 +283,7 @@ public partial class MainWindow : Window
     internal bool MoveCard(Guid sourceId, Guid targetId, bool after)
     {
         if (!GameRules.Move(Games, sourceId, targetId, after)) return false;
-        Persist(); Refresh(); Notice("Orden guardado."); return true;
+        Persist(); Refresh(); Notice(I18n.T("Orden guardado.")); return true;
     }
     private void DragHandleKey(object sender, KeyEventArgs e)
     {
@@ -298,7 +299,7 @@ public partial class MainWindow : Window
             var handle = VisualChildren(GameList).OfType<Button>().FirstOrDefault(b => b.Tag is Game g && g.Id == game.Id && (string?)b.Content == "⠿");
             handle?.Focus();
         }
-        else Notice("Los favoritos permanecen arriba. Reordena dentro del mismo grupo.");
+        else Notice(I18n.T("Los favoritos permanecen arriba. Reordena dentro del mismo grupo."));
     }
     internal static IEnumerable<DependencyObject> VisualChildren(DependencyObject parent)
     {
@@ -327,11 +328,11 @@ public partial class MainWindow : Window
         if (Games.Count != 0) return;
         Games.AddRange(new[]
         {
-            new Game { Title = "Hollow Knight", SteamAppId = 367520, Platform = "Steam", Status = GameStatus.Playing, Favorite = true, SortOrder = 0, Tasks = [new() { Title = "Explorar una nueva zona" }] },
+            new Game { Title = "Hollow Knight", SteamAppId = 367520, Platform = "Steam", Status = GameStatus.Playing, Favorite = true, SortOrder = 0, Tasks = [new() { Title = I18n.T("Explorar una nueva zona") }] },
             new Game { Title = "Hades", SteamAppId = 1145360, Platform = "Steam", Status = GameStatus.Pending, SortOrder = 1, Goal = GameGoal.Story },
-            new Game { Title = "Portal 2", SteamAppId = 620, Platform = "Steam", Status = GameStatus.Paused, SortOrder = 2, Tasks = [new() { Title = "Continuar la campaña cooperativa" }] }
+            new Game { Title = "Portal 2", SteamAppId = 620, Platform = "Steam", Status = GameStatus.Paused, SortOrder = 2, Tasks = [new() { Title = I18n.T("Continuar la campaña cooperativa") }] }
         });
-        Persist(); Notice("Juegos de ejemplo añadidos. El progreso de Steam aún no se ha consultado.");
+        Persist(); Notice(I18n.T("Juegos de ejemplo añadidos. El progreso de Steam aún no se ha consultado."));
     }
     internal void ShowWidget() { Show(); WindowState = WindowState.Normal; Activate(); }
     private void ToggleVisible() { if (IsVisible) Hide(); else ShowWidget(); }
@@ -339,7 +340,7 @@ public partial class MainWindow : Window
     protected override void OnClosing(CancelEventArgs e)
     {
         if (!exiting && Preferences.CloseToTray) { e.Cancel = true; Hide(); Persist(); return; }
-        try { Persist(); } catch (Exception ex) { MessageBox.Show("No se pudo guardar: " + ex.Message, "Checkpoint"); e.Cancel = true; return; }
+        try { Persist(); } catch (Exception ex) { MessageBox.Show(I18n.T("No se pudo guardar: ") + ex.Message, "Checkpoint"); e.Cancel = true; return; }
         base.OnClosing(e);
     }
     protected override void OnClosed(EventArgs e)
@@ -364,19 +365,19 @@ public partial class MainWindow : Window
             var service = SteamClient.ValidateServiceUrl(Preferences.ServiceUrl).AbsoluteUri;
             var flow = await Steam.BeginLogin(service, cancellation.Token);
             if (!Uri.TryCreate(flow.AuthorizeUrl, UriKind.Absolute, out var authorize) || authorize.Scheme != "https" || authorize.Host != "steamcommunity.com" || authorize.AbsolutePath != "/openid/login")
-                throw new InvalidDataException("El servicio no ha devuelto una dirección oficial de Steam.");
+                throw new InvalidDataException(I18n.T("El servicio no ha devuelto una dirección oficial de Steam."));
             Process.Start(new ProcessStartInfo(authorize.AbsoluteUri) { UseShellExecute = true });
-            Notice("Completa la vinculación en tu navegador. Puedes seguir usando el widget.");
+            Notice(I18n.T("Completa la vinculación en tu navegador. Puedes seguir usando el widget."));
             while (!cancellation.IsCancellationRequested)
             {
                 await Task.Delay(2500, cancellation.Token);
                 var result = await Steam.Poll(service, flow, cancellation.Token);
                 if (result.Status != "complete") continue;
                 Steam.SaveSession(service, result); Preferences.SteamId = result.SteamId; Persist();
-                Notice("Steam vinculado. Importando biblioteca…"); break;
+                Notice(I18n.T("Steam vinculado. Importando biblioteca…")); break;
             }
         }
-        catch (OperationCanceledException) { if (!shutdown.IsCancellationRequested) Notice("Vinculación cancelada o agotada. Puedes volver a intentarlo."); }
+        catch (OperationCanceledException) { if (!shutdown.IsCancellationRequested) Notice(I18n.T("Vinculación cancelada o agotada. Puedes volver a intentarlo.")); }
         catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or ArgumentException or IOException) { Notice(ex.Message); }
         finally { syncing = false; if (!shutdown.IsCancellationRequested) Refresh(); }
         if (!shutdown.IsCancellationRequested && Steam.Session is not null) await Sync(true);
@@ -395,7 +396,7 @@ public partial class MainWindow : Window
             {
                 var library = await Steam.Library(Preferences.ServiceUrl, shutdown.Token);
                 int added = GameRules.MergeSteamLibrary(Games, library.Games);
-                Notice($"{added} juegos importados. Añádelos a Mi lista desde su ficha.");
+                Notice((I18n.IsEnglish ? $"{added} games imported. Add them to My list from their cards." : $"{added} juegos importados. Añádelos a Mi lista desde su ficha."));
                 if (Games.All(g => !g.Tracked)) allLibrary = true;
             }
             var selected = single is null ? Games.Where(g => g.Tracked && g.SteamAppId.HasValue)
@@ -412,9 +413,9 @@ public partial class MainWindow : Window
             }
             Persist();
             if (errors.Count > 0) Notice(errors[0]);
-            else if (selected.Count > 0) Notice("Última sincronización: " + DateTime.Now.ToString("HH:mm") + ".");
+            else if (selected.Count > 0) Notice(I18n.T("Última sincronización: ") + DateTime.Now.ToString("HH:mm") + ".");
         }
-        catch (OperationCanceledException) { if (!shutdown.IsCancellationRequested) Notice("Se agotó el tiempo. Se conserva el progreso anterior."); }
+        catch (OperationCanceledException) { if (!shutdown.IsCancellationRequested) Notice(I18n.T("Se agotó el tiempo. Se conserva el progreso anterior.")); }
         catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or ArgumentException or IOException) { Notice(ex.Message); }
         finally { syncing = false; if (!shutdown.IsCancellationRequested) Refresh(); }
     }
@@ -429,9 +430,9 @@ public partial class MainWindow : Window
         public System.Windows.Media.Brush CoverBackground { get; }
         public System.Windows.Media.Brush StatusBrush { get; }
         public string Meta => (Model.Favorite ? "★  " : "") + Model.Platform + (Model.PlaytimeMinutes > 0 ? $"  ·  {Model.PlaytimeMinutes / 60d:0.#} h" : "");
-        public string ProgressCaption => Model.Goal == GameGoal.Story && Model.StoryPercent.HasValue ? "Historia · avance manual" : Model.Goal == GameGoal.Custom && Model.Tasks.Count > 0 ? $"{Model.Tasks.Count(t => t.Done)} / {Model.Tasks.Count} tareas" : Model.SteamAppId is null ? "Objetivos locales" : Model.Achievements is null ? "Logros sin sincronizar" : Model.Achievements.Count == 0 ? "Sin logros de Steam" : $"{Model.UnlockedCount} / {Model.Achievements.Count} logros";
+        public string ProgressCaption => Model.Goal == GameGoal.Story && Model.StoryPercent.HasValue ? I18n.T("Historia · avance manual") : Model.Goal == GameGoal.Custom && Model.Tasks.Count > 0 ? (I18n.IsEnglish ? $"{Model.Tasks.Count(t => t.Done)} / {Model.Tasks.Count} tasks" : $"{Model.Tasks.Count(t => t.Done)} / {Model.Tasks.Count} tareas") : Model.SteamAppId is null ? I18n.T("Objetivos locales") : Model.Achievements is null ? I18n.T("Logros sin sincronizar") : Model.Achievements.Count == 0 ? I18n.T("Sin logros de Steam") : (I18n.IsEnglish ? $"{Model.UnlockedCount} / {Model.Achievements.Count} achievements" : $"{Model.UnlockedCount} / {Model.Achievements.Count} logros");
         public string GridProgressCaption => ProgressCaption + (PercentText.Length > 0 ? " · " + PercentText : "");
-        public string ReorderName => "Reordenar " + Model.Title;
+        public string ReorderName => I18n.T("Reordenar ") + Model.Title;
         private int? ProgressPercent => Model.Goal == GameGoal.Story && Model.StoryPercent.HasValue ? Model.StoryPercent : Model.Goal == GameGoal.Custom && Model.Tasks.Count > 0 ? (int)Math.Round(Model.Tasks.Count(t => t.Done) * 100d / Model.Tasks.Count) : Model.AchievementPercent;
         public int Percentage => ProgressPercent ?? 0;
         public string PercentText => ProgressPercent is int percent ? percent + "%" : "";

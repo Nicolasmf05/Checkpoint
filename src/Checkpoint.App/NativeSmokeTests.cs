@@ -216,6 +216,27 @@ public partial class MainWindow
             await SetView(false, true, true, 375, 540);
             Render(this, "widget-compact-light.png");
             Check(Store.LoadGames().Count == 3, "dialog fixtures do not remain in the persisted library");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Language / Idioma").SelectedIndex = 1;
+                Click(window,"Guardar");
+            });
+            Check(Preferences.Language == "en" && Store.LoadSettings().Language == "en" && (string?)LibraryButton.Content == "Library" && Summary.Text.Contains("in your list"), "settings save English and update the interface immediately");
+            await SetView(true,false,false,700,740);
+            Render(this,"widget-grid-wide-dark-en.png");
+            RunModal(() => Dialogs.Edit(this,Games.First()),window =>
+            {
+                Check(Controls<TextBox>(window).Any(c => AutomationProperties.GetName(c) == "Game title"), "English game editor has localized accessible controls");
+                Render(window,"dialog-editor-en.png"); Click(window,"Cancel");
+            });
+            RunModal(() => Dialogs.Settings(this),window =>
+            {
+                Check(Texts(window).Contains("Language") && Texts(window).Contains("Background opacity"), "English settings translate labels");
+                Render(window,"dialog-settings-en.png");
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Language / Idioma").SelectedIndex = 0;
+                Click(window,"Save");
+            });
+            Check(Preferences.Language == "es" && (string?)FriendsButton.Content == "Amigos", "switching back to Spanish restores the interface");
             File.WriteAllText(Path.Combine(outputDirectory, "smoke.json"), JsonSerializer.Serialize(new { ok = true, checks = checks.Count, assertions = checks }, DataJson.Options));
             Console.WriteLine($"WPF smoke test passed: {checks.Count} checks, {outputDirectory}");
         }

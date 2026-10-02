@@ -40,7 +40,7 @@ public partial class MainWindow
                 AttachSocial(new(project,session:session));
             }
         }
-        catch (Exception ex) when (ex is IOException or JsonException or ArgumentException) { socialStartupError = "Amigos: " + ex.Message; }
+        catch (Exception ex) when (ex is IOException or JsonException or ArgumentException) { socialStartupError = I18n.T("Amigos: ") + ex.Message; }
         FriendsView = new(this); FriendsHost.Child = FriendsView;
         publicationTimer.Tick += async (_, _) => { publicationTimer.Stop(); await PublishSocial(); };
         socialTimer.Tick += async (_, _) => { await PublishSocial(); if (friendsVisible && !FriendsView.Busy) await FriendsView.Reload(); };
@@ -79,7 +79,7 @@ public partial class MainWindow
             string file = Path.Combine(Covers.DirectoryPath,game.CustomCover!);
             if (File.Exists(file))
             {
-                if (new FileInfo(file).Length > 2097152) throw new ArgumentException("La carátula compartida debe ocupar menos de 2 MiB.");
+                if (new FileInfo(file).Length > 2097152) throw new ArgumentException(I18n.T("La carátula compartida debe ocupar menos de 2 MiB."));
                 remote = Outbox!.UserId + "/covers/" + Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(file))).ToLowerInvariant() + ".png";
                 local = game.CustomCover;
             }
@@ -88,7 +88,7 @@ public partial class MainWindow
     }
     internal void SetShared(Game game, bool share)
     {
-        if (Outbox is null) throw new InvalidOperationException("Entra en Checkpoint antes de compartir.");
+        if (Outbox is null) throw new InvalidOperationException(I18n.T("Entra en Checkpoint antes de compartir."));
         if (share) { var projection = ProjectGame(game); Outbox.SetDesired(game.Id,projection.Payload,projection.LocalCover); }
         else Outbox.SetDesired(game.Id,null);
         SaveOutbox(); SchedulePublications();
@@ -107,7 +107,7 @@ public partial class MainWindow
             }
             SaveOutbox(); publicationTimer.Stop(); publicationTimer.Start();
         }
-        catch (Exception ex) when (ex is IOException or ArgumentException) { Notice("Publicación pendiente: " + ex.Message); }
+        catch (Exception ex) when (ex is IOException or ArgumentException) { Notice(I18n.T("Publicación pendiente: ") + ex.Message); }
     }
     internal async Task PublishSocial()
     {
@@ -127,10 +127,10 @@ public partial class MainWindow
                     {
                         if (operation.Payload?.CoverPath is string path && operation.LocalCover is string local)
                         {
-                            if (!BackupFiles.IsCustomCoverName(local)) throw new InvalidDataException("Carátula local no válida.");
+                            if (!BackupFiles.IsCustomCoverName(local)) throw new InvalidDataException(I18n.T("Carátula local no válida."));
                             var bytes = File.ReadAllBytes(Path.Combine(Covers.DirectoryPath,local));
                             if (!path.EndsWith(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() + ".png",StringComparison.Ordinal))
-                                throw new InvalidDataException("La carátula cambió; revisa la publicación.");
+                                throw new InvalidDataException(I18n.T("La carátula cambió; revisa la publicación."));
                             await api.UploadCover(path,bytes,shutdown.Token);
                         }
                         long revision = await api.Publish(id,operation,shutdown.Token);
@@ -141,7 +141,7 @@ public partial class MainWindow
                         var remote = (await api.Publications(box.UserId,shutdown.Token)).FirstOrDefault(g => g.GameId == id);
                         if (remote is null) throw;
                         box.Reconcile(id,remote); SaveOutbox();
-                        if (box.Entry(id).Conflict) { Notice("Hay un conflicto de publicación. Revísalo en Amigos → Compartir."); break; }
+                        if (box.Entry(id).Conflict) { Notice(I18n.T("Hay un conflicto de publicación. Revísalo en Amigos → Compartir.")); break; }
                     }
                 }
             }
@@ -160,8 +160,8 @@ public partial class MainWindow
         FilterArea.Visibility = friendsVisible ? Visibility.Collapsed : Visibility.Visible;
         GameArea.Visibility = friendsVisible ? Visibility.Collapsed : Visibility.Visible;
         FriendsHost.Visibility = friendsVisible ? Visibility.Visible : Visibility.Collapsed;
-        SummaryTitle.Text = friendsVisible ? "Tu gente, tus aventuras" : "Tu próxima aventura";
+        SummaryTitle.Text = friendsVisible ? I18n.T("Tu gente, tus aventuras") : I18n.T("Tu próxima aventura");
         FriendsButton.Foreground = (System.Windows.Media.Brush)Application.Current.Resources[friendsVisible ? "AccentBrush" : "TextBrush"];
-        if (friendsVisible) Summary.Text = "Progreso compartido desde Checkpoint";
+        if (friendsVisible) Summary.Text = I18n.T("Progreso compartido desde Checkpoint");
     }
 }

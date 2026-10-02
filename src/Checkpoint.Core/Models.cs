@@ -53,9 +53,9 @@ public sealed class Game
     [JsonIgnore] public string StatusText => Labels.Status(Status);
     [JsonIgnore] public string GoalText => Goal switch
     {
-        GameGoal.Story => "Terminar la historia",
-        GameGoal.Achievements => "Conseguir todos los logros",
-        _ => string.IsNullOrWhiteSpace(CustomGoal) ? "Objetivo personal" : CustomGoal
+        GameGoal.Story => I18n.T("Terminar la historia"),
+        GameGoal.Achievements => I18n.T("Conseguir todos los logros"),
+        _ => string.IsNullOrWhiteSpace(CustomGoal) ? I18n.T("Objetivo personal") : CustomGoal
     };
     [JsonIgnore] public string NextTask => Tasks.FirstOrDefault(t => !t.Done)?.Title ?? GoalText;
 }
@@ -64,17 +64,18 @@ public static class Labels
 {
     public static string Status(GameStatus status) => status switch
     {
-        GameStatus.Pending => "Pendiente", GameStatus.Playing => "Jugando",
-        GameStatus.Paused => "Pausado", GameStatus.Finished => "Historia terminada", _ => "Abandonado"
+        GameStatus.Pending => I18n.T("Pendiente"), GameStatus.Playing => I18n.T("Jugando"),
+        GameStatus.Paused => I18n.T("Pausado"), GameStatus.Finished => I18n.T("Historia terminada"), _ => I18n.T("Abandonado")
     };
     public static string Goal(GameGoal goal) => goal switch
     {
-        GameGoal.Story => "Historia", GameGoal.Achievements => "Todos los logros", _ => "Personalizado"
+        GameGoal.Story => I18n.T("Historia"), GameGoal.Achievements => I18n.T("Todos los logros"), _ => I18n.T("Personalizado")
     };
 }
 
 public sealed class Settings
 {
+    public string Language { get; set; } = "es";
     public double Width { get; set; } = 510;
     public double Height { get; set; } = 740;
     public double? Left { get; set; }
@@ -136,7 +137,7 @@ public static class GameRules
 
     public static void SetStatus(Game game, GameStatus status)
     {
-        if (!Enum.IsDefined(status)) throw new ArgumentException("Estado desconocido.");
+        if (!Enum.IsDefined(status)) throw new ArgumentException(I18n.T("Estado desconocido."));
         if (status == GameStatus.Finished && game.Status != GameStatus.Finished)
             game.FinishedAt = DateTimeOffset.UtcNow;
         else if (status != GameStatus.Finished) game.FinishedAt = null;
@@ -146,16 +147,16 @@ public static class GameRules
     public static void Validate(Game game)
     {
         game.Title ??= ""; game.Platform ??= "PC"; game.Notes ??= ""; game.CustomGoal ??= ""; game.Tasks ??= [];
-        if (game.Tasks.Any(t => t is null || t.Title is null)) throw new ArgumentException("Una tarea no es válida.");
+        if (game.Tasks.Any(t => t is null || t.Title is null)) throw new ArgumentException(I18n.T("Una tarea no es válida."));
         if (game.Achievements?.Any(a => a is null || a.Id is null || a.Name is null || a.Description is null) == true)
-            throw new ArgumentException("Los logros guardados no son válidos.");
+            throw new ArgumentException(I18n.T("Los logros guardados no son válidos."));
         game.Title = game.Title.Trim();
-        if (game.Title.Length is < 1 or > 140) throw new ArgumentException("El nombre debe tener entre 1 y 140 caracteres.");
-        if (game.SteamAppId is <= 0) throw new ArgumentException("El identificador de Steam debe ser un número positivo.");
-        if (game.StoryPercent is < 0 or > 100) throw new ArgumentException("El porcentaje de historia debe estar entre 0 y 100.");
-        if (!Enum.IsDefined(game.Status) || !Enum.IsDefined(game.Goal)) throw new ArgumentException("Estado u objetivo desconocido.");
+        if (game.Title.Length is < 1 or > 140) throw new ArgumentException(I18n.T("El nombre debe tener entre 1 y 140 caracteres."));
+        if (game.SteamAppId is <= 0) throw new ArgumentException(I18n.T("El identificador de Steam debe ser un número positivo."));
+        if (game.StoryPercent is < 0 or > 100) throw new ArgumentException(I18n.T("El porcentaje de historia debe estar entre 0 y 100."));
+        if (!Enum.IsDefined(game.Status) || !Enum.IsDefined(game.Goal)) throw new ArgumentException(I18n.T("Estado u objetivo desconocido."));
         if (game.Notes.Length > 20000 || game.Tasks.Count > 200 || game.Tasks.Any(t => t.Title.Length > 500))
-            throw new ArgumentException("Las notas o tareas son demasiado largas.");
+            throw new ArgumentException(I18n.T("Las notas o tareas son demasiado largas."));
         game.Platform = game.SteamAppId is null ? game.Platform.Trim()[..Math.Min(game.Platform.Trim().Length, 60)] : "Steam";
         if (game.Platform.Length == 0) game.Platform = "PC";
         game.CustomGoal = game.CustomGoal[..Math.Min(game.CustomGoal.Length, 500)];

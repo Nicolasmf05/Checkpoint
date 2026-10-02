@@ -1,3 +1,5 @@
+[English](en/FRIENDS-PLAN.md) · **Español**
+
 # Amigos de Checkpoint
 
 ## Alcance solicitado

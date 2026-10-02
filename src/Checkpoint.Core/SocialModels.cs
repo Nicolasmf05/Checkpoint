@@ -11,7 +11,7 @@ public sealed record SocialProject(string Url, string PublishableKey)
             || !uri.Host.EndsWith(".supabase.co", StringComparison.OrdinalIgnoreCase) || uri.AbsolutePath != "/"
             || uri.UserInfo.Length > 0 || uri.Query.Length > 0 || uri.Fragment.Length > 0
             || !PublishableKey.StartsWith("sb_publishable_", StringComparison.Ordinal) || PublishableKey.Length > 200)
-            throw new ArgumentException("La configuración pública de Checkpoint no es válida.");
+            throw new ArgumentException(I18n.T("La configuración pública de Checkpoint no es válida."));
         return uri;
     }
 }
@@ -45,12 +45,12 @@ public sealed record SharedGamePayload(string Title, string Platform, string Sta
         game.Tasks.Count > 0 ? game.Tasks.Count(t => t.Done) : null, game.Tasks.Count > 0 ? game.Tasks.Count : null,
         game.Achievements is { Count: > 0 } ? game.UnlockedCount : null,
         game.Achievements is { Count: > 0 } ? game.Achievements.Count : null, game.SteamAppId, coverPath, game.FinishedAt);
-    [JsonIgnore] public string StatusText => Status switch { "pending" => "Pendiente", "playing" => "Jugando",
-        "paused" => "Pausado", "finished" => "Terminado", _ => "Abandonado" };
+    [JsonIgnore] public string StatusText => Status switch { "pending" => I18n.T("Pendiente"), "playing" => I18n.T("Jugando"),
+        "paused" => I18n.T("Pausado"), "finished" => I18n.T("Terminado"), _ => I18n.T("Abandonado") };
     [JsonIgnore] public string ProgressText => string.Join(" · ", new[] {
-        StoryPercent is int story ? $"Historia: {story}%" : null,
-        TasksTotal is int tasks ? $"Tareas: {TasksDone}/{tasks}" : null,
-        AchievementsTotal is int achievements ? $"Logros guardados: {AchievementsUnlocked}/{achievements}" : null
+        StoryPercent is int story ? (I18n.IsEnglish ? $"Story: {story}%" : $"Historia: {story}%") : null,
+        TasksTotal is int tasks ? (I18n.IsEnglish ? $"Tasks: {TasksDone}/{tasks}" : $"Tareas: {TasksDone}/{tasks}") : null,
+        AchievementsTotal is int achievements ? (I18n.IsEnglish ? $"Saved achievements: {AchievementsUnlocked}/{achievements}" : $"Logros guardados: {AchievementsUnlocked}/{achievements}") : null
     }.Where(s => s is not null));
 }
 
@@ -104,7 +104,7 @@ public sealed class SocialOutbox
     public void Acknowledge(Guid id, long revision)
     {
         var entry = Entry(id);
-        if (entry.Pending is null) throw new InvalidOperationException("No hay publicación pendiente.");
+        if (entry.Pending is null) throw new InvalidOperationException(I18n.T("No hay publicación pendiente."));
         entry.Revision = revision; entry.Published = entry.Pending.Payload; entry.Pending = null; entry.Conflict = false;
     }
     public void Reconcile(Guid id, SocialPublication remote)
@@ -121,7 +121,7 @@ public sealed class SocialOutbox
         var result = File.Exists(path) ? JsonSerializer.Deserialize<SocialOutbox>(File.ReadAllText(path), DataJson.Options) : null;
         if (result is null) return new() { ProjectUrl = project, UserId = user };
         if (result.UserId != user || result.ProjectUrl != project || result.Games is null || result.Games.Count > 10000)
-            throw new InvalidDataException("La cola de publicación pertenece a otra cuenta o no es válida.");
+            throw new InvalidDataException(I18n.T("La cola de publicación pertenece a otra cuenta o no es válida."));
         return result;
     }
     public void Save(string path)

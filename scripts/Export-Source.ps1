@@ -3,7 +3,7 @@ $checkpointRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 Set-Location -LiteralPath $checkpointRoot
 $version = & "$PSScriptRoot\Get-Version.ps1"
 Add-Type -AssemblyName System.IO.Compression
-$sourceFiles = & rg --files --hidden --no-require-git
+$sourceFiles = & rg --files --hidden --no-require-git --glob '!.git/**'
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo enumerar el código con ripgrep.' }
 New-Item -ItemType Directory -Path (Join-Path $checkpointRoot 'dist') -Force | Out-Null
 $destination = Join-Path $checkpointRoot "dist\Checkpoint-source-$version.zip"

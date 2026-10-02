@@ -17,7 +17,7 @@ public sealed class SqliteStore : IDisposable
         }.ToString());
         connection.Open();
         using var version = connection.CreateCommand(); version.CommandText = "PRAGMA user_version";
-        if (Convert.ToInt32(version.ExecuteScalar()) > 2) throw new InvalidDataException("Esta biblioteca pertenece a una versión más reciente de Checkpoint.");
+        if (Convert.ToInt32(version.ExecuteScalar()) > 2) throw new InvalidDataException(I18n.T("Esta biblioteca pertenece a una versión más reciente de Checkpoint."));
         using var cmd = connection.CreateCommand();
         cmd.CommandText = "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS games (id TEXT PRIMARY KEY, payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1), payload TEXT NOT NULL); CREATE TABLE IF NOT EXISTS deleted_games (id TEXT PRIMARY KEY, payload TEXT NOT NULL, deleted_at TEXT NOT NULL); PRAGMA user_version=2;";
         cmd.ExecuteNonQuery();
@@ -30,7 +30,7 @@ public sealed class SqliteStore : IDisposable
         while (reader.Read())
         {
             var game = JsonSerializer.Deserialize<Game>(reader.GetString(0), DataJson.Options)
-                ?? throw new InvalidDataException("Un juego guardado no se puede leer.");
+                ?? throw new InvalidDataException(I18n.T("Un juego guardado no se puede leer."));
             GameRules.Validate(game); games.Add(game);
         }
         return games;
@@ -88,7 +88,7 @@ public sealed class SqliteStore : IDisposable
         using var reader = cmd.ExecuteReader(); var deleted = new List<DeletedGame>();
         while (reader.Read())
         {
-            var game = JsonSerializer.Deserialize<Game>(reader.GetString(1), DataJson.Options) ?? throw new InvalidDataException("No se puede leer un juego eliminado.");
+            var game = JsonSerializer.Deserialize<Game>(reader.GetString(1), DataJson.Options) ?? throw new InvalidDataException(I18n.T("No se puede leer un juego eliminado."));
             GameRules.Validate(game);
             deleted.Add(new(Guid.Parse(reader.GetString(0)), game, DateTimeOffset.Parse(reader.GetString(2))));
         }
@@ -98,7 +98,7 @@ public sealed class SqliteStore : IDisposable
     public void DeleteGame(Game game, IEnumerable<Game> remaining, Settings settings)
     {
         var snapshot = remaining.ToList();
-        if (snapshot.Any(g => g.Id == game.Id)) throw new ArgumentException("El juego eliminado sigue en la colección.");
+        if (snapshot.Any(g => g.Id == game.Id)) throw new ArgumentException(I18n.T("El juego eliminado sigue en la colección."));
         GameRules.Validate(game);
         SaveState(snapshot, settings, new(Guid.NewGuid(), game, DateTimeOffset.UtcNow));
     }
@@ -106,10 +106,10 @@ public sealed class SqliteStore : IDisposable
     public Game RestoreDeletedGame(Guid recoveryId, IEnumerable<Game> games, Settings settings)
     {
         var deleted = LoadDeletedGames().FirstOrDefault(d => d.RecoveryId == recoveryId)
-            ?? throw new InvalidOperationException("Ese juego ya se ha recuperado o no está disponible.");
+            ?? throw new InvalidOperationException(I18n.T("Ese juego ya se ha recuperado o no está disponible."));
         var current = games.ToList();
         if (current.Any(g => g.Id == deleted.Game.Id || (deleted.Game.SteamAppId is not null && g.SteamAppId == deleted.Game.SteamAppId)))
-            throw new InvalidOperationException("Este juego ya existe en la biblioteca. Se han conservado sus datos actuales; puedes recuperar otro juego desde Ajustes.");
+            throw new InvalidOperationException(I18n.T("Este juego ya existe en la biblioteca. Se han conservado sus datos actuales; puedes recuperar otro juego desde Ajustes."));
         current.Add(deleted.Game); SaveState(current, settings, restored: recoveryId); return deleted.Game;
     }
 

@@ -76,6 +76,13 @@ internal static class SocialChecks
         }),new(project.Validate().AbsoluteUri,user,"OLD","OLD-REFRESH",DateTimeOffset.UtcNow.AddMinutes(-1)));
         await Task.WhenAll(refreshing.Profiles(),refreshing.Requests());
         check(refreshes == 1 && refreshing.Session!.AccessToken == "NEW","concurrent requests rotate an expired refresh token once");
+        var spanishProjection = SharedGamePayload.From(game);
+        I18n.SetLanguage("en");
+        check(Labels.Status(GameStatus.Playing) == "Playing" && Labels.Goal(GameGoal.Story) == "Story", "English model labels use the built-in catalog");
+        check(SharedGamePayload.From(game) == spanishProjection, "language changes do not change shared wire data");
+        check(I18n.T("Unknown user text") == "Unknown user text", "localization leaves user text unchanged");
+        I18n.SetLanguage("es");
+        check(Labels.Status(GameStatus.Playing) == "Jugando", "Spanish remains available after language switching");
     }
     internal sealed class Handler(Func<HttpRequestMessage,Task<HttpResponseMessage>> respond) : HttpMessageHandler
     {

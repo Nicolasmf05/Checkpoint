@@ -31,7 +31,7 @@ public sealed class SocialApi : IDisposable
     {
         if (response.User?.Id is not Guid id || id == Guid.Empty || string.IsNullOrEmpty(response.AccessToken)
             || string.IsNullOrEmpty(response.RefreshToken) || response.ExpiresIn <= 0)
-            throw new InvalidDataException("La respuesta de inicio de sesión no es válida.");
+            throw new InvalidDataException(I18n.T("La respuesta de inicio de sesión no es válida."));
         var candidate = new SocialSession(origin.AbsoluteUri, id, response.AccessToken, response.RefreshToken,
             DateTimeOffset.UtcNow.AddSeconds(response.ExpiresIn));
         SessionChanged?.Invoke(candidate); Session = candidate;
@@ -41,11 +41,11 @@ public sealed class SocialApi : IDisposable
         await sessionGate.WaitAsync(ct);
         try
         {
-            if (Session is null) throw new SocialApiException("Entra en tu cuenta de Checkpoint.");
+            if (Session is null) throw new SocialApiException(I18n.T("Entra en tu cuenta de Checkpoint."));
             if (Session.ExpiresAt > DateTimeOffset.UtcNow.AddSeconds(60)) return;
             var refreshed = await Send<AuthResponse>(HttpMethod.Post,"auth/v1/token?grant_type=refresh_token",
                 new { refresh_token = Session.RefreshToken }, false, ct);
-            if (refreshed.User?.Id != Session.UserId) throw new InvalidDataException("La cuenta de la sesión cambió.");
+            if (refreshed.User?.Id != Session.UserId) throw new InvalidDataException(I18n.T("La cuenta de la sesión cambió."));
             Accept(refreshed);
         }
         finally { sessionGate.Release(); }
@@ -75,37 +75,37 @@ public sealed class SocialApi : IDisposable
             }
             catch (JsonException) { }
             string message = code switch {
-                "40001" => "El progreso cambió en otro equipo. Revisa el conflicto antes de publicar.",
-                "email_not_confirmed" => "Confirma tu correo antes de entrar.",
-                "invalid_credentials" => "El usuario o la contraseña no son correctos.",
-                "user_already_exists" or "email_exists" => "Ese nombre de usuario ya está en uso.",
-                "weak_password" => "La contraseña no cumple los requisitos del servicio.",
-                "over_email_send_rate_limit" => "Se ha alcanzado el límite de correo. Espera antes de intentarlo.",
-                "P0001" => "La solicitud no está disponible o se ha alcanzado el límite. Actualiza e inténtalo más tarde.",
+                "40001" => I18n.T("El progreso cambió en otro equipo. Revisa el conflicto antes de publicar."),
+                "email_not_confirmed" => I18n.T("Confirma tu correo antes de entrar."),
+                "invalid_credentials" => I18n.T("El usuario o la contraseña no son correctos."),
+                "user_already_exists" or "email_exists" => I18n.T("Ese nombre de usuario ya está en uso."),
+                "weak_password" => I18n.T("La contraseña no cumple los requisitos del servicio."),
+                "over_email_send_rate_limit" => I18n.T("Se ha alcanzado el límite de correo. Espera antes de intentarlo."),
+                "P0001" => I18n.T("La solicitud no está disponible o se ha alcanzado el límite. Actualiza e inténtalo más tarde."),
                 _ => response.StatusCode switch {
-                    HttpStatusCode.Unauthorized => "La sesión no es válida. Vuelve a entrar en Checkpoint.",
-                    HttpStatusCode.Forbidden => "No tienes permiso para consultar o cambiar estos datos.",
-                    HttpStatusCode.TooManyRequests => "Demasiadas consultas. Espera antes de volver a intentarlo.",
-                    _ => "No se pudo completar la operación. Los cambios pendientes se conservan en este PC."
+                    HttpStatusCode.Unauthorized => I18n.T("La sesión no es válida. Vuelve a entrar en Checkpoint."),
+                    HttpStatusCode.Forbidden => I18n.T("No tienes permiso para consultar o cambiar estos datos."),
+                    HttpStatusCode.TooManyRequests => I18n.T("Demasiadas consultas. Espera antes de volver a intentarlo."),
+                    _ => I18n.T("No se pudo completar la operación. Los cambios pendientes se conservan en este PC.")
                 }
             };
             throw new SocialApiException(message, code);
         }
         if (typeof(T) == typeof(bool)) return (T)(object)true;
-        return await response.Content.ReadFromJsonAsync<T>(Json, ct) ?? throw new InvalidDataException("Respuesta vacía de Checkpoint.");
+        return await response.Content.ReadFromJsonAsync<T>(Json, ct) ?? throw new InvalidDataException(I18n.T("Respuesta vacía de Checkpoint."));
     }
     public static string AccountAddress(string username)
     {
         string normalized = username.Trim().ToLowerInvariant();
         if (!System.Text.RegularExpressions.Regex.IsMatch(normalized,"^[a-z0-9_]{3,24}$"))
-            throw new ArgumentException("El usuario debe tener de 3 a 24 letras, números o guiones bajos, sin espacios.");
+            throw new ArgumentException(I18n.T("El usuario debe tener de 3 a 24 letras, números o guiones bajos, sin espacios."));
         return normalized + "@accounts.checkpoint.invalid";
     }
     public async Task Login(string username, string password, CancellationToken ct = default) => Accept(
         await Send<AuthResponse>(HttpMethod.Post,"auth/v1/token?grant_type=password",new { email = AccountAddress(username), password },false,ct));
     public async Task<bool> Register(string username, string password, string displayName, CancellationToken ct = default)
     {
-        if (displayName.Trim().Length is < 1 or > 50 || password.Length < 8) throw new ArgumentException("Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres.");
+        if (displayName.Trim().Length is < 1 or > 50 || password.Length < 8) throw new ArgumentException(I18n.T("Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres."));
         var response = await Send<AuthResponse>(HttpMethod.Post,"auth/v1/signup",new { email = AccountAddress(username), password,
             data = new { display_name = displayName.Trim() } },false,ct);
         if (response.AccessToken is null) return false;
@@ -118,12 +118,12 @@ public sealed class SocialApi : IDisposable
     }
     public Task<bool> ChangePassword(string password, CancellationToken ct = default)
     {
-        if (password.Length < 8) throw new ArgumentException("La contraseña debe tener al menos 8 caracteres.");
+        if (password.Length < 8) throw new ArgumentException(I18n.T("La contraseña debe tener al menos 8 caracteres."));
         return Send<bool>(HttpMethod.Put,"auth/v1/user",new { password },true,ct);
     }
     public Task<bool> UpdateName(string name, CancellationToken ct = default)
     {
-        if (name.Trim().Length is < 1 or > 50 || name.Any(char.IsControl)) throw new ArgumentException("Usa un nombre de 1 a 50 caracteres.");
+        if (name.Trim().Length is < 1 or > 50 || name.Any(char.IsControl)) throw new ArgumentException(I18n.T("Usa un nombre de 1 a 50 caracteres."));
         return Send<bool>(HttpMethod.Patch,$"rest/v1/cp_profiles?user_id=eq.{Session?.UserId}",new { display_name = name.Trim() },true,ct);
     }
     public Task<SocialProfile[]> Profiles(CancellationToken ct = default) => Send<SocialProfile[]>(HttpMethod.Get,
@@ -134,25 +134,25 @@ public sealed class SocialApi : IDisposable
         "rest/v1/cp_friend_requests?select=id,sender_id,recipient_id,status&status=eq.pending&limit=100",null,true,ct);
     public Task<SocialProfile[]> Find(string code, CancellationToken ct = default)
     {
-        if (!System.Text.RegularExpressions.Regex.IsMatch(code.Trim(), "^cp-[a-fA-F0-9]{12}$")) throw new ArgumentException("El código tiene el formato cp- seguido de 12 caracteres.");
+        if (!System.Text.RegularExpressions.Regex.IsMatch(code.Trim(), "^cp-[a-fA-F0-9]{12}$")) throw new ArgumentException(I18n.T("El código tiene el formato cp- seguido de 12 caracteres."));
         return Send<SocialProfile[]>(HttpMethod.Post,"rest/v1/rpc/cp_find_friend",new { p_code = code.Trim().ToLowerInvariant() },true,ct);
     }
     public Task<bool> Invite(Guid recipient, CancellationToken ct = default) => Send<bool>(HttpMethod.Post,"rest/v1/cp_friend_requests",
-        new { sender_id = Session?.UserId ?? throw new SocialApiException("Entra en Checkpoint."), recipient_id = recipient },true,ct);
+        new { sender_id = Session?.UserId ?? throw new SocialApiException(I18n.T("Entra en Checkpoint.")), recipient_id = recipient },true,ct);
     public Task<bool> Answer(Guid request, bool accept, CancellationToken ct = default) => Send<bool>(HttpMethod.Patch,
         $"rest/v1/cp_friend_requests?id=eq.{request}",new { status = accept ? "accepted" : "rejected" },true,ct);
     public Task<bool> Cancel(Guid request, CancellationToken ct = default) => Send<bool>(HttpMethod.Delete,
         $"rest/v1/cp_friend_requests?id=eq.{request}",null,true,ct);
     public Task<bool> Unfriend(Guid other, CancellationToken ct = default)
     {
-        var own = Session?.UserId ?? throw new SocialApiException("Entra en Checkpoint.");
+        var own = Session?.UserId ?? throw new SocialApiException(I18n.T("Entra en Checkpoint."));
         // UUID textual order matches PostgreSQL's byte order.
         var low = string.CompareOrdinal(own.ToString(),other.ToString()) < 0 ? own : other;
         var high = low == own ? other : own;
         return Send<bool>(HttpMethod.Delete,$"rest/v1/cp_friendships?user_low=eq.{low}&user_high=eq.{high}",null,true,ct);
     }
     public Task<bool> Block(Guid other, CancellationToken ct = default) => Send<bool>(HttpMethod.Post,"rest/v1/cp_blocks",
-        new { blocker_id = Session?.UserId ?? throw new SocialApiException("Entra en Checkpoint."), blocked_id = other },true,ct);
+        new { blocker_id = Session?.UserId ?? throw new SocialApiException(I18n.T("Entra en Checkpoint.")), blocked_id = other },true,ct);
     public Task<bool> Unblock(Guid other, CancellationToken ct = default) => Send<bool>(HttpMethod.Delete,
         $"rest/v1/cp_blocks?blocked_id=eq.{other}",null,true,ct);
     public Task<JsonElement[]> Blocks(CancellationToken ct = default) => Send<JsonElement[]>(HttpMethod.Get,"rest/v1/cp_blocks?select=blocked_id&limit=500",null,true,ct);
@@ -163,7 +163,7 @@ public sealed class SocialApi : IDisposable
     public Task<bool> UploadCover(string path, byte[] png, CancellationToken ct = default)
     {
         ValidateCoverPath(path, Session?.UserId ?? Guid.Empty);
-        if (png.Length > 2097152) throw new ArgumentException("La carátula supera 2 MiB.");
+        if (png.Length > 2097152) throw new ArgumentException(I18n.T("La carátula supera 2 MiB."));
         return Send<bool>(HttpMethod.Post,"storage/v1/object/checkpoint-assets/" + path,null,true,ct,png);
     }
     public async Task<byte[]> DownloadCover(string path, Guid owner, CancellationToken ct = default)
@@ -172,15 +172,15 @@ public sealed class SocialApi : IDisposable
         using var request = new HttpRequestMessage(HttpMethod.Get,new Uri(origin,"storage/v1/object/authenticated/checkpoint-assets/" + path));
         request.Headers.Add("apikey",project.PublishableKey); request.Headers.Authorization = new("Bearer",Session!.AccessToken);
         using var response = await http.SendAsync(request,ct);
-        if (!response.IsSuccessStatusCode) throw new SocialApiException("La carátula ya no está disponible.");
+        if (!response.IsSuccessStatusCode) throw new SocialApiException(I18n.T("La carátula ya no está disponible."));
         var bytes = await response.Content.ReadAsByteArrayAsync(ct);
-        if (bytes.Length > 2097152) throw new InvalidDataException("Carátula demasiado grande.");
+        if (bytes.Length > 2097152) throw new InvalidDataException(I18n.T("Carátula demasiado grande."));
         return bytes;
     }
     private static void ValidateCoverPath(string path, Guid owner)
     {
         if (owner == Guid.Empty || !System.Text.RegularExpressions.Regex.IsMatch(path,"^" + owner + "/covers/[a-zA-Z0-9_-]+\\.(png|jpg|jpeg|webp)$"))
-            throw new ArgumentException("La referencia de carátula no es válida.");
+            throw new ArgumentException(I18n.T("La referencia de carátula no es válida."));
     }
     public void Dispose() { http.Dispose(); sessionGate.Dispose(); }
 }

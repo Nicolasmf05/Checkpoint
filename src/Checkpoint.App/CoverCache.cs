@@ -29,7 +29,7 @@ public sealed class CoverCache : IDisposable
     {
         var bitmap = new BitmapImage(); bitmap.BeginInit(); bitmap.CacheOption = BitmapCacheOption.OnLoad; bitmap.DecodePixelWidth = 220;
         bitmap.StreamSource = stream; bitmap.EndInit();
-        if (bitmap.PixelHeight > 4096) throw new InvalidDataException("La carátula tiene una proporción demasiado alta.");
+        if (bitmap.PixelHeight > 4096) throw new InvalidDataException(I18n.T("La carátula tiene una proporción demasiado alta."));
         bitmap.Freeze(); return bitmap;
     }
     private BitmapImage ReadCached(string path)
@@ -51,12 +51,12 @@ public sealed class CoverCache : IDisposable
     }
     public string Import(string source)
     {
-        if (new FileInfo(source).Length > BackupFiles.MaxImageBytes) throw new ArgumentException("La imagen debe ocupar menos de 8 MB.");
+        if (new FileInfo(source).Length > BackupFiles.MaxImageBytes) throw new ArgumentException(I18n.T("La imagen debe ocupar menos de 8 MB."));
         return SavePrepared(Encode(Read(source)));
     }
     internal static byte[] PrepareImport(byte[] bytes)
     {
-        if (bytes.Length > BackupFiles.MaxImageBytes || !BackupFiles.IsPng(bytes)) throw new InvalidDataException("La carátula de la copia no es una imagen PNG válida.");
+        if (bytes.Length > BackupFiles.MaxImageBytes || !BackupFiles.IsPng(bytes)) throw new InvalidDataException(I18n.T("La carátula de la copia no es una imagen PNG válida."));
         BackupFiles.ValidatePngImage(bytes);
         using var input = new MemoryStream(bytes, writable: false); return Encode(Read(input));
     }
@@ -64,7 +64,7 @@ public sealed class CoverCache : IDisposable
     {
         using var output = new MemoryStream();
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(image)); encoder.Save(output);
-        if (output.Length > BackupFiles.MaxImageBytes) throw new InvalidDataException("La carátula preparada supera los 8 MB.");
+        if (output.Length > BackupFiles.MaxImageBytes) throw new InvalidDataException(I18n.T("La carátula preparada supera los 8 MB."));
         return output.ToArray();
     }
     internal string SavePrepared(byte[] bytes)
@@ -76,7 +76,7 @@ public sealed class CoverCache : IDisposable
     }
     internal void RemoveCreated(string name)
     {
-        if (!BackupFiles.IsCustomCoverName(name)) throw new ArgumentException("Nombre de carátula no válido.");
+        if (!BackupFiles.IsCustomCoverName(name)) throw new ArgumentException(I18n.T("Nombre de carátula no válido."));
         File.Delete(Path.Combine(folder, name));
     }
     public async Task<BitmapImage?> Get(Game game)

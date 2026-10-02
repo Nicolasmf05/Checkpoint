@@ -1,140 +1,113 @@
 # Checkpoint
 
-Un juego cada vez. Widget nativo y translúcido para organizar los juegos que quieres pasarte en Windows.
+**English** · [Español](README.es.md)
 
-![Checkpoint: biblioteca y carátulas](docs/screenshots/widget-grid-wide-dark.png)
+One game at a time. A native, translucent Windows desktop widget for the games you want to finish, with cover art, goals and progress shared with Checkpoint friends.
 
-## Capturas
+![Checkpoint cover grid](docs/screenshots/widget-grid-wide-dark-en.png)
 
-Capturas de la aplicación Windows 0.4.0 renderizadas durante las pruebas nativas. Los juegos, usuarios y progresos son datos de ejemplo; las carátulas privadas de prueba usan una imagen de color plano. Consulta la [galería de capturas](docs/SCREENSHOTS.md) para ver lista, vista compacta, amigos y ajustes.
+## Screenshots
 
-| Biblioteca | Amigos de Checkpoint |
+Captures use real WPF controls rendered during native tests. Games, users and friend progress are examples; the private cover fixture is a solid-color image. See the [gallery](docs/en/SCREENSHOTS.md) for both languages.
+
+| Account | Friends' progress |
 | --- | --- |
-| ![Lista en tema oscuro](docs/screenshots/widget-dark.png) | ![Progreso compartido de ejemplo](docs/screenshots/widget-friends-progress.png) |
+| ![Username and password](docs/screenshots/widget-friends-login-en.png) | ![Example friend progress](docs/screenshots/widget-friends-progress-en.png) |
 
-## Descargar y utilizar
+## Download and run
 
-La versión actual es **0.4.0**. En la carpeta `dist` se generan:
+Current version: **0.5.0**. Build outputs in `dist`:
 
-También puedes compilarla con las instrucciones de este repositorio. El workflow **Build and verify** genera el ZIP y MSI en los artefactos de GitHub Actions cuando finaliza correctamente; todavía no hay una release publicada.
+- `Checkpoint-0.5.0-win-x64.zip`: portable edition. Extract the entire folder and run `Checkpoint.exe`.
+- `Checkpoint-0.5.0-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `.sha256` files: integrity checksums.
 
-- `Checkpoint-0.4.0-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.4.0-win-x64.zip`: edición portable. Extrae toda la carpeta y ejecuta `Checkpoint.exe`.
-- Archivos `.sha256`: comprobación de integridad.
+Build from source below or use the **Build and verify** GitHub Actions artifacts after a successful run. A GitHub release has not been published yet. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI is unsigned; no private certificates are included.
 
-Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
+## Features
 
-El MSI aún no tiene firma digital. Firma los artefactos antes de una distribución pública amplia si quieres ofrecer un editor verificado. El proyecto no incluye certificados privados.
+- Frameless, movable, resizable widget; saved bounds; background opacity 35–100%; readable text/covers. Alpha translucency persists across focus changes, without Acrylic blur.
+- Dark/light themes, list/compact/cover-grid views, always-on-top and position locking.
+- **English and Spanish**, switchable immediately in Settings → Language. Choice persists; user titles, notes and custom goals remain unchanged.
+- My list and Library, search/status filters, virtualized rows for large collections.
+- Steam covers and local caching, custom images, favorites and persistent drag/keyboard ordering.
+- Pending, playing, paused, story finished and abandoned states.
+- Story, all-achievements and custom goals; notes/checklists; optional manual story percentage separate from task/achievement counters.
+- Steam import and achievements through the included server; secret achievements hidden by default. Manual sync or every 15/30/60/120 minutes, up to 20 tracked games per cycle, least recently updated first.
+- Tray, optional Windows startup and keyboard shortcuts.
+- SQLite library, complete backups with covers, non-destructive imports and legacy JSON support.
+- Restore the last 20 deleted games with their data/covers after restarting.
+- Checkpoint accounts, requests, accepted friendships, blocks and explicitly selected publications through Supabase.
 
-## Incluido
+**Story completion and all achievements are independent.** Sync never decides you finished a story and preserves previous progress if Steam fails.
 
-- Widget sin marco, movible, redimensionable, con posición guardada y opacidad del **fondo** ajustable entre 35 % y 100 %.
-- Translucidez que conserva su apariencia al perder el foco. Esta edición utiliza transparencia alfa, **sin desenfoque Acrylic**.
-- Temas claro y oscuro, vistas de lista, compacta y cuadrícula de carátulas, y opción de mantenerlo encima de otras ventanas.
-- Mi lista y biblioteca, búsqueda y filtro por estado. Lista y filas de cuadrícula virtualizadas para colecciones grandes.
-- Carátulas descargadas al usar juegos de Steam, caché local y selección de imágenes propias.
-- Estados pendiente, jugando, pausado, historia terminada y abandonado; favoritos y orden por arrastre o teclado.
-- Objetivo de historia, todos los logros o personalizado; notas y tareas con casillas.
-- Importación de Steam y consulta de logros a través del servicio incluido; logros secretos ocultos por defecto.
-- Actualización manual y cada 15, 30, 60 o 120 minutos. Cada ciclo consulta como máximo 20 juegos de Mi lista, empezando por los menos actualizados.
-- Bandeja del sistema, inicio con Windows opcional y bloqueo de posición/tamaño.
-- Biblioteca SQLite, copias completas con carátulas e importación que añade juegos sin sobrescribir los ya presentes. Se conservan los JSON anteriores.
-- Recuperación de los últimos 20 juegos eliminados, con datos y carátulas, disponible después de reiniciar.
-- Cuentas de Checkpoint con usuario y contraseña, solicitudes de amistad y progreso compartido mediante Supabase.
-- Porcentaje manual de historia, publicación explícita de juegos y reintentos de publicación al recuperar la conexión.
+## Friends
 
-**Historia terminada y todos los logros son independientes.** La sincronización nunca decide que has terminado una historia y conserva los datos previos si Steam falla.
+Open Friends and create an account: username of 3–24 ASCII letters, digits or underscores, password of at least eight characters. Usernames are case-insensitive. No real email or confirmation is requested. Keep your password safe: recovery is unavailable.
 
-Atajos: `Ctrl+Alt+C` muestra u oculta; `Ctrl+N` añade un juego; `Ctrl+F` busca; `F6` alterna las tres vistas; `Ctrl+Z` recupera el último juego eliminado cuando no estás editando texto; `Escape` oculta. Si otro programa ocupa `Ctrl+Alt+C`, puedes abrir Checkpoint desde la bandeja.
+Copy your code from Account. Another user sends a request with that code. After acceptance, each can view games the other selects in Sharing: title, platform, cover, state, goal and counters. Notes, task names and individual achievement details stay private.
 
-Para reordenar, arrastra el asa `⠿` de un juego hasta otro: la mitad superior coloca antes y la inferior después. También puedes enfocar el asa con Tab y usar `Alt+↑` / `Alt+↓`. Los favoritos permanecen arriba; puedes reordenar dentro de cada grupo. Los juegos ocultos por los filtros conservan su orden relativo. El botón de vista de la esquina inferior y Ajustes permiten elegir lista, compacta o cuadrícula; esta última cambia de columnas al redimensionar.
+Consent and pending changes persist per account. Offline changes retry when connected; a withdrawal takes effect after server acknowledgment, so the old publication can remain visible until then. Signing out does not withdraw games. Cross-device conflicts require an explicit choice to publish your local version. Friends refresh every 60 seconds while the tab is open. The private library stays local; full cloud restore is unavailable.
 
-Los datos viven en `%LOCALAPPDATA%\Checkpoint`. La desinstalación conserva esa biblioteca. Los tokens están protegidos con Windows DPAPI para el usuario actual y no se incluyen en copias de seguridad. Las carátulas personalizadas tampoco se incluyen en el JSON.
+Public Supabase configuration is included. Friends use Checkpoint accounts independently of Steam. See [setup](docs/en/SUPABASE.md), [friends scope](docs/en/FRIENDS-PLAN.md) and [privacy](docs/en/PRIVACY.md).
 
-## Amigos de Checkpoint
+## Controls and data
 
-En **Amigos**, crea una cuenta con usuario de 3 a 24 caracteres (letras sin tildes, números o `_`) y contraseña de al menos 8 caracteres. No se pide correo ni confirmación. Guarda la contraseña: esta versión no ofrece recuperación de cuenta.
+`Ctrl+Alt+C` show/hide; `Ctrl+N` add; `Ctrl+F` search; `F6` cycle views; `Ctrl+Z` restore last deletion when not editing text; `Escape` hide. Use the tray if the global shortcut is occupied.
 
-En **Cuenta**, copia tu código de amigo. La otra persona lo busca y envía una solicitud; al aceptarla, ambos pueden ver los juegos que cada uno seleccione en **Compartir**. Las notas, nombres de tareas y detalles individuales de logros siguen siendo privados. Se comparte el estado, objetivo y contadores de progreso, incluyendo el porcentaje manual de historia.
+Drag `⠿` above/below another game or focus the handle and press `Alt+↑` / `Alt+↓`. Favorites stay above other games; reorder within each group. Filtered-out games retain relative order. Grid columns adapt to width.
 
-Las publicaciones pendientes se guardan por cuenta y se reintentan con conexión. Una retirada sin conexión se hará efectiva en el servidor al sincronizar; hasta entonces permanece la última publicación. Cerrar sesión no retira publicaciones. Los conflictos entre equipos requieren escoger explícitamente si publicar la versión local. El progreso de amigos se consulta cada 60 segundos mientras la pestaña está abierta. La biblioteca privada permanece local: no hay restauración completa desde la nube.
+Data lives in `%LOCALAPPDATA%\Checkpoint`. Uninstalling preserves the library. Steam/Checkpoint tokens use Windows DPAPI for the current user and are excluded from backups.
 
-La distribución incluye la configuración pública del proyecto Supabase. Los amigos son cuentas de Checkpoint y no requieren vincular Steam.
+## Backups and recovery
 
-## Copias y recuperación
+Settings → Backups → Export creates a `.checkpoint` archive of the current collection and custom covers. Import adds games/images, preserving existing games matched by local ID or Steam ID. Steam covers download again online. Legacy JSON omits images.
 
-En Ajustes → Copias de seguridad, **Exportar** crea por defecto un archivo `.checkpoint` con tu colección actual y las carátulas personalizadas. **Importar** recupera juegos nuevos y sus imágenes; los que ya existen por identificador o por juego de Steam conservan sus datos. Las carátulas de Steam se vuelven a descargar cuando hay conexión. Si prefieres un JSON compatible con versiones anteriores, elígelo en el selector de exportación; ese formato no lleva imágenes.
+Limits: 10,000 games, 8 MB/image, 25 MB collection data, 200 MB extracted. PNG headers are validated before decoding (4,096 pixels/side, 12 million pixels). References are never extraction paths. Failures preserve existing data.
 
-Las copias completas admiten hasta 10.000 juegos, 8 MB por imagen, 25 MB de datos de colección y 200 MB al descomprimir. Las imágenes PNG de una copia se validan antes de decodificarlas, con un máximo de 4.096 píxeles por lado y 12 millones de píxeles. Las referencias del archivo nunca se usan como rutas de extracción. Si faltan imágenes o falla la exportación, se conserva el archivo anterior; si falla la importación, se conserva la colección actual.
+The ↶ button and Settings → View deleted games restore the last 20 deletions with notes, tasks, progress, favorites, order and covers. Existing library data wins on conflicts. Backups exclude deletion history, sessions and sharing consent.
 
-Al eliminar un juego aparece el botón **↶** para recuperarlo. Ajustes → **Ver juegos eliminados** permite escoger entre los últimos 20, incluso después de reiniciar. Recuperar conserva estado, objetivos, notas, tareas, logros, favoritos, orden y carátula. Si el juego ya existe en la biblioteca, la app mantiene sus datos actuales. Las copias exportan la colección activa y no incluyen este historial.
+Version 0.3 introduced SQLite schema 2. Version 0.5 opens older libraries; use 0.3+ after migration. Legacy JSON remains compatible; complete backups require 0.3+.
 
-La versión 0.3.0 abre las bibliotecas 0.1.0/0.2.0 y añade la tabla de recuperación. Después de migrar, usa 0.3.0 o posterior para abrir esa base de datos; los JSON exportados mantienen el formato compatible.
+## Steam service
 
-## Steam para una aplicación distribuida
+The local library works without Steam. The distribution's Steam URL is empty: the operator must host `server` and supply its URL at build time. Moving Steam to Supabase Edge Functions is pending.
 
-**La aplicación funciona como biblioteca local sin configurar nada.** Para que cualquier usuario pueda vincular Steam, el responsable de la distribución debe alojar el servicio `server` y proporcionar su dirección al generar la edición.
+Keep the Steam API key in a server environment secret, never the app or GitHub. Users sign in on Steam through OpenID; private game details remain inaccessible. See [Steam setup and limits](docs/en/STEAM-SERVICE.md). Advanced connection supports a local development server.
 
-La clave de Steam permanece en una variable de entorno del servidor; **no se incluye ni en el ejecutable ni en GitHub**. Cada usuario se identifica mediante Steam OpenID en la web oficial. OpenID no concede acceso a datos privados: Steam debe permitir consultar sus detalles de juegos.
+## Build and test
 
-Consulta [docs/STEAM-SERVICE.md](docs/STEAM-SERVICE.md) para configurarlo. El paquete local inicial lleva una dirección de servicio vacía: no presenta una integración conectada o progreso inventado. En Ajustes → Conexión avanzada puedes establecer la dirección de tu servidor de desarrollo.
-
-## Compilar
-
-Requisitos: Windows, PowerShell 7, SDK de .NET 10 y Node.js 22 o posterior. El icono ya está incluido; `scripts/New-Icon.ps1` permite regenerarlo.
+Requirements: Windows, PowerShell 7, .NET SDK 10, Node.js 22+. Scripts use `.tools/dotnet` if available; that directory is not published. The icon is included (`scripts/New-Icon.ps1` regenerates it).
 
 ```powershell
 dotnet restore Checkpoint.slnx --configfile NuGet.config
 dotnet build Checkpoint.slnx -c Release --no-restore
 dotnet run --project src/Checkpoint.App -c Release --no-build
-```
-
-La preparación local de este proyecto incluye un SDK portable en `.tools/dotnet`, que no se publica en GitHub. Los scripts lo usan si existe.
-
-```powershell
-# Compiler local, no instalación global
 dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGet.config
-
-# Pruebas, portable e instalador
 ./scripts/Build.ps1 -Installer
-
-# Edición distribuida con tu servicio HTTPS
-./scripts/Build.ps1 -Installer -ServiceUrl https://tu-servicio.example
+# With your hosted Steam service:
+./scripts/Build.ps1 -Installer -ServiceUrl https://your-service.example
 ```
 
-`service-config.json` solo contiene una URL pública, nunca una clave. El MSI instala en `%LOCALAPPDATA%\Programs\Checkpoint` y no activa automáticamente el inicio con Windows.
-
-## Pruebas
+`service-config.json` contains only a public URL; `supabase-config.json` contains public project configuration and its publishable key, never privileged keys. MSI installs into `%LOCALAPPDATA%\Programs\Checkpoint` without enabling Windows startup automatically.
 
 ```powershell
 dotnet run --project tests/Checkpoint.Tests -c Release
 node --test server/test/service.test.mjs
-```
-
-La prueba nativa abre los diálogos reales y genera imágenes de las tres vistas y ambos temas con datos aislados:
-
-```powershell
+# Always use a new isolated data folder:
 dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PWD/.qa/example" --demo --diagnostics --smoke-test "$PWD/.qa/render"
 ```
 
-Usa siempre una carpeta nueva para `--smoke-test`: esta comprobación modifica su biblioteca de prueba y rechaza una carpeta con biblioteca o sesión existentes. El modo `--demo` añade tres juegos de ejemplo únicamente a una biblioteca vacía. No inventa logros. Las pruebas de Steam y las pruebas del diálogo de logros usan respuestas simuladas y no necesitan contraseñas ni claves reales.
+Native tests reject existing libraries/sessions/publications and exercise real controls with simulated Steam/social responses. Demo adds examples only to an empty library. Build extracts and tests its self-contained ZIP, including language switching and virtualized rendering of 1,003 games. Reports and captures: `.qa/package-…/render`.
 
-`Build.ps1` comprueba también el ZIP recién generado: lo extrae a `.qa`, ejecuta su app autocontenida y valida búsqueda, vistas, reordenación, persistencia, diálogos, secretos, recuperación, copias con imágenes, cuentas y amistades simuladas, y virtualización con 1.003 juegos. Puedes repetir solo esa comprobación con `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.4.0-win-x64.zip`. Las imágenes y el informe quedan en `.qa/package-…/render`. La ejecución ARM64 necesita un equipo Windows ARM64; en otros equipos se comprueba la estructura del paquete.
+Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.5.0-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
 
-La integración con una cuenta real y la instalación/desinstalación del MSI deben validarse en un entorno de lanzamiento antes de publicar. Consulta [docs/VALIDATION.md](docs/VALIDATION.md).
+## GitHub
 
-## Publicar en GitHub
+MIT license, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
-El proyecto incluye `.gitignore`, licencia MIT, documentación, pruebas y un workflow que genera artefactos al ejecutar GitHub Actions. Define la variable de repositorio `CHECKPOINT_SERVICE_URL` si quieres que las ediciones lleven el servicio configurado. El workflow **no publica automáticamente una release** ni contiene la clave de Steam.
+`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.5.0.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 
-Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
+See [roadmap](docs/en/ROADMAP.md) and [changelog](CHANGELOG.md). Notifications, monthly statistics and private-library cloud sync are future work.
 
-También se entrega `dist/Checkpoint-source-0.4.0.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
-
-## Próximas versiones
-
-El backend de cuentas y amistades está desplegado en Supabase y la app 0.4.0 incorpora la pestaña Amigos. Han pasado 33 comprobaciones SQL y 7 HTTP del backend; queda validar el registro y el intercambio de imágenes con dos cuentas reales. El estado, configuración pública y pasos pendientes están en [docs/SUPABASE.md](docs/SUPABASE.md).
-
-Notificaciones, estadísticas mensuales y sincronización de la biblioteca entre equipos quedan para futuras versiones. Consulta [docs/ROADMAP.md](docs/ROADMAP.md) y [CHANGELOG.md](CHANGELOG.md).
-
-Checkpoint es independiente de Valve. Los juegos, carátulas y marcas pertenecen a sus titulares. [Licencia](LICENSE) · [Avisos de terceros](THIRD-PARTY-NOTICES.md) · [Privacidad](docs/PRIVACY.md).
+Checkpoint is independent of Valve. Games, artwork and trademarks belong to their owners. [License](LICENSE) · [Third-party notices](THIRD-PARTY-NOTICES.md) · [Privacy](docs/en/PRIVACY.md).

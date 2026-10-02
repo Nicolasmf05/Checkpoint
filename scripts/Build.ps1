@@ -26,7 +26,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación.' }
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas de la biblioteca.' }
 & node --test server/test/service.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas del servicio.' }
-$output = Join-Path $checkpointRoot "dist\$Runtime"
+$output = Join-Path $checkpointRoot "dist\$version\$Runtime"
 & $dotnet publish src/Checkpoint.App/Checkpoint.App.csproj -c Release -r $Runtime --self-contained true -o $output --nologo -p:RestoreConfigFile="$checkpointRoot\NuGet.config" -p:DebugType=None -p:DebugSymbols=false
 if ($LASTEXITCODE -ne 0) { throw 'Falló publish.' }
 @{ serviceUrl = $ServiceUrl } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'service-config.json') -Encoding utf8

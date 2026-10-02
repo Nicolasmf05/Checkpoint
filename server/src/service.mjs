@@ -61,8 +61,14 @@ export function createService({ apiKey = '', publicUrl = 'http://127.0.0.1:34871
     });
   }
   function page(res, title, text) {
+    const english = {
+      'Checkpoint': ['Checkpoint', 'One game at a time. Steam connection service for the Windows widget. Independent application, not affiliated with Valve. Steam data is provided as-is; availability and accuracy depend on Valve.'],
+      'Privacidad': ['Privacy', `Operator: ${operator}. Service and cache hosting: ${country}. Contact: ${contact}. Linking Steam requests your authenticated ID, visible library, playtime and achievements. We do not receive passwords. Sessions remain in memory for up to seven days, queried data for fifteen minutes; restarting clears sessions and unlinking revokes them. Your library and images also remain on your PC until deleted. No advertising or analytics. Consult your hosting provider's connection-log policy. Steam data is provided as-is, without guarantees of accuracy, availability or continuity; liability is limited to the extent permitted by law.`],
+      'Vinculación cancelada': ['Connection canceled', 'You can close this tab and return to the widget.'],
+      'Cuenta vinculada': ['Account linked', 'You can close this tab and return to Checkpoint. The app will import your available library.']
+    }[title] ?? [title, text];
     res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-    res.end(`<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(title)} · Checkpoint</title><style>body{font:16px system-ui;background:#111827;color:#edf5fb;max-width:640px;margin:12vh auto;padding:24px;line-height:1.7}h1{color:#8cebc6}a{color:#8cebc6}</style><h1>${escapeHtml(title)}</h1><p>${escapeHtml(text)}</p><p><a href="/privacy">Privacidad</a> · <a href="https://store.steampowered.com/">Steam</a></p></html>`);
+    res.end(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(english[0])} · Checkpoint</title><style>body{font:16px system-ui;background:#111827;color:#edf5fb;max-width:640px;margin:8vh auto;padding:24px;line-height:1.7}h1,h2{color:#8cebc6}a{color:#8cebc6}</style><section lang="en"><h1>${escapeHtml(english[0])}</h1><p>${escapeHtml(english[1])}</p></section><section lang="es"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(text)}</p></section><p><a href="/privacy">Privacy / Privacidad</a> · <a href="https://store.steampowered.com/">Steam</a></p></html>`);
   }
   const server = http.createServer(async (req, res) => {
     res.setHeader('cache-control', 'no-store'); res.setHeader('x-content-type-options', 'nosniff');

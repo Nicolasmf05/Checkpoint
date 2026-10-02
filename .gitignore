@@ -4,6 +4,11 @@
 dist/
 artifacts/
 .qa/
+.git/
+*.key
+*.pem
+*.pfx
+*.dat
 .vs/
 node_modules/
 supabase/.temp/

@@ -79,7 +79,13 @@ test('unconfigured release has health and privacy but no fake Steam login', asyn
   const { send } = await fixture(t, { apiKey: '' });
   assert.equal((await (await send('/health')).json()).steamConfigured, false);
   assert.equal((await send('/v1/auth/start', {})).status, 503);
-  assert.equal((await send('/privacy')).status, 200);
+  const privacy = await send('/privacy');
+  assert.equal(privacy.status, 200);
+  const privacyText = await privacy.text();
+  assert.match(privacyText, /<section lang="en">/);
+  assert.match(privacyText, /<section lang="es">/);
+  assert.match(privacyText, /Operator:/);
+  assert.match(privacyText, /Responsable:/);
 });
 test('Steam library and achievement endpoints require a session', async t => {
   const { send } = await fixture(t);

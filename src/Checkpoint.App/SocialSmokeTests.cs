@@ -78,6 +78,11 @@ public partial class MainWindow
         await Dispatcher.InvokeAsync(UpdateLayout,DispatcherPriority.ContextIdle);
         check(Controls<PasswordBox>(this).Count() == 1 && Texts(this).Contains("Una cuenta de Checkpoint"),"friends tab has a real account form without Steam");
         RenderElement(this,Path.Combine(output,"widget-friends-login.png"));
+        Preferences.Language = "en"; ApplyLanguage();
+        await Dispatcher.InvokeAsync(UpdateLayout,DispatcherPriority.ContextIdle);
+        check(Texts(this).Contains("A Checkpoint account") && (string?)FriendsButton.Content == "Friends", "English account form and dynamic navigation render");
+        RenderElement(this,Path.Combine(output,"widget-friends-login-en.png"));
+        Preferences.Language = "es"; ApplyLanguage();
         check(FriendsButton.TranslatePoint(new Point(FriendsButton.ActualWidth,0),this).X < Width - 22,"friends navigation fits the narrow widget");
         await Social!.Login("native_user","PASSWORD-FIXTURE"); await FriendsView.Reload();
         var encrypted = Encoding.UTF8.GetString(File.ReadAllBytes(SocialSessionPath));
@@ -105,6 +110,12 @@ public partial class MainWindow
         check(Texts(this).Contains("Celeste") && Texts(this).Contains("Historia: 60%"),"friend view shows progress from Checkpoint publications");
         check(privateCoverAuthenticated && VisualChildren(FriendsView).OfType<Image>().Any(i => i.Source is not null),"private friend cover downloads with account authorization and renders");
         RenderElement(this,Path.Combine(output,"widget-friends-progress.png"));
+        var publicationBeforeLanguage = shared[game.Id].Payload;
+        Preferences.Language = "en"; ApplyLanguage(); await ClickSocial("View progress for Ana");
+        check(Texts(this).Contains("Story: 60%") && Texts(this).Contains("Goal: finish the story"), "English friend progress translates status, goal and counters");
+        check(shared[game.Id].Payload == publicationBeforeLanguage && game.Notes == "PRIVATE-NATIVE-NOTE", "changing language preserves user content and publication payloads");
+        RenderElement(this,Path.Combine(output,"widget-friends-progress-en.png"));
+        Preferences.Language = "es"; ApplyLanguage(); await ClickSocial("Ver progreso de Ana");
         await ClickSocial("← Volver a mis amigos");
         var block = Controls<Button>(this).First(b => (string?)b.Content == "Bloquear"); block.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         for (int i = 0; FriendsView.Busy && i < 100; i++) await Task.Delay(10);

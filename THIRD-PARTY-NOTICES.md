@@ -1,11 +1,12 @@
-# Dependencias y recursos externos
+# Third-party dependencies and resources
 
-- .NET y WPF: Microsoft y .NET Foundation, licencia MIT. Los avisos completos se incluyen en `licenses/DOTNET-LICENSE.txt` y `licenses/DOTNET-THIRD-PARTY-NOTICES.txt`.
-- Microsoft.Data.Sqlite: Microsoft, licencia MIT.
-- SQLitePCLRaw: Eric Sink / SourceGear, licencia Apache-2.0, incluida en `licenses/APACHE-2.0.txt`.
-- SQLite: dominio público; se incluye la biblioteca nativa 3.53.3.
-- WiX Toolset 5.0.2: utilizado para compilar el MSI, bajo MS-RL. El compilador no se distribuye con Checkpoint.
-- Steam y las carátulas: marcas y contenido de sus titulares. Se descargan al usar la aplicación desde la CDN pública de Steam; no se incluyen carátulas de juegos en el código ni en los paquetes. La disponibilidad de cada recurso puede variar.
+**English** · [Español](THIRD-PARTY-NOTICES.es.md)
 
-Checkpoint es una aplicación independiente y no está afiliada ni respaldada por Valve.
-El acceso a datos de Steam está sujeto a [las condiciones de su Web API](https://steamcommunity.com/dev/apiterms). Los datos se suministran tal como están y su disponibilidad depende de Valve.
+- .NET/WPF: Microsoft and .NET Foundation, MIT. Full notices in `licenses/DOTNET-LICENSE.txt` and `licenses/DOTNET-THIRD-PARTY-NOTICES.txt`.
+- Microsoft.Data.Sqlite: Microsoft, MIT.
+- SQLitePCLRaw: Eric Sink / SourceGear, Apache-2.0, included in `licenses/APACHE-2.0.txt`.
+- SQLite: public domain; native library 3.53.3.
+- WiX Toolset 5.0.2: MSI compiler, MS-RL; not distributed with the app.
+- Steam/game artwork belongs to its owners. The app downloads covers from Steam's CDN; executable packages do not bundle game artwork. Documentation screenshots show example artwork displayed by the app. Availability may vary.
+
+Checkpoint is independent of, not affiliated with and not endorsed by Valve. Access follows [Steam Web API terms](https://steamcommunity.com/dev/apiterms); data is provided as-is and availability depends on Valve.

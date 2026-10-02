@@ -1,6 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="Checkpoint" Manufacturer="Checkpoint contributors" Version="$(var.AppVersion)" Language="1034" UpgradeCode="D80E2FA8-94D7-4BC9-9570-D06F6286A0A1" Scope="perUser">
-    <MajorUpgrade DowngradeErrorMessage="Ya tienes instalada una versión más reciente de Checkpoint." />
+  <Package Name="Checkpoint" Manufacturer="Checkpoint contributors" Version="$(var.AppVersion)" Language="1033" UpgradeCode="D80E2FA8-94D7-4BC9-9570-D06F6286A0A1" Scope="perUser">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Checkpoint is already installed. / Ya tienes instalada una versión más reciente de Checkpoint." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
     <Property Id="ARPNOMODIFY" Value="1" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />

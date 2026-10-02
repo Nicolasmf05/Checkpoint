@@ -1,3 +1,5 @@
+[English](en/STEAM-SERVICE.md) · **Español**
+
 # Servicio de Steam
 
 El servicio Node.js utiliza únicamente módulos integrados. No necesita `npm install`.

@@ -16,9 +16,9 @@
             <ProgressBar Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,5,0,0" Visibility="{Binding ProgressVisibility}"/>
           </StackPanel>
           <StackPanel Grid.Column="2" VerticalAlignment="Center">
-            <Button Content="{Binding FinishIcon}" Tag="{Binding Model}" Click="FinishClick" Padding="0" Width="29" Height="29" FontSize="17" ToolTip="Marcar o desmarcar historia terminada" AutomationProperties.Name="Marcar historia terminada"/>
-            <Button Content="⋯" Tag="{Binding Model}" Click="EditClick" Padding="0" Width="29" Height="26" FontSize="19" Margin="0,8,0,0" ToolTip="Editar juego y consultar logros" AutomationProperties.Name="Editar juego"/>
-            <Button Content="⠿" Tag="{Binding Model}" Padding="0" Width="29" Height="20" Margin="0,4,0,0" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandleDown" PreviewKeyDown="DragHandleKey" ToolTip="Arrastra para reordenar · Alt+↑ / Alt+↓" AutomationProperties.Name="{Binding ReorderName}"/>
+            <Button Content="{Binding FinishIcon}" Tag="{Binding Model}" Click="FinishClick" Padding="0" Width="29" Height="29" FontSize="17" ToolTip="{DynamicResource Loc_da4837928478}" AutomationProperties.Name="{DynamicResource Loc_6cf94875ea7c}"/>
+            <Button Content="⋯" Tag="{Binding Model}" Click="EditClick" Padding="0" Width="29" Height="26" FontSize="19" Margin="0,8,0,0" ToolTip="{DynamicResource Loc_20f9d62dd0f6}" AutomationProperties.Name="{DynamicResource Loc_ab5c261bc29a}"/>
+            <Button Content="⠿" Tag="{Binding Model}" Padding="0" Width="29" Height="20" Margin="0,4,0,0" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandleDown" PreviewKeyDown="DragHandleKey" ToolTip="{DynamicResource Loc_5a6575fe2e3d}" AutomationProperties.Name="{Binding ReorderName}"/>
           </StackPanel>
         </Grid>
       </Border>
@@ -38,9 +38,9 @@
             <ProgressBar Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,5,0,0"/>
           </StackPanel>
           <Grid Margin="0,9,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <Button Content="⠿" Tag="{Binding Model}" Padding="0" Width="28" Height="25" HorizontalAlignment="Left" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandleDown" PreviewKeyDown="DragHandleKey" ToolTip="Arrastra para reordenar · Alt+↑ / Alt+↓" AutomationProperties.Name="{Binding ReorderName}"/>
-            <Button Grid.Column="1" Content="{Binding FinishIcon}" Tag="{Binding Model}" Click="FinishClick" Padding="0" Width="28" Height="25" FontSize="17" ToolTip="Marcar o desmarcar historia terminada" AutomationProperties.Name="Marcar historia terminada"/>
-            <Button Grid.Column="2" Content="⋯" Tag="{Binding Model}" Click="EditClick" Padding="0" Width="28" Height="25" FontSize="19" Margin="5,0,0,0" ToolTip="Editar juego y consultar logros" AutomationProperties.Name="Editar juego"/>
+            <Button Content="⠿" Tag="{Binding Model}" Padding="0" Width="28" Height="25" HorizontalAlignment="Left" Cursor="SizeAll" PreviewMouseLeftButtonDown="DragHandleDown" PreviewKeyDown="DragHandleKey" ToolTip="{DynamicResource Loc_5a6575fe2e3d}" AutomationProperties.Name="{Binding ReorderName}"/>
+            <Button Grid.Column="1" Content="{Binding FinishIcon}" Tag="{Binding Model}" Click="FinishClick" Padding="0" Width="28" Height="25" FontSize="17" ToolTip="{DynamicResource Loc_da4837928478}" AutomationProperties.Name="{DynamicResource Loc_6cf94875ea7c}"/>
+            <Button Grid.Column="2" Content="⋯" Tag="{Binding Model}" Click="EditClick" Padding="0" Width="28" Height="25" FontSize="19" Margin="5,0,0,0" ToolTip="{DynamicResource Loc_20f9d62dd0f6}" AutomationProperties.Name="{DynamicResource Loc_ab5c261bc29a}"/>
           </Grid>
         </StackPanel>
       </Border>
@@ -58,38 +58,38 @@
         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" MouseLeftButtonDown="DragTitle" Cursor="SizeAll">
           <Border Width="29" Height="29" CornerRadius="8" Background="{DynamicResource AccentFillBrush}" Margin="0,0,9,0"><Path Data="M8,19 L8,7 L19,7 L16,11 L19,15 L10,15" Stroke="#FF102D27" StrokeThickness="2" StrokeLineJoin="Round"/></Border>
-          <StackPanel VerticalAlignment="Center"><TextBlock Text="checkpoint" FontWeight="Bold" FontSize="17"/><TextBlock Text="UN JUEGO CADA VEZ" Foreground="{DynamicResource MutedBrush}" FontSize="8"/></StackPanel>
+          <StackPanel VerticalAlignment="Center"><TextBlock Text="checkpoint" FontWeight="Bold" FontSize="17"/><TextBlock Text="{DynamicResource Loc_3070e6c5ed66}" Foreground="{DynamicResource MutedBrush}" FontSize="8"/></StackPanel>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-          <Button x:Name="PinButton" Content="◇" Click="PinClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="Mantener siempre visible" AutomationProperties.Name="Mantener siempre visible"/>
-          <Button Content="⚙" Click="SettingsClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="Ajustes" AutomationProperties.Name="Ajustes"/>
-          <Button Content="−" Click="HideClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="Ocultar en la bandeja · Ctrl+Alt+C" AutomationProperties.Name="Ocultar widget"/>
-          <Button Content="×" Click="CloseClick" Width="29" Height="29" Padding="0" ToolTip="Cerrar" AutomationProperties.Name="Cerrar"/>
+          <Button x:Name="PinButton" Content="◇" Click="PinClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_ccd9c24d49b0}" AutomationProperties.Name="{DynamicResource Loc_ccd9c24d49b0}"/>
+          <Button Content="⚙" Click="SettingsClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_4f2debbbf4fa}" AutomationProperties.Name="{DynamicResource Loc_4f2debbbf4fa}"/>
+          <Button Content="−" Click="HideClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_f882ac34dce0}" AutomationProperties.Name="{DynamicResource Loc_1cea6be7bd3a}"/>
+          <Button Content="×" Click="CloseClick" Width="29" Height="29" Padding="0" ToolTip="{DynamicResource Loc_aeccae342e4b}" AutomationProperties.Name="{DynamicResource Loc_aeccae342e4b}"/>
         </StackPanel>
       </Grid>
-      <StackPanel Grid.Row="1" Margin="0,0,0,18"><TextBlock x:Name="SummaryTitle" Text="Tu próxima aventura" FontSize="25" FontWeight="SemiBold"/><TextBlock x:Name="Summary" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,7,0,0"/></StackPanel>
+      <StackPanel Grid.Row="1" Margin="0,0,0,18"><TextBlock x:Name="SummaryTitle" Text="{DynamicResource Loc_7a262f2c703d}" FontSize="25" FontWeight="SemiBold"/><TextBlock x:Name="Summary" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,7,0,0"/></StackPanel>
       <Grid Grid.Row="2" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-        <StackPanel Orientation="Horizontal"><Button x:Name="TrackedButton" Content="Mi lista" Click="TrackedClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="LibraryButton" Content="Biblioteca" Click="LibraryClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="FriendsButton" Content="Amigos" Click="FriendsClick" Padding="10,7"/></StackPanel>
-        <Button Grid.Column="1" Content="+ Añadir" Style="{StaticResource AccentButton}" Click="AddClick" Padding="11,7" ToolTip="Añadir un juego · Ctrl+N"/>
+        <StackPanel Orientation="Horizontal"><Button x:Name="TrackedButton" Content="{DynamicResource Loc_041fb6146f6e}" Click="TrackedClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="LibraryButton" Content="{DynamicResource Loc_c9169c12cba9}" Click="LibraryClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="FriendsButton" Content="{DynamicResource Loc_bead8677698a}" Click="FriendsClick" Padding="10,7"/></StackPanel>
+        <Button Grid.Column="1" Content="{DynamicResource Loc_893f9701300c}" Style="{StaticResource AccentButton}" Click="AddClick" Padding="11,7" ToolTip="{DynamicResource Loc_234289d9e3d6}"/>
       </Grid>
       <Grid x:Name="FilterArea" Grid.Row="3" Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="125"/></Grid.ColumnDefinitions>
-        <Grid Margin="0,0,8,0"><TextBox x:Name="Search" TextChanged="FilterChanged" ToolTip="Buscar un juego" AutomationProperties.Name="Buscar juego" Padding="10,7"/><TextBlock Text="Buscar un juego…" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="11,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=Search}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
-        <ComboBox x:Name="StatusFilter" Grid.Column="1" SelectionChanged="FilterChanged" SelectedIndex="0" AutomationProperties.Name="Filtrar por estado"><ComboBoxItem Content="Todos"/><ComboBoxItem Content="Pendiente"/><ComboBoxItem Content="Jugando"/><ComboBoxItem Content="Pausado"/><ComboBoxItem Content="Terminados"/><ComboBoxItem Content="Abandonados"/></ComboBox>
+        <Grid Margin="0,0,8,0"><TextBox x:Name="Search" TextChanged="FilterChanged" ToolTip="{DynamicResource Loc_13400b39ec9f}" AutomationProperties.Name="{DynamicResource Loc_d9b20ad96333}" Padding="10,7"/><TextBlock Text="{DynamicResource Loc_706954420e15}" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="11,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=Search}" Value=""><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></Grid>
+        <ComboBox x:Name="StatusFilter" Grid.Column="1" SelectionChanged="FilterChanged" SelectedIndex="0" AutomationProperties.Name="{DynamicResource Loc_74580843ea91}"><ComboBoxItem Content="{DynamicResource Loc_bd02b9a7d71d}"/><ComboBoxItem Content="{DynamicResource Loc_2ef68536d8e2}"/><ComboBoxItem Content="{DynamicResource Loc_185ac6464620}"/><ComboBoxItem Content="{DynamicResource Loc_d455cfb682d3}"/><ComboBoxItem Content="{DynamicResource Loc_4a76229cd4a2}"/><ComboBoxItem Content="{DynamicResource Loc_e82e91150650}"/></ComboBox>
       </Grid>
       <Grid x:Name="GameArea" Grid.Row="4">
         <ListBox x:Name="GameList" ItemTemplate="{StaticResource GameTemplate}" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" VirtualizingPanel.ScrollUnit="Pixel" ScrollViewer.CanContentScroll="True" SizeChanged="GameListSizeChanged"/>
         <StackPanel x:Name="EmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="290" Margin="6">
           <Border Width="64" Height="64" Background="{DynamicResource PanelBrush}" CornerRadius="18" HorizontalAlignment="Center" Margin="0,0,0,18"><TextBlock Text="✦" Foreground="{DynamicResource AccentBrush}" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border>
-          <TextBlock x:Name="EmptyTitle" Text="Aquí empieza tu próxima partida" TextAlignment="Center" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap"/>
-          <TextBlock x:Name="EmptyText" Text="Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano." TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,18" LineHeight="19"/>
-          <Button Content="Conectar Steam" Click="ConnectClick" Style="{StaticResource AccentButton}" Margin="15,0,15,8"/>
-          <Button x:Name="ExampleButton" Content="Ver ejemplo" Click="ExampleClick" Margin="15,0,15,0"/>
+          <TextBlock x:Name="EmptyTitle" Text="{DynamicResource Loc_d92a258c51ea}" TextAlignment="Center" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap"/>
+          <TextBlock x:Name="EmptyText" Text="{DynamicResource Loc_c030ce966c27}" TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource MutedBrush}" Margin="0,10,0,18" LineHeight="19"/>
+          <Button Content="{DynamicResource Loc_94665f4f307d}" Click="ConnectClick" Style="{StaticResource AccentButton}" Margin="15,0,15,8"/>
+          <Button x:Name="ExampleButton" Content="{DynamicResource Loc_Example}" Click="ExampleClick" Margin="15,0,15,0"/>
         </StackPanel>
       </Grid>
       <Border x:Name="FriendsHost" Grid.Row="3" Grid.RowSpan="2" Visibility="Collapsed"/>
       <Grid Grid.Row="5" Margin="0,15,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ConnectionText" Text="● Biblioteca local" Foreground="{DynamicResource MutedBrush}" FontSize="10"/><TextBlock x:Name="NoticeText" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,4,8,0" TextWrapping="Wrap" MaxWidth="290"/></StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="UndoButton" Content="↶" Click="UndoClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" Visibility="Collapsed" ToolTip="Recuperar el último juego eliminado · Ctrl+Z" AutomationProperties.Name="Recuperar último juego eliminado"/><Button x:Name="ViewButton" Content="▤" Click="ViewClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" ToolTip="Cambiar vista · F6" AutomationProperties.Name="Cambiar vista"/><Button x:Name="SyncButton" Content="↻" Click="SyncClick" Width="30" Padding="0" Height="30" ToolTip="Sincronizar Steam" AutomationProperties.Name="Sincronizar Steam"/></StackPanel>
+        <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ConnectionText" Text="{DynamicResource Loc_2f1941c17edd}" Foreground="{DynamicResource MutedBrush}" FontSize="10"/><TextBlock x:Name="NoticeText" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,4,8,0" TextWrapping="Wrap" MaxWidth="290"/></StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="UndoButton" Content="↶" Click="UndoClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" Visibility="Collapsed" ToolTip="{DynamicResource Loc_UndoTooltip}" AutomationProperties.Name="{DynamicResource Loc_b55af60434ee}"/><Button x:Name="ViewButton" Content="▤" Click="ViewClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" ToolTip="{DynamicResource Loc_ViewTooltip}" AutomationProperties.Name="{DynamicResource Loc_6388939b12c2}"/><Button x:Name="SyncButton" Content="↻" Click="SyncClick" Width="30" Padding="0" Height="30" ToolTip="{DynamicResource Loc_Sync}" AutomationProperties.Name="{DynamicResource Loc_Sync}"/></StackPanel>
       </Grid>
       <Thumb x:Name="ResizeGrip" Grid.RowSpan="6" Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-17,-12" Cursor="SizeNWSE" DragDelta="ResizeDrag"><Thumb.Template><ControlTemplate><Path Data="M4,12 L12,4 M9,13 L13,9" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.5"/></ControlTemplate></Thumb.Template></Thumb>
     </Grid>

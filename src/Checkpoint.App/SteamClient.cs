@@ -40,8 +40,8 @@ public sealed class SteamClient : IDisposable
         if (!Uri.TryCreate(address.Trim().TrimEnd('/') + "/", UriKind.Absolute, out var uri)
             || !string.IsNullOrEmpty(uri.UserInfo) || !string.IsNullOrEmpty(uri.Query) || !string.IsNullOrEmpty(uri.Fragment)
             || (uri.Scheme != "https" && !(uri.Scheme == "http" && uri.IsLoopback)))
-            throw new ArgumentException("Usa la dirección HTTPS del servicio. HTTP solo se permite para un servidor local.");
-        if (uri.AbsolutePath != "/") throw new ArgumentException("La dirección del servicio debe ser su origen, sin rutas adicionales.");
+            throw new ArgumentException(I18n.T("Usa la dirección HTTPS del servicio. HTTP solo se permite para un servidor local."));
+        if (uri.AbsolutePath != "/") throw new ArgumentException(I18n.T("La dirección del servicio debe ser su origen, sin rutas adicionales."));
         return uri;
     }
     private async Task<T> Request<T>(string service, string path, object? body = null, bool authenticated = true, CancellationToken cancellation = default)
@@ -50,7 +50,7 @@ public sealed class SteamClient : IDisposable
         if (authenticated)
         {
             if (Session is null || !string.Equals(Session.ServiceUrl, ValidateServiceUrl(service).AbsoluteUri, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException("Vincula Steam con este servicio antes de sincronizar.");
+                throw new InvalidOperationException(I18n.T("Vincula Steam con este servicio antes de sincronizar."));
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Session.Token);
         }
         if (body is not null) request.Content = JsonContent.Create(body);
@@ -59,27 +59,27 @@ public sealed class SteamClient : IDisposable
         {
             string message = response.StatusCode switch
             {
-                HttpStatusCode.Unauthorized => "La sesión ha caducado. Vuelve a vincular Steam.",
-                HttpStatusCode.TooManyRequests => "Demasiadas consultas. Espera un minuto y vuelve a intentarlo.",
-                HttpStatusCode.ServiceUnavailable => "El servicio de Steam todavía no está configurado o no está disponible.",
-                _ => "No se pudo consultar Steam. Se conserva el último progreso guardado."
+                HttpStatusCode.Unauthorized => I18n.T("La sesión ha caducado. Vuelve a vincular Steam."),
+                HttpStatusCode.TooManyRequests => I18n.T("Demasiadas consultas. Espera un minuto y vuelve a intentarlo."),
+                HttpStatusCode.ServiceUnavailable => I18n.T("El servicio de Steam todavía no está configurado o no está disponible."),
+                _ => I18n.T("No se pudo consultar Steam. Se conserva el último progreso guardado.")
             };
             try
             {
                 using var error = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellation));
-                if (error.RootElement.TryGetProperty("error", out var field) && field.GetString() is { Length: > 0 and < 300 } detail) message = detail;
+                if (error.RootElement.TryGetProperty("error", out var field) && field.GetString() is { Length: > 0 and < 300 } detail) message = I18n.T(detail);
             }
             catch (JsonException) { }
             throw new InvalidOperationException(message);
         }
         return await response.Content.ReadFromJsonAsync<T>(DataJson.Options, cancellation)
-            ?? throw new InvalidDataException("Respuesta vacía del servicio.");
+            ?? throw new InvalidDataException(I18n.T("Respuesta vacía del servicio."));
     }
     public Task<LoginStart> BeginLogin(string service, CancellationToken cancellation) => Request<LoginStart>(service, "v1/auth/start", new { }, false, cancellation);
     public Task<LoginResult> Poll(string service, LoginStart flow, CancellationToken cancellation) => Request<LoginResult>(service, "v1/auth/poll", new { flow.FlowId, flow.PollSecret }, false, cancellation);
     public void SaveSession(string service, LoginResult result)
     {
-        if (result.Token is null || result.SteamId is null) throw new InvalidDataException("La sesión recibida no es válida.");
+        if (result.Token is null || result.SteamId is null) throw new InvalidDataException(I18n.T("La sesión recibida no es válida."));
         Session = new SavedSession(ValidateServiceUrl(service).AbsoluteUri, result.Token, result.SteamId);
         File.WriteAllBytes(tokenFile, ProtectedData.Protect(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(Session, DataJson.Options)), null, DataProtectionScope.CurrentUser));
     }

@@ -1,4 +1,8 @@
+[English](en/PRIVACY.md) · **Español**
+
 # Privacidad
+
+El idioma es una preferencia local. Cambiarlo no traduce ni envía contenido escrito por el usuario.
 
 Checkpoint guarda en el equipo del usuario títulos, estados, notas, tareas, preferencias, carátulas y el último progreso de Steam. No utiliza publicidad ni telemetría.
 

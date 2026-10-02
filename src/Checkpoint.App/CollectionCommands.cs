@@ -16,14 +16,14 @@ public partial class MainWindow
         Games.RemoveAll(g => g.Id == game.Id);
         SchedulePublications();
         DeletedGames = Store.LoadDeletedGames(); Refresh();
-        Notice($"«{game.Title}» eliminado. Recupéralo con ↶ o desde Ajustes.");
+        Notice((I18n.IsEnglish ? $"«{game.Title}» deleted. Restore it with ↶ or from Settings." : $"«{game.Title}» eliminado. Recupéralo con ↶ o desde Ajustes."));
     }
     internal Game RestoreDeleted(Guid recoveryId)
     {
         CaptureBounds();
         var game = Store.RestoreDeletedGame(recoveryId, Games, Preferences);
         Games.Add(game); DeletedGames = Store.LoadDeletedGames(); Refresh();
-        Notice($"«{game.Title}» recuperado con sus notas y tareas."); return game;
+        Notice((I18n.IsEnglish ? $"«{game.Title}» restored with its notes and tasks." : $"«{game.Title}» recuperado con sus notas y tareas.")); return game;
     }
     private void UndoClick(object sender, System.Windows.RoutedEventArgs e) => UndoLastDeletion();
     private void UndoLastDeletion()
@@ -35,11 +35,11 @@ public partial class MainWindow
     internal void ExportBackup(string path)
     {
         if (string.Equals(Path.GetExtension(path), ".json", StringComparison.OrdinalIgnoreCase))
-        { Store.Export(path, Games); Notice("Copia JSON exportada. Este formato no incluye imágenes."); }
+        { Store.Export(path, Games); Notice(I18n.T("Copia JSON exportada. Este formato no incluye imágenes.")); }
         else
         {
             int covers = BackupFiles.WriteComplete(path, Games, Covers.DirectoryPath);
-            Notice($"Copia completa exportada: {Games.Count} juegos y {covers} carátulas personalizadas.");
+            Notice((I18n.IsEnglish ? $"Complete backup exported: {Games.Count} games and {covers} custom covers." : $"Copia completa exportada: {Games.Count} juegos y {covers} carátulas personalizadas."));
         }
     }
     internal (int Added, int Skipped) ImportBackup(string path)
@@ -71,7 +71,7 @@ public partial class MainWindow
                 try { Covers.RemoveCreated(name); } catch (IOException) { /* An unused cache image does not alter the saved collection. */ }
             throw;
         }
-        Refresh(); Notice($"{added.Count} juegos importados · {skipped} ya estaban en la biblioteca.");
+        Refresh(); Notice((I18n.IsEnglish ? $"{added.Count} games imported · {skipped} already in the library." : $"{added.Count} juegos importados · {skipped} ya estaban en la biblioteca."));
         return (added.Count, skipped);
     }
 }

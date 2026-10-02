@@ -25,25 +25,25 @@ public static class BackupFiles
     public static void ValidatePngImage(ReadOnlySpan<byte> bytes)
     {
         if (bytes.Length < 33 || !IsPng(bytes) || BinaryPrimitives.ReadUInt32BigEndian(bytes[8..12]) != 13 || !bytes[12..16].SequenceEqual("IHDR"u8))
-            throw new InvalidDataException("Una carátula no tiene una cabecera PNG válida.");
+            throw new InvalidDataException(I18n.T("Una carátula no tiene una cabecera PNG válida."));
         uint width = BinaryPrimitives.ReadUInt32BigEndian(bytes[16..20]);
         uint height = BinaryPrimitives.ReadUInt32BigEndian(bytes[20..24]);
         if (width == 0 || height == 0 || width > 4096 || height > 4096 || (ulong)width * height > 12_000_000)
-            throw new InvalidDataException("Una carátula supera los 4.096 píxeles por lado o los 12 millones de píxeles.");
+            throw new InvalidDataException(I18n.T("Una carátula supera los 4.096 píxeles por lado o los 12 millones de píxeles."));
         if ((ulong)height * 220 > (ulong)width * 4096)
-            throw new InvalidDataException("Una carátula tiene una proporción demasiado alta.");
+            throw new InvalidDataException(I18n.T("Una carátula tiene una proporción demasiado alta."));
     }
 
     internal static void ValidateGames(List<Game>? games)
     {
-        if (games is null || games.Count > MaxGames) throw new InvalidDataException("La copia no tiene una colección válida o supera los 10.000 juegos.");
+        if (games is null || games.Count > MaxGames) throw new InvalidDataException(I18n.T("La copia no tiene una colección válida o supera los 10.000 juegos."));
         var ids = new HashSet<Guid>(); var appIds = new HashSet<int>();
         foreach (var game in games)
         {
-            if (game is null || game.Id == Guid.Empty) throw new InvalidDataException("La copia contiene un juego sin identificador válido.");
+            if (game is null || game.Id == Guid.Empty) throw new InvalidDataException(I18n.T("La copia contiene un juego sin identificador válido."));
             GameRules.Validate(game);
             if (!ids.Add(game.Id) || (game.SteamAppId is int id && !appIds.Add(id)))
-                throw new InvalidDataException("La copia contiene juegos duplicados.");
+                throw new InvalidDataException(I18n.T("La copia contiene juegos duplicados."));
         }
     }
 
@@ -51,8 +51,8 @@ public static class BackupFiles
     {
         using var file = File.OpenRead(path);
         var backup = JsonSerializer.Deserialize<Backup>(ReadLimited(file, MaxJsonBytes), DataJson.Options)
-            ?? throw new InvalidDataException("Copia no válida.");
-        if (backup.Version != 1) throw new InvalidDataException("Versión de copia JSON no compatible.");
+            ?? throw new InvalidDataException(I18n.T("Copia no válida."));
+        if (backup.Version != 1) throw new InvalidDataException(I18n.T("Versión de copia JSON no compatible."));
         ValidateGames(backup.Games);
         foreach (var game in backup.Games) game.CustomCover = null;
         return backup.Games;
@@ -63,7 +63,7 @@ public static class BackupFiles
         var snapshot = Snapshot(games);
         foreach (var game in snapshot) game.CustomCover = null;
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(new Backup { Games = snapshot }, DataJson.Options);
-        if (bytes.Length > MaxJsonBytes) throw new InvalidDataException("La copia JSON supera los 25 MB.");
+        if (bytes.Length > MaxJsonBytes) throw new InvalidDataException(I18n.T("La copia JSON supera los 25 MB."));
         WriteAtomic(path, stream => stream.Write(bytes));
     }
 
@@ -77,14 +77,14 @@ public static class BackupFiles
         {
             if (game.CustomCover is not null)
             {
-                if (!IsCustomCoverName(game.CustomCover)) throw new InvalidDataException($"La carátula personalizada de «{game.Title}» no es válida.");
+                if (!IsCustomCoverName(game.CustomCover)) throw new InvalidDataException((I18n.IsEnglish ? $"The custom cover for «{game.Title}» is invalid." : $"La carátula personalizada de «{game.Title}» no es válida."));
                 string entry = "covers/" + game.CustomCover;
                 string file = Path.Combine(coversDirectory, game.CustomCover);
                 if (!files.ContainsKey(entry))
                 {
                     var info = new FileInfo(file);
-                    if (!info.Exists) throw new FileNotFoundException($"Falta la carátula personalizada de «{game.Title}». Vuelve a elegirla antes de exportar.");
-                    if (info.Length > MaxImageBytes) throw new InvalidDataException("Una carátula supera los 8 MB.");
+                    if (!info.Exists) throw new FileNotFoundException((I18n.IsEnglish ? $"The custom cover for «{game.Title}» is missing. Choose it again before exporting." : $"Falta la carátula personalizada de «{game.Title}». Vuelve a elegirla antes de exportar."));
+                    if (info.Length > MaxImageBytes) throw new InvalidDataException(I18n.T("Una carátula supera los 8 MB."));
                     total += info.Length; files.Add(entry, file);
                 }
                 manifest.Covers[game.Id] = entry;
@@ -94,7 +94,7 @@ public static class BackupFiles
         }
         byte[] json = JsonSerializer.SerializeToUtf8Bytes(manifest, DataJson.Options);
         if (json.Length > MaxJsonBytes || total + json.Length > MaxExpandedBytes)
-            throw new InvalidDataException("La copia supera el límite de 200 MB o su colección supera los 25 MB.");
+            throw new InvalidDataException(I18n.T("La copia supera el límite de 200 MB o su colección supera los 25 MB."));
         WriteAtomic(path, output =>
         {
             using var archive = new ZipArchive(output, ZipArchiveMode.Create, leaveOpen: true);
@@ -117,9 +117,9 @@ public static class BackupFiles
         int read = file.Read(signature); file.Position = 0;
         if (read < 4 || signature[0] != 'P' || signature[1] != 'K')
             return new(ReadJson(path), new Dictionary<Guid, byte[]>());
-        if (file.Length > MaxArchiveBytes) throw new InvalidDataException("La copia comprimida supera los 250 MB.");
+        if (file.Length > MaxArchiveBytes) throw new InvalidDataException(I18n.T("La copia comprimida supera los 250 MB."));
         using var archive = new ZipArchive(file, ZipArchiveMode.Read);
-        if (archive.Entries.Count > MaxGames + 2) throw new InvalidDataException("La copia tiene demasiados archivos.");
+        if (archive.Entries.Count > MaxGames + 2) throw new InvalidDataException(I18n.T("La copia tiene demasiados archivos."));
         var entries = new Dictionary<string, ZipArchiveEntry>(StringComparer.Ordinal);
         long total = 0;
         foreach (var entry in archive.Entries)
@@ -127,28 +127,28 @@ public static class BackupFiles
             if (entry.FullName == "covers/" && entry.Length == 0) continue;
             bool cover = entry.FullName.StartsWith("covers/", StringComparison.Ordinal) && IsCustomCoverName(entry.FullName[7..]);
             if ((entry.FullName != ManifestName && !cover) || !entries.TryAdd(entry.FullName, entry))
-                throw new InvalidDataException("La copia contiene rutas, archivos duplicados o archivos no permitidos.");
-            if (entry.Length > (cover ? MaxImageBytes : MaxJsonBytes)) throw new InvalidDataException("Un archivo de la copia supera su límite de tamaño.");
+                throw new InvalidDataException(I18n.T("La copia contiene rutas, archivos duplicados o archivos no permitidos."));
+            if (entry.Length > (cover ? MaxImageBytes : MaxJsonBytes)) throw new InvalidDataException(I18n.T("Un archivo de la copia supera su límite de tamaño."));
             total += entry.Length;
-            if (total > MaxExpandedBytes) throw new InvalidDataException("La copia descomprimida supera los 200 MB.");
+            if (total > MaxExpandedBytes) throw new InvalidDataException(I18n.T("La copia descomprimida supera los 200 MB."));
         }
-        if (!entries.TryGetValue(ManifestName, out var jsonEntry)) throw new InvalidDataException("Falta la colección en la copia.");
+        if (!entries.TryGetValue(ManifestName, out var jsonEntry)) throw new InvalidDataException(I18n.T("Falta la colección en la copia."));
         Backup manifest;
         manifest = JsonSerializer.Deserialize<Backup>(ReadEntry(jsonEntry, MaxJsonBytes), DataJson.Options)
-            ?? throw new InvalidDataException("Copia no válida.");
-        if (manifest.Version != 2 || manifest.Covers is null) throw new InvalidDataException("Versión de copia completa no compatible.");
+            ?? throw new InvalidDataException(I18n.T("Copia no válida."));
+        if (manifest.Version != 2 || manifest.Covers is null) throw new InvalidDataException(I18n.T("Versión de copia completa no compatible."));
         ValidateGames(manifest.Games);
         var gameIds = manifest.Games.Select(g => g.Id).ToHashSet();
-        if (manifest.Covers.Count > gameIds.Count) throw new InvalidDataException("La copia contiene demasiadas referencias de carátulas.");
+        if (manifest.Covers.Count > gameIds.Count) throw new InvalidDataException(I18n.T("La copia contiene demasiadas referencias de carátulas."));
         var referenced = new HashSet<string>(StringComparer.Ordinal) { ManifestName };
         foreach (var (gameId, name) in manifest.Covers)
         {
             if (!gameIds.Contains(gameId) || name is null || !name.StartsWith("covers/", StringComparison.Ordinal) ||
                 !IsCustomCoverName(name[7..]) || !entries.ContainsKey(name))
-                throw new InvalidDataException("La copia contiene una referencia de carátula no válida.");
+                throw new InvalidDataException(I18n.T("La copia contiene una referencia de carátula no válida."));
             referenced.Add(name);
         }
-        if (referenced.Count != entries.Count) throw new InvalidDataException("La copia contiene carátulas que no pertenecen a la colección.");
+        if (referenced.Count != entries.Count) throw new InvalidDataException(I18n.T("La copia contiene carátulas que no pertenecen a la colección."));
         var images = new Dictionary<string, byte[]>(StringComparer.Ordinal);
         foreach (string name in referenced.Where(n => n != ManifestName))
         {
@@ -167,11 +167,11 @@ public static class BackupFiles
     }
     private static byte[] ReadLimited(Stream input, int maximum)
     {
-        if (input.CanSeek && input.Length > maximum) throw new InvalidDataException("Un archivo de la copia supera su límite de tamaño.");
+        if (input.CanSeek && input.Length > maximum) throw new InvalidDataException(I18n.T("Un archivo de la copia supera su límite de tamaño."));
         using var output = new MemoryStream(); var buffer = new byte[65536]; int count;
         while ((count = input.Read(buffer)) > 0)
         {
-            if (output.Length + count > maximum) throw new InvalidDataException("Un archivo de la copia supera su límite al descomprimirlo.");
+            if (output.Length + count > maximum) throw new InvalidDataException(I18n.T("Un archivo de la copia supera su límite al descomprimirlo."));
             output.Write(buffer, 0, count);
         }
         return output.ToArray();
@@ -179,7 +179,7 @@ public static class BackupFiles
     private static byte[] ReadEntry(ZipArchiveEntry entry, int maximum)
     {
         using var input = entry.Open(); var bytes = ReadLimited(input, maximum);
-        if (bytes.LongLength != entry.Length) throw new InvalidDataException("El tamaño real de un archivo no coincide con la copia.");
+        if (bytes.LongLength != entry.Length) throw new InvalidDataException(I18n.T("El tamaño real de un archivo no coincide con la copia."));
         return bytes;
     }
     private static void WriteAtomic(string path, Action<Stream> write)

@@ -2,7 +2,7 @@ param([ValidateSet('win-x64','win-arm64')][string]$Runtime = 'win-x64')
 $ErrorActionPreference = 'Stop'
 $checkpointRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $version = & "$PSScriptRoot\Get-Version.ps1"
-$publish = Join-Path $checkpointRoot "dist\$Runtime"
+$publish = Join-Path $checkpointRoot "dist\$version\$Runtime"
 $wix = Join-Path $checkpointRoot '.tools\wix\wix.exe'
 if (!(Test-Path -LiteralPath $wix)) { throw 'Instala WiX 5.0.2 con dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGet.config.' }
 if (!(Test-Path -LiteralPath (Join-Path $publish 'Checkpoint.exe'))) { throw 'Genera primero el paquete con scripts/Build.ps1.' }
