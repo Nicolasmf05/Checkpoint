@@ -158,7 +158,7 @@ public partial class MainWindow
     }
     private void ApplySocialTab()
     {
-        FilterArea.Visibility = friendsVisible ? Visibility.Collapsed : Visibility.Visible;
+        FilterArea.Visibility = friendsVisible || Preferences.MiniatureView ? Visibility.Collapsed : Visibility.Visible;
         GameArea.Visibility = friendsVisible ? Visibility.Collapsed : Visibility.Visible;
         FriendsHost.Visibility = friendsVisible ? Visibility.Visible : Visibility.Collapsed;
         SummaryTitle.Text = friendsVisible ? I18n.T("Tu gente, tus aventuras") : I18n.T("Tu próxima aventura");

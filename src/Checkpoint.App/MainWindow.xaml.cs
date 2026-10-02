@@ -45,6 +45,7 @@ public partial class MainWindow : Window
     private Point dragOrigin;
     private Border? dropBorder;
     private int dragScrollDirection;
+    private bool? miniatureApplied;
 
     public MainWindow(string directory, bool demo)
     {
@@ -81,8 +82,9 @@ public partial class MainWindow : Window
             var point = e.GetPosition(GameList);
             if (point.Y < 0 || point.Y > GameList.ActualHeight || point.X < 0 || point.X > GameList.ActualWidth) dragScrollDirection = 0;
         };
-        Width = Math.Clamp(Preferences.Width, MinWidth, SystemParameters.VirtualScreenWidth);
-        Height = Math.Clamp(Preferences.Height, MinHeight, SystemParameters.VirtualScreenHeight);
+        MinWidth = Preferences.MiniatureView ? 240 : 365; MinHeight = Preferences.MiniatureView ? 90 : 440;
+        Width = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureWidth : Preferences.Width, MinWidth, SystemParameters.VirtualScreenWidth);
+        Height = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureHeight : Preferences.Height, MinHeight, SystemParameters.VirtualScreenHeight);
         if (Preferences.Left is double left && Preferences.Top is double top)
         {
             WindowStartupLocation = WindowStartupLocation.Manual;
@@ -145,6 +147,31 @@ public partial class MainWindow : Window
 
     internal void ApplyPreferences()
     {
+        if (miniatureApplied != Preferences.MiniatureView)
+        {
+            if (miniatureApplied.HasValue) CaptureBounds();
+            miniatureApplied = Preferences.MiniatureView;
+            MinWidth = Preferences.MiniatureView ? 240 : 365;
+            MinHeight = Preferences.MiniatureView ? 90 : 440;
+            Width = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureWidth : Preferences.Width, MinWidth, SystemParameters.VirtualScreenWidth);
+            Height = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureHeight : Preferences.Height, MinHeight, SystemParameters.VirtualScreenHeight);
+            if (Preferences.MiniatureView) { friendsVisible = false; allLibrary = false; Search.Clear(); StatusFilter.SelectedIndex = 0; }
+        }
+        bool miniature = Preferences.MiniatureView;
+        HeaderArea.Visibility = SummaryArea.Visibility = NavigationArea.Visibility = FooterArea.Visibility = miniature ? Visibility.Collapsed : Visibility.Visible;
+        MiniDragHandle.Visibility = miniature ? Visibility.Visible : Visibility.Collapsed;
+        Shell.Padding = miniature ? new Thickness(10) : new Thickness(22,17,22,16);
+        ResizeGrip.Margin = miniature ? new Thickness(0,0,-6,-6) : new Thickness(0,0,-17,-12);
+        if (miniature)
+        {
+            var menu = new System.Windows.Controls.ContextMenu();
+            var restore = new System.Windows.Controls.MenuItem { Header = I18n.T("Salir de miniatura") };
+            restore.Click += (_, _) => { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; ApplyPreferences(); Persist(); Refresh(); };
+            var settings = new System.Windows.Controls.MenuItem { Header = I18n.T("Ajustes") };
+            settings.Click += (_, _) => Dialogs.Settings(this);
+            menu.Items.Add(restore); menu.Items.Add(settings); Shell.ContextMenu = menu;
+        }
+        else Shell.ContextMenu = null;
         var resources = Application.Current.Resources;
         bool light = Preferences.LightTheme;
         resources["TextBrush"] = Brush(light ? "#FF152338" : "#FFF2F4FA");
@@ -159,9 +186,9 @@ public partial class MainWindow : Window
         Topmost = Preferences.AlwaysOnTop; PinButton.Content = Topmost ? "◆" : "◇";
         ResizeGrip.Visibility = Preferences.PositionLocked ? Visibility.Collapsed : Visibility.Visible;
         timer.Interval = TimeSpan.FromMinutes(Math.Clamp(Preferences.SyncMinutes, 15, 120));
-        Covers.SetEnabled(!Preferences.LightweightMode);
-        ViewButton.Content = Preferences.GridView ? "▦" : Preferences.Compact ? "≡" : "▤";
-        string view = Preferences.GridView ? I18n.T("Cuadrícula") : Preferences.Compact ? I18n.T("Compacta") : I18n.T("Lista");
+        Covers.SetEnabled(!Preferences.LightweightMode && !miniature);
+        ViewButton.Content = miniature ? "☷" : Preferences.GridView ? "▦" : Preferences.Compact ? "≡" : "▤";
+        string view = miniature ? I18n.T("Miniatura") : Preferences.GridView ? I18n.T("Cuadrícula") : Preferences.Compact ? I18n.T("Compacta") : I18n.T("Lista");
         ViewButton.ToolTip = (I18n.IsEnglish ? $"View: {view} · switch with F6" : $"Vista: {view} · cambiar con F6");
         System.Windows.Automation.AutomationProperties.SetName(ViewButton, (I18n.IsEnglish ? $"Change view, current: {view}" : $"Cambiar vista, actual: {view}"));
     }
@@ -169,7 +196,8 @@ public partial class MainWindow : Window
     internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); }
     private void CaptureBounds()
     {
-        Preferences.Width = Width; Preferences.Height = Height;
+        if (miniatureApplied == true) { Preferences.MiniatureWidth = Width; Preferences.MiniatureHeight = Height; }
+        else { Preferences.Width = Width; Preferences.Height = Height; }
         Preferences.Left = Left; Preferences.Top = Top;
     }
     internal void Refresh()
@@ -180,9 +208,9 @@ public partial class MainWindow : Window
         var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || g.Tracked)
             .Where(g => g.Title.Contains(Search.Text, StringComparison.CurrentCultureIgnoreCase))
             .Where(g => StatusFilter.SelectedIndex <= 0 || (int)g.Status == StatusFilter.SelectedIndex - 1)).ToList();
-        visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Preferences.LightTheme, Preferences.LightweightMode)).ToList();
+        visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Preferences.LightTheme, Preferences.LightweightMode || Preferences.MiniatureView)).ToList();
         BindCards();
-        EmptyPanel.Visibility = filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        EmptyPanel.Visibility = !Preferences.MiniatureView && filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         EmptyTitle.Text = Games.Count == 0 ? I18n.T("Aquí empieza tu próxima partida") : I18n.T("Tu lista tiene espacio para otra aventura");
         EmptyText.Text = Games.Count == 0 ? I18n.T("Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano.")
             : allLibrary ? I18n.T("No hay juegos con esos filtros. Prueba otra búsqueda o añade un juego.") : I18n.T("Añade juegos a Mi lista desde su ficha en la biblioteca, o prueba otra búsqueda.");
@@ -198,7 +226,7 @@ public partial class MainWindow : Window
     private async void CoverLoaded(object sender, RoutedEventArgs e)
     {
         var image = (FrameworkElement)sender;
-        if (Preferences.LightweightMode) { CoverUnloaded(sender, e); return; }
+        if (Preferences.LightweightMode || Preferences.MiniatureView) { CoverUnloaded(sender, e); return; }
         if (image.Tag is CardView previous && previous != image.DataContext) previous.ReleaseCover();
         if (image.DataContext is CardView card) { image.Tag = card; await card.LoadCover(Covers); }
     }
@@ -221,7 +249,8 @@ public partial class MainWindow : Window
     private void ViewClick(object sender, RoutedEventArgs e) => CycleView();
     private void CycleView()
     {
-        if (Preferences.GridView) { Preferences.GridView = false; Preferences.Compact = false; }
+        if (Preferences.MiniatureView) { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; }
+        else if (Preferences.GridView) { Preferences.MiniatureView = true; }
         else if (Preferences.Compact) { Preferences.GridView = true; Preferences.Compact = false; }
         else Preferences.Compact = true;
         ApplyPreferences(); CaptureBounds(); Store.SaveSettings(Preferences); Refresh();
@@ -230,15 +259,15 @@ public partial class MainWindow : Window
     private void BindCards()
     {
         gridColumns = CalculateColumns();
-        GameList.ItemTemplate = (DataTemplate)Resources[Preferences.GridView ? "GridRowTemplate" : "GameTemplate"];
+        GameList.ItemTemplate = (DataTemplate)Resources[Preferences.MiniatureView ? "MiniatureTemplate" : Preferences.GridView ? "GridRowTemplate" : "GameTemplate"];
         // Virtualize rows so a large library does not create a control for every cover.
-        GameList.ItemsSource = Preferences.GridView
+        GameList.ItemsSource = Preferences.GridView && !Preferences.MiniatureView
             ? visibleCards.Chunk(gridColumns).Select(cards => new CardRow(cards, gridColumns)).ToList()
             : visibleCards;
     }
     private void GameListSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (ready && Preferences.GridView && gridColumns != CalculateColumns()) BindCards();
+        if (ready && Preferences.GridView && !Preferences.MiniatureView && gridColumns != CalculateColumns()) BindCards();
     }
     internal sealed record CardRow(CardView[] Cards, int Columns);
 

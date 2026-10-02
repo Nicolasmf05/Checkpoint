@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.4 — 2026-10-02
+
+- Miniature view: only names/states, no covers or surrounding controls; independent saved dimensions, drag strip and resize grip.
+- Settings/F6 activation and right-click/F6 exit; English/Spanish states and menu, verified theme contrast and native captures.
+
 ## 0.6.3 — 2026-10-02
 
 - Optional saved lightweight mode: no collection/friend cover rendering or new image requests; clears decoded cache without deleting library/cover files or changing sharing.

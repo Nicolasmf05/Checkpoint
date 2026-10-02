@@ -380,5 +380,7 @@
   "Steam no ha devuelto la definición de logros de este juego.": "Steam did not return the achievement definitions for this game.",
   "Steam no permite consultar estos logros. Revisa la privacidad de tus detalles de juegos.": "Steam does not allow achievement access. Check your Game details privacy settings.",
   "Modo ligero (sin carátulas)": "Lightweight mode (no covers)",
-  "Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso.": "Hide covers in your list and friends, avoid new image downloads and release the cover cache. Games, goals and progress are preserved."
+  "Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso.": "Hide covers in your list and friends, avoid new image downloads and release the cover cache. Games, goals and progress are preserved.",
+  "Miniatura": "Miniature",
+  "Salir de miniatura": "Exit miniature view"
 }

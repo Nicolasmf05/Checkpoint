@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.4 — vista Miniatura
+
+Han pasado 243 comprobaciones locales: 108 de biblioteca, 15 Node, 14 Edge y 106 WPF. Miniatura se prueba desde Ajustes, con persistencia, tamaños independientes, redimensionado, filas de nombre/estado, interfaz exterior oculta, ausencia de imágenes/botones/progreso, contraste, cambio inmediato a inglés, salida con menú y ciclo de vistas. Capturas nativas en ambos idiomas. Generados ZIP/MSI y MSIX de prueba validado con SDK. Siguen pendientes pruebas físicas de teclado/arrastre, actualización/desinstalación instalada y cuentas reales.
+
 ## 0.6.3 — modo ligero
 
 Han pasado 233 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 96 WPF. La casilla real de Ajustes se prueba al guardar, persistir, cancelar y desactivar; las imágenes de colección permanecen ocultas con caché vacía. Las peticiones simuladas de Storage privado demuestran que el progreso de amigos sigue visible sin descargar carátulas y que estas vuelven al desactivar el modo. Traducción inglesa validada. Generados ZIP/MSI y MSIX sin firma validado con SDK. Se conservan las limitaciones de instalación y cuentas reales indicadas abajo.

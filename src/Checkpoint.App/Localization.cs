@@ -25,6 +25,7 @@ public partial class MainWindow
         items[2].Text = I18n.T("Salir");
         NoticeText.Text = "";
         FriendsView.RefreshLanguage();
+        ApplyPreferences();
         Refresh();
     }
 }

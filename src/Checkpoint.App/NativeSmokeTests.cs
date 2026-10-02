@@ -286,6 +286,40 @@ public partial class MainWindow
                 Click(window,"Save");
             });
             Check(Preferences.Language == "es" && (string?)FriendsButton.Content == "Amigos", "switching back to Spanish restores the interface");
+            double normalWidth = Width, normalHeight = Height;
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Vista de la colección").SelectedIndex = 3;
+                Click(window,"Guardar");
+            });
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            GameList.ScrollIntoView(GameList.Items[0]);
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(Preferences.MiniatureView && Store.LoadSettings().MiniatureView && Width == 300 && Height == 220, "miniature view saves and uses independent small dimensions");
+            Check(GameList.Items.Count == Games.Count(g => g.Tracked) && !VisualChildren(GameList).OfType<Image>().Any() &&
+                !VisualChildren(GameList).OfType<Button>().Any() && !VisualChildren(GameList).OfType<ProgressBar>().Any(), "miniature rows contain no covers actions or progress bars");
+            Check(HeaderArea.Visibility == Visibility.Collapsed && SummaryArea.Visibility == Visibility.Collapsed &&
+                NavigationArea.Visibility == Visibility.Collapsed && FooterArea.Visibility == Visibility.Collapsed && FilterArea.Visibility == Visibility.Collapsed &&
+                Covers.MemoryBytes == 0, "miniature hides surrounding chrome and clears cover cache");
+            Check(VisualChildren(GameList).OfType<TextBlock>().Any(t => t.Text == Games.First().Title) &&
+                VisualChildren(GameList).OfType<TextBlock>().Any(t => t.Text == Games.First().StatusText), "miniature shows game names and states");
+            Check(VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.Title == t.Text)).All(t =>
+                t.Foreground is SolidColorBrush brush && brush.Color == ((SolidColorBrush)Application.Current.Resources["TextBrush"]).Color), "miniature names use the readable theme foreground");
+            Render(this,"widget-miniature.png");
+            Preferences.Language = "en"; ApplyLanguage();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(VisualChildren(GameList).OfType<TextBlock>().Any(t => t.Text == "Playing") &&
+                (string?)((MenuItem)Shell.ContextMenu.Items[0]).Header == "Exit miniature view", "miniature states and exit menu switch to English");
+            Render(this,"widget-miniature-en.png");
+            Preferences.Language = "es"; ApplyLanguage();
+            Width = 280; Height = 180; Persist();
+            Check(Store.LoadSettings().MiniatureWidth == 280 && Store.LoadSettings().MiniatureHeight == 180 &&
+                Preferences.Width == normalWidth && Preferences.Height == normalHeight, "miniature resize preserves normal dimensions");
+            ((MenuItem)Shell.ContextMenu.Items[0]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Check(!Preferences.MiniatureView && Width == normalWidth && Height == normalHeight, "context menu exits miniature and restores normal size");
+            Preferences.GridView = true; Preferences.Compact = false; ApplyPreferences(); Refresh();
+            CycleView(); Check(Preferences.MiniatureView, "view cycle enters miniature after grid");
+            CycleView(); Check(!Preferences.MiniatureView && !Preferences.GridView && !Preferences.Compact, "view cycle exits miniature to list");
             File.WriteAllText(Path.Combine(outputDirectory, "smoke.json"), JsonSerializer.Serialize(new { ok = true, checks = checks.Count, assertions = checks }, DataJson.Options));
             Console.WriteLine($"WPF smoke test passed: {checks.Count} checks, {outputDirectory}");
         }

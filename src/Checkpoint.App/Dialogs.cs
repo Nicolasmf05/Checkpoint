@@ -227,7 +227,7 @@ internal static class Dialogs
         opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles");
         var top = Check(body, I18n.T("Mantener siempre visible"), prefs.AlwaysOnTop); var position = Check(body, I18n.T("Bloquear posición y tamaño"), prefs.PositionLocked);
         Label(body, I18n.T("Vista de la colección"));
-        var view = new ComboBox { ItemsSource = new[] { I18n.T("Lista"), I18n.T("Compacta"), I18n.T("Cuadrícula de carátulas") }, SelectedIndex = prefs.GridView ? 2 : prefs.Compact ? 1 : 0 };
+        var view = new ComboBox { ItemsSource = new[] { I18n.T("Lista"), I18n.T("Compacta"), I18n.T("Cuadrícula de carátulas"), I18n.T("Miniatura") }, SelectedIndex = prefs.MiniatureView ? 3 : prefs.GridView ? 2 : prefs.Compact ? 1 : 0 };
         System.Windows.Automation.AutomationProperties.SetName(view, I18n.T("Vista de la colección")); body.Children.Add(view);
         var light = Check(body, I18n.T("Tema claro"), prefs.LightTheme);
         var lightweight = Check(body, I18n.T("Modo ligero (sin carátulas)"), prefs.LightweightMode);
@@ -280,7 +280,7 @@ internal static class Dialogs
                 if (!string.IsNullOrWhiteSpace(endpoint.Text)) SteamClient.ValidateServiceUrl(endpoint.Text);
                 if ((startup.IsChecked == true) != prefs.StartWithWindows) SetStartup(startup.IsChecked == true);
                 prefs.BackgroundOpacity = opacity.Value; prefs.AlwaysOnTop = top.IsChecked == true; prefs.PositionLocked = position.IsChecked == true;
-                prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; prefs.LightTheme = light.IsChecked == true; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
+                prefs.MiniatureView = view.SelectedIndex == 3; prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; prefs.LightTheme = light.IsChecked == true; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
                 prefs.LightweightMode = lightweight.IsChecked == true;

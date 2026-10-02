@@ -19,6 +19,10 @@ La vía alternativa es Microsoft Store con MSIX, donde Microsoft firma tras apro
 
 Portable: extrae el ZIP y abre `Checkpoint.exe` dentro de `Checkpoint`. Conserva todos los archivos juntos. El MSI instala para tu usuario. Ambas ediciones incluyen este aviso y su traducción inglesa.
 
+## Vista Miniatura
+
+Selecciona **Ajustes → Vista de la colección → Miniatura**, o pulsa F6 hasta llegar a ella. Muestra únicamente **nombre y estado** de los juegos de Mi lista, sin carátulas, botones de fila ni barras de progreso. Oculta cabecera, navegación, filtros y pie. Su ventana puede reducirse hasta 240 × 90 unidades lógicas de Windows. Arrastra el borde superior y redimensiona desde la esquina inferior derecha. **F6 o clic derecho → Salir de miniatura** vuelve a la vista normal. Ambos tamaños se guardan por separado; no modifica el progreso ni los archivos. No carga carátulas mientras está activa.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.

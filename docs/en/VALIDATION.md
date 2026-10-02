@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.4 — miniature view
+
+243 local checks passed: 108 core, 15 Node, 14 Edge and 106 native WPF. Miniature tests cover actual Settings activation/persistence, separate dimensions and resizing, name/state-only templates, hidden chrome, no images/actions/progress bars, readable theme colors, immediate English labels, context-menu exit and view cycling. Spanish/English captures are rendered from native controls. ZIP/MSI and an SDK-validated unsigned MSIX preview were generated. Physical keyboard/drag, installed updates/uninstall and real-account limitations remain pending.
+
 ## 0.6.3 — lightweight mode
 
 233 checks passed: 108 core, 15 Node, 14 Edge and 96 native WPF. The actual Settings checkbox is tested for save, persistence, cancel and disabling; collection images remain hidden with an empty decoded cache. Simulated private Storage requests prove that friend progress remains visible without cover downloads in lightweight mode and that covers return when disabled. English localization is verified. ZIP/MSI and an SDK-validated unsigned MSIX preview were generated. Installed-package and real-account limitations remain as described below.

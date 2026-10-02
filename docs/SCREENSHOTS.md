@@ -35,3 +35,9 @@ En Windows, `./scripts/Build.ps1 -Installer` ejecuta las pruebas contra el ZIP e
 Sin carátulas; la colección y el progreso se conservan. Captura de prueba en español.
 
 ![Modo ligero](screenshots/widget-lightweight.png)
+
+## Miniatura — 0.6.4
+
+Solo nombre y estado. Se activa en Ajustes o con F6; clic derecho para salir.
+
+![Miniatura](screenshots/widget-miniature.png)

@@ -39,3 +39,9 @@ Regenerate with `./scripts/Build.ps1 -Installer` on Windows. Output: `.qa/packag
 Covers are hidden while games and progress remain. This test capture uses Spanish; the setting is also available in English.
 
 ![Lightweight mode, Spanish capture](../screenshots/widget-lightweight.png)
+
+## Miniature — 0.6.4
+
+Only name and state. Enable from Settings or F6; right-click to exit.
+
+![Miniature](../screenshots/widget-miniature-en.png)

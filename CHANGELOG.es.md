@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.4 — 2026-10-02
+
+- Vista Miniatura: solo nombres/estados, sin carátulas ni controles alrededor; tamaño guardado independiente, borde para mover y esquina para redimensionar.
+- Activación en Ajustes/F6 y salida mediante clic derecho/F6; estados/menú bilingües, contraste comprobado y capturas nativas.
+
 ## 0.6.3 — 2026-10-02
 
 - Modo ligero opcional y persistente: oculta carátulas de colección/amigos, evita nuevas consultas de imágenes y vacía la caché sin borrar juegos/archivos ni cambiar la compartición.

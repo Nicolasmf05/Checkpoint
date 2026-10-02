@@ -50,11 +50,19 @@
         <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="{Binding Columns}"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
       </ItemsControl>
     </DataTemplate>
+    <DataTemplate x:Key="MiniatureTemplate">
+      <Grid Margin="2,3" Height="28">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" ToolTip="{Binding Model.Title}"/>
+        <TextBlock Grid.Column="1" Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" VerticalAlignment="Center"/>
+      </Grid>
+    </DataTemplate>
   </Window.Resources>
   <Border x:Name="Shell" CornerRadius="20" BorderThickness="1" BorderBrush="{DynamicResource LineBrush}" Padding="22,17,22,16">
     <Grid>
       <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-      <Grid Margin="0,0,0,23">
+      <Border x:Name="MiniDragHandle" Height="10" Background="Transparent" Visibility="Collapsed" MouseLeftButtonDown="DragTitle" Cursor="SizeAll"/>
+      <Grid x:Name="HeaderArea" Margin="0,0,0,23">
         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" MouseLeftButtonDown="DragTitle" Cursor="SizeAll">
           <Border Width="29" Height="29" CornerRadius="8" Background="{DynamicResource AccentFillBrush}" Margin="0,0,9,0"><Path Data="M8,19 L8,7 L19,7 L16,11 L19,15 L10,15" Stroke="#FF102D27" StrokeThickness="2" StrokeLineJoin="Round"/></Border>
@@ -67,8 +75,8 @@
           <Button Content="×" Click="CloseClick" Width="29" Height="29" Padding="0" ToolTip="{DynamicResource Loc_aeccae342e4b}" AutomationProperties.Name="{DynamicResource Loc_aeccae342e4b}"/>
         </StackPanel>
       </Grid>
-      <StackPanel Grid.Row="1" Margin="0,0,0,18"><TextBlock x:Name="SummaryTitle" Text="{DynamicResource Loc_7a262f2c703d}" FontSize="25" FontWeight="SemiBold"/><TextBlock x:Name="Summary" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,7,0,0"/></StackPanel>
-      <Grid Grid.Row="2" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <StackPanel x:Name="SummaryArea" Grid.Row="1" Margin="0,0,0,18"><TextBlock x:Name="SummaryTitle" Text="{DynamicResource Loc_7a262f2c703d}" FontSize="25" FontWeight="SemiBold"/><TextBlock x:Name="Summary" FontSize="11" Foreground="{DynamicResource MutedBrush}" Margin="0,7,0,0"/></StackPanel>
+      <Grid x:Name="NavigationArea" Grid.Row="2" Margin="0,0,0,12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal"><Button x:Name="TrackedButton" Content="{DynamicResource Loc_041fb6146f6e}" Click="TrackedClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="LibraryButton" Content="{DynamicResource Loc_c9169c12cba9}" Click="LibraryClick" Padding="10,7" Margin="0,0,5,0"/><Button x:Name="FriendsButton" Content="{DynamicResource Loc_bead8677698a}" Click="FriendsClick" Padding="10,7"/></StackPanel>
         <Button Grid.Column="1" Content="{DynamicResource Loc_893f9701300c}" Style="{StaticResource AccentButton}" Click="AddClick" Padding="11,7" ToolTip="{DynamicResource Loc_234289d9e3d6}"/>
       </Grid>
@@ -87,7 +95,7 @@
         </StackPanel>
       </Grid>
       <Border x:Name="FriendsHost" Grid.Row="3" Grid.RowSpan="2" Visibility="Collapsed"/>
-      <Grid Grid.Row="5" Margin="0,15,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <Grid x:Name="FooterArea" Grid.Row="5" Margin="0,15,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel VerticalAlignment="Center"><TextBlock x:Name="ConnectionText" Text="{DynamicResource Loc_2f1941c17edd}" Foreground="{DynamicResource MutedBrush}" FontSize="10"/><TextBlock x:Name="NoticeText" Foreground="{DynamicResource MutedBrush}" FontSize="10" Margin="0,4,8,0" TextWrapping="Wrap" MaxWidth="290"/></StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="UndoButton" Content="↶" Click="UndoClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" Visibility="Collapsed" ToolTip="{DynamicResource Loc_UndoTooltip}" AutomationProperties.Name="{DynamicResource Loc_b55af60434ee}"/><Button x:Name="ViewButton" Content="▤" Click="ViewClick" Width="30" Padding="0" Height="30" Margin="0,0,6,0" ToolTip="{DynamicResource Loc_ViewTooltip}" AutomationProperties.Name="{DynamicResource Loc_6388939b12c2}"/><Button x:Name="SyncButton" Content="↻" Click="SyncClick" Width="30" Padding="0" Height="30" ToolTip="{DynamicResource Loc_Sync}" AutomationProperties.Name="{DynamicResource Loc_Sync}"/></StackPanel>
       </Grid>

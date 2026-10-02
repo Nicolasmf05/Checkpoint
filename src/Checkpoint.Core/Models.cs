@@ -85,6 +85,9 @@ public sealed class Settings
     public bool PositionLocked { get; set; }
     public bool Compact { get; set; }
     public bool GridView { get; set; }
+    public bool MiniatureView { get; set; }
+    public double MiniatureWidth { get; set; } = 300;
+    public double MiniatureHeight { get; set; } = 220;
     public bool LightTheme { get; set; }
     public bool LightweightMode { get; set; }
     public bool CloseToTray { get; set; } = true;
