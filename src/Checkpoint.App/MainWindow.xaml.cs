@@ -128,10 +128,10 @@ public partial class MainWindow : Window
             hotkeyRegistered = RegisterHotKey(source.Handle, HotkeyId, 0x4000 | 0x0001 | 0x0002, 0x43);
         };
     }
-    private void ClampToScreen()
+    private void ClampToScreen(Forms.Screen? targetScreen = null)
     {
         var scale = VisualTreeHelper.GetDpi(this);
-        var screen = Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle).WorkingArea;
+        var screen = (targetScreen ?? Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle)).WorkingArea;
         double left = screen.Left / scale.DpiScaleX, top = screen.Top / scale.DpiScaleY;
         Width = Math.Min(Width, screen.Width / scale.DpiScaleX); Height = Math.Min(Height, screen.Height / scale.DpiScaleY);
         Left = Math.Clamp(double.IsFinite(Left) ? Left : left, left, Math.Max(left, (screen.Right / scale.DpiScaleX) - Width));
@@ -149,12 +149,14 @@ public partial class MainWindow : Window
     {
         if (miniatureApplied != Preferences.MiniatureView)
         {
+            var currentScreen = ready ? Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle) : null;
             if (miniatureApplied.HasValue) CaptureBounds();
             miniatureApplied = Preferences.MiniatureView;
             MinWidth = Preferences.MiniatureView ? 240 : 365;
             MinHeight = Preferences.MiniatureView ? 90 : 440;
             Width = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureWidth : Preferences.Width, MinWidth, SystemParameters.VirtualScreenWidth);
             Height = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureHeight : Preferences.Height, MinHeight, SystemParameters.VirtualScreenHeight);
+            if (ready) ClampToScreen(currentScreen);
             if (Preferences.MiniatureView) { friendsVisible = false; allLibrary = false; Search.Clear(); StatusFilter.SelectedIndex = 0; }
         }
         bool miniature = Preferences.MiniatureView;
@@ -203,6 +205,8 @@ public partial class MainWindow : Window
     internal void Refresh()
     {
         if (!ready) return;
+        var selectedId = Preferences.MiniatureView ? (GameList.SelectedItem as CardView)?.Model.Id : null;
+        bool restoreFocus = Preferences.MiniatureView && GameList.IsKeyboardFocusWithin;
         int finished = Games.Count(g => g.Status == GameStatus.Finished);
         Summary.Text = I18n.IsEnglish ? $"{Games.Count(g => g.Tracked)} in your list  ·  {finished} stories finished" : $"{Games.Count(g => g.Tracked)} en tu lista  ·  {finished} historias terminadas";
         var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || g.Tracked)
@@ -222,6 +226,11 @@ public partial class MainWindow : Window
         SyncButton.IsEnabled = !syncing;
         UndoButton.Visibility = DeletedGames.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         ApplySocialTab();
+        if (selectedId.HasValue && visibleCards.FirstOrDefault(c => c.Model.Id == selectedId) is { } selected)
+        {
+            GameList.SelectedItem = selected;
+            if (restoreFocus) FocusMiniatureCard(selected, expectedFocus: Keyboard.FocusedElement, guardFocus: true);
+        }
     }
     private async void CoverLoaded(object sender, RoutedEventArgs e)
     {
@@ -247,7 +256,7 @@ public partial class MainWindow : Window
     private void AddClick(object sender, RoutedEventArgs e) => Dialogs.Edit(this, null);
     private void SettingsClick(object sender, RoutedEventArgs e) => Dialogs.Settings(this);
     private void ViewClick(object sender, RoutedEventArgs e) => CycleView();
-    private void FocusMiniatureCard(CardView card, int retry = 0)
+    private void FocusMiniatureCard(CardView card, int retry = 0, IInputElement? expectedFocus = null, bool guardFocus = false)
     {
         GameList.SelectedItem = card; GameList.ScrollIntoView(card); GameList.UpdateLayout();
         if (GameList.ItemContainerGenerator.ContainerFromItem(card) is ListBoxItem container && FindVisual<Grid>(container) is { } row && row.DataContext == card)
@@ -255,7 +264,9 @@ public partial class MainWindow : Window
         // A distant virtualized container may be created on the next layout pass.
         if (retry < 3) Dispatcher.BeginInvoke(() =>
         {
-            if (Preferences.MiniatureView && GameList.SelectedItem == card) FocusMiniatureCard(card, retry + 1);
+            if (Preferences.MiniatureView && GameList.SelectedItem == card &&
+                (!guardFocus || Keyboard.FocusedElement == expectedFocus || GameList.IsKeyboardFocusWithin))
+                FocusMiniatureCard(card, retry + 1, expectedFocus, guardFocus);
         }, System.Windows.Threading.DispatcherPriority.ContextIdle);
     }
     private void MiniatureKeyDown(object sender, KeyEventArgs e)
@@ -277,10 +288,18 @@ public partial class MainWindow : Window
     }
     private void MiniatureMenuClosed(object sender, RoutedEventArgs e)
     {
-        if (((System.Windows.Controls.ContextMenu)sender).PlacementTarget is not FrameworkElement { DataContext: CardView previous }) return;
+        var menu = (System.Windows.Controls.ContextMenu)sender;
+        if (menu.Tag is not Guid gameId) return;
+        menu.Tag = null;
+        var selectionAtClose = (GameList.SelectedItem as CardView)?.Model.Id ?? gameId;
+        var focusAtClose = Keyboard.FocusedElement;
         Dispatcher.BeginInvoke(() =>
         {
-            if (Preferences.MiniatureView && visibleCards.FirstOrDefault(c => c.Model.Id == previous.Model.Id) is { } current) FocusMiniatureCard(current);
+            if (Preferences.MiniatureView && (GameList.SelectedItem as CardView)?.Model.Id == selectionAtClose &&
+                (Keyboard.FocusedElement == focusAtClose || Keyboard.FocusedElement is null ||
+                    (Keyboard.FocusedElement as FrameworkElement)?.DataContext is CardView focused && focused.Model.Id == gameId) &&
+                visibleCards.FirstOrDefault(c => c.Model.Id == gameId) is { } current)
+                FocusMiniatureCard(current, expectedFocus: Keyboard.FocusedElement, guardFocus: true);
         }, System.Windows.Threading.DispatcherPriority.ContextIdle);
     }
     private void MiniatureMenuOpened(object sender, RoutedEventArgs e)
@@ -288,6 +307,8 @@ public partial class MainWindow : Window
         var menu = (System.Windows.Controls.ContextMenu)sender;
         menu.Items.Clear();
         if (menu.PlacementTarget is not FrameworkElement { DataContext: CardView card } || !Preferences.MiniatureView) return;
+        GameList.SelectedItem = card;
+        menu.Tag = card.Model.Id;
         foreach (var state in Enum.GetValues<GameStatus>())
         {
             var item = new System.Windows.Controls.MenuItem { Header = Labels.Status(state), Tag = state, IsCheckable = true, IsChecked = card.Model.Status == state };
@@ -439,7 +460,7 @@ public partial class MainWindow : Window
         });
         Persist(); Notice(I18n.T("Juegos de ejemplo añadidos. El progreso de Steam aún no se ha consultado."));
     }
-    internal void ShowWidget() { Show(); WindowState = WindowState.Normal; Activate(); }
+    internal void ShowWidget() { Show(); WindowState = WindowState.Normal; if (ready) ClampToScreen(); Activate(); }
     private void ToggleVisible() { if (IsVisible) Hide(); else ShowWidget(); }
     internal void Exit() { exiting = true; Close(); }
     protected override void OnClosing(CancelEventArgs e)

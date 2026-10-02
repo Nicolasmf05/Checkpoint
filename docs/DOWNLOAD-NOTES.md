@@ -27,6 +27,8 @@ En Miniatura, **clic derecho sobre un juego** permite cambiar entre pendiente, j
 
 También puedes usar el teclado en Miniatura: **↑/↓** para recorrer los juegos, **Inicio/Fin** para ir al primero/último y **Enter/Espacio** para abrir el menú del juego activo. El contorno resalta la fila enfocada. Al cerrar el menú o cambiar el estado, el foco vuelve a ese juego. No afecta a los atajos de las otras vistas.
 
+Las actualizaciones conservan el juego seleccionado y recuperan su foco de teclado solo si la lista tenía el foco. Retirarlo de Mi lista limpia la selección. Cambiar de vista o mostrar el widget ajusta la ventana al área de trabajo del monitor actual.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.

@@ -329,6 +329,24 @@ public partial class MainWindow
             Check(keyboardRow.ContextMenu.IsOpen, "miniature Space also opens the state menu");
             keyboardRow.ContextMenu.IsOpen = false;
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            FocusMiniatureCard(visibleCards[^1]);
+            var retainedGame = visibleCards[^1].Model;
+            Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check((GameList.SelectedItem as CardView)?.Model.Id == retainedGame.Id &&
+                (Keyboard.FocusedElement as FrameworkElement)?.DataContext == GameList.SelectedItem, "miniature refresh retains selection and row focus by game identity");
+            int retainedOrder = retainedGame.SortOrder;
+            bool retainedFavorite = retainedGame.Favorite;
+            retainedGame.Favorite = true; retainedGame.SortOrder = -100; Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(GameList.SelectedItem == visibleCards[0] && (Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[0], "miniature retains the selected game when display order changes");
+            retainedGame.Favorite = retainedFavorite; retainedGame.SortOrder = retainedOrder;
+            Keyboard.ClearFocus(); Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check((GameList.SelectedItem as CardView)?.Model.Id == retainedGame.Id && Keyboard.FocusedElement is null, "miniature refresh preserves selection without acquiring absent keyboard focus");
+            retainedGame.Tracked = false; Refresh();
+            Check(GameList.SelectedItem is null, "miniature refresh clears a selection that is no longer in the list");
+            retainedGame.Tracked = true; Refresh(); FocusMiniatureCard(visibleCards[0]);
             var keyboardBulk = Enumerable.Range(0,1000).Select(i => new Game { Title = $"Keyboard game {i:0000}", SortOrder = i + 100 }).ToList();
             Games.AddRange(keyboardBulk); Refresh(); FocusMiniatureCard(visibleCards[0]); MiniatureKey(Key.End);
             for (int i = 0; i < 10 && (Keyboard.FocusedElement as FrameworkElement)?.DataContext != visibleCards[^1]; i++)
@@ -336,6 +354,13 @@ public partial class MainWindow
             Console.WriteLine($"Virtual keyboard: selected={GameList.SelectedItem == visibleCards[^1]}, focused={(Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1]}, realized={VisualChildren(GameList).OfType<ListBoxItem>().Count()}");
             Check(GameList.SelectedItem == visibleCards[^1] && (Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1] &&
                 VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "miniature End focuses a distant virtualized row in a large collection");
+            var distantId = visibleCards[^1].Model.Id;
+            Refresh();
+            for (int i = 0; i < 10 && (Keyboard.FocusedElement as FrameworkElement)?.DataContext != GameList.SelectedItem; i++)
+            { await Task.Delay(10); await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle); }
+            Check((GameList.SelectedItem as CardView)?.Model.Id == distantId &&
+                (Keyboard.FocusedElement as FrameworkElement)?.DataContext == GameList.SelectedItem &&
+                VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "miniature refresh restores a distant row without disabling virtualization");
             Games.RemoveAll(g => keyboardBulk.Contains(g)); Refresh(); FocusMiniatureCard(visibleCards[0]);
             var miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
             var miniatureGame = ((CardView)miniatureRow.DataContext).Model;
@@ -345,17 +370,21 @@ public partial class MainWindow
             Check(miniatureRow.ContextMenu.Items.OfType<MenuItem>().Count(i => i.Tag is GameStatus) == 5 &&
                 miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == priorState).IsChecked, "miniature menu exposes all states and checks the current one");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu.png"));
-            var finishState = miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Finished);
-            finishState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureRow.ContextMenu.IsOpen = false;
+            var miniatureMenu = miniatureRow.ContextMenu;
+            var finishState = miniatureMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Finished);
+            finishState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureMenu.IsOpen = false;
             Check(miniatureGame.Status == GameStatus.Finished && miniatureGame.FinishedAt.HasValue &&
                 Store.LoadGames().Single(g => g.Id == miniatureGame.Id).Status == GameStatus.Finished && Preferences.MiniatureView, "miniature state action persists story completion without leaving the view");
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            for (int i = 0; i < 10 && !((Keyboard.FocusedElement as FrameworkElement)?.DataContext is CardView stateFocus && stateFocus.Model.Id == miniatureGame.Id); i++)
+            { await Task.Delay(10); await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle); }
             Check((Keyboard.FocusedElement as FrameworkElement)?.DataContext is CardView updatedFocus && updatedFocus.Model.Id == miniatureGame.Id, "miniature keeps keyboard focus on the game after its state changes");
             miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView c && c.Model.Id == miniatureGame.Id);
             miniatureRow.ContextMenu.PlacementTarget = miniatureRow; miniatureRow.ContextMenu.IsOpen = true;
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
-            var playingState = miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Playing);
-            playingState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureRow.ContextMenu.IsOpen = false;
+            miniatureMenu = miniatureRow.ContextMenu;
+            var playingState = miniatureMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Playing);
+            playingState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureMenu.IsOpen = false;
             Check(miniatureGame.Status == GameStatus.Playing && miniatureGame.FinishedAt is null &&
                 Store.LoadGames().Single(g => g.Id == miniatureGame.Id).FinishedAt is null, "miniature reopening clears story completion date");
             GameRules.SetStatus(miniatureGame, priorState); Persist(); Refresh();
@@ -375,8 +404,25 @@ public partial class MainWindow
             Width = 280; Height = 180; Persist();
             Check(Store.LoadSettings().MiniatureWidth == 280 && Store.LoadSettings().MiniatureHeight == 180 &&
                 Preferences.Width == normalWidth && Preferences.Height == normalHeight, "miniature resize preserves normal dimensions");
+            double priorLeft = Left, priorTop = Top;
+            var workArea = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(this).Handle).WorkingArea;
+            var dpi = VisualTreeHelper.GetDpi(this);
+            Left = workArea.Right / dpi.DpiScaleX - Width; Top = workArea.Bottom / dpi.DpiScaleY - Height;
             ((MenuItem)Shell.ContextMenu.Items[0]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Check(!Preferences.MiniatureView && Width == normalWidth && Height == normalHeight, "context menu exits miniature and restores normal size");
+            bool InsideWorkArea() => Left >= workArea.Left / dpi.DpiScaleX - 1 && Top >= workArea.Top / dpi.DpiScaleY - 1 &&
+                Left + Width <= workArea.Right / dpi.DpiScaleX + 1 && Top + Height <= workArea.Bottom / dpi.DpiScaleY + 1;
+            Check(InsideWorkArea(), "expanding miniature at the screen corner keeps the normal window in the work area");
+            Left = workArea.Right / dpi.DpiScaleX - 30; Top = workArea.Bottom / dpi.DpiScaleY - 30;
+            workArea = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(this).Handle).WorkingArea;
+            dpi = VisualTreeHelper.GetDpi(this);
+            Preferences.MiniatureView = true; ApplyPreferences(); Refresh();
+            Check(InsideWorkArea(), "entering miniature corrects a partly offscreen window");
+            Hide(); Left = workArea.Right / dpi.DpiScaleX + 50;
+            workArea = System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(this).Handle).WorkingArea;
+            dpi = VisualTreeHelper.GetDpi(this); ShowWidget();
+            Check(InsideWorkArea(), "showing the widget corrects an offscreen saved position");
+            Preferences.MiniatureView = false; ApplyPreferences(); Refresh(); Left = priorLeft; Top = priorTop; Persist();
             Preferences.GridView = true; Preferences.Compact = false; ApplyPreferences(); Refresh();
             CycleView(); Check(Preferences.MiniatureView, "view cycle enters miniature after grid");
             CycleView(); Check(!Preferences.MiniatureView && !Preferences.GridView && !Preferences.Compact, "view cycle exits miniature to list");

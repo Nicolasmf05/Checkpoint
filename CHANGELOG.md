@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.7 — 2026-10-02
+
+- Miniature retains selected game and keyboard focus across refreshes and ordering changes, including virtualized rows. Refresh without list focus does not acquire it; removed games clear selection.
+- Switching views and showing the widget clamp its bounds to the current monitor work area.
+
 ## 0.6.6 — 2026-10-02
 
 - Miniature keyboard navigation with Up/Down/Home/End and Enter/Space state-menu access.

@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.7 — selección y ventana estables
+
+Han pasado 263 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 126 WPF. Las pruebas conservan selección/foco al actualizar y reordenar, comprueban que una actualización sin foco no lo adquiere, limpian selecciones retiradas y recuperan filas virtualizadas entre 1.003 juegos sin crear 30 filas. Se prueba salir de Miniatura desde la esquina de la pantalla, entrar desde una posición parcialmente exterior y mostrar una ventana fuera del área de trabajo. Estas pruebas usan el monitor actual: varios monitores y cambios de DPI físicos siguen pendientes, junto con instalación y cuentas reales.
+
 ## 0.6.6 — teclado en Miniatura
 
 Han pasado 255 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 118 WPF. Los eventos de teclado prueban Fin/↑/Inicio, límites de fila, menú con Enter/Espacio, recuperación del foco al cerrar/cambiar estado y salto a una fila virtualizada entre 1.003 juegos con menos de 30 filas creadas. El foco espera al diseño diferido y la prueba espera a su recuperación. Captura nativa incluida. No sustituye pruebas físicas de teclado/lector de pantalla; siguen pendientes instalación y cuentas reales.

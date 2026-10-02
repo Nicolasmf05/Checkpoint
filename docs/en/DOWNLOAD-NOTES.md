@@ -27,6 +27,8 @@ In Miniature, **right-click a game** to select pending, playing, paused, story f
 
 Miniature also supports keyboard controls: **Up/Down** select games, **Home/End** jump to the first/last and **Enter/Space** open the active game menu. A focus outline marks the active row. Closing the menu or changing state returns focus to that game. Other views retain their existing shortcuts.
 
+Updates preserve the selected game and restore its keyboard focus only if the list had focus. Removing it from My list clears selection. Changing view or showing the widget keeps the window within the current monitor work area.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.
