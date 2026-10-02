@@ -409,7 +409,8 @@ public partial class MainWindow
             var dpi = VisualTreeHelper.GetDpi(this);
             Left = workArea.Right / dpi.DpiScaleX - Width; Top = workArea.Bottom / dpi.DpiScaleY - Height;
             ((MenuItem)Shell.ContextMenu.Items[0]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
-            Check(!Preferences.MiniatureView && Width == normalWidth && Height == normalHeight, "context menu exits miniature and restores normal size");
+            Check(!Preferences.MiniatureView && Width == Math.Max(MinWidth,Math.Min(normalWidth,workArea.Width / dpi.DpiScaleX)) &&
+                Height == Math.Max(MinHeight,Math.Min(normalHeight,workArea.Height / dpi.DpiScaleY)), "context menu exits miniature and restores normal size within the available work area");
             bool InsideWorkArea() => Left >= workArea.Left / dpi.DpiScaleX - 1 && Top >= workArea.Top / dpi.DpiScaleY - 1 &&
                 Left + Width <= workArea.Right / dpi.DpiScaleX + 1 && Top + Height <= workArea.Bottom / dpi.DpiScaleY + 1;
             Check(InsideWorkArea(), "expanding miniature at the screen corner keeps the normal window in the work area");

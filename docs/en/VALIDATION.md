@@ -2,7 +2,7 @@
 
 ## 0.6.7 — stable selection and window bounds
 
-263 checks passed: 108 core, 15 Node, 14 Edge and 126 native WPF. Tests retain selection/focus through refresh and reordering, avoid acquiring absent keyboard focus, clear removed selections and restore a distant virtualized row among 1,003 games with fewer than 30 realized rows. Bounds tests expand from the screen corner, enter Miniature from a partly offscreen position and show an offscreen widget. These tests use the current monitor; physical multi-monitor/DPI transitions, installed packages and real accounts remain pending.
+263 checks passed: 108 core, 15 Node, 14 Edge and 126 native WPF. Tests retain selection/focus through refresh and reordering, avoid acquiring absent keyboard focus, clear removed selections and restore a distant virtualized row among 1,003 games with fewer than 30 realized rows. Bounds tests expand from the screen corner, enter Miniature from a partly offscreen position and show an offscreen widget. Restored dimensions are capped by the available work area, including small desktops. These tests use the current monitor; physical multi-monitor/DPI transitions, installed packages and real accounts remain pending.
 
 ## 0.6.6 — miniature keyboard controls
 
