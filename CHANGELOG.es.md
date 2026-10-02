@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.6.1 — 2026-10-02
+
+- El ZIP portable se extrae en una sola carpeta `Checkpoint`, con el ejecutable, runtime, configuración y licencias.
+- La validación comprueba esa estructura y ejecuta la app desde la carpeta. El MSI recoge el mismo paquete.
+- Documentación para distinguir avisos de reputación/editor sin firma de detecciones antivirus. Los paquetes siguen sin firma digital.
+
 ## 0.6.0 — 2026-10-02
 
 - Función Steam de Supabase: OpenID verificado, hashes privados persistentes, sondeo atómico, protección contra respuestas repetidas, límites y caché compartidos.

@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.1 — 2026-10-02
+
+- Portable ZIP extracts into one `Checkpoint` folder, containing the executable, runtime, configuration and licenses.
+- Package validation checks the single-folder layout and runs the app from that folder. MSI harvesting uses the same bundle.
+- Windows security troubleshooting distinguishes reputation/unsigned-publisher warnings from antivirus detections. Packages remain unsigned.
+
 ## 0.6.0 — 2026-10-02
 
 - Supabase Steam Edge Function: verified OpenID, durable private session hashes, atomic polling, nonce replay protection, shared limits and caches.

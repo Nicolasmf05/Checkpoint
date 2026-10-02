@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.1 packaging
+
+The portable archive contains one top-level `Checkpoint` folder. Verification enforces that layout and launches the extracted application from it. The EXE/MSI remain unsigned; the reported SmartScreen block requires a trusted signing/distribution route. No suitable code-signing certificate was found in the current-user certificate store. Functional tests do not validate SmartScreen reputation.
+
 ## 0.6.0 Steam integration
 
 Local distribution checks passed: 108 core, 15 legacy Node, 14 Supabase Edge HTTP/security and 79 native WPF assertions (216 total). Native checks include Supabase URL validation, bound authorization, DPAPI restoration, malformed-session preservation, language parameters and unlinking. ZIP and MSI were generated; the MSI remains unsigned and installation/uninstallation is untested.

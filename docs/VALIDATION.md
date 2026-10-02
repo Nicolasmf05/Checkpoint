@@ -2,6 +2,10 @@
 
 # Validación
 
+## Empaquetado de 0.6.1
+
+El portable contiene una sola carpeta `Checkpoint` en la raíz. La verificación exige esa estructura y ejecuta la app desde ella. EXE/MSI siguen sin firma: el bloqueo comunicado de SmartScreen necesita una vía de firma/distribución de confianza. No se encontró un certificado adecuado en el almacén del usuario Windows. Las pruebas funcionales no validan reputación de SmartScreen.
+
 ## Integración Steam de 0.6.0
 
 Han pasado 108 comprobaciones de biblioteca, 15 del servidor Node, 14 HTTP/seguridad de la función Supabase y 79 nativas WPF (216 en total). Las pruebas Steam nativas verifican dirección Supabase, autorización vinculada al servicio, restauración DPAPI, rechazo de sesiones incorrectas, idioma y desvinculación. ZIP y MSI generados; el MSI sigue sin firma y sin prueba de instalación/desinstalación.

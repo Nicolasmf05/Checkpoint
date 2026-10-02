@@ -6,10 +6,15 @@ $ErrorActionPreference = 'Stop'
 $checkpointRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $version = & "$PSScriptRoot\Get-Version.ps1"
 $caseRoot = Join-Path $checkpointRoot ('.qa\package-' + [Guid]::NewGuid().ToString('N'))
-$extracted = Join-Path $caseRoot 'app'
+$extractionRoot = Join-Path $caseRoot 'app'
+$extracted = Join-Path $extractionRoot 'Checkpoint'
 $data = Join-Path $caseRoot 'data'
 $render = Join-Path $caseRoot 'render'
-Expand-Archive -LiteralPath $ZipPath -DestinationPath $extracted
+Expand-Archive -LiteralPath $ZipPath -DestinationPath $extractionRoot
+$topLevel = @(Get-ChildItem -LiteralPath $extractionRoot -Force)
+if ($topLevel.Count -ne 1 -or !$topLevel[0].PSIsContainer -or $topLevel[0].Name -ne 'Checkpoint') {
+    throw 'El portable debe contener una única carpeta Checkpoint en la raíz.'
+}
 $exe = Join-Path $extracted 'Checkpoint.exe'
 foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt')) {
     if (!(Test-Path -LiteralPath (Join-Path $extracted $relative))) { throw "El paquete no incluye $relative." }

@@ -30,14 +30,14 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas de la biblioteca.' }
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas del servicio.' }
 & node --test supabase/tests/steam.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas Steam de Supabase.' }
-$output = Join-Path $checkpointRoot "dist\$version\$Runtime"
+$output = Join-Path $checkpointRoot "dist\$version\$Runtime\Checkpoint"
 & $dotnet publish src/Checkpoint.App/Checkpoint.App.csproj -c Release -r $Runtime --self-contained true -o $output --nologo -p:RestoreConfigFile="$checkpointRoot\NuGet.config" -p:DebugType=None -p:DebugSymbols=false
 if ($LASTEXITCODE -ne 0) { throw 'Falló publish.' }
 @{ serviceUrl = $ServiceUrl } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'service-config.json') -Encoding utf8
 Copy-Item -LiteralPath LICENSE,THIRD-PARTY-NOTICES.md -Destination $output
 Copy-Item -LiteralPath licenses -Destination $output -Recurse -Force
 $zip = Join-Path $checkpointRoot "dist\Checkpoint-$version-$Runtime.zip"
-Compress-Archive -Path "$output\*" -DestinationPath $zip -Force
+Compress-Archive -LiteralPath $output -DestinationPath $zip -Force
 Get-FileHash -LiteralPath $zip -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLowerInvariant())  $(Split-Path $zip -Leaf)" } | Set-Content -LiteralPath "$zip.sha256" -Encoding ascii
 Write-Output "Portable: $zip"
 # Native WPF tests run against the extracted distribution, not the SDK build folder.
