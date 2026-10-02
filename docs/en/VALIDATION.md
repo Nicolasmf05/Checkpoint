@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.5 — miniature state menu
+
+247 local checks passed: 108 core, 15 Node, 14 Edge and 110 native WPF. Tests open real row context menus, check all five states/current selection, persist story completion without leaving Miniature, reopen a story and clear its date, and verify English menu labels. Native menu captures are included in both languages. Physical keyboard/drag, installed-package and real-account limitations remain pending.
+
 ## 0.6.4 — miniature view
 
 243 local checks passed: 108 core, 15 Node, 14 Edge and 106 native WPF. Miniature tests cover actual Settings activation/persistence, separate dimensions and resizing, name/state-only templates, hidden chrome, no images/actions/progress bars, readable theme colors, immediate English labels, context-menu exit and view cycling. Spanish/English captures are rendered from native controls. ZIP/MSI and an SDK-validated unsigned MSIX preview were generated. Physical keyboard/drag, installed updates/uninstall and real-account limitations remain pending.

@@ -45,3 +45,9 @@ Covers are hidden while games and progress remain. This test capture uses Spanis
 Only name and state. Enable from Settings or F6; right-click to exit.
 
 ![Miniature](../screenshots/widget-miniature-en.png)
+
+## Change state in Miniature — 0.6.5
+
+Right-click a game. Its current state is checked; rows still show only name and state.
+
+![State menu](../screenshots/miniature-state-menu-en.png)

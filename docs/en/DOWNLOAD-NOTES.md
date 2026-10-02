@@ -23,6 +23,8 @@ Portable: extract the ZIP and run `Checkpoint.exe` inside `Checkpoint`. Keep the
 
 Choose **Settings → Collection view → Miniature**, or cycle with F6. Shows only **game name and state** for My list, without covers, row buttons or progress bars. Header, navigation, filters and footer are hidden. The window can shrink to 240 × 90 Windows logical units. Drag the top edge and resize from the bottom-right corner. **F6 or right-click → Exit miniature view** returns to the normal view. Both sizes are saved independently; progress/files are unchanged. No covers are loaded while active.
 
+In Miniature, **right-click a game** to select pending, playing, paused, story finished or abandoned. The menu checks the current state and also offers Exit miniature view and Settings. Changes persist and follow the normal progress/sharing rules: changing a state does not share a new game. The list still shows only name and state.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

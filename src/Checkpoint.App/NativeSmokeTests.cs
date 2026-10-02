@@ -306,11 +306,39 @@ public partial class MainWindow
             Check(VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.Title == t.Text)).All(t =>
                 t.Foreground is SolidColorBrush brush && brush.Color == ((SolidColorBrush)Application.Current.Resources["TextBrush"]).Color), "miniature names use the readable theme foreground");
             Render(this,"widget-miniature.png");
+            var miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
+            var miniatureGame = ((CardView)miniatureRow.DataContext).Model;
+            var priorState = miniatureGame.Status;
+            miniatureRow.ContextMenu.PlacementTarget = miniatureRow; miniatureRow.ContextMenu.IsOpen = true;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(miniatureRow.ContextMenu.Items.OfType<MenuItem>().Count(i => i.Tag is GameStatus) == 5 &&
+                miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == priorState).IsChecked, "miniature menu exposes all states and checks the current one");
+            RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu.png"));
+            var finishState = miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Finished);
+            finishState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureRow.ContextMenu.IsOpen = false;
+            Check(miniatureGame.Status == GameStatus.Finished && miniatureGame.FinishedAt.HasValue &&
+                Store.LoadGames().Single(g => g.Id == miniatureGame.Id).Status == GameStatus.Finished && Preferences.MiniatureView, "miniature state action persists story completion without leaving the view");
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView c && c.Model.Id == miniatureGame.Id);
+            miniatureRow.ContextMenu.PlacementTarget = miniatureRow; miniatureRow.ContextMenu.IsOpen = true;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            var playingState = miniatureRow.ContextMenu.Items.OfType<MenuItem>().Single(i => i.Tag is GameStatus s && s == GameStatus.Playing);
+            playingState.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); miniatureRow.ContextMenu.IsOpen = false;
+            Check(miniatureGame.Status == GameStatus.Playing && miniatureGame.FinishedAt is null &&
+                Store.LoadGames().Single(g => g.Id == miniatureGame.Id).FinishedAt is null, "miniature reopening clears story completion date");
+            GameRules.SetStatus(miniatureGame, priorState); Persist(); Refresh();
             Preferences.Language = "en"; ApplyLanguage();
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             Check(VisualChildren(GameList).OfType<TextBlock>().Any(t => t.Text == "Playing") &&
                 (string?)((MenuItem)Shell.ContextMenu.Items[0]).Header == "Exit miniature view", "miniature states and exit menu switch to English");
             Render(this,"widget-miniature-en.png");
+            miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
+            miniatureRow.ContextMenu.PlacementTarget = miniatureRow; miniatureRow.ContextMenu.IsOpen = true;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(miniatureRow.ContextMenu.Items.OfType<MenuItem>().Any(i => (string?)i.Header == "Story finished") &&
+                miniatureRow.ContextMenu.Items.OfType<MenuItem>().Any(i => (string?)i.Header == "Exit miniature view"), "miniature game menu opens with localized English states and exit");
+            RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu-en.png"));
+            miniatureRow.ContextMenu.IsOpen = false;
             Preferences.Language = "es"; ApplyLanguage();
             Width = 280; Height = 180; Persist();
             Check(Store.LoadSettings().MiniatureWidth == 280 && Store.LoadSettings().MiniatureHeight == 180 &&

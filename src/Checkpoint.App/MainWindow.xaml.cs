@@ -247,6 +247,29 @@ public partial class MainWindow : Window
     private void AddClick(object sender, RoutedEventArgs e) => Dialogs.Edit(this, null);
     private void SettingsClick(object sender, RoutedEventArgs e) => Dialogs.Settings(this);
     private void ViewClick(object sender, RoutedEventArgs e) => CycleView();
+    private void MiniatureMenuOpened(object sender, RoutedEventArgs e)
+    {
+        var menu = (System.Windows.Controls.ContextMenu)sender;
+        menu.Items.Clear();
+        if (menu.PlacementTarget is not FrameworkElement { DataContext: CardView card } || !Preferences.MiniatureView) return;
+        foreach (var state in Enum.GetValues<GameStatus>())
+        {
+            var item = new System.Windows.Controls.MenuItem { Header = Labels.Status(state), Tag = state, IsCheckable = true, IsChecked = card.Model.Status == state };
+            item.Click += (_, _) =>
+            {
+                var game = Games.FirstOrDefault(g => g.Id == card.Model.Id);
+                if (game is null || game.Status == state) return;
+                GameRules.SetStatus(game, state); Persist(); Refresh();
+            };
+            menu.Items.Add(item);
+        }
+        menu.Items.Add(new Separator());
+        var restore = new System.Windows.Controls.MenuItem { Header = I18n.T("Salir de miniatura") };
+        restore.Click += (_, _) => { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; ApplyPreferences(); Persist(); Refresh(); };
+        var settings = new System.Windows.Controls.MenuItem { Header = I18n.T("Ajustes") };
+        settings.Click += (_, _) => Dialogs.Settings(this);
+        menu.Items.Add(restore); menu.Items.Add(settings);
+    }
     private void CycleView()
     {
         if (Preferences.MiniatureView) { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; }
@@ -479,6 +502,7 @@ public partial class MainWindow : Window
         public string ProgressCaption => Model.Goal == GameGoal.Story && Model.StoryPercent.HasValue ? I18n.T("Historia · avance manual") : Model.Goal == GameGoal.Custom && Model.Tasks.Count > 0 ? (I18n.IsEnglish ? $"{Model.Tasks.Count(t => t.Done)} / {Model.Tasks.Count} tasks" : $"{Model.Tasks.Count(t => t.Done)} / {Model.Tasks.Count} tareas") : Model.SteamAppId is null ? I18n.T("Objetivos locales") : Model.Achievements is null ? I18n.T("Logros sin sincronizar") : Model.Achievements.Count == 0 ? I18n.T("Sin logros de Steam") : (I18n.IsEnglish ? $"{Model.UnlockedCount} / {Model.Achievements.Count} achievements" : $"{Model.UnlockedCount} / {Model.Achievements.Count} logros");
         public string GridProgressCaption => ProgressCaption + (PercentText.Length > 0 ? " · " + PercentText : "");
         public string ReorderName => I18n.T("Reordenar ") + Model.Title;
+        public string MiniatureName => Model.Title + " · " + Model.StatusText;
         private int? ProgressPercent => Model.Goal == GameGoal.Story && Model.StoryPercent.HasValue ? Model.StoryPercent : Model.Goal == GameGoal.Custom && Model.Tasks.Count > 0 ? (int)Math.Round(Model.Tasks.Count(t => t.Done) * 100d / Model.Tasks.Count) : Model.AchievementPercent;
         public int Percentage => ProgressPercent ?? 0;
         public string PercentText => ProgressPercent is int percent ? percent + "%" : "";

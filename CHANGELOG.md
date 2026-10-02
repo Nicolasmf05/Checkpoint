@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.5 — 2026-10-02
+
+- Miniature game context menu: five localized states with the current one checked; persist changes without leaving the view.
+- Context menu retains Settings/Exit; keyboard-focusable rows expose accessible names with game/state.
+- Native tests open real menus, save/reopen story completion and verify English labels.
+
 ## 0.6.4 — 2026-10-02
 
 - Miniature view: only names/states, no covers or surrounding controls; independent saved dimensions, drag strip and resize grip.

@@ -23,6 +23,8 @@ Portable: extrae el ZIP y abre `Checkpoint.exe` dentro de `Checkpoint`. Conserva
 
 Selecciona **Ajustes → Vista de la colección → Miniatura**, o pulsa F6 hasta llegar a ella. Muestra únicamente **nombre y estado** de los juegos de Mi lista, sin carátulas, botones de fila ni barras de progreso. Oculta cabecera, navegación, filtros y pie. Su ventana puede reducirse hasta 240 × 90 unidades lógicas de Windows. Arrastra el borde superior y redimensiona desde la esquina inferior derecha. **F6 o clic derecho → Salir de miniatura** vuelve a la vista normal. Ambos tamaños se guardan por separado; no modifica el progreso ni los archivos. No carga carátulas mientras está activa.
 
+En Miniatura, **clic derecho sobre un juego** permite cambiar entre pendiente, jugando, pausado, historia terminada y abandonado. El menú marca el estado actual y también permite salir de Miniatura o abrir Ajustes. Los cambios se guardan y siguen las reglas habituales de progreso y compartición: no se comparte un juego nuevo por cambiar su estado. La lista continúa mostrando solo nombre y estado.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.

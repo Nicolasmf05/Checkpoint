@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.5 — estados en Miniatura
+
+Han pasado 247 comprobaciones locales: 108 de biblioteca, 15 Node, 14 Edge y 110 WPF. Las pruebas abren los menús reales de las filas, comprueban cinco estados y selección actual, guardan historia terminada sin salir de Miniatura, reabren la historia eliminando la fecha y verifican etiquetas inglesas. Capturas nativas del menú en ambos idiomas. Siguen pendientes las pruebas físicas de teclado/arrastre, paquetes instalados y cuentas reales.
+
 ## 0.6.4 — vista Miniatura
 
 Han pasado 243 comprobaciones locales: 108 de biblioteca, 15 Node, 14 Edge y 106 WPF. Miniatura se prueba desde Ajustes, con persistencia, tamaños independientes, redimensionado, filas de nombre/estado, interfaz exterior oculta, ausencia de imágenes/botones/progreso, contraste, cambio inmediato a inglés, salida con menú y ciclo de vistas. Capturas nativas en ambos idiomas. Generados ZIP/MSI y MSIX de prueba validado con SDK. Siguen pendientes pruebas físicas de teclado/arrastre, actualización/desinstalación instalada y cuentas reales.

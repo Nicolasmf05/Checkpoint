@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.6.5 — 2026-10-02
+
+- Menú contextual de juego en Miniatura: cinco estados traducidos, estado actual marcado y guardado sin salir de la vista.
+- El menú conserva Ajustes/Salir; filas enfocables con nombre accesible de juego/estado.
+- Pruebas nativas abren los menús reales, terminan/reabren la historia y comprueban etiquetas inglesas.
+
 ## 0.6.4 — 2026-10-02
 
 - Vista Miniatura: solo nombres/estados, sin carátulas ni controles alrededor; tamaño guardado independiente, borde para mover y esquina para redimensionar.
