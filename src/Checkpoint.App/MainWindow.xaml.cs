@@ -117,7 +117,7 @@ public partial class MainWindow : Window
         PreviewKeyDown += (_, e) =>
         {
             if (e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control) { Dialogs.Edit(this, null); e.Handled = true; }
-            if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control) { Search.Focus(); e.Handled = true; }
+            if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control) { FocusCollectionSearch(); e.Handled = true; }
             if (e.Key == Key.F6) { CycleView(); e.Handled = true; }
             if (e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control && Keyboard.FocusedElement is not TextBoxBase) { UndoLastDeletion(); e.Handled = true; }
             if (e.Key == Key.Escape) { Hide(); e.Handled = true; }
@@ -327,12 +327,25 @@ public partial class MainWindow : Window
         var settings = new System.Windows.Controls.MenuItem { Header = I18n.T("Ajustes") };
         settings.Click += (_, _) => Dialogs.Settings(this);
         menu.Items.Add(restore); menu.Items.Add(settings);
+        var search = new System.Windows.Controls.MenuItem { Header = I18n.T("Buscar juego"), InputGestureText = "Ctrl+F" };
+        search.Click += (_, _) => FocusCollectionSearch();
+        menu.Items.Add(search);
         menu.Items.Add(new Separator());
         var pin = new System.Windows.Controls.MenuItem { Header = I18n.T("Mantener siempre visible"), IsCheckable = true, IsChecked = Preferences.AlwaysOnTop };
         pin.Click += (_, _) => { Preferences.AlwaysOnTop = pin.IsChecked; ApplyPreferences(); Persist(); };
         var position = new System.Windows.Controls.MenuItem { Header = I18n.T("Bloquear posición y tamaño"), IsCheckable = true, IsChecked = Preferences.PositionLocked };
         position.Click += (_, _) => { Preferences.PositionLocked = position.IsChecked; ApplyPreferences(); Persist(); };
         menu.Items.Add(pin); menu.Items.Add(position);
+    }
+    private void FocusCollectionSearch()
+    {
+        friendsVisible = false;
+        if (Preferences.MiniatureView)
+        {
+            Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false;
+            ApplyPreferences(); CaptureBounds(); Store.SaveSettings(Preferences);
+        }
+        Refresh(); Search.Focus(); Search.SelectAll();
     }
     private void CycleView()
     {

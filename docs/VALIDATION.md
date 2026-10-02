@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.9 — búsqueda visible
+
+Han pasado 275 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 138 WPF. Cinco nuevas pruebas comprueban selección de la consulta actual, búsqueda visible desde Amigos, salida/guardado de vista normal desde el menú de Miniatura sin perder su tamaño, foco tras cerrar el menú del juego y etiqueta/atajo en inglés. Se prueba el mismo método usado por Ctrl+F; no se simula la pulsación física con modificadores. Capturas nativas actualizadas en ambos idiomas. Siguen pendientes teclado físico, instalación y cuentas reales.
+
 ## 0.6.8 — acciones de ventana en Miniatura
 
 Han pasado 270 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 133 WPF. Las siete nuevas comprueban valores marcados, aplicación/guardado de siempre visible desde fondo y juego, bloqueo de redimensionado, cursor de arrastre, desbloqueo y traducción inmediata a inglés. Los menús nativos se capturan en ambos idiomas. No se afirma haber probado gestos físicos de arrastre, instalación/actualización ni cuentas reales.

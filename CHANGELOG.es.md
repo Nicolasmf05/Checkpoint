@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.9 — 2026-10-03
+
+- Ctrl+F abre la búsqueda visible de la colección desde Miniatura o Amigos y selecciona la consulta actual, en lugar de intentar enfocar un campo oculto.
+- Menús de fondo/juego de Miniatura incluyen Buscar juego y el atajo Ctrl+F. Buscar vuelve a la lista normal y conserva el tamaño guardado de Miniatura.
+
 ## 0.6.8 — 2026-10-02
 
 - Los menús de Miniatura incluyen Mantener siempre visible y Bloquear posición y tamaño, con estado marcado, aplicación inmediata y guardado.

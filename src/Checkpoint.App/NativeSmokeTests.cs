@@ -428,6 +428,8 @@ public partial class MainWindow
                 miniatureRow.ContextMenu.Items.OfType<MenuItem>().Any(i => (string?)i.Header == "Exit miniature view"), "miniature game menu opens with localized English states and exit");
             Check(MiniatureAction(miniatureRow.ContextMenu,"Mantener siempre visible").Header.Equals("Always on top") &&
                 MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño").Header.Equals("Lock position and size"), "miniature quick window actions switch to English in both menus");
+            Check((string?)MiniatureAction(miniatureRow.ContextMenu,"Buscar juego").Header == "Search games" &&
+                MiniatureAction(Shell.ContextMenu,"Buscar juego").InputGestureText == "Ctrl+F", "miniature search action is localized and exposes its shortcut");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu-en.png"));
             miniatureRow.ContextMenu.IsOpen = false;
             Preferences.Language = "es"; ApplyLanguage();
@@ -457,6 +459,25 @@ public partial class MainWindow
             Preferences.GridView = true; Preferences.Compact = false; ApplyPreferences(); Refresh();
             CycleView(); Check(Preferences.MiniatureView, "view cycle enters miniature after grid");
             CycleView(); Check(!Preferences.MiniatureView && !Preferences.GridView && !Preferences.Compact, "view cycle exits miniature to list");
+            Search.Text = "Hades"; FocusCollectionSearch();
+            Check(Search.IsKeyboardFocused && Search.SelectedText == "Hades" && visibleCards.Count == 1, "collection search focuses and selects the existing query without clearing its results");
+            friendsVisible = true; Refresh(); FocusCollectionSearch();
+            Check(!friendsVisible && FriendsHost.Visibility == Visibility.Collapsed && FilterArea.IsVisible && Search.IsKeyboardFocused && Search.Text == "Hades",
+                "search from friends opens the visible collection search without changing its query");
+            Search.Clear(); Preferences.MiniatureView = true; ApplyPreferences(); Refresh();
+            double searchMiniWidth = Width, searchMiniHeight = Height;
+            MiniatureAction(Shell.ContextMenu,"Buscar juego").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            Check(!Preferences.MiniatureView && !Store.LoadSettings().MiniatureView && FilterArea.IsVisible && Search.IsKeyboardFocused &&
+                Preferences.MiniatureWidth == searchMiniWidth && Preferences.MiniatureHeight == searchMiniHeight,
+                "miniature search menu opens and persists the normal view while retaining miniature dimensions");
+            Preferences.MiniatureView = true; ApplyPreferences(); Refresh(); FocusMiniatureCard(visibleCards[0]);
+            var searchRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
+            var searchMenu = searchRow.ContextMenu;
+            searchMenu.PlacementTarget = searchRow; searchMenu.IsOpen = true;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            MiniatureAction(searchMenu,"Buscar juego").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); searchMenu.IsOpen = false;
+            await Task.Delay(20); await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(!Preferences.MiniatureView && Search.IsKeyboardFocused && FilterArea.IsVisible, "game search menu keeps focus in the visible search after the popup closes");
             File.WriteAllText(Path.Combine(outputDirectory, "smoke.json"), JsonSerializer.Serialize(new { ok = true, checks = checks.Count, assertions = checks }, DataJson.Options));
             Console.WriteLine($"WPF smoke test passed: {checks.Count} checks, {outputDirectory}");
         }

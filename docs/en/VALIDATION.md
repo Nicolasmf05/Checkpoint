@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.9 — visible search
+
+275 checks passed: 108 core, 15 Node, 14 Edge and 138 native WPF. Five new checks cover current-query selection, visible collection search from Friends, saved normal view from the Miniature menu without losing its dimensions, search focus after closing the game menu and the English label/shortcut hint. Tests exercise the same method used by Ctrl+F; physical modifier-key input is not simulated. Native menu screenshots updated in both languages. Physical keyboard, installed packages and real accounts remain pending.
+
 ## 0.6.8 — Miniature window actions
 
 270 checks passed: 108 core, 15 Node, 14 Edge and 133 native WPF. Seven new checks cover checked values, application/persistence of Always on top from background and game menus, resize locking, drag cursor, unlocking and immediate English translation. Native menus are captured in both languages. Physical drag gestures, installed package upgrades and real accounts remain pending.

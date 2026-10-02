@@ -31,6 +31,8 @@ Updates preserve the selected game and restore its keyboard focus only if the li
 
 **Right-click the background or a game → Always on top / Lock position and size.** Checked options reflect your saved settings; changes apply immediately and persist. Unlock from the same menu to move or resize again. The drag strip uses a normal cursor while locked. The list keeps only names and states.
 
+**Ctrl+F or right-click → Search games** opens the normal collection view and focuses search. It saves that view while preserving Miniature dimensions for your next visit. From Friends, Ctrl+F also returns to the visible collection search. Any existing query is selected so you can replace it by typing; its text is preserved until you change it. Miniature itself keeps the names/states-only list.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

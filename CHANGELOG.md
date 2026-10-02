@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.9 — 2026-10-03
+
+- Ctrl+F opens visible collection search from Miniature or Friends; it selects the current query instead of focusing a hidden field.
+- Miniature background/game menus add Search games with its Ctrl+F hint. Searching leaves Miniature for the normal list and preserves its saved dimensions.
+
 ## 0.6.8 — 2026-10-02
 
 - Miniature menus expose checked Always on top and Lock position and size actions; changes apply immediately and persist.
