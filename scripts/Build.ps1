@@ -30,7 +30,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas de la biblioteca.' }
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas del servicio.' }
 & node --test tests/web/ui-model.test.mjs tests/web/shortcuts.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'CSS UI model tests failed.' }
-& node --test supabase/tests/steam.test.mjs
+& node --test supabase/tests/steam.test.mjs supabase/tests/covers.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas Steam de Supabase.' }
 $output = Join-Path $checkpointRoot "dist\$version\$Runtime\Checkpoint"
 & $dotnet publish src/Checkpoint.App/Checkpoint.App.csproj -c Release -r $Runtime --self-contained true -o $output --nologo -p:RestoreConfigFile="$checkpointRoot\NuGet.config" -p:DebugType=None -p:DebugSymbols=false

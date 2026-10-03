@@ -1,3 +1,4 @@
+const missingCoverSignals=new Set();
 import {defaults, effectiveShortcuts, eventGesture, matches, displayGesture} from './shortcuts.mjs';
 import { visibleRange, nextIndex } from './ui-model.mjs';
 
@@ -99,7 +100,7 @@ function schema(node) {
     case 'details': element = el('details', 'type-details'); element.open = node.open; element.append(el('summary', '', node.text)); element.addEventListener('toggle', () => { if (element.open !== node.open) update(element.open); }); break;
     default: element = el('div', `type-${node.type}`); break;
   }
-  if(['achievement-card','achievement-summary','achievement-description'].includes(node.style))element.classList.add(node.style);
+  if(['achievement-card','achievement-summary','achievement-description','cover-preview'].includes(node.style))element.classList.add(node.style);
   if (node.type === 'grid') { element.style.gridTemplateColumns = node.columnWidths?.join(' ') || `repeat(${node.columns},minmax(0,1fr))`; if (node.rows?.length) element.style.gridTemplateRows = node.rows.join(' '); }
   element.dataset.control = node.id; if (node.name) element.setAttribute('aria-label', node.name); if (node.tip) element.title = node.tip;
   if ('disabled' in element) element.disabled = !node.enabled;
@@ -180,7 +181,9 @@ function renderGames() {
     row.addEventListener('focus',()=>selected=game.id); row.addEventListener('contextmenu',e=>{ e.preventDefault(); selected=game.id; showMenu(game,e.clientX,e.clientY); });
     if (state.mini) { const name=el('div','game-title ellipsis',game.title); name.title=game.title; row.append(name,el('div',`status state-${game.state}`,game.status)); row.addEventListener('click',()=>{selected=game.id;row.focus();}); }
     else {
-      if (!state.lightweight) { const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)))); cover.addEventListener('click',()=>action('edit',{id:game.id})); row.append(cover); }
+      if (!state.lightweight) {
+        const missing=()=>{const key=game.id+'|'+game.title+'|'+game.cover;if(missingCoverSignals.has(key))return;missingCoverSignals.add(key);action('cover-missing',{id:game.id});};
+        const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>{cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)));missing();});if(!game.cover)queueMicrotask(missing); cover.addEventListener('click',()=>action('edit',{id:game.id})); row.append(cover); }
       const details=el('div','details'); details.append(el('div','game-title ellipsis',game.title),el('div','platform ellipsis',game.platform),el('div',`status state-${game.state}`,game.status),el('div','next ellipsis',game.next),el('div','progress ellipsis',game.progress+(game.percent==null?'':` · ${game.percent}%`)));
       if (game.percent != null) { const progress=el('progress'); progress.max=100; progress.value=game.percent; progress.setAttribute('aria-label',game.progress); details.append(progress); }
       details.append(button('🏆 '+(game.achievementCaption||state.labels.achievements),'achievements',state.labels.achievements,{id:game.id},'achievement-link'));

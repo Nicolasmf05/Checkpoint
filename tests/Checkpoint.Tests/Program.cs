@@ -7,6 +7,16 @@ Directory.CreateDirectory(root);
 int passed = 0;
 void Check(bool condition, string name) { if (!condition) throw new Exception("FAILED: " + name); passed++; Console.WriteLine("PASS " + name); }
 void Reject(Action action, string name) { try { action(); } catch { passed++; Console.WriteLine("PASS " + name); return; } throw new Exception("FAILED: " + name); }
+var coverGame=new Game { Title="Cover fixture" };
+Check(CoverSuggestions.ShouldSuggest(coverGame),"missing custom covers allow an initial automatic lookup");
+coverGame.IgdbCoverSearchTitle=coverGame.Title;CoverSuggestions.Reject(coverGame,"rejected_cover");
+var restoredCoverGame=JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(coverGame,DataJson.Options),DataJson.Options)!;
+Check(!CoverSuggestions.ShouldSuggest(restoredCoverGame)&&restoredCoverGame.RejectedIgdbCovers.Contains("rejected_cover"),"cover rejections and automatic-search dismissal survive restart serialization");
+restoredCoverGame.Title="Different title";
+Check(CoverSuggestions.ShouldSuggest(restoredCoverGame)&&restoredCoverGame.RejectedIgdbCovers.Contains("rejected_cover"),"renaming allows a new search while retaining rejected images");
+restoredCoverGame.CustomCover="custom-fixture.png";
+Check(!CoverSuggestions.ShouldSuggest(restoredCoverGame),"a chosen custom cover prevents automatic replacement");
+Reject(()=>CoverSuggestions.Reject(coverGame,"../escape"),"rejected cover IDs never accept paths or URLs");
 Check(Shortcuts.Canonical("shift+control+n")=="Ctrl+Shift+N", "shortcut canonical order");
 Check(Shortcuts.Effective(null)["add"]=="Ctrl+N", "existing settings keep default shortcuts");
 Reject(()=>Shortcuts.Canonical("N"), "bare letters do not steal typing");

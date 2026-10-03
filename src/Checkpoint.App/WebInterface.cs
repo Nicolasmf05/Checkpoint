@@ -17,6 +17,7 @@ public partial class MainWindow
     private readonly WebControls friendControls = new();
     private void StartWebInterface()
     {
+        InitializeCoverSuggestions();
         web = new WebSurface(this,Store.DirectoryPath,WebSnapshot,WebCommand,() => friendsVisible);
         _ = ConfigureWebResources();
     }
@@ -66,6 +67,7 @@ public partial class MainWindow
         switch (action)
         {
             case "ready": break;
+            case "cover-missing" when game is not null: QueueCoverSuggestion(game);break;
             case "window-mode": if (message.GetProperty("value").TryGetInt32(out int mode)) SetWindowMode(mode); break;
             case "tab":
                 switch (message.GetProperty("value").GetString()) { case "friends": Click(FriendsButton); break; case "library": Click(LibraryButton); break; case "list": Click(TrackedButton); break; }

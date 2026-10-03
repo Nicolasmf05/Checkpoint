@@ -24,6 +24,8 @@ export function normalize(raw) {
     playtimeMinutes:integer(raw.playtimeMinutes,2147483647),addedAt:raw.addedAt||new Date().toISOString(),
     finishedAt:raw.status===3||String(raw.status).toLowerCase()==='finished'?raw.finishedAt||new Date().toISOString():null,
     syncedAt:typeof raw.syncedAt==='string'?raw.syncedAt:null,
+    rejectedIgdbCovers:[...new Set((Array.isArray(raw.rejectedIgdbCovers)?raw.rejectedIgdbCovers:[]).filter(v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,80}$/.test(v)))].slice(0,200),
+    igdbCoverSearchTitle:text(raw.igdbCoverSearchTitle,140),igdbCoverImageId:typeof raw.igdbCoverImageId==='string'&&/^[A-Za-z0-9_-]{1,80}$/.test(raw.igdbCoverImageId)?raw.igdbCoverImageId:'',
     customCover:typeof raw.customCover==='string'&&/^data:image\/(png|jpeg|webp);base64,[a-z\d+/=]+$/i.test(raw.customCover)&&raw.customCover.length<400000?raw.customCover:null,
     tasks:(Array.isArray(raw.tasks)?raw.tasks:[]).slice(0,200).filter(t=>text(t?.title,250).trim()).map(t=>({id:uuid(t.id)?t.id:crypto.randomUUID(),title:text(t.title,250).trim(),done:t.done===true})),
     achievements:Array.isArray(raw.achievements)?raw.achievements.slice(0,10000).map(a=>({id:text(a?.id,250),name:text(a?.name,250),description:text(a?.description,2000),hidden:a?.hidden===true,unlocked:a?.unlocked===true,unlockedAt:typeof a?.unlockedAt==='string'?a.unlockedAt:null})):null};

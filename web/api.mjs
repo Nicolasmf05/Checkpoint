@@ -28,6 +28,14 @@ export class BrowserApi {
   unfriend(id){const [low,high]=[this.social.user.id,id].sort();return this.request('rest/v1/cp_friendships?user_low=eq.'+low+'&user_high=eq.'+high,undefined,{auth:true,method:'DELETE'});}
   block(id){return this.request('rest/v1/cp_blocks',{blocker_id:this.social.user.id,blocked_id:id},{auth:true});}
   publish(id,operation){return this.rpc('cp_publish_game',{p_game_id:id,p_expected_revision:operation.revision,p_operation_id:operation.id,p_game:operation.payload});}
+  coverSearch(title,excluded,refresh=false){return this.request('functions/v1/checkpoint-covers/v1/search',{title,excluded,refresh});}
+  async coverImage(id){
+    if(!/^[A-Za-z0-9_-]{1,80}$/.test(id))throw new RemoteError('igdb-unavailable');
+    const response=await this.fetch(this.config.url+'/functions/v1/checkpoint-covers/v1/image/'+id,{headers:{apikey:this.config.publishableKey},credentials:'omit',referrerPolicy:'no-referrer',signal:AbortSignal.timeout(35000)});
+    if(!response.ok||!response.headers.get('content-type')?.startsWith('image/'))throw new RemoteError('igdb-unavailable');
+    const reader=response.body.getReader(),parts=[];let length=0;try{for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>2000000)throw new RemoteError('igdb-unavailable');parts.push(value);}}finally{await reader.cancel();}
+    return new Blob(parts,{type:response.headers.get('content-type')});
+  }
   steamRequest(path,body,auth=true){return this.request(path,body,{steam:true,auth});}
   async unlink(){try{if(this.steam)await this.steamRequest('v1/auth/logout',{});}finally{this.steam=null;this.save('checkpoint-steam',null);}}
 }

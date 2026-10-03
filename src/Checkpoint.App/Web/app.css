@@ -65,3 +65,5 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .mini-controls { display:none; }
 .mini .mini-controls { display:flex; justify-content:flex-end; flex:none; padding:2px 0 6px; }
 .mini-exit { min-height:28px; padding:4px 8px; font-size:11px; color:var(--accent); }
+
+.type-image.cover-preview { align-self:center; max-height:260px; max-width:200px; }

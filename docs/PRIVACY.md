@@ -41,3 +41,7 @@ Las copias incluyen privacidad, pertenencias y nombres de listas vacías.
 ## RetroAchievements y detección local
 
 La detección consulta nombres/rutas de procesos y títulos de ventanas localmente; no envía esa lista a servidores. Las consultas opcionales a RetroAchievements transmiten tu usuario, ID del juego y clave web al dominio oficial mediante HTTPS. La clave se cifra con DPAPI y se excluye de copias. Los objetivos y marcas manuales no se publican a amigos. [Guía](ACHIEVEMENTS.md).
+
+## Búsquedas de carátulas de IGDB
+
+Las propuestas y búsquedas manuales envían el título a Supabase/IGDB, incluso para juegos privados para amigos. No incluyen notas, contraseñas ni progreso. Se envían los identificadores rechazados para filtrar propuestas; las imágenes aceptadas y el historial permanecen locales y no se publican para amigos. El servicio guarda coincidencias públicas durante siete días y utiliza identificadores resumidos de IP para limitar consultas. [Detalles](IGDB.md).

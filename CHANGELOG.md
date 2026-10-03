@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.4 — 2026-10-04
+
+- IGDB cover suggestions when Steam artwork is unavailable, with closest-title matching and explicit preview approval in Windows and the browser.
+- Declined images persist per game; the game editor requests fresh alternatives while excluding rejected IDs. Accepted images are stored locally and retained by compatible backups.
+- Server-only Twitch credentials, restricted image proxy, bounded requests and cached metadata. Bilingual controls, screenshots and regression tests.
+
 ## 0.8.3 — 2026-10-03
 
 - Visible, localized **Exit miniature view** button above the game list: one click restores and saves the previous normal layout.

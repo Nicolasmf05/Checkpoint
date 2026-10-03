@@ -148,7 +148,7 @@ internal sealed class WebControls
         var node = new Dictionary<string,object?> { ["id"]=id, ["enabled"]=element.IsEnabled,
             ["name"]=System.Windows.Automation.AutomationProperties.GetName(element), ["tip"]=element.ToolTip?.ToString(),
             ["row"]=Grid.GetRow(element)+1, ["column"]=Grid.GetColumn(element)+1 };
-        if(element.Tag is string style && style is "achievement-card" or "achievement-summary" or "achievement-description")node["style"]=style;
+        if(element.Tag is string style && style is "achievement-card" or "achievement-summary" or "achievement-description" or "cover-preview")node["style"]=style;
         switch (element)
         {
             case ProgressBar progress: node["type"]="progress";node["value"]=progress.Value;node["max"]=progress.Maximum;break;

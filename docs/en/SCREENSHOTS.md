@@ -4,6 +4,12 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.8.4 — IGDB cover proposals
+
+Explicit preview approval and persistent rejection. Solid-color fixture artwork; [guide](IGDB.md).
+
+![IGDB](../screenshots/css-igdb-cover-en.png)
+
 ## 0.8.3 — leave Miniature with one click
 
 The **Exit miniature view** button sits above the list and restores the previous normal layout without a shortcut or context menu.

@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.4 — 2026-10-04
+
+- Propuestas de carátulas de IGDB cuando falla Steam, con búsqueda del nombre más parecido y aprobación explícita en Windows y navegador.
+- Rechazos persistentes por juego y búsqueda de alternativas nuevas desde el editor. Las imágenes aceptadas se guardan localmente y en las copias compatibles.
+- Credenciales de Twitch solo en el servidor, proxy de imágenes restringido, límites y caché de metadatos. Controles, capturas y pruebas en ambos idiomas.
+
 ## 0.8.3 — 2026-10-03
 
 - Botón visible **Salir de miniatura** encima de la lista: un clic recupera y guarda la vista normal anterior.

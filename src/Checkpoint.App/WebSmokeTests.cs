@@ -276,6 +276,28 @@ public partial class MainWindow
             await Run("const c=document.querySelector('.collection-selector');c.value='private';c.dispatchEvent(new Event('change',{bubbles:true}));");
             Check(await Script(web,"window.checkpointState.games.some(g=>g.title==='Private list fixture') && document.querySelector('.collection-selector').value==='private'"),"the separate private view shows games hidden from friends");
             await Capture(web,"css-private-games-en.png");
+            Igdb?.Dispose();Igdb=CoverFixtureClient();
+            await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"] .game-tools button:nth-child(2)').click();");
+            var coverEditor=await Dialog();
+            async Task<WebSurface> CoverPreview()
+            {
+                WebSurface? found=null;
+                await Wait(async()=>{found=Application.Current.Windows.Cast<Window>().Where(w=>w.Title==I18n.T("Carátula de IGDB")).Select(w=>w.Tag).OfType<WebSurface>().FirstOrDefault();return found?.Browser.CoreWebView2 is not null&&await Script(found,"window.checkpointState?.kind==='dialog'");});return found!;
+            }
+            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Search IGDB for another cover').click();");
+            var coverPreview=await CoverPreview();
+            Check(await Script(coverPreview,"!!document.querySelector('img.cover-preview') && document.body.innerText.includes('Closest cover fixture')"),"CSS game editor opens an IGDB candidate preview with its matched name");
+            await Capture(coverPreview,"css-igdb-cover-en.png");
+            await coverPreview.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Do not use this cover').click();");await Task.Delay(300);
+            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(300);
+            Check(Store.LoadGames().Single(g=>g.Id==privateFixture.Id).RejectedIgdbCovers.Contains("fixture_first")&&!CoverSuggestions.ShouldSuggest(privateFixture)&&privateFixture.CustomCover is null,"explicit IGDB rejection persists even after cancelling the game editor and suppresses automatic repetition");
+            await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"] .game-tools button:nth-child(2)').click();");coverEditor=await Dialog();
+            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Search IGDB for another cover').click();");coverPreview=await CoverPreview();
+            Check(await Script(coverPreview,"document.body.innerText.includes('Second cover fixture')&&!document.body.innerText.includes('Closest cover fixture')"),"manual IGDB retry proposes a different image and excludes the declined one");
+            await coverPreview.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Use this cover').click();");await Task.Delay(300);
+            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
+            var acceptedCover=Store.LoadGames().Single(g=>g.Id==privateFixture.Id);
+            Check(acceptedCover.IgdbCoverImageId=="fixture_second"&&BackupFiles.IsCustomCoverName(acceptedCover.CustomCover)&&File.Exists(Path.Combine(Covers.DirectoryPath,acceptedCover.CustomCover!)),"accepted IGDB cover is saved locally and survives SQLite reload");
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

@@ -35,3 +35,7 @@ Backups include privacy, memberships and empty list names.
 ## RetroAchievements and local detection
 
 Detection reads process names/paths and window titles locally; the process inventory is never sent to servers. Optional RetroAchievements queries send your username, game ID and Web API key to its official domain over HTTPS. The key uses DPAPI and is excluded from backups. Manual goals and overrides are not published to friends. [Guide](ACHIEVEMENTS.md).
+
+## IGDB cover searches
+
+Missing-cover proposals and manual searches send the game title to Supabase/IGDB, even for games private to friends. No notes, passwords or progress are included. Rejected image IDs are sent to filter proposals; accepted images and rejection history remain local and are excluded from friend publications. The service caches public matches for seven days and uses hashed IP identifiers for rate limiting. [Details](IGDB.md).

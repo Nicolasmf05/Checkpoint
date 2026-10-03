@@ -73,6 +73,12 @@ public sealed class CoverCache : IDisposable
         if (new FileInfo(source).Length > BackupFiles.MaxImageBytes) throw new ArgumentException(I18n.T("La imagen debe ocupar menos de 8 MB."));
         return SavePrepared(Encode(Read(source)));
     }
+    internal static byte[] PrepareRemote(byte[] bytes)
+    {
+        if(bytes.Length>2_000_000)throw new InvalidDataException(I18n.T("La imagen debe ocupar menos de 8 MB."));
+        using var stream=new MemoryStream(bytes,writable:false);return Encode(Read(stream));
+    }
+    internal static BitmapImage ReadPrepared(byte[] bytes) { using var stream=new MemoryStream(bytes,writable:false);return Read(stream); }
     internal static byte[] PrepareImport(byte[] bytes)
     {
         if (bytes.Length > BackupFiles.MaxImageBytes || !BackupFiles.IsPng(bytes)) throw new InvalidDataException(I18n.T("La carátula de la copia no es una imagen PNG válida."));

@@ -118,5 +118,19 @@
   "Todavía no hay logros. Sincroniza o añade un objetivo manual.": "No achievements yet. Sync or add a personal goal.",
   " logros pendientes": " achievements remaining",
   "logros completados": "achievements completed",
-  "Activa la opción superior para revelar este logro.": "Enable the option above to reveal this achievement."
+  "Activa la opción superior para revelar este logro.": "Enable the option above to reveal this achievement.",
+  "La configuración de carátulas no es válida.": "The cover settings are invalid.",
+  "El responsable de esta edición debe configurar IGDB en Supabase.": "The maintainer of this edition must configure IGDB in Supabase.",
+  "IGDB no está disponible. Inténtalo más tarde.": "IGDB is unavailable. Try again later.",
+  "Demasiadas consultas. Espera antes de volver a intentarlo.": "Too many requests. Wait before trying again.",
+  "Carátula de IGDB": "IGDB cover",
+  "¿Quieres usar esta carátula?": "Would you like to use this cover?",
+  "Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.": "Closest match by name. Check that it is your game. Cover: IGDB.",
+  "Si la rechazas no volveremos a ofrecerla. Puedes buscar otra desde el editor del juego.": "If you reject it, we will not offer it again. You can search for another in the game editor.",
+  "No usar esta carátula": "Do not use this cover",
+  "Usar esta carátula": "Use this cover",
+  "Has rechazado 200 carátulas para este juego. No se harán más búsquedas.": "You have rejected 200 covers for this game. No further searches will be made.",
+  "No hay otra carátula de IGDB disponible para este nombre.": "No other IGDB cover is available for this name.",
+  "Buscar otra carátula en IGDB": "Search IGDB for another cover",
+  "Se conserva la carátula anterior.": "The previous cover is preserved."
 }

@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.4 — propuestas de carátulas de IGDB
+
+Vista previa con aprobación explícita y rechazo persistente. Imagen de color de prueba; [guía](IGDB.md).
+
+![IGDB](screenshots/css-igdb-cover-en.png)
+
 ## 0.8.3 — salir de miniatura con un clic
 
 El botón **Salir de miniatura** aparece encima de la lista y recupera la vista normal anterior sin usar el teclado ni abrir un menú.

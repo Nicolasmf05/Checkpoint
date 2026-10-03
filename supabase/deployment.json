@@ -35,5 +35,14 @@
     "pendingPollStatus": 200,
     "invalidPollSecretStatus": 400,
     "remainingSyntheticSteamEntriesAfterDatabaseTests": 0
+  },
+  "igdb": {
+    "function": "checkpoint-covers",
+    "deployedOn": "2026-10-04",
+    "gatewayVerifyJwt": false,
+    "credentialsConfigured": true,
+    "liveSearch": "Hollow Knight",
+    "liveImageStatus": 200,
+    "serverMockTests": 9
   }
 }

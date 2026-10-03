@@ -17,6 +17,10 @@ Settings → Updates checks new releases on launch and downloads/installs a veri
 
 The Windows edition opens pending achievements when a saved game is detected. Steam, RetroAchievements and manual goals support adding, removing and personal completion. RetroAchievements requires your username and personal Web API key in Settings, plus a game ID and emulator association. [Setup, privacy and limitations](docs/en/ACHIEVEMENTS.md).
 
+## Missing game covers
+
+When a listed game has no working Steam cover, Checkpoint proposes the closest IGDB match for your approval. Declined images are remembered; Edit game → Search IGDB for another cover requests a fresh alternative. Accepted images are stored locally. Available in Windows and the browser. [Setup and behavior](docs/en/IGDB.md).
+
 ## Screenshots
 
 Current captures come from the actual local HTML/CSS interface in WebView2, using isolated test data. Game titles and progress are examples; the green cover is a local fixture. [Current gallery and archived screenshots](docs/en/SCREENSHOTS.md).
@@ -27,13 +31,13 @@ Current captures come from the actual local HTML/CSS interface in WebView2, usin
 
 ## Download and run
 
-Current version: **0.8.3**. Build outputs in `dist`:
+Current version: **0.8.4**. Build outputs in `dist`:
 
-- `Checkpoint-0.8.3-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.8.3-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.8.4-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.8.4-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.3), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.4), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.

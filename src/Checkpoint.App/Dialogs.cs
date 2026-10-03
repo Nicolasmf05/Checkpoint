@@ -114,11 +114,17 @@ internal static partial class Dialogs
             var picker = new OpenFileDialog { Filter = I18n.T("Imágenes|*.png;*.jpg;*.jpeg;*.webp;*.bmp"), Title = I18n.T("Elegir carátula") };
             if (picker.ShowDialog(window) == true)
             {
-                try { game.CustomCover = owner.Covers.Import(picker.FileName); coverNotice.Text = I18n.T("Carátula personalizada preparada."); }
+                try { game.CustomCover = owner.Covers.Import(picker.FileName);game.IgdbCoverImageId=""; coverNotice.Text = I18n.T("Carátula personalizada preparada."); }
                 catch (Exception ex) { LocalizedNotice.Show(window, I18n.T("No se pudo leer la imagen: ") + I18n.Error(ex), "Checkpoint"); }
             }
         }));
-        imageButtons.Children.Add(Button(I18n.T("Automática"), (_, _) => { game.CustomCover = null; coverNotice.Text = I18n.T("Se usará la carátula de Steam, si está disponible."); }));
+        var igdbButton=Button(I18n.T("Buscar otra carátula en IGDB"),async(sender,_)=>
+        {
+            var button=(Button)sender;button.IsEnabled=false;
+            try{await owner.FindIgdbCover(game,window,title.Text);coverNotice.Text=game.CustomCover is null?I18n.T("Se conserva la carátula anterior."):I18n.T("Carátula personalizada preparada.");}
+            finally{button.IsEnabled=true;}
+        });imageButtons.Children.Add(igdbButton);
+        imageButtons.Children.Add(Button(I18n.T("Automática"), (_, _) => { game.CustomCover = null;game.IgdbCoverImageId=""; coverNotice.Text = I18n.T("Se usará la carátula de Steam, si está disponible."); }));
         if (!creating)
         {
             Label(body, "Steam");

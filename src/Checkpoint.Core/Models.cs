@@ -42,6 +42,9 @@ public sealed class Game
     public int? StoryPercent { get; set; }
     public string Notes { get; set; } = "";
     public string? CustomCover { get; set; }
+    public List<string> RejectedIgdbCovers { get; set; } = [];
+    public string IgdbCoverSearchTitle { get; set; } = "";
+    public string IgdbCoverImageId { get; set; } = "";
     public bool Tracked { get; set; } = true;
     public bool? FriendsPrivate { get; set; }
     public List<string> Lists { get; set; } = [];
@@ -179,6 +182,10 @@ public static class GameRules
             throw new ArgumentException(I18n.T("La configuración de logros o detección no es válida."));
         if(game.ManualAchievements.Concat(game.RetroAchievements??[]).Any(a=>a is null||string.IsNullOrWhiteSpace(a.Id)||a.Id.Length>250||string.IsNullOrWhiteSpace(a.Name)||a.Name.Length>250||a.Description is null||a.Description.Length>2000))
             throw new ArgumentException(I18n.T("Los logros guardados no son válidos."));
+        game.RejectedIgdbCovers ??= [];game.IgdbCoverSearchTitle ??= "";game.IgdbCoverImageId ??= "";
+        if(game.RejectedIgdbCovers.Count>200 || game.RejectedIgdbCovers.Any(id=>!CoverSuggestions.ValidImageId(id)) || game.IgdbCoverSearchTitle.Length>140 || (game.IgdbCoverImageId.Length>0&&!CoverSuggestions.ValidImageId(game.IgdbCoverImageId)))
+            throw new ArgumentException(I18n.T("La configuración de carátulas no es válida."));
+        game.RejectedIgdbCovers=game.RejectedIgdbCovers.Distinct().ToList();
         game.Lists = GameLists.Normalize(game.Lists);
         game.Title = game.Title.Trim();
         if (game.Title.Length is < 1 or > 140) throw new ArgumentException(I18n.T("El nombre debe tener entre 1 y 140 caracteres."));
