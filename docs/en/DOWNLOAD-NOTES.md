@@ -67,3 +67,7 @@ Source, documentation and downloads: [Nicolasmf05/Checkpoint](https://github.com
 ## Achievements and detection
 
 Detection works only in Windows while Checkpoint is open. Steam uses its existing connection; optional RetroAchievements requires a username, personal Web API key in Settings and a game ID. The key is encrypted locally. Manual achievements work offline and never unlock official achievements. [Guide](ACHIEVEMENTS.md).
+
+## Creator and license
+
+Checkpoint originally created by **Nicolasmf05** — https://github.com/Nicolasmf05/Checkpoint. New distributions from the license-change revision use Checkpoint Attribution License 1.0; retain the accompanying LICENSE and creator credit when redistributing. Original v0.8.5 and earlier packages retain their included MIT license.

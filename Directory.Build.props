@@ -3,7 +3,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <Version>0.8.5</Version>
-    <Authors>Checkpoint contributors</Authors>
+    <Authors>Nicolasmf05</Authors>
+    <Copyright>Copyright (c) 2026 Nicolasmf05 and Checkpoint contributors</Copyright>
     <Product>Checkpoint</Product>
     <Deterministic>true</Deterministic>
   </PropertyGroup>

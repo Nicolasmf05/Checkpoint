@@ -191,9 +191,13 @@ Usa siempre una carpeta nueva para `--smoke-test`: esta comprobación modifica s
 
 La integración con una cuenta real y la instalación/desinstalación del MSI deben validarse en un entorno de lanzamiento antes de publicar. Consulta [docs/VALIDATION.md](docs/VALIDATION.md).
 
+## Licencia y crédito de autoría
+
+**Checkpoint creado originalmente por Nicolasmf05.** El código actual usa [Checkpoint Attribution License 1.0](LICENSE): las redistribuciones y versiones derivadas alojadas públicamente deben conservar un crédito accesible al creador y el enlace al proyecto original. Se permite usarlo y distribuirlo comercialmente cumpliendo sus condiciones. [Requisitos de atribución](ATTRIBUTION.es.md). Las descargas originales de v0.8.5 y anteriores conservan su licencia MIT.
+
 ## Publicar en GitHub
 
-El proyecto incluye `.gitignore`, licencia MIT, documentación, pruebas y un workflow que genera artefactos al ejecutar GitHub Actions. Define la variable de repositorio `CHECKPOINT_SERVICE_URL` si quieres que las ediciones lleven el servicio configurado. El workflow **no publica automáticamente una release** ni contiene la clave de Steam.
+El proyecto incluye `.gitignore`, licencia Checkpoint Attribution License 1.0, documentación, pruebas y un workflow que genera artefactos al ejecutar GitHub Actions. Define la variable de repositorio `CHECKPOINT_SERVICE_URL` si quieres que las ediciones lleven el servicio configurado. El workflow **no publica automáticamente una release** ni contiene la clave de Steam.
 
 Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
 

@@ -67,3 +67,7 @@ Código, documentación y descargas: [Nicolasmf05/Checkpoint](https://github.com
 ## Logros y detección
 
 La detección funciona solo en Windows mientras Checkpoint esté abierto. Steam utiliza su vinculación actual; RetroAchievements necesita usuario y clave web personal opcionales en Ajustes y un ID del juego. La clave se cifra en el equipo. Los logros manuales funcionan sin conexión y no desbloquean logros oficiales. [Guía](ACHIEVEMENTS.md).
+
+## Creador y licencia
+
+Checkpoint creado originalmente por **Nicolasmf05** — https://github.com/Nicolasmf05/Checkpoint. Las nuevas distribuciones desde la revisión que cambia la licencia usan Checkpoint Attribution License 1.0; conserva su archivo LICENSE y el crédito al redistribuirlas. Los paquetes originales de v0.8.5 y anteriores conservan su licencia MIT.

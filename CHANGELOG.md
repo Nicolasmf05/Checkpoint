@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## Unreleased — creator attribution
+
+- Current source now uses Checkpoint Attribution License 1.0, requiring accessible attribution to Nicolasmf05 as the original creator and an original-project link in redistributions and publicly hosted derivatives.
+- Attribution files included in future Windows packages and the web deployment. Original v0.8.5 and earlier releases retain their MIT terms.
+
 ## 0.8.5 — 2026-10-04
 
 - Click any game card, title, cover or Miniature row to open its full game sheet; buttons retain their direct actions.

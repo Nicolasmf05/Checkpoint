@@ -16,7 +16,7 @@ if ($topLevel.Count -ne 1 -or !$topLevel[0].PSIsContainer -or $topLevel[0].Name 
     throw 'El portable debe contener una única carpeta Checkpoint en la raíz.'
 }
 $exe = Join-Path $extracted 'Checkpoint.exe'
-foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt','licenses\WEBVIEW2-LICENSE.txt','Web\index.html','Web\app.css','Web\app.js','Web\ui-model.mjs','READ-ME-FIRST.md','LEEME-PRIMERO.md')) {
+foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','ATTRIBUTION.md','ATTRIBUTION.es.md','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt','licenses\WEBVIEW2-LICENSE.txt','Web\index.html','Web\app.css','Web\app.js','Web\ui-model.mjs','READ-ME-FIRST.md','LEEME-PRIMERO.md')) {
     if (!(Test-Path -LiteralPath (Join-Path $extracted $relative))) { throw "El paquete no incluye $relative." }
 }
 $unexpectedLanguages = @(Get-ChildItem -LiteralPath $extracted -Directory | Where-Object { $_.Name -in @('cs','de','fr','it','ja','ko','pl','pt-BR','ru','tr','zh-Hans','zh-Hant') })

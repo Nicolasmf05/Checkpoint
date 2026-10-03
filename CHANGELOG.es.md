@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## Sin publicar — atribución al creador
+
+- El código actual pasa a Checkpoint Attribution License 1.0: exige un crédito accesible a Nicolasmf05 como creador original y un enlace al proyecto en las redistribuciones y versiones derivadas alojadas públicamente.
+- Archivos de atribución incluidos en futuros paquetes de Windows y en la web. Las publicaciones originales de v0.8.5 y anteriores conservan MIT.
+
 ## 0.8.5 — 2026-10-04
 
 - Pulsa la tarjeta, el nombre, la carátula o la fila de Miniatura para abrir la ficha completa; los botones conservan sus acciones directas.

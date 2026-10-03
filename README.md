@@ -165,9 +165,13 @@ Native tests reject existing libraries/sessions/publications and exercise real c
 
 Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.7.1-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
 
+## License and creator credit
+
+**Checkpoint originally created by Nicolasmf05.** Current source is licensed under [Checkpoint Attribution License 1.0](LICENSE): redistributed and publicly hosted derivatives must retain an accessible creator credit and original project link. Use and commercial distribution remain permitted subject to these terms. [Attribution requirements](ATTRIBUTION.md). Original v0.8.5 and earlier downloads retain their included MIT license.
+
 ## GitHub
 
-MIT license, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
+The Checkpoint Attribution License 1.0, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
 `scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.7.1.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 

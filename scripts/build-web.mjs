@@ -4,6 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),out=path.join(root,'dist','web');await mkdir(out,{recursive:true});
 const files=['index.html','start.mjs','bridge.mjs','model.mjs','store.mjs','api.mjs','web.css','sw.js','icon.svg','manifest.webmanifest'];
+for(const file of ['LICENSE','ATTRIBUTION.md','ATTRIBUTION.es.md'])await copyFile(path.join(root,file),path.join(out,file));
 for(const file of files)await copyFile(path.join(root,'web',file),path.join(out,file));
 for(const [from,to] of [['app.css','app.css'],['app.js','ui.js'],['ui-model.mjs','ui-model.mjs'],['shortcuts.mjs','shortcuts.mjs']])await copyFile(path.join(root,'src','Checkpoint.App','Web',from),path.join(out,to));
 const english={...JSON.parse(await readFile(path.join(root,'src','Checkpoint.Core','Localization','en.json'),'utf8')),...JSON.parse(await readFile(path.join(root,'web','en.json'),'utf8'))};
