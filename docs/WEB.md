@@ -4,7 +4,7 @@
 
 [**Abrir la app web**](https://nicolasmf05.github.io/Checkpoint/). No requiere instalar Checkpoint ni .NET. Usa un navegador moderno con JavaScript y almacenamiento IndexedDB habilitados.
 
-La web permite crear y editar juegos, marcar estado e historia, notas privadas, tareas, favoritos, carátulas locales, lista/compacta/cuadrícula, ventana completa/pequeña/Miniatura, ocho temas, español o inglés y [atajos configurables](SHORTCUTS.md). En ventana completa el fondo tiene opacidad máxima. La transparencia afecta al fondo de la página; el navegador no es un widget sobre otras aplicaciones.
+La web permite crear y editar juegos, marcar estado e historia, notas privadas, tareas, favoritos, carátulas locales, lista/compacta/cuadrícula, ocho temas, español o inglés y [atajos configurables](SHORTCUTS.md). La interfaz ocupa el espacio disponible del navegador y se adapta al redimensionarlo; no ofrece modos de ventana completa/pequeña/Miniatura. El selector de vista solo cambia la presentación de los juegos.
 
 Steam se vincula en Ajustes y abre el acceso oficial de Steam. La biblioteca y los logros se consultan al abrir, al recuperar conexión y cada 15/30/60/120 minutos mientras la pestaña está visible. Steam exige que los datos pertinentes sean públicos. Los juegos familiares que Steam devuelve en sus licencias o actividad reciente se incorporan; no se garantiza encontrar todo el catálogo familiar. La historia, estado y notas no se completan ni sustituyen con Steam.
 

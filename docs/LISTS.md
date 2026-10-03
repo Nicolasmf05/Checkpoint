@@ -11,7 +11,7 @@ Desde 0.7.6, al iniciar sesión los juegos de **Mi lista** son visibles automát
 - **Varias listas:** Gestionar listas → escribe un nombre → Crear lista. En el editor marca las listas del juego. Puede pertenecer a varias sin duplicarse. Hasta 30 listas de 1–40 caracteres, con nombres únicos sin distinguir mayúsculas.
 - **Renombrar o quitar:** elige la lista en Gestionar listas. Quitar conserva juegos, privacidad y otras pertenencias. Las listas vacías también se guardan. Renombrar o quitar actualiza también los juegos del historial de recuperación.
 
-Los nombres y pertenencias son organización local. Los amigos ven todos los juegos visibles, sin agrupación de listas. En Miniatura se conserva la lista seleccionada y solo se muestran nombres y estados; usa su menú para cambiar de lista.
+Los nombres y pertenencias son organización local. Los amigos ven todos los juegos visibles, sin agrupación de listas. En la versión de Windows, Miniatura conserva la lista seleccionada y solo se muestran nombres y estados; usa su menú para cambiar de lista.
 
 Las retiradas explícitas de versiones anteriores se conservan como privadas. Los demás juegos de Mi lista pasan al nuevo valor visible por defecto. Los cambios de privacidad se guardan localmente incluso sin red, pero una publicación anterior puede seguir visible hasta que el servidor confirme su retirada. Cerrar sesión no retira publicaciones.
 

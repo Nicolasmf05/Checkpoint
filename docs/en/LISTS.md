@@ -11,7 +11,7 @@ Since 0.7.6, signing in automatically makes **My list** visible to accepted Chec
 - **Multiple lists:** Manage lists → enter a name → Create list. Select memberships in the game editor. A game may belong to several without duplicate records. Up to 30 lists, 1–40 characters and unique names ignoring case.
 - **Rename or remove:** select the list in Manage lists. Removing preserves games, privacy and other memberships. Empty lists persist too. Rename and removal also update games in deletion recovery.
 
-Names and memberships are local organization. Friends see all visible game progress without list grouping. Miniature keeps the selected list and only shows names and states; its menu changes the selected list.
+Names and memberships are local organization. Friends see all visible game progress without list grouping. In the Windows edition, Miniature keeps the selected list and only shows names and states; its menu changes the selected list.
 
 Explicit withdrawals from older versions are preserved as private. Other tracked games use the new default visibility. Privacy changes persist offline, but previously published progress may remain visible until the server confirms withdrawal. Signing out does not withdraw publications.
 

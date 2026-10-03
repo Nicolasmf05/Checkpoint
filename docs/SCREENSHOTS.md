@@ -4,6 +4,10 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## Navegador adaptable
+
+La web ocupa el espacio disponible sin modos de tamaño de escritorio. [Capturas de navegador ancho y estrecho con interfaz inglesa](en/SCREENSHOTS.md#responsive-browser-layout), con datos de prueba.
+
 ## 0.7.6 — listas y privacidad
 
 Las capturas de Windows y navegador muestran Gestionar listas y la vista Privados con datos de prueba. Están en inglés en la [galería correspondiente](en/SCREENSHOTS.md#076--lists-and-privacy).

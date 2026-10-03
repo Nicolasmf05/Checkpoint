@@ -106,5 +106,6 @@
   "Sin conexión, los cambios de visibilidad se aplican a tus amigos cuando vuelva la conexión.": "While offline, visibility changes reach your friends when the connection returns.",
   "Retirada pendiente de conexión.": "Withdrawal waiting for connection.",
   "Iniciar sesión": "Sign in",
-  "Mi cuenta": "My account"
+  "Mi cuenta": "My account",
+  "La interfaz se adapta al tamaño de tu navegador. Usa Mi lista o Biblioteca; la bandeja y los atajos globales están en la app de Windows.": "The interface adapts to your browser size. Use My list or Library; the tray and global shortcuts are available in the Windows app."
 }

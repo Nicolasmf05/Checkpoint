@@ -4,7 +4,7 @@
 
 [**Open the web app**](https://nicolasmf05.github.io/Checkpoint/). No Checkpoint or .NET installation is required. Use a modern browser with JavaScript and IndexedDB enabled.
 
-Create and edit games, state and manual story progress, private notes, tasks, favorites, local covers, list/compact/grid layouts, full/small/Miniature modes, eight themes, Spanish or English and [configurable shortcuts](SHORTCUTS.md). Full mode uses maximum background opacity. Transparency affects the page background; the browser is not an always-on-top desktop widget.
+Create and edit games, state and manual story progress, private notes, tasks, favorites, local covers, list/compact/grid layouts, eight themes, Spanish or English and [configurable shortcuts](SHORTCUTS.md). The interface automatically fills the available browser viewport and adapts when resized; no full/small/Miniature window presets are offered. Layout selection only changes game presentation.
 
 Link Steam in Settings using the official Steam login page. Library and achievements refresh on launch, reconnection and every 15/30/60/120 minutes while the tab is visible. Relevant Steam data must be public. Family games returned through licenses or recent activity are included; the entire family catalog is not guaranteed. Steam never completes the story or overwrites manual state and notes.
 

@@ -31,7 +31,7 @@ function renderHelp() {
   function section(title,rows) {const group=el('section');group.append(el('h3','',title));const list=el('dl');for(const [keys,label,note] of rows){const row=el('div','shortcut-row'),term=el('dt'),description=el('dd','',label);term.append(el('kbd','',keys));if(note)description.append(el('small','',note));row.append(term,description);list.append(row);}group.append(list);content.append(group);}
   const general=[[gestures.shortcuts,l.shortcuts],[gestures.add,l.add],[gestures.search,l.search],[gestures.undo,l.undo,l.undoContext],[gestures.view,l.view],[gestures.hide,l.hide,l.hideContext]];
   general.push([gestures.global,l.globalKeys,state.globalHotkey?null:l.globalUnavailable]);
-  section(l.generalKeys,general);section(l.miniKeys,[[gestures.up+' / '+gestures.down,l.selectGame],[gestures.first+' / '+gestures.last,l.firstLast],[gestures.pageUp+' / '+gestures.pageDown,l.pageGame],[gestures.gameMenu+' / '+l.enterSpace.split(' / ')[1],l.gameMenu],[gestures.edit,l.edit]]);section(l.orderKeys,[[gestures.moveUp+' / '+gestures.moveDown,l.reorder]]);help.append(content);if(l.configureShortcuts){const configure=el('button','',l.configureShortcuts);configure.addEventListener('click',()=>{help.close();action('configure-shortcuts');});help.append(configure);}
+  section(l.generalKeys,general);if(!state.browser)section(l.miniKeys,[[gestures.up+' / '+gestures.down,l.selectGame],[gestures.first+' / '+gestures.last,l.firstLast],[gestures.pageUp+' / '+gestures.pageDown,l.pageGame],[gestures.gameMenu+' / '+l.enterSpace.split(' / ')[1],l.gameMenu],[gestures.edit,l.edit]]);section(l.orderKeys,[[gestures.moveUp+' / '+gestures.moveDown,l.reorder]]);help.append(content);if(l.configureShortcuts){const configure=el('button','',l.configureShortcuts);configure.addEventListener('click',()=>{help.close();action('configure-shortcuts');});help.append(configure);}
 }
 
 function showMenu(game, x, y) {
@@ -48,7 +48,7 @@ function showMenu(game, x, y) {
   }
   if(state.collections){for(const list of state.collections)entry(list.label,'collection',{value:list.value},list.value===state.collection);entry(state.labels.manageLists,'manage-lists');}
   if (state.mini) entry(state.labels.exitMini, 'exit-mini');
-  [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((label,value)=>entry(label,'window-mode',{value},value===(state.mini?2:state.full?0:1)));
+  if(!state.browser)[state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((label,value)=>entry(label,'window-mode',{value},value===(state.mini?2:state.full?0:1)));
   entry(state.labels.settings, 'settings'); entry(state.labels.search, 'search'); entry(state.labels.add, 'add');
   const helpItem=el('button','',state.labels.shortcuts);helpItem.setAttribute('role','menuitem');helpItem.setAttribute('aria-keyshortcuts',gestures.shortcuts);helpItem.append(el('kbd','',gestures.shortcuts));helpItem.addEventListener('click',showHelp);menu.append(helpItem);
   if(!state.browser){menu.append(el('hr')); entry(state.labels.pin, 'pin', {}, state.pinned); entry(state.labels.locked, 'lock', {}, state.locked);}
@@ -113,7 +113,7 @@ function frame() {
   const wordmark = el('div'); wordmark.append(el('strong', '', 'checkpoint'), el('div', 'tagline')); brand.append(wordmark);
   brand.addEventListener('pointerdown', e => { if (e.button === 0 && !state.locked && !state.browser) action('drag'); }); header.append(brand);
   for (const [icon, name, label] of [['◇','pin','pin'], ['⚙','settings','settings'], ['−','hide','hide'], ['×','close','close']]) { const node = button(icon, name, icon, {}, 'icon'); node.dataset.label = label; header.append(node); }
-  const modes=el('select','window-mode'); modes.setAttribute('aria-label','Checkpoint'); modes.addEventListener('change',()=>action('window-mode',{value:Number(modes.value)})); header.append(modes);
+  if(!state.browser){const modes=el('select','window-mode'); modes.setAttribute('aria-label','Checkpoint'); modes.addEventListener('change',()=>action('window-mode',{value:Number(modes.value)})); header.append(modes);}
   const intro = el('section', 'intro'); intro.append(el('h1'), el('div', 'summary'));
   const navigation = el('nav', 'navigation');
   for (const name of ['list','library','friends']) { const node = button('', 'tab', '', { value: name }); node.dataset.tab = name; navigation.append(node); }
@@ -136,7 +136,7 @@ function renderMain() {
   if (dialogMode || !root.querySelector('.window')) frame(); dialogMode = false;
   const host = root.querySelector('.window'); host.classList.toggle('mini', state.mini); host.classList.toggle('full',state.full);
   if(state.mini && document.activeElement?.closest('.header,.navigation,.searchbar,.collectionbar,.footer,.shortcutbar,.web-toolbar'))host.querySelector('.viewport').focus({preventScroll:true});
-  const modes=host.querySelector('.window-mode'); modes.replaceChildren(); [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((text,index)=>{const option=el('option','',text);option.value=index;modes.append(option);}); modes.value=state.mini?2:state.full?0:1; modes.setAttribute('aria-label',state.labels.windowMode);
+  const modes=host.querySelector('.window-mode'); if(modes){modes.replaceChildren(); [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((text,index)=>{const option=el('option','',text);option.value=index;modes.append(option);}); modes.value=state.mini?2:state.full?0:1; modes.setAttribute('aria-label',state.labels.windowMode);}
   host.style.setProperty('--opacity', state.opacity); host.style.setProperty('--mini-size', `${state.textSize}px`);
   if(state.browser){host.classList.add('browser');host.querySelector('.brand').style.cursor='default';for(const name of ['pin','hide','close'])host.querySelector(`[data-label="${name}"]`).hidden=true;
     if(!host.querySelector('.web-toolbar')){const tools=el('div','web-toolbar');tools.append(button(state.labels.account,'account',state.labels.account,{},'accent web-account'));for(const [name,label] of [['import',state.labels.backupImport],['export',state.labels.backupExport],['web-info',state.labels.browserInfo]])tools.append(button(label,name));const link=el('a','',state.labels.windowsDownload);link.href='https://github.com/Nicolasmf05/Checkpoint/releases';link.target='_blank';link.rel='noopener noreferrer';tools.append(link);host.querySelector('.header').after(tools);}}
