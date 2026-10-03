@@ -2,28 +2,28 @@
 
 # Checkpoint
 
-Un juego cada vez. Widget nativo y translúcido para organizar los juegos que quieres pasarte en Windows.
+Un juego cada vez. Widget translúcido para organizar los juegos que quieres pasarte en Windows.
 
 > **AVISO IMPORTANTE — SMARTSCREEN:** los EXE/MSI de GitHub no tienen firma ni certificado de editor. La ausencia de firma y de reputación puede provocar «Windows protegió su PC». **No tengo certificado porque supone un coste; no lo compraré hasta que los ingresos de Checkpoint cubran al menos lo que cueste. Hasta entonces, estas descargas seguirán sin certificado.** Firmar tampoco garantiza que el aviso desaparezca inmediatamente. [Lee el aviso y los requisitos](docs/DOWNLOAD-NOTES.md).
 
-![Checkpoint: biblioteca y carátulas](docs/screenshots/widget-grid-wide-dark.png)
+![Checkpoint: interfaz CSS](docs/screenshots/css-widget-es.png)
 
 ## Capturas
 
-Capturas de la aplicación Windows 0.6.1 renderizadas durante las pruebas nativas. Los juegos, usuarios y progresos son datos de ejemplo; las carátulas privadas de prueba usan una imagen de color plano. Consulta la [galería de capturas](docs/SCREENSHOTS.md) para ver lista, vista compacta, amigos y ajustes.
+Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. Juegos y progresos son ejemplos; la carátula verde es una imagen local de prueba. Consulta la [galería actual y capturas históricas](docs/SCREENSHOTS.md).
 
-| Biblioteca | Amigos de Checkpoint |
+| Editor | Miniatura |
 | --- | --- |
-| ![Lista en tema oscuro](docs/screenshots/widget-dark.png) | ![Progreso compartido de ejemplo](docs/screenshots/widget-friends-progress.png) |
+| ![Editor en español](docs/screenshots/css-editor-es.png) | ![Nombre y estado](docs/screenshots/css-miniature-es.png) |
 
 ## Descargar y utilizar
 
-La versión actual es **0.6.16**. En la carpeta `dist` se generan:
+La versión actual es **0.7.0**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.6.16), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.0), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.6.16-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.6.16-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.7.0-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.7.0-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -34,7 +34,13 @@ La distribución por Microsoft Store se prepara por separado: [guía de MSIX y p
 
 ## Requisitos para utilizarla
 
-Windows x64 (Windows 11 probado), carpeta accesible para tu usuario y espacio para los archivos. **Sin instalar .NET ni herramientas de desarrollo, sin permisos de administrador y sin cuenta ni Internet para la biblioteca manual.** Steam, carátulas online y amigos son opcionales. RAM/CPU mínimos en equipos antiguos aún no medidos. [Requisitos y consumo](docs/DOWNLOAD-NOTES.md).
+Windows x64 (Windows 11 probado), **Microsoft Edge WebView2 Evergreen Runtime**, carpeta accesible para tu usuario y espacio para los archivos. **Sin instalar .NET ni herramientas de desarrollo, sin permisos de administrador y sin cuenta ni Internet para la biblioteca manual.** Steam, carátulas online y amigos son opcionales. RAM/CPU mínimos en equipos antiguos aún no medidos. [Requisitos y consumo](docs/DOWNLOAD-NOTES.md).
+
+WebView2 se comparte con otras aplicaciones y viene incluido en Windows 11. Si falta, [instálalo desde Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/).
+
+## Tecnología de la interfaz
+
+La colección, Miniatura, amigos, editores, ajustes y avisos propios se muestran con **HTML, CSS y JavaScript locales en WebView2**. El diseño se modifica en `src/Checkpoint.App/Web/app.css`. C#/.NET conserva SQLite, Steam, Supabase, bandeja y ventana nativa. WPF sigue como contenedor y controladores de formularios; los selectores de archivos de Windows y el aviso de falta de WebView2 son nativos. Sin framework JavaScript ni interfaz remota. [Arquitectura y desarrollo](docs/CSS-INTERFACE.md).
 
 ## Incluido
 
@@ -143,7 +149,7 @@ dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PW
 
 Usa siempre una carpeta nueva para `--smoke-test`: esta comprobación modifica su biblioteca de prueba y rechaza una carpeta con biblioteca o sesión existentes. El modo `--demo` añade tres juegos de ejemplo únicamente a una biblioteca vacía. No inventa logros. Las pruebas de Steam y las pruebas del diálogo de logros usan respuestas simuladas y no necesitan contraseñas ni claves reales.
 
-`Build.ps1` comprueba también el ZIP recién generado: lo extrae a `.qa`, ejecuta su app autocontenida y valida búsqueda, vistas, reordenación, persistencia, diálogos, secretos, recuperación, copias con imágenes, cuentas y amistades simuladas, y virtualización con 1.003 juegos. Puedes repetir solo esa comprobación con `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.6.16-win-x64.zip`. Las imágenes y el informe quedan en `.qa/package-…/render`. La ejecución ARM64 necesita un equipo Windows ARM64; en otros equipos se comprueba la estructura del paquete.
+`Build.ps1` comprueba también el ZIP recién generado: lo extrae a `.qa`, ejecuta su app autocontenida y valida búsqueda, vistas, reordenación, persistencia, diálogos, secretos, recuperación, copias con imágenes, cuentas y amistades simuladas, y virtualización con 1.003 juegos. Puedes repetir solo esa comprobación con `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.7.0-win-x64.zip`. También se ejecuta la interfaz HTML real con 1.004 juegos, formularios, menús y cambios de idioma. Las imágenes y los informes quedan en `.qa/package-…/render` y `.qa/web-package-…/render`. La ejecución ARM64 necesita un equipo Windows ARM64; en otros equipos se comprueba la estructura del paquete.
 
 La integración con una cuenta real y la instalación/desinstalación del MSI deben validarse en un entorno de lanzamiento antes de publicar. Consulta [docs/VALIDATION.md](docs/VALIDATION.md).
 
@@ -153,11 +159,11 @@ El proyecto incluye `.gitignore`, licencia MIT, documentación, pruebas y un wor
 
 Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
 
-También se entrega `dist/Checkpoint-source-0.6.16.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
+También se entrega `dist/Checkpoint-source-0.7.0.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
 
 ## Próximas versiones
 
-El backend de cuentas y amistades está desplegado en Supabase y la app 0.6.16 incorpora la pestaña Amigos. Han pasado 33 comprobaciones SQL y 7 HTTP del backend; queda validar el registro y el intercambio de imágenes con dos cuentas reales. El estado, configuración pública y pasos pendientes están en [docs/SUPABASE.md](docs/SUPABASE.md).
+El backend de cuentas y amistades está desplegado en Supabase y la app 0.7.0 incorpora la pestaña Amigos. Han pasado 33 comprobaciones SQL y 7 HTTP del backend; queda validar el registro y el intercambio de imágenes con dos cuentas reales. El estado, configuración pública y pasos pendientes están en [docs/SUPABASE.md](docs/SUPABASE.md).
 
 Notificaciones, estadísticas mensuales y sincronización de la biblioteca entre equipos quedan para futuras versiones. Consulta [docs/ROADMAP.md](docs/ROADMAP.md) y [CHANGELOG.md](CHANGELOG.md).
 
@@ -169,4 +175,4 @@ La app incluye la dirección del servicio Steam de Supabase, ya desplegado y con
 
 Los avisos, menús y ventanas de Checkpoint siguen el idioma elegido en Ajustes. Los errores técnicos externos se muestran como explicaciones traducidas. Los títulos de juegos, notas, tareas y nombres de personas conservan su contenido. Los cuadros del sistema, como el selector de archivos o SmartScreen, siguen el idioma de Windows.
 
-Tu código de amigo se muestra y copia completo desde Amigos → Cuenta: `checkpoint-` seguido de 12 caracteres. Usa Checkpoint 0.6.16 o posterior para introducir este formato; también acepta códigos copiados de versiones anteriores sin cambiar la cuenta.
+Tu código de amigo se muestra y copia completo desde Amigos → Cuenta: `checkpoint-` seguido de 12 caracteres. Usa Checkpoint 0.7.0 o posterior para introducir este formato; también acepta códigos copiados de versiones anteriores sin cambiar la cuenta.

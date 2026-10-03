@@ -6,7 +6,7 @@ Checkpoint now has a repeatable MSIX packaging path. It is not yet published or 
 
 ## What is ready
 
-- Windows 11 desktop manifest for the native WPF app, including English/Spanish and `runFullTrust`.
+- Windows 11 desktop manifest for the native app with a WPF shell and WebView2 CSS interface, including English/Spanish and `runFullTrust`.
 - Store, Start menu and tile icons derived from the existing Checkpoint icon. Regenerate with `scripts/New-StoreAssets.ps1`.
 - Self-contained .NET runtime, Steam/Supabase public configuration and licenses inside the package.
 - MakeAppx schema/content validation, SHA-256 checksum and unpack verification of every application file, icon dimensions and native architecture.
@@ -52,7 +52,7 @@ The app currently uses `%LOCALAPPDATA%\Checkpoint` and creates an optional Start
 
 Before moving from portable/MSI to Store, export a `.checkpoint` backup, then import it in the Store edition. Sessions and sharing consent are excluded: sign in again and choose shared games explicitly. Test actual migration, update and uninstall behavior before promising data preservation; MSIX uninstall may remove package-scoped data.
 
-The `runFullTrust` capability is needed because Checkpoint is a native WPF desktop widget with SQLite, a tray icon, keyboard shortcuts and user-selected backups. Provide that explanation to certification reviewers. This capability does not request elevation.
+The `runFullTrust` capability is needed because Checkpoint is a desktop widget with a WPF shell and WebView2 CSS interface with SQLite, a tray icon, keyboard shortcuts and user-selected backups. Provide that explanation to certification reviewers. This capability does not request elevation.
 
 ## Pending external requirements
 

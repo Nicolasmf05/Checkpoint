@@ -393,5 +393,8 @@
   "No se pudo leer o guardar el archivo. Comprueba que esté disponible y vuelve a intentarlo.": "The file could not be read or saved. Check that it is available and try again.",
   "Los datos recibidos no tienen un formato válido.": "The received data is not in a valid format.",
   "No se pudo completar la operación. Vuelve a intentarlo.": "The operation could not be completed. Try again.",
-  "Entendido": "OK"
+  "Entendido": "OK",
+  "Añadir ejemplos": "Add examples",
+  "Checkpoint necesita Microsoft Edge WebView2 Runtime para mostrar la interfaz. Instálalo y vuelve a abrir la aplicación.": "Checkpoint needs Microsoft Edge WebView2 Runtime to display the interface. Install it and reopen the app.",
+  "Descargar WebView2": "Download WebView2"
 }

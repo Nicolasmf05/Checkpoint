@@ -1,5 +1,11 @@
 # Validation
 
+## 0.7.0 — CSS interface
+
+366 checks passed: 128 core, 15 service Node, 14 Supabase Edge, 175 native controller regression, 4 frontend model and 30 actual WebView2 checks. The extracted ZIP runs both native and CSS test suites with fresh isolated data. CSS checks exercise local cover loading, game/notes SQLite persistence, input acknowledgement, password preservation without snapshot disclosure, Spanish/English, settings, friends login, Miniature menus/focus/editing, 1,004-game virtualization, grid, light compact view, keyboard ordering, safe text rendering and blocked remote navigation. Screenshots are captured from WebView2 rather than legacy WPF controls.
+
+The legacy WPF checks validate existing controllers and simulated Steam/Supabase behavior; they do not prove the new HTML interactions by themselves. Live Steam accounts, two real Checkpoint accounts, installed MSI/MSIX upgrades, physical drag/keyboard, multi-monitor DPI, screen readers and low-end hardware remain pending. WebView2 Evergreen Runtime is an additional requirement; no memory reduction or signing reputation is claimed.
+
 ## 0.6.16 — complete friend-code name
 
 332 checks passed: 128 core, 15 Node, 14 Edge and 175 WPF. Tests cover complete presentation, case/whitespace normalization, length and character validation, existing-identity lookup with both formats, Spanish/English Account windows and the 23-character input. Stored service codes and historical schema identifiers remain compatible with released clients. HTTP responses are simulated and actual windows use isolated data; real accounts and installation remain pending.

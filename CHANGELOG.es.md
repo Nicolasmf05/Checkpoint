@@ -2,6 +2,14 @@
 
 # Historial de cambios
 
+## 0.7.0 — 2026-10-03
+
+- Interfaz visible migrada a HTML/CSS/JavaScript locales en WebView2 transparente: colección, Miniatura, amigos, formularios y avisos propios.
+- C# conserva SQLite, Steam, Supabase, bandeja, copias y validaciones existentes; los datos mantienen su formato.
+- Filas virtualizadas, menús y orden por teclado, español/inglés coherentes, temas claro/oscuro y carátulas mediante origen interno.
+- **Nuevo requisito: Microsoft Edge WebView2 Evergreen Runtime.** .NET sigue incluido; WebView2 se comparte y se instala por separado si falta.
+- Pruebas del paquete en WebView2 real, pruebas del modelo de interfaz y nuevas capturas/documentación. Sigue vigente el aviso de descargas sin firma.
+
 ## 0.6.16 — 2026-10-03
 
 - Códigos de amigo mostrados y copiados con el nombre completo `checkpoint-` y sus 12 caracteres originales.

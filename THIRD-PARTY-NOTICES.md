@@ -2,6 +2,8 @@
 
 **English** · [Español](THIRD-PARTY-NOTICES.es.md)
 
+- Microsoft.Web.WebView2 1.0.4258.31: Microsoft, SDK redistribution terms in `licenses/WEBVIEW2-LICENSE.txt`. The shared Microsoft Edge WebView2 Evergreen Runtime is installed separately and is not bundled in Checkpoint.
+- Microsoft.Windows.SDK.NET / CsWinRT: Microsoft Windows API projections used by the composition control. [Windows SDK license](https://aka.ms/WinSDKLicenseURL), as referenced by the targeting-pack metadata.
 - .NET/WPF: Microsoft and .NET Foundation, MIT. Full notices in `licenses/DOTNET-LICENSE.txt` and `licenses/DOTNET-THIRD-PARTY-NOTICES.txt`.
 - Microsoft.Data.Sqlite: Microsoft, MIT.
 - SQLitePCLRaw: Eric Sink / SourceGear, Apache-2.0, included in `licenses/APACHE-2.0.txt`.

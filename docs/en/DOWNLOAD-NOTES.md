@@ -13,6 +13,7 @@ Microsoft Store MSIX is an alternative: Microsoft signs approved apps without bu
 ## Requirements to use it
 
 - A Windows x64 PC. Windows 11 is the tested platform. Windows 10 is unvalidated; Windows 7/8/8.1 are unsupported. ARM64 requires its own package and hardware validation.
+- **Microsoft Edge WebView2 Evergreen Runtime is required from version 0.7.0.** Windows 11 includes it; if missing, [download it from Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/). It is shared and updated independently. The ZIP/MSI includes .NET but does not bundle or silently install WebView2. Offline use requires the runtime to be present first.
 - A user-writable folder and disk space for the app, library, covers and backups.
 - **No .NET, Node.js, Python, Visual Studio, Supabase installation or server is needed. The runtime is included. No administrator privileges are requested.**
 - **No account or Internet connection is needed to organize games manually, use local covers or import/export backups.** Internet is only needed for cover downloads and Steam/friends features; Steam and Checkpoint accounts are separate and optional. Steam sign-in requires a browser.
@@ -51,7 +52,7 @@ Enable **Settings → Lightweight mode (no covers)**. Collection and friend cove
 
 Lists are virtualized; recycled cover cards release image references and the decoded image cache has an estimated 8 MiB budget with at most 32 entries. That budget is not the application's total memory. Unused framework language resources are omitted. Friend progress does not refresh periodically while the widget is hidden or minimized; pending publications can still be delivered.
 
-There is no measured minimum RAM/CPU on older hardware. No arbitrary minimum is promised: usage depends on library size, window size and images. Covers and backups can increase disk use; users control their data.
+There is no measured minimum RAM/CPU on older hardware. No arbitrary minimum is promised: usage depends on library size, window size and images. The CSS interface uses WebView2 browser processes in addition to .NET. Lower RAM usage than the previous WPF interface is not claimed. Covers and backups can increase disk use; users control their data.
 
 Source, documentation and downloads: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). See [Windows security](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/en/WINDOWS-SECURITY.md) and [Microsoft SmartScreen reputation guidance](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
 

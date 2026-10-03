@@ -2,6 +2,12 @@
 
 # Validación
 
+## 0.7.0 — interfaz CSS
+
+Han pasado 366 comprobaciones: 128 de biblioteca, 15 Node del servicio, 14 Edge de Supabase, 175 de regresión de controladores nativos, 4 del modelo de interfaz y 30 en WebView2 real. El ZIP extraído ejecuta ambas pruebas con datos nuevos y aislados. CSS comprueba carátulas locales, juegos/notas guardados en SQLite, confirmación de valores escritos, contraseñas conservadas sin aparecer en instantáneas, español/inglés, ajustes, acceso a amigos, menús/foco/edición en Miniatura, virtualización de 1.004 juegos, cuadrícula, compacta clara, orden por teclado, texto seguro y bloqueo de navegación remota. Las capturas proceden de WebView2, no de los controles WPF antiguos.
+
+Las pruebas WPF validan los controladores existentes y Steam/Supabase simulados; por sí solas no prueban las nuevas interacciones HTML. Siguen pendientes cuentas Steam reales, dos cuentas reales de Checkpoint, actualización de MSI/MSIX instalados, arrastre/teclado físicos, varios monitores y DPI, lectores de pantalla y hardware antiguo. WebView2 Evergreen Runtime es un requisito adicional; no se afirma menor memoria ni reputación de firma.
+
 ## 0.6.16 — nombre completo en códigos de amigo
 
 Han pasado 332 comprobaciones: 128 de biblioteca, 15 Node, 14 Edge y 175 WPF. Se verifican presentación completa, mayúsculas/espacios, límites y caracteres del código, búsqueda de la identidad existente con ambos formatos, ventanas de Cuenta en español/inglés y campo de entrada de 23 caracteres. Los códigos del servicio se conservan; los nombres técnicos históricos del esquema permanecen para compatibilidad con clientes publicados. Pruebas HTTP simuladas y ventanas reales con datos aislados; cuentas reales e instalación siguen pendientes.

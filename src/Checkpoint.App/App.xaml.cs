@@ -10,16 +10,19 @@ namespace Checkpoint.App;
 
 public partial class App : Application
 {
+    internal static bool UseCss { get; private set; } = true;
     private Mutex? singleInstance;
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        UseCss = !e.Args.Contains("--smoke-test");
         int index = Array.IndexOf(e.Args, "--data-dir");
         int smokeIndex = Array.IndexOf(e.Args, "--smoke-test");
+        int webSmokeIndex = Array.IndexOf(e.Args, "--web-smoke-test");
         bool explicitDirectory = index >= 0 && index + 1 < e.Args.Length && !e.Args[index + 1].StartsWith("--", StringComparison.Ordinal);
         string directory = explicitDirectory ? e.Args[index + 1]
             : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Checkpoint");
-        if (smokeIndex >= 0)
+        if (smokeIndex >= 0 || webSmokeIndex >= 0)
         {
             if (!explicitDirectory) directory = Path.Combine(Path.GetTempPath(), "Checkpoint-smoke-" + Guid.NewGuid().ToString("N"));
             if (File.Exists(Path.Combine(directory, "checkpoint.db")) || File.Exists(Path.Combine(directory, "steam-session.dat"))
@@ -53,6 +56,8 @@ public partial class App : Application
         {
             var window = new MainWindow(directory, e.Args.Contains("--demo")); MainWindow = window; window.Show();
             if (smokeIndex >= 0 && smokeIndex + 1 < e.Args.Length) _ = window.RenderSmokeTest(e.Args[smokeIndex + 1]);
+            int webIndex = Array.IndexOf(e.Args, "--web-smoke-test");
+            if (webIndex >= 0 && webIndex + 1 < e.Args.Length) _ = window.RenderWebSmokeTest(e.Args[webIndex + 1]);
         }
         catch (Exception ex)
         {

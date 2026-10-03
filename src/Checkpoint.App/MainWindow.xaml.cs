@@ -112,10 +112,12 @@ public partial class MainWindow : Window
             timer.Tick += async (_, _) => { if (Steam.Session is not null && !syncing) await Sync(false); };
             timer.Start();
             StartSocial();
+            if (App.UseCss) StartWebInterface();
             if (Steam.Session is not null) _ = Sync(false);
         };
         PreviewKeyDown += (_, e) =>
         {
+            if (App.UseCss) return;
             if (e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control) { Dialogs.Edit(this, null); e.Handled = true; }
             if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control) { FocusCollectionSearch(); e.Handled = true; }
             if (e.Key == Key.F6) { CycleView(); e.Handled = true; }
@@ -194,6 +196,7 @@ public partial class MainWindow : Window
         string view = miniature ? I18n.T("Miniatura") : Preferences.GridView ? I18n.T("Cuadrícula") : Preferences.Compact ? I18n.T("Compacta") : I18n.T("Lista");
         ViewButton.ToolTip = (I18n.IsEnglish ? $"View: {view} · switch with F6" : $"Vista: {view} · cambiar con F6");
         System.Windows.Automation.AutomationProperties.SetName(ViewButton, (I18n.IsEnglish ? $"Change view, current: {view}" : $"Cambiar vista, actual: {view}"));
+        web?.Publish();
     }
     internal static SolidColorBrush Brush(string color) => (SolidColorBrush)new BrushConverter().ConvertFromString(color)!;
     internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); }
@@ -232,6 +235,7 @@ public partial class MainWindow : Window
             GameList.SelectedItem = selected;
             if (restoreFocus) FocusMiniatureCard(selected, expectedFocus: Keyboard.FocusedElement, guardFocus: true);
         }
+        web?.Publish();
     }
     private async void CoverLoaded(object sender, RoutedEventArgs e)
     {
@@ -250,7 +254,7 @@ public partial class MainWindow : Window
     {
         if (((FrameworkElement)sender).IsLoaded) CoverLoaded(sender, new RoutedEventArgs());
     }
-    internal void Notice(string text) => NoticeText.Text = text;
+    internal void Notice(string text) { NoticeText.Text = text; web?.Publish(); }
     private void FilterChanged(object sender, RoutedEventArgs e) => Refresh();
     private void TrackedClick(object sender, RoutedEventArgs e) { friendsVisible = false; allLibrary = false; Refresh(); }
     private void LibraryClick(object sender, RoutedEventArgs e) { friendsVisible = false; allLibrary = true; Refresh(); }

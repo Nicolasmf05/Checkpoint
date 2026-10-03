@@ -2,7 +2,7 @@
   <ItemGroup><EmbeddedResource Include="LocalizationKeys.json" /></ItemGroup>
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>Checkpoint</AssemblyName>
@@ -16,6 +16,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Checkpoint.Core/Checkpoint.Core.csproj" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+    <Content Include="Web/**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="service-config.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../supabase/project.json" Link="supabase-config.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

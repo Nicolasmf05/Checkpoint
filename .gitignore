@@ -23,3 +23,5 @@ supabase/.branches/
 *.db-wal
 *.log
 dotnet-install.ps1
+
+**/webview-profile/

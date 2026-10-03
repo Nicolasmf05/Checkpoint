@@ -2,7 +2,25 @@
 
 **English** · [Español](../SCREENSHOTS.md)
 
-Captured from actual WPF controls through `RenderTargetBitmap` during isolated native package tests. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
+Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
+
+## 0.7.0 — current CSS interface
+
+![English widget](../screenshots/css-widget-en.png)
+
+| Friends login | Miniature |
+| --- | --- |
+| ![Friends](../screenshots/css-friends-login-en.png) | ![Miniature](../screenshots/css-miniature-en.png) |
+
+![Light compact view](../screenshots/css-compact-light-en.png)
+
+![Settings](../screenshots/css-settings-en.png)
+
+![English app notice](../screenshots/css-notice-en.png)
+
+Spanish captures: [widget](../screenshots/css-widget-es.png), [editor](../screenshots/css-editor-es.png), [Miniature](../screenshots/css-miniature-es.png).
+
+## Archived WPF interface (0.6.x)
 
 ## English
 

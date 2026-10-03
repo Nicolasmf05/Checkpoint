@@ -22,6 +22,7 @@ internal static class Dialogs
             ShowInTaskbar = false, FontFamily = new FontFamily("Segoe UI"), FontSize = 13,
             Background = (Brush)Application.Current.Resources["InputBrush"], Foreground = (Brush)Application.Current.Resources["TextBrush"] };
         window.Height = Math.Min(height, SystemParameters.WorkArea.Height - 35);
+        if (App.UseCss) window.Loaded += (_, _) => WebSurface.AttachDialog(window);
         return window;
     }
     private static StackPanel Panel() => new() { Margin = new Thickness(23, 18, 23, 18) };

@@ -28,6 +28,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación.' }
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas de la biblioteca.' }
 & node --test server/test/service.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas del servicio.' }
+& node --test tests/web/ui-model.test.mjs
+if ($LASTEXITCODE -ne 0) { throw 'CSS UI model tests failed.' }
 & node --test supabase/tests/steam.test.mjs
 if ($LASTEXITCODE -ne 0) { throw 'Fallaron las pruebas Steam de Supabase.' }
 $output = Join-Path $checkpointRoot "dist\$version\$Runtime\Checkpoint"

@@ -2,6 +2,8 @@
 
 # Dependencias y recursos externos
 
+- Microsoft.Web.WebView2 1.0.4258.31: Microsoft, condiciones del SDK en `licenses/WEBVIEW2-LICENSE.txt`. Microsoft Edge WebView2 Evergreen Runtime se instala por separado y no se incluye en Checkpoint.
+- Microsoft.Windows.SDK.NET / CsWinRT: proyecciones de la API de Windows usadas por el control de composición.
 - .NET y WPF: Microsoft y .NET Foundation, licencia MIT. Los avisos completos se incluyen en `licenses/DOTNET-LICENSE.txt` y `licenses/DOTNET-THIRD-PARTY-NOTICES.txt`.
 - Microsoft.Data.Sqlite: Microsoft, licencia MIT.
 - SQLitePCLRaw: Eric Sink / SourceGear, licencia Apache-2.0, incluida en `licenses/APACHE-2.0.txt`.

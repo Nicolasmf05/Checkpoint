@@ -13,6 +13,7 @@ La vía alternativa es Microsoft Store con MSIX, donde Microsoft firma tras apro
 ## Requisitos para usarla
 
 - Un PC Windows x64. Windows 11 es la plataforma probada. Windows 10 no está validado; Windows 7/8/8.1 no son compatibles. ARM64 requiere su paquete específico y validación en ese hardware.
+- **Desde 0.7.0 se necesita Microsoft Edge WebView2 Evergreen Runtime.** Windows 11 lo incluye; si falta, [descárgalo desde Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/). Es compartido y se actualiza por separado. El ZIP/MSI incluye .NET, pero no incluye ni instala WebView2 automáticamente. El uso sin Internet requiere tenerlo instalado previamente.
 - Una carpeta donde tu usuario pueda escribir y espacio para la app, biblioteca, carátulas y copias.
 - **No necesitas instalar .NET, Node.js, Python, Visual Studio, Supabase ni un servidor. El runtime viene incluido. No pide permisos de administrador.**
 - **No necesitas cuenta ni Internet para añadir y organizar juegos manualmente, utilizar carátulas locales o importar/exportar copias.** Internet solo se necesita para descargar carátulas y las funciones de Steam/amigos; Steam y Checkpoint se vinculan por separado y son opcionales. Hace falta un navegador para iniciar sesión en Steam.
@@ -51,7 +52,7 @@ Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas
 
 La interfaz virtualiza las listas; las carátulas recicladas liberan sus referencias y la caché de imágenes decodificadas tiene un presupuesto estimado de 8 MiB y un máximo de 32 entradas. Ese presupuesto no es la memoria total de la app. Los recursos de .NET no utilizados de otros idiomas no se distribuyen. El progreso de amigos no se consulta periódicamente mientras el widget está oculto o minimizado; las publicaciones pendientes siguen pudiendo enviarse.
 
-No hay un mínimo de RAM/CPU medido en equipos antiguos. No se promete una cifra inventada: el consumo depende del tamaño de la biblioteca, la ventana y las imágenes. Las carátulas y copias pueden aumentar el espacio utilizado; el usuario controla sus datos.
+No hay un mínimo de RAM/CPU medido en equipos antiguos. No se promete una cifra inventada: el consumo depende del tamaño de la biblioteca, la ventana y las imágenes. La interfaz CSS añade procesos de WebView2 a .NET. No se afirma que consuma menos RAM que la interfaz WPF anterior. Las carátulas y copias pueden aumentar el espacio utilizado; el usuario controla sus datos.
 
 Código, documentación y descargas: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). Guía: [seguridad de Windows](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/WINDOWS-SECURITY.md). [Reputación de SmartScreen según Microsoft](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
 

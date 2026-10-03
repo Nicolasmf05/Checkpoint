@@ -20,6 +20,9 @@ jobs:
           node-version: '24'
       - name: Install local MSI compiler
         run: dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGet.config
+      - name: Ensure WebView2 Runtime for real CSS UI tests
+        shell: pwsh
+        run: ./scripts/Ensure-WebViewRuntime.ps1 -InstallForCI
       - name: Build, test, and package
         shell: pwsh
         env:
@@ -49,3 +52,6 @@ jobs:
             .qa/package-*/render/smoke.json
             .qa/msix-*/verification.json
             .qa/msix-*/unpack.log
+            .qa/web-package-*/web.*.log
+            .qa/web-package-*/render/*.png
+            .qa/web-package-*/render/web-smoke.json

@@ -6,7 +6,7 @@ Checkpoint ya tiene un proceso reproducible para generar MSIX. Todavía no está
 
 ## Qué está preparado
 
-- Manifiesto para Windows 11 y la app WPF, con español/inglés y `runFullTrust`.
+- Manifiesto para Windows 11 y la app con contenedor WPF e interfaz CSS en WebView2, con español/inglés y `runFullTrust`.
 - Iconos de tienda, menú Inicio y mosaico derivados del icono de Checkpoint. Se regeneran con `scripts/New-StoreAssets.ps1`.
 - Runtime de .NET, configuración pública de Steam/Supabase y licencias incluidos.
 - Validación de esquema/contenido con MakeAppx, SHA-256 y comprobación del paquete extraído: todos los archivos, dimensiones de iconos y arquitectura nativa.
@@ -52,7 +52,7 @@ La app utiliza `%LOCALAPPDATA%\Checkpoint` y un acceso directo opcional de Inici
 
 Antes de cambiar de portable/MSI a Store, exporta una copia `.checkpoint` y luego impórtala en la edición Store. Las sesiones y el consentimiento de compartición no se exportan: vuelve a iniciar sesión y elige los juegos compartidos. La migración, actualización y desinstalación deben probarse antes de prometer conservación de datos; desinstalar MSIX puede eliminar datos del paquete.
 
-`runFullTrust` permite ejecutar el widget WPF con SQLite, bandeja, atajos y copias elegidas por el usuario. Esta explicación debe incluirse para los revisores. No solicita permisos de administrador.
+`runFullTrust` permite ejecutar el widget con contenedor WPF e interfaz CSS en WebView2 con SQLite, bandeja, atajos y copias elegidas por el usuario. Esta explicación debe incluirse para los revisores. No solicita permisos de administrador.
 
 ## Requisitos externos pendientes
 

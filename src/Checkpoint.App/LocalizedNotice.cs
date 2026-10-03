@@ -26,6 +26,8 @@ internal static class LocalizedNotice
         close.Click += (_, _) => window.Close(); DockPanel.SetDock(close, Dock.Bottom); panel.Children.Add(close);
         panel.Children.Add(new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap } });
-        window.Content = panel; window.ShowDialog();
+        window.Content = panel;
+        if (App.UseCss) window.Loaded += (_, _) => WebSurface.AttachDialog(window);
+        window.ShowDialog();
     }
 }

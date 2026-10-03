@@ -1,8 +1,22 @@
 [English](en/SCREENSHOTS.md) · **Español**
 
-# Capturas de Checkpoint 0.6.0
+# Capturas de Checkpoint
 
-Estas imágenes proceden de los controles WPF reales mediante `RenderTargetBitmap`, durante la validación del ZIP de distribución. Utilizan una biblioteca aislada y respuestas HTTP simuladas. Los nombres y progresos de amigos son ficticios y la carátula privada de ejemplo es una imagen de color plano. No son una prueba de registro con cuentas reales.
+Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
+
+## 0.7.0 — interfaz CSS actual
+
+Capturas de HTML/CSS real en WebView2 mediante `CapturePreviewAsync`, con datos aislados. La carátula verde es una imagen local de prueba. Las imágenes WPF siguientes se conservan como archivo histórico.
+
+![Widget en español](screenshots/css-widget-es.png)
+
+| Editor | Miniatura |
+| --- | --- |
+| ![Editor](screenshots/css-editor-es.png) | ![Miniatura](screenshots/css-miniature-es.png) |
+
+Las capturas inglesas están en la [galería en inglés](en/SCREENSHOTS.md).
+
+## Interfaz WPF histórica (0.6.x)
 
 ## Biblioteca y carátulas
 

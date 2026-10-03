@@ -2,6 +2,14 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.0 — 2026-10-03
+
+- Visible interface migrated to local HTML/CSS/JavaScript in transparent WebView2: collection, Miniature, friends, forms and app notices.
+- Native C# retains SQLite, Steam, Supabase, tray, backups and existing form validation; data formats remain compatible.
+- Virtualized rows, keyboard menus/order, consistent Spanish/English, dark/light themes and local cover endpoint.
+- **New requirement: Microsoft Edge WebView2 Evergreen Runtime.** .NET remains bundled; WebView2 is shared and installed separately if missing.
+- Real WebView2 package tests, frontend model tests and updated current screenshots/documentation. Unsigned-download warning remains applicable.
+
 ## 0.6.16 — 2026-10-03
 
 - Friend codes display and copy the full `checkpoint-` name with their original 12 characters.

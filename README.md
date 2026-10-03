@@ -2,36 +2,40 @@
 
 **English** · [Español](README.es.md)
 
-One game at a time. A native, translucent Windows desktop widget for the games you want to finish, with cover art, goals and progress shared with Checkpoint friends.
+One game at a time. A translucent Windows desktop widget for the games you want to finish, with cover art, goals and progress shared with Checkpoint friends.
 
 > **IMPORTANT — SMARTSCREEN:** GitHub EXE/MSI downloads have no digital signature or publisher certificate. Their unsigned status and lack of reputation can trigger “Windows protected your PC”. **I have no certificate because it costs money; I will not buy one until Checkpoint income covers at least its cost. Until then, these downloads will remain without a certificate.** Signing does not guarantee that warnings immediately disappear. [Read the notice and requirements](docs/en/DOWNLOAD-NOTES.md).
 
-![Checkpoint cover grid](docs/screenshots/widget-grid-wide-dark-en.png)
+![Checkpoint CSS interface](docs/screenshots/css-widget-en.png)
 
 ## Screenshots
 
-Captures use real WPF controls rendered during native tests. Games, users and friend progress are examples; the private cover fixture is a solid-color image. See the [gallery](docs/en/SCREENSHOTS.md) for both languages.
+Current captures come from the actual local HTML/CSS interface in WebView2, using isolated test data. Game titles and progress are examples; the green cover is a local fixture. [Current gallery and archived screenshots](docs/en/SCREENSHOTS.md).
 
-| Account | Friends' progress |
+| Friends login | Miniature |
 | --- | --- |
-| ![Username and password](docs/screenshots/widget-friends-login-en.png) | ![Example friend progress](docs/screenshots/widget-friends-progress-en.png) |
+| ![Username and password](docs/screenshots/css-friends-login-en.png) | ![Names and states](docs/screenshots/css-miniature-en.png) |
 
 ## Download and run
 
-Current version: **0.6.16**. Build outputs in `dist`:
+Current version: **0.7.0**. Build outputs in `dist`:
 
-- `Checkpoint-0.6.16-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.6.16-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.7.0-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.7.0-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.6.16), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.0), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
 
 ## Requirements to use it
 
-Windows x64 (Windows 11 tested), a user-writable folder and disk space. **No .NET/development-tool installation, administrator privileges, account or Internet connection is needed for the manual library.** Steam, online covers and friends are optional. Minimum RAM/CPU on older hardware is not yet measured. [Requirements and resource usage](docs/en/DOWNLOAD-NOTES.md).
+Windows x64 (Windows 11 tested), **Microsoft Edge WebView2 Evergreen Runtime**, a user-writable folder and disk space. WebView2 is shared with other applications and included in Windows 11; if missing, [install it from Microsoft](https://developer.microsoft.com/microsoft-edge/webview2/). **No .NET/development-tool installation, administrator privileges, account or Internet connection is needed for the manual library.** Steam, online covers and friends are optional. Minimum RAM/CPU on older hardware is not yet measured. [Requirements and resource usage](docs/en/DOWNLOAD-NOTES.md).
+
+## Interface technology
+
+The visible collection, Miniature, friends, editors, settings and app notices use **local HTML, CSS and JavaScript in WebView2**. Style them in `src/Checkpoint.App/Web/app.css`. C#/.NET handles SQLite, Steam, Supabase, the tray and native window. WPF remains the window shell and existing form controllers; Windows file pickers and the missing-runtime notice remain native. No JavaScript framework or remote interface is required. [Architecture and development](docs/en/CSS-INTERFACE.md).
 
 ## Features
 
@@ -99,7 +103,7 @@ Keep the Steam API key in a server environment secret, never the app or GitHub. 
 
 ## Build and test
 
-Requirements: Windows, PowerShell 7, .NET SDK 10, Node.js 22+. Scripts use `.tools/dotnet` if available; that directory is not published. The icon is included (`scripts/New-Icon.ps1` regenerates it).
+Requirements: Windows, PowerShell 7, .NET SDK 10, Node.js 22+ and WebView2 Evergreen Runtime. Scripts use `.tools/dotnet` if available; that directory is not published. The icon is included (`scripts/New-Icon.ps1` regenerates it).
 
 ```powershell
 dotnet restore Checkpoint.slnx --configfile NuGet.config
@@ -116,19 +120,20 @@ dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGe
 ```powershell
 dotnet run --project tests/Checkpoint.Tests -c Release
 node --test server/test/service.test.mjs
+node --test tests/web/ui-model.test.mjs
 # Always use a new isolated data folder:
 dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PWD/.qa/example" --demo --diagnostics --smoke-test "$PWD/.qa/render"
 ```
 
-Native tests reject existing libraries/sessions/publications and exercise real controls with simulated Steam/social responses. Demo adds examples only to an empty library. Build extracts and tests its self-contained ZIP, including language switching and virtualized rendering of 1,003 games. Reports and captures: `.qa/package-…/render`.
+Native tests reject existing libraries/sessions/publications and exercise real controls with simulated Steam/social responses. Demo adds examples only to an empty library. Build extracts and tests its self-contained ZIP, including language switching and virtualized rendering of 1,003 games. The CSS suite separately launches the actual HTML interface with 1,004 games, forms, menus and language changes. Reports and captures: `.qa/package-…/render` and `.qa/web-package-…/render`.
 
-Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.6.16-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
+Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.7.0-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
 
 ## GitHub
 
 MIT license, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
-`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.6.16.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
+`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.7.0.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 
 See [roadmap](docs/en/ROADMAP.md) and [changelog](CHANGELOG.md). Notifications, monthly statistics and private-library cloud sync are future work.
 
@@ -136,4 +141,4 @@ Checkpoint is independent of Valve. Games, artwork and trademarks belong to thei
 
 Checkpoint notices, menus and windows follow the language selected in Settings. External technical errors appear as translated explanations. Game titles, notes, tasks and player names keep their original content. System dialogs, including file pickers and SmartScreen, follow the Windows language.
 
-Your complete friend code appears and copies from Friends → Account: `checkpoint-` followed by 12 characters. Use Checkpoint 0.6.16 or later to enter this format; codes copied from earlier versions still identify the same account.
+Your complete friend code appears and copies from Friends → Account: `checkpoint-` followed by 12 characters. Use Checkpoint 0.7.0 or later to enter this format; codes copied from earlier versions still identify the same account.
