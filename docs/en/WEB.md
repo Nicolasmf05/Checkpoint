@@ -8,6 +8,8 @@ Create and edit games, state and manual story progress, private notes, tasks, fa
 
 Link Steam in Settings using the official Steam login page. Library and achievements refresh on launch, reconnection and every 15/30/60/120 minutes while the tab is visible. Relevant Steam data must be public. Family games returned through licenses or recent activity are included; the entire family catalog is not guaranteed. Steam never completes the story or overwrites manual state and notes.
 
+Use **Sign in** at the top of the page with the same Checkpoint username and password as Windows. You may also create an account there. Once signed in, **My account** shows your friend code and **Sign out**.
+
 Friends uses your Checkpoint username/password account, full checkpoint-… codes, requests and progress published from Checkpoint. Tracked games are visible to accepted friends by default; private games and untracked imports are excluded. [Lists and privacy](LISTS.md). Title, platform, state and progress totals are published; notes, task titles and custom covers remain private. Signing out does not withdraw publications: use Stop sharing. Cross-device conflicts require review before publishing again.
 
 ## Data and backups

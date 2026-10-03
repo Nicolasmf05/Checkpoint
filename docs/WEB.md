@@ -8,6 +8,8 @@ La web permite crear y editar juegos, marcar estado e historia, notas privadas, 
 
 Steam se vincula en Ajustes y abre el acceso oficial de Steam. La biblioteca y los logros se consultan al abrir, al recuperar conexión y cada 15/30/60/120 minutos mientras la pestaña está visible. Steam exige que los datos pertinentes sean públicos. Los juegos familiares que Steam devuelve en sus licencias o actividad reciente se incorporan; no se garantiza encontrar todo el catálogo familiar. La historia, estado y notas no se completan ni sustituyen con Steam.
 
+Pulsa **Iniciar sesión** en la parte superior con el mismo usuario y contraseña de Checkpoint que utilizas en Windows. También puedes crear una cuenta desde ese formulario. Al entrar, **Mi cuenta** muestra el código de amigo y **Cerrar sesión**.
+
 Amigos utiliza tu cuenta de Checkpoint, con usuario y contraseña, código completo checkpoint-…, solicitudes y progreso publicado desde Checkpoint. Los juegos de Mi lista se comparten por defecto con amigos aceptados; los privados y las importaciones no añadidas a Mi lista quedan excluidos. [Listas y privacidad](LISTS.md). Se publican título, plataforma, estado y cifras de progreso; las notas, títulos de tareas y carátulas propias quedan privadas. Cerrar sesión no retira publicaciones: usa Dejar de compartir. Los conflictos entre dispositivos necesitan revisión antes de volver a publicar.
 
 ## Datos y copias

@@ -140,3 +140,5 @@ Se comprobaron 152 casos de biblioteca, 18 del servicio Node, 21 de Steam en Sup
 ## 0.7.6: listas y privacidad
 
 Pasan 162 comprobaciones de núcleo, 177 WPF y 68 CSS reales, además de 18 pruebas del servicio Node, 21 Steam de Supabase y 6 de interfaz JavaScript. Otras 8 pruebas de modelo web y 38 comprobaciones de navegador aislado cubren pertenencias múltiples, renombrar/quitar listas, privacidad antes de guardar, valor inicial privado, migración de retiradas anteriores, publicación automática y retirada en el servidor. Las pruebas nativas comprueban que una operación pública pendiente no se envía tras marcar el juego privado. No se crearon cuentas ni mensajes reales. Quedan pendientes pruebas con dos cuentas reales e interrupciones de red.
+
+Actualización del acceso web: 40 comprobaciones de navegador verifican el botón Iniciar sesión, acceso a Mi cuenta y cierre de sesión, con servicios simulados.

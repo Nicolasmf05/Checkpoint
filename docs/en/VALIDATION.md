@@ -134,3 +134,5 @@ Validated 152 core cases, 18 Node service tests, 21 Supabase Steam tests, 175 WP
 ## 0.7.6: lists and privacy
 
 162 core checks, 177 WPF checks and 68 actual CSS checks pass, alongside 18 Node service, 21 Supabase Steam and 6 JavaScript UI checks. Another 8 web model tests and 38 isolated browser checks cover multiple memberships, list rename/removal, private-first-save, default-private settings, legacy withdrawal migration, automatic publication and server withdrawal. Native tests verify that a queued public operation is not sent after the game becomes private. No real user accounts or messages were created. Real two-account and network interruption testing remain pending.
+
+Web sign-in update: 40 browser checks verify the visible Sign in entry, My account and sign-out, using simulated services.
