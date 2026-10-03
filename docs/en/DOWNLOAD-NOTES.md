@@ -28,7 +28,7 @@ Choose Full window, Small window or Miniature in the header or Settings → Wind
 
 Choose **Settings → Collection view → Miniature**, or cycle with F6. Shows only **game name and state** for My list, without covers, row buttons or progress bars. Header, navigation, filters and footer are hidden. The window can shrink to 240 × 90 Windows logical units. Drag the top edge and resize from the bottom-right corner. **F6 or right-click → Exit miniature view** returns to the normal view. Both sizes are saved independently; progress/files are unchanged. No covers are loaded while active.
 
-In Miniature, **right-click a game** to select pending, playing, paused, story finished or abandoned. The menu checks the current state and also offers Exit miniature view and Settings. Changes persist and follow the normal progress/sharing rules: changing a state does not share a new game. The list still shows only name and state.
+In Miniature, **right-click a game** to select pending, playing, paused, story finished or abandoned. The menu checks the current state and also offers Exit miniature view and Settings. Changes persist and follow the normal progress/sharing rules: tracked games are visible to friends unless marked private. The list still shows only name and state.
 
 Miniature also supports keyboard controls: **Up/Down** select games, **Home/End** jump to the first/last and **Enter/Space** open the active game menu. A focus outline marks the active row. Closing the menu or changing state returns focus to that game. Other views retain their existing shortcuts.
 

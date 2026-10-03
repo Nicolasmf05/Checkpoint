@@ -13,7 +13,7 @@ using Microsoft.Win32;
 
 namespace Checkpoint.App;
 
-internal static class Dialogs
+internal static partial class Dialogs
 {
     private static Window Modal(MainWindow owner, string title, double width = 540, double height = 710)
     {
@@ -64,7 +64,7 @@ internal static class Dialogs
     internal static void Edit(MainWindow owner, Game? original)
     {
         bool creating = original is null;
-        var game = original is null ? new Game { SortOrder = owner.Games.Count } : JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(original, DataJson.Options), DataJson.Options)!;
+        var game = original is null ? new Game { SortOrder = owner.Games.Count, FriendsPrivate=owner.Preferences.NewGamesPrivate||owner.Preferences.ActiveList=="private", Lists=owner.Preferences.ActiveList.StartsWith("custom:")?[owner.Preferences.ActiveList[7..]]:[] } : JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(original, DataJson.Options), DataJson.Options)!;
         var window = Modal(owner, creating ? I18n.T("Añadir juego · Checkpoint") : game.Title + " · Checkpoint");
         var body = Panel(); Layout(window, body, out var footer);
         Heading(body, creating ? I18n.T("Una nueva aventura") : game.Title, I18n.T("La historia y los logros se guardan como objetivos independientes."));
@@ -77,6 +77,11 @@ internal static class Dialogs
         var storyPercent = Input(body, I18n.T("Historia completada (0–100 %, opcional y manual)"), game.StoryPercent?.ToString() ?? "");
         storyPercent.MaxLength = 3;
         var tracked = Check(body, I18n.T("Mostrar en Mi lista"), game.Tracked);
+        var friendsPrivate=Check(body,I18n.T("Privado para mis amigos"),game.FriendsPrivate==true);
+        body.Children.Add(new TextBlock{Text=I18n.T("Los juegos de tus listas son visibles para tus amigos salvo que los marques privados. Notas y nombres de tareas siguen siendo privados."),TextWrapping=TextWrapping.Wrap});
+        body.Children.Add(new TextBlock{Text=I18n.T("Sin conexión, los cambios de visibilidad se aplican a tus amigos cuando vuelva la conexión."),TextWrapping=TextWrapping.Wrap});
+        var listChecks=new Dictionary<string,CheckBox>();
+        foreach(var name in owner.Preferences.GameLists)listChecks[name]=Check(body,I18n.T("Lista: ")+name,game.Lists.Contains(name,StringComparer.OrdinalIgnoreCase));
         var favorite = Check(body, I18n.T("Destacar como favorito"), game.Favorite);
         var priority = Input(body, I18n.T("Orden en la lista (los números menores aparecen antes)"), game.SortOrder.ToString());
         var notes = Input(body, I18n.T("Notas · dónde lo dejaste"), game.Notes, true); notes.MaxLength = 20000;
@@ -142,6 +147,7 @@ internal static class Dialogs
                 else throw new ArgumentException(I18n.T("El ID de Steam debe ser un número positivo."));
                 if (owner.Games.Any(g => g.Id != game.Id && g.SteamAppId is not null && g.SteamAppId == game.SteamAppId)) throw new ArgumentException(I18n.T("Ese juego de Steam ya está en la biblioteca."));
                 if (!int.TryParse(priority.Text, out int order)) throw new ArgumentException(I18n.T("El orden debe ser un número entero."));
+                game.FriendsPrivate=friendsPrivate.IsChecked==true; game.Lists=listChecks.Where(p=>p.Value.IsChecked==true).Select(p=>p.Key).ToList();
                 game.SortOrder = order; game.Goal = (GameGoal)goal.SelectedIndex; game.Tracked = tracked.IsChecked == true; game.Favorite = favorite.IsChecked == true;
                 GameRules.SetStatus(game, (GameStatus)state.SelectedIndex); GameRules.Validate(game);
                 if (original?.SteamAppId != game.SteamAppId) { game.Achievements = null; game.SyncedAt = null; }
@@ -286,6 +292,7 @@ internal static class Dialogs
         Label(body, I18n.T("Juegos eliminados")); body.Children.Add(new TextBlock { Text = I18n.T("Los últimos 20 pueden recuperarse con sus datos completos. Los juegos existentes en tu biblioteca se conservan."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         body.Children.Add(Button(I18n.T("Ver juegos eliminados"), (_, _) => DeletedGames(owner)));
         Label(body, "Checkpoint " + typeof(MainWindow).Assembly.GetName().Version?.ToString(3)); body.Children.Add(new TextBlock { Text = I18n.T("Los datos se guardan en tu PC. Sin publicidad ni telemetría. Aplicación independiente, sin afiliación con Valve."), TextWrapping = TextWrapping.Wrap, FontSize = 11 });
+        body.Children.Add(Button(I18n.T("Gestionar listas"),(_,_)=>ManageLists(owner,window)));
         body.Children.Add(Button(I18n.T("Configurar atajos"), (_, _) => ShortcutSettings(owner,window)));
         bool saved = false;
         footer.Children.Add(Button(I18n.T("Cancelar"), (_, _) => window.Close()));

@@ -136,3 +136,7 @@ La validación 0.5.0 comprueba el cambio de idioma desde Ajustes, persistencia, 
 ## 0.7.5: atajos y navegador
 
 Se comprobaron 152 casos de biblioteca, 18 del servicio Node, 21 de Steam en Supabase, 175 de WPF, 62 de la interfaz CSS real y 6 del modelo/atajos JavaScript. La nueva configuración captura combinaciones, guarda en SQLite, actualiza ayuda y ejecuta el atajo personalizado. Además, 7 pruebas del modelo web y 28 comprobaciones de navegador verifican copias, idiomas, temas, atajos persistentes, duplicados, Steam, amigos, publicación sin notas privadas, pantallas estrechas y apertura sin conexión. Los servicios sociales/Steam de esas pruebas son simulados. El CORS desplegado se verificó con 204 para Pages, 401 sin sesión y 403 para un origen ajeno. Los ensayos con cuentas reales, lectores de pantalla y teclado físico siguen pendientes.
+
+## 0.7.6: listas y privacidad
+
+Pasan 162 comprobaciones de núcleo, 177 WPF y 68 CSS reales, además de 18 pruebas del servicio Node, 21 Steam de Supabase y 6 de interfaz JavaScript. Otras 8 pruebas de modelo web y 38 comprobaciones de navegador aislado cubren pertenencias múltiples, renombrar/quitar listas, privacidad antes de guardar, valor inicial privado, migración de retiradas anteriores, publicación automática y retirada en el servidor. Las pruebas nativas comprueban que una operación pública pendiente no se envía tras marcar el juego privado. No se crearon cuentas ni mensajes reales. Quedan pendientes pruebas con dos cuentas reales e interrupciones de red.

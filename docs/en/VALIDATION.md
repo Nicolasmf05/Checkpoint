@@ -130,3 +130,7 @@ Transparency is alpha, without blur. SQLite 0.1/0.2 libraries migrate to schema 
 ## 0.7.5: shortcuts and browser
 
 Validated 152 core cases, 18 Node service tests, 21 Supabase Steam tests, 175 WPF checks, 62 actual CSS checks and 6 JavaScript UI/shortcut tests. The new editor captures combinations, persists to SQLite, updates hints and executes a custom binding. Another 7 web model tests and 28 browser checks cover backups, language, themes, persistent shortcuts, duplicates, Steam, friends, publication without private notes, narrow screens and offline opening. Browser social/Steam services are simulated. Production CORS returned 204 for Pages, 401 without a session and 403 for an unrelated origin. Real accounts, screen readers and physical keyboard validation remain pending.
+
+## 0.7.6: lists and privacy
+
+162 core checks, 177 WPF checks and 68 actual CSS checks pass, alongside 18 Node service, 21 Supabase Steam and 6 JavaScript UI checks. Another 8 web model tests and 38 isolated browser checks cover multiple memberships, list rename/removal, private-first-save, default-private settings, legacy withdrawal migration, automatic publication and server withdrawal. Native tests verify that a queued public operation is not sent after the game becomes private. No real user accounts or messages were created. Real two-account and network interruption testing remain pending.

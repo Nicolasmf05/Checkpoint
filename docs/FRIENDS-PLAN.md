@@ -15,9 +15,9 @@ La versión 0.4.0 incluye cuentas, solicitudes, amistades, publicación selectiv
 1. Crear una cuenta de Checkpoint y configurar alias y avatar.
 2. Añadir a un amigo por un identificador único o una invitación.
 3. Aceptar, rechazar o cancelar solicitudes. La amistad solo existe tras la aceptación.
-4. Elegir qué juegos y datos compartir con los amigos aceptados.
+4. Los juegos de Mi lista son visibles por defecto; marcar como privados los que no quieras compartir.
 5. Abrir Amigos para ver sus perfiles, juegos compartidos y progreso.
-6. Los cambios del propietario se publican automáticamente una vez activada la compartición.
+6. Los cambios del propietario se publican automáticamente salvo en juegos privados.
 7. Eliminar la amistad, bloquear a alguien o dejar de compartir retira el acceso en el servidor y la caché de la app cuando esta vuelve a contactar con el servicio.
 
 La app local sigue siendo usable sin cuenta y sin conexión. El propietario edita su colección; sus amigos consultan la parte compartida. Todos deben usar el mismo servicio de Checkpoint para encontrarse; la federación entre servidores queda fuera del alcance inicial.

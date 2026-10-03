@@ -22,7 +22,7 @@ public partial class MainWindow
     {
         CaptureBounds();
         var game = Store.RestoreDeletedGame(recoveryId, Games, Preferences);
-        Games.Add(game); DeletedGames = Store.LoadDeletedGames(); Refresh();
+        Games.Add(game);SchedulePublications(); DeletedGames = Store.LoadDeletedGames(); Refresh();
         Notice((I18n.IsEnglish ? $"«{game.Title}» restored with its notes and tasks." : $"«{game.Title}» recuperado con sus notas y tareas.")); return game;
     }
     private void UndoClick(object sender, System.Windows.RoutedEventArgs e) => UndoLastDeletion();
@@ -35,10 +35,10 @@ public partial class MainWindow
     internal void ExportBackup(string path)
     {
         if (string.Equals(Path.GetExtension(path), ".json", StringComparison.OrdinalIgnoreCase))
-        { Store.Export(path, Games); Notice(I18n.T("Copia JSON exportada. Este formato no incluye imágenes.")); }
+        { BackupFiles.WriteJson(path, Games,Preferences.GameLists); Notice(I18n.T("Copia JSON exportada. Este formato no incluye imágenes.")); }
         else
         {
-            int covers = BackupFiles.WriteComplete(path, Games, Covers.DirectoryPath);
+            int covers = BackupFiles.WriteComplete(path, Games, Covers.DirectoryPath,Preferences.GameLists);
             Notice((I18n.IsEnglish ? $"Complete backup exported: {Games.Count} games and {covers} custom covers." : $"Copia completa exportada: {Games.Count} juegos y {covers} carátulas personalizadas."));
         }
     }
@@ -63,7 +63,9 @@ public partial class MainWindow
                 if (!created.TryGetValue(bytes, out var name)) { name = Covers.SavePrepared(prepared[bytes]); created.Add(bytes, name); }
                 game.CustomCover = name;
             }
-            if (added.Count > 0) { CaptureBounds(); Store.Save(Games.Concat(added), Preferences); Games.AddRange(added); }
+            var previousLists=Preferences.GameLists;
+            Preferences.GameLists=GameLists.Normalize(previousLists.Concat(backup.GameLists??[]).Concat(added.SelectMany(g=>g.Lists)));
+            try{CaptureBounds();Store.Save(Games.Concat(added),Preferences);Games.AddRange(added);}catch{Preferences.GameLists=previousLists;throw;}
         }
         catch
         {
@@ -71,7 +73,7 @@ public partial class MainWindow
                 try { Covers.RemoveCreated(name); } catch (IOException) { /* An unused cache image does not alter the saved collection. */ }
             throw;
         }
-        Refresh(); Notice((I18n.IsEnglish ? $"{added.Count} games imported · {skipped} already in the library." : $"{added.Count} juegos importados · {skipped} ya estaban en la biblioteca."));
+        SchedulePublications();Refresh(); Notice((I18n.IsEnglish ? $"{added.Count} games imported · {skipped} already in the library." : $"{added.Count} juegos importados · {skipped} ya estaban en la biblioteca."));
         return (added.Count, skipped);
     }
 }

@@ -20,13 +20,13 @@ Current captures come from the actual local HTML/CSS interface in WebView2, usin
 
 ## Download and run
 
-Current version: **0.7.5**. Build outputs in `dist`:
+Current version: **0.7.6**. Build outputs in `dist`:
 
-- `Checkpoint-0.7.5-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.7.5-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.7.6-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.7.6-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.5), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.6), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
@@ -74,19 +74,25 @@ Use the header selector or Settings → Window mode: **Full window**, **Small wi
 - Tray, optional Windows startup and keyboard shortcuts.
 - SQLite library, complete backups with covers, non-destructive imports and legacy JSON support.
 - Restore the last 20 deleted games with their data/covers after restarting.
-- Checkpoint accounts, requests, accepted friendships, blocks and explicitly selected publications through Supabase.
+- Checkpoint accounts, requests, accepted friendships, blocks and default-visible games and per-game privacy through Supabase.
 
 **Story completion and all achievements are independent.** Sync never decides you finished a story and preserves previous progress if Steam fails.
 
 Miniature retains selection/focus during updates; changing view or showing the widget keeps it within the current screen work area.
 
+## Lists and privacy
+
+**My list is visible to accepted Checkpoint friends by default when signed in.** Imported Steam games remain in Library until tracked. In the game editor, enable **Private to my friends** before the first save, or right-click a saved game to make it private later. Private games appear in the separate **Private games** view and stay out of the normal/custom lists.
+
+Use the list selector and **Manage lists** to create, rename or remove up to 30 custom lists. Select memberships in the game editor: a game can belong to several lists without duplicate records. Removing a list preserves its games. Enable **Create new games as private** to change the default for future additions. Previous explicit withdrawals are preserved as private. List names and membership remain local; friends see visible game progress, without your grouping. [Guide](docs/en/LISTS.md).
+
 ## Friends
 
 Open Friends and create an account: username of 3–24 ASCII letters, digits or underscores, password of at least eight characters. Usernames are case-insensitive. No real email or confirmation is requested. Keep your password safe: recovery is unavailable.
 
-Copy your code from Account. Another user sends a request with that code. After acceptance, each can view games the other selects in Sharing: title, platform, cover, state, goal and counters. Notes, task names and individual achievement details stay private.
+Copy your code from Account. Another user sends a request with that code. After acceptance, each can view the other’s tracked games unless marked private: title, platform, cover, state, goal and counters. Notes, task names and individual achievement details stay private.
 
-Consent and pending changes persist per account. Offline changes retry when connected; a withdrawal takes effect after server acknowledgment, so the old publication can remain visible until then. Signing out does not withdraw games. Cross-device conflicts require an explicit choice to publish your local version. Friends refresh every 60 seconds while the tab is open. The private library stays local; full cloud restore is unavailable.
+Pending changes persist per account; per-game privacy persists in the library. Offline changes retry when connected; a withdrawal takes effect after server acknowledgment, so the old publication can remain visible until then. Signing out does not withdraw games. Cross-device conflicts require an explicit choice to publish your local version. Friends refresh every 60 seconds while the tab is open. The private library stays local; full cloud restore is unavailable.
 
 Public Supabase configuration is included. Friends use Checkpoint accounts independently of Steam. See [setup](docs/en/SUPABASE.md), [friends scope](docs/en/FRIENDS-PLAN.md) and [privacy](docs/en/PRIVACY.md).
 
@@ -106,7 +112,7 @@ Settings → Backups → Export creates a `.checkpoint` archive of the current c
 
 Limits: 10,000 games, 8 MB/image, 25 MB collection data, 200 MB extracted. PNG headers are validated before decoding (4,096 pixels/side, 12 million pixels). References are never extraction paths. Failures preserve existing data.
 
-The ↶ button and Settings → View deleted games restore the last 20 deletions with notes, tasks, progress, favorites, order and covers. Existing library data wins on conflicts. Backups exclude deletion history, sessions and sharing consent.
+The ↶ button and Settings → View deleted games restore the last 20 deletions with notes, tasks, progress, favorites, order and covers. Existing library data wins on conflicts. Backups include game privacy, memberships and empty list names; they exclude deletion history, sessions and the account publication queue.
 
 Version 0.3 introduced SQLite schema 2. Version 0.5 opens older libraries; use 0.3+ after migration. Legacy JSON remains compatible; complete backups require 0.3+.
 

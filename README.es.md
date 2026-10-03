@@ -20,12 +20,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.7.5**. En la carpeta `dist` se generan:
+La versión actual es **0.7.6**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.5), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.6), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.7.5-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.7.5-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.7.6-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.7.6-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -98,11 +98,17 @@ Los datos viven en `%LOCALAPPDATA%\Checkpoint`. La desinstalación conserva esa 
 
 Miniatura conserva la selección y el foco durante las actualizaciones; cambiar de vista o mostrar el widget lo mantiene dentro del área de trabajo de la pantalla actual.
 
+## Listas y privacidad
+
+**Mi lista es visible por defecto para los amigos aceptados de Checkpoint cuando has iniciado sesión.** Los juegos importados de Steam siguen en Biblioteca hasta añadirlos a tu lista. Marca **Privado para mis amigos** antes del primer guardado, o usa el menú de un juego guardado para hacerlo privado después. Se muestra en **Privados**, separado de las listas normales y personalizadas.
+
+El selector y **Gestionar listas** permiten crear, renombrar o quitar hasta 30 listas. En el editor seleccionas sus pertenencias: un juego puede estar en varias listas sin duplicarse. Quitar una lista conserva sus juegos. **Crear juegos nuevos como privados** cambia el valor inicial de las siguientes incorporaciones. Se conservan como privados los juegos que antes dejaste de compartir. Los nombres de listas y sus pertenencias son locales; los amigos ven el progreso visible sin tu agrupación. [Guía](docs/LISTS.md).
+
 ## Amigos de Checkpoint
 
 En **Amigos**, crea una cuenta con usuario de 3 a 24 caracteres (letras sin tildes, números o `_`) y contraseña de al menos 8 caracteres. No se pide correo ni confirmación. Guarda la contraseña: esta versión no ofrece recuperación de cuenta.
 
-En **Cuenta**, copia tu código de amigo. La otra persona lo busca y envía una solicitud; al aceptarla, ambos pueden ver los juegos que cada uno seleccione en **Compartir**. Las notas, nombres de tareas y detalles individuales de logros siguen siendo privados. Se comparte el estado, objetivo y contadores de progreso, incluyendo el porcentaje manual de historia.
+En **Cuenta**, copia tu código de amigo. La otra persona lo busca y envía una solicitud; al aceptarla, ambos pueden ver los juegos de sus listas salvo los marcados como privados. Las notas, nombres de tareas y detalles individuales de logros siguen siendo privados. Se comparte el estado, objetivo y contadores de progreso, incluyendo el porcentaje manual de historia.
 
 Las publicaciones pendientes se guardan por cuenta y se reintentan con conexión. Una retirada sin conexión se hará efectiva en el servidor al sincronizar; hasta entonces permanece la última publicación. Cerrar sesión no retira publicaciones. Los conflictos entre equipos requieren escoger explícitamente si publicar la versión local. El progreso de amigos se consulta cada 60 segundos mientras la pestaña está abierta. La biblioteca privada permanece local: no hay restauración completa desde la nube.
 

@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace Checkpoint.Core;
 
-public sealed record BackupContents(List<Game> Games, IReadOnlyDictionary<Guid, byte[]> CustomCovers);
+public sealed record BackupContents(List<Game> Games, IReadOnlyDictionary<Guid, byte[]> CustomCovers, IReadOnlyList<string>? GameLists = null);
 
 public static class BackupFiles
 {
@@ -47,30 +47,32 @@ public static class BackupFiles
         }
     }
 
-    public static List<Game> ReadJson(string path)
+    public static List<Game> ReadJson(string path)=>ReadJson(path,out _);
+    private static List<Game> ReadJson(string path,out List<string> lists)
     {
         using var file = File.OpenRead(path);
         var backup = JsonSerializer.Deserialize<Backup>(ReadLimited(file, MaxJsonBytes), DataJson.Options)
             ?? throw new InvalidDataException(I18n.T("Copia no válida."));
         if (backup.Version != 1) throw new InvalidDataException(I18n.T("Versión de copia JSON no compatible."));
         ValidateGames(backup.Games);
+        lists=GameLists.Normalize((backup.GameLists??[]).Concat(backup.Games.SelectMany(g=>g.Lists)));
         foreach (var game in backup.Games) game.CustomCover = null;
         return backup.Games;
     }
 
-    public static void WriteJson(string path, IEnumerable<Game> games)
+    public static void WriteJson(string path, IEnumerable<Game> games,IEnumerable<string>? lists=null)
     {
         var snapshot = Snapshot(games);
         foreach (var game in snapshot) game.CustomCover = null;
-        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(new Backup { Games = snapshot }, DataJson.Options);
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(new Backup { Games = snapshot, GameLists=GameLists.Normalize((lists??[]).Concat(snapshot.SelectMany(g=>g.Lists))) }, DataJson.Options);
         if (bytes.Length > MaxJsonBytes) throw new InvalidDataException(I18n.T("La copia JSON supera los 25 MB."));
         WriteAtomic(path, stream => stream.Write(bytes));
     }
 
-    public static int WriteComplete(string path, IEnumerable<Game> games, string coversDirectory)
+    public static int WriteComplete(string path, IEnumerable<Game> games, string coversDirectory,IEnumerable<string>? lists=null)
     {
         var snapshot = Snapshot(games);
-        var manifest = new Backup { Version = 2, Games = snapshot };
+        var manifest = new Backup { Version = 2, Games = snapshot, GameLists=GameLists.Normalize((lists??[]).Concat(snapshot.SelectMany(g=>g.Lists))) };
         var files = new Dictionary<string, string>(StringComparer.Ordinal);
         long total = 0;
         foreach (var game in snapshot)
@@ -116,7 +118,7 @@ public static class BackupFiles
         Span<byte> signature = stackalloc byte[4];
         int read = file.Read(signature); file.Position = 0;
         if (read < 4 || signature[0] != 'P' || signature[1] != 'K')
-            return new(ReadJson(path), new Dictionary<Guid, byte[]>());
+            {var games=ReadJson(path,out var lists);return new(games,new Dictionary<Guid,byte[]>(),lists);}
         if (file.Length > MaxArchiveBytes) throw new InvalidDataException(I18n.T("La copia comprimida supera los 250 MB."));
         using var archive = new ZipArchive(file, ZipArchiveMode.Read);
         if (archive.Entries.Count > MaxGames + 2) throw new InvalidDataException(I18n.T("La copia tiene demasiados archivos."));
@@ -157,7 +159,7 @@ public static class BackupFiles
             images.Add(name, bytes);
         }
         foreach (var game in manifest.Games) game.CustomCover = null;
-        return new(manifest.Games, manifest.Covers.ToDictionary(pair => pair.Key, pair => images[pair.Value]));
+        return new(manifest.Games, manifest.Covers.ToDictionary(pair => pair.Key, pair => images[pair.Value]),GameLists.Normalize((manifest.GameLists??[]).Concat(manifest.Games.SelectMany(g=>g.Lists))));
     }
 
     private static List<Game> Snapshot(IEnumerable<Game> games)

@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.6 — 2026-10-03
+
+- Tracked games visible to accepted friends by default, with private-from-first-save, later withdrawal and a separate Private games view.
+- Multiple local lists with non-duplicating memberships, creation, rename, removal and default-private additions.
+- Preserve prior explicit privacy decisions and privacy/list data in backups; pending public operations are reconciled before private withdrawals.
+- Available in Windows and the browser, fully localized in English and Spanish.
+
 ## 0.7.5 — 2026-10-03
 
 - Configurable local, Miniature, ordering and global Windows shortcuts, with conflict validation, persistence, default reset and updated hints.

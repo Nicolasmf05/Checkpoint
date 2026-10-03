@@ -75,6 +75,7 @@ public partial class MainWindow
             }
             throw new InvalidOperationException("Unexpected native social route: " + path);
         });
+        var excluded=Games.Last();var previousPrivacy=excluded.FriendsPrivate;excluded.FriendsPrivate=true;
         AttachSocial(new(project,handler));
         friendsVisible = true; Width = 375; Height = 740; Refresh(); await FriendsView.Reload();
         await Dispatcher.InvokeAsync(UpdateLayout,DispatcherPriority.ContextIdle);
@@ -87,6 +88,12 @@ public partial class MainWindow
         Preferences.Language = "es"; ApplyLanguage();
         check(FriendsButton.TranslatePoint(new Point(FriendsButton.ActualWidth,0),this).X < Width - 22,"friends navigation fits the narrow widget");
         await Social!.Login("native_user","PASSWORD-FIXTURE"); await FriendsView.Reload();
+        SchedulePublications();publicationTimer.Stop();await PublishSocial();
+        check(Games.Where(GameLists.ShouldShare).All(g=>shared.TryGetValue(g.Id,out var p)&&p.IsShared) && !shared.ContainsKey(excluded.Id),"native default sharing publishes tracked games and excludes an initially private game");
+        var queued=new Game{Title="Queued private fixture"};Games.Add(queued);SchedulePublications();publicationTimer.Stop();
+        Outbox!.Prepare(queued.Id);SetShared(queued,false);publicationTimer.Stop();await PublishSocial();
+        check(!shared.ContainsKey(queued.Id) && !Outbox.Entry(queued.Id).HasWork,"making a queued native publication private does not send its public payload");
+        Games.Remove(queued);excluded.FriendsPrivate=previousPrivacy;
         var encrypted = Encoding.UTF8.GetString(File.ReadAllBytes(SocialSessionPath));
         check(!encrypted.Contains("NATIVE-ACCESS-FIXTURE") && !encrypted.Contains("NATIVE-REFRESH-FIXTURE"),"Checkpoint tokens are saved encrypted with DPAPI");
         async Task ClickSocial(string content)
@@ -146,7 +153,7 @@ public partial class MainWindow
         check(Outbox!.UserId == loginUser && Outbox.Games.Count == 0,"switching accounts never inherits publication consent");
         await Social.Logout(); await FriendsView.Reload();
         check(!File.Exists(SocialSessionPath) && Texts(this).Contains("Una cuenta de Checkpoint"),"logout clears the saved Checkpoint session and remote view");
-        game.Notes = oldNotes; game.StoryPercent = oldStory; friendsVisible = false; Persist(); Refresh();
+        game.FriendsPrivate=false;game.Notes = oldNotes; game.StoryPercent = oldStory; friendsVisible = false; Persist(); Refresh();
     }
     private sealed class NativeSocialHandler(Func<HttpRequestMessage,Task<HttpResponseMessage>> respond) : HttpMessageHandler
     {

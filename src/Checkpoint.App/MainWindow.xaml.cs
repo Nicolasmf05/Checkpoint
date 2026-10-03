@@ -245,6 +245,11 @@ public partial class MainWindow : Window
     }
     internal static SolidColorBrush Brush(string color) => (SolidColorBrush)new BrushConverter().ConvertFromString(color)!;
     internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); }
+    internal void PersistListChange(string previous,string? next)
+    {
+        CaptureBounds();Store.SaveListChange(Games,Preferences,previous,next);
+        DeletedGames=Store.LoadDeletedGames();SchedulePublications();
+    }
     private void CaptureBounds()
     {
         if (fullWindowApplied) return;
@@ -255,11 +260,13 @@ public partial class MainWindow : Window
     internal void Refresh()
     {
         if (!ready) return;
+        Preferences.GameLists=GameLists.Normalize((Preferences.GameLists??[]).Concat(Games.SelectMany(g=>g.Lists)));
+        if(Preferences.ActiveList!="all"&&Preferences.ActiveList!="private"&&!Preferences.GameLists.Any(n=>"custom:"+n==Preferences.ActiveList))Preferences.ActiveList="all";
         var selectedId = Preferences.MiniatureView ? (GameList.SelectedItem as CardView)?.Model.Id : null;
         bool restoreFocus = Preferences.MiniatureView && GameList.IsKeyboardFocusWithin;
         int finished = Games.Count(g => g.Status == GameStatus.Finished);
         Summary.Text = I18n.IsEnglish ? $"{Games.Count(g => g.Tracked)} in your list  ·  {finished} stories finished" : $"{Games.Count(g => g.Tracked)} en tu lista  ·  {finished} historias terminadas";
-        var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || g.Tracked)
+        var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || GameLists.Visible(g,Preferences.ActiveList))
             .Where(g => g.Title.Contains(Search.Text, StringComparison.CurrentCultureIgnoreCase))
             .Where(g => StatusFilter.SelectedIndex <= 0 || (int)g.Status == StatusFilter.SelectedIndex - 1)).ToList();
         visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Themes.IsLight(Preferences), Preferences.LightweightMode || Preferences.MiniatureView)).ToList();

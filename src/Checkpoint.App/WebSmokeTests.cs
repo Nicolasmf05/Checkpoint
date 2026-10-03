@@ -129,7 +129,7 @@ public partial class MainWindow
             Check(await Script(web,"document.activeElement.matches('.minirow')"),"CSS Miniature keyboard navigation focuses an HTML game row");
             var activeGameId=Guid.Parse(JsonSerializer.Deserialize<string>(await web.Browser.CoreWebView2.ExecuteScriptAsync("document.activeElement.dataset.game"))!);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
-            Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===10"),"Miniature state and window actions render in an HTML context menu");
+            Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===10+window.checkpointState.collections.length"),"Miniature state and window actions render in an HTML context menu");
             await Run("[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Playing')).click();");
             Check(Store.LoadGames().Single(g=>g.Id==activeGameId).Status==GameStatus.Playing,"HTML state actions persist through the native controller");
             await Capture(web,"css-miniature-en.png");
@@ -217,6 +217,23 @@ public partial class MainWindow
             var shortcutEditor=await Dialog();
             Check(await Script(shortcutEditor,"!!document.querySelector('input[aria-label=\"Game title\"]')"),"custom desktop shortcut opens the game editor");
             await shortcutEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);
+            await Run("document.querySelector('.manage-lists').click();");
+            var listsDialog=await Dialog();
+            Check(await Script(listsDialog,"!!document.querySelector('input[aria-label=\"List name\"]') && document.body.innerText.includes('without duplication')"),"CSS list manager explains membership and renders localized controls");
+            await listsDialog.Browser.CoreWebView2.ExecuteScriptAsync("const n=document.querySelector('input[aria-label=\"List name\"]');n.value='Weekend';n.dispatchEvent(new Event('input',{bubbles:true}));[...document.querySelectorAll('button')].find(b=>b.textContent==='Create list').click();");await Task.Delay(350);
+            Check(Store.LoadSettings().GameLists.Contains("Weekend") && Preferences.ActiveList=="custom:Weekend","CSS list creation persists the catalog and active selection");
+            await Capture(listsDialog,"css-lists-en.png");
+            await listsDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(250);
+            Check(await Script(web,"document.querySelector('.collection-selector').value==='custom:Weekend' && !window.checkpointState.games.length"),"an empty custom list is independently selectable");
+            await Run("document.querySelector('[data-label=add]').click();");
+            var privateEditor=await Dialog();
+            await privateEditor.Browser.CoreWebView2.ExecuteScriptAsync("const n=document.querySelector('input[aria-label=\"Game title\"]');n.value='Private list fixture';n.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('input[aria-label=\"Private to my friends\"]').click();[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(400);
+            var privateFixture=Games.Single(g=>g.Title=="Private list fixture");
+            Check(privateFixture.FriendsPrivate==true && privateFixture.Lists.Contains("Weekend") && Store.LoadGames().Single(g=>g.Id==privateFixture.Id).FriendsPrivate==true,"CSS initial save persists privacy and the active custom membership");
+            Check(await Script(web,"!window.checkpointState.games.some(g=>g.title==='Private list fixture')"),"private games are excluded from public custom lists");
+            await Run("const c=document.querySelector('.collection-selector');c.value='private';c.dispatchEvent(new Event('change',{bubbles:true}));");
+            Check(await Script(web,"window.checkpointState.games.some(g=>g.title==='Private list fixture') && document.querySelector('.collection-selector').value==='private'"),"the separate private view shows games hidden from friends");
+            await Capture(web,"css-private-games-en.png");
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

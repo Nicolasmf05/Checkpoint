@@ -207,7 +207,8 @@ internal sealed class FriendsPanel : ScrollViewer
     }
     private void RenderSharing()
     {
-        body.Children.Add(Text(I18n.T("Elige qué compartir"),18));
+        body.Children.Add(Text(I18n.T("Visibilidad para amigos"),18));
+        body.Children.Add(Text(I18n.T("Los juegos de tus listas son visibles para tus amigos salvo que los marques privados. Notas y nombres de tareas siguen siendo privados."),11,true));
         body.Children.Add(Text(I18n.T("Tus amigos verán título, carátula, estado, objetivo y contadores de progreso. Las notas y los nombres de las tareas son privados."),11,true));
         var pending = owner.Outbox?.Games.Values.Count(e => e.HasWork) ?? 0;
         body.Children.Add(Text(pending > 0 ? (I18n.IsEnglish ? $"{pending} pending publications. They retry when connected." : $"{pending} publicaciones pendientes. Se reintentan con conexión.") : I18n.T("No hay publicaciones pendientes."),11,true));

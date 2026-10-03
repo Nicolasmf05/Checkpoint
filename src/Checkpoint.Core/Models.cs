@@ -36,6 +36,8 @@ public sealed class Game
     public string Notes { get; set; } = "";
     public string? CustomCover { get; set; }
     public bool Tracked { get; set; } = true;
+    public bool? FriendsPrivate { get; set; }
+    public List<string> Lists { get; set; } = [];
     public bool Favorite { get; set; }
     public int SortOrder { get; set; }
     public int PlaytimeMinutes { get; set; }
@@ -98,6 +100,9 @@ public sealed class Settings
     public int SyncMinutes { get; set; } = 30;
     public string ServiceUrl { get; set; } = "";
     public Dictionary<string,string> Shortcuts { get; set; } = [];
+    public List<string> GameLists { get; set; } = [];
+    public string ActiveList { get; set; } = "all";
+    public bool NewGamesPrivate { get; set; }
     public string? SteamId { get; set; }
 }
 
@@ -106,6 +111,7 @@ public sealed class Backup
     public int Version { get; set; } = 1;
     public DateTimeOffset ExportedAt { get; set; } = DateTimeOffset.UtcNow;
     public List<Game> Games { get; set; } = [];
+    public List<string> GameLists { get; set; } = [];
     public Dictionary<Guid, string> Covers { get; set; } = [];
 }
 
@@ -158,6 +164,7 @@ public static class GameRules
         if (game.Tasks.Any(t => t is null || t.Title is null)) throw new ArgumentException(I18n.T("Una tarea no es válida."));
         if (game.Achievements?.Any(a => a is null || a.Id is null || a.Name is null || a.Description is null) == true)
             throw new ArgumentException(I18n.T("Los logros guardados no son válidos."));
+        game.Lists = GameLists.Normalize(game.Lists);
         game.Title = game.Title.Trim();
         if (game.Title.Length is < 1 or > 140) throw new ArgumentException(I18n.T("El nombre debe tener entre 1 y 140 caracteres."));
         if (game.SteamAppId is <= 0) throw new ArgumentException(I18n.T("El identificador de Steam debe ser un número positivo."));

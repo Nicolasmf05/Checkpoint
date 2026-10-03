@@ -7,12 +7,13 @@ const enumeration=(value,values)=>typeof value==='number'&&values[value]?value:M
 export const uuid=v=>typeof v==='string'&&/^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(v);
 export function normalize(raw) {
   if(!raw||typeof raw!=='object'||!text(raw.title,140).trim())throw new Error('invalid-game');
+  if(raw.friendsPrivate!=null&&typeof raw.friendsPrivate!=='boolean')throw new Error('invalid-game');
   const steam=Number(raw.steamAppId);
   return {id:uuid(raw.id)?raw.id:crypto.randomUUID(),title:text(raw.title,140).trim(),platform:text(raw.platform,40)||'PC',
     steamAppId:Number.isInteger(steam)&&steam>0&&steam<=2147483647?steam:null,
     status:enumeration(raw.status,statuses),goal:enumeration(raw.goal,goals),customGoal:text(raw.customGoal,250),
     storyPercent:raw.storyPercent==null||raw.storyPercent===''?null:Math.min(100,integer(raw.storyPercent,100)),
-    notes:text(raw.notes,20000),tracked:raw.tracked!==false,favorite:raw.favorite===true,sortOrder:integer(raw.sortOrder,100000),
+    friendsPrivate:typeof raw.friendsPrivate==='boolean'?raw.friendsPrivate:null,lists:normalizeLists(raw.lists),notes:text(raw.notes,20000),tracked:raw.tracked!==false,favorite:raw.favorite===true,sortOrder:integer(raw.sortOrder,100000),
     playtimeMinutes:integer(raw.playtimeMinutes,2147483647),addedAt:raw.addedAt||new Date().toISOString(),
     finishedAt:raw.status===3||String(raw.status).toLowerCase()==='finished'?raw.finishedAt||new Date().toISOString():null,
     syncedAt:typeof raw.syncedAt==='string'?raw.syncedAt:null,
@@ -51,3 +52,8 @@ export function friendCode(code,service=false) {
 }
 export function account(username){const name=String(username).trim().toLowerCase();if(!/^[a-z\d_]{3,24}$/.test(name))throw new Error('invalid-user');return name+'@accounts.checkpoint.invalid';}
 
+
+export function normalizeLists(names){const map=new Map();for(const n of Array.isArray(names)?names:[]){if(typeof n!=='string'||!n.trim()||n.trim().length>40||/[\x00-\x1f\x7f]/.test(n))continue;const key=n.trim().toLocaleLowerCase();if(!map.has(key))map.set(key,n.trim());}return [...map.values()].slice(0,30);}
+export function listName(name,existing,previous){name=String(name||'').trim();if(!name||name.length>40||/[\x00-\x1f\x7f]/.test(name))throw new Error('invalid-list');if(['mi lista','my list','privados','private games','biblioteca','library'].includes(name.toLocaleLowerCase())||existing.some(n=>n.toLocaleLowerCase()===name.toLocaleLowerCase()&&n.toLocaleLowerCase()!==previous?.toLocaleLowerCase()))throw new Error('duplicate-list');if(!previous&&existing.length>=30)throw new Error('too-many-lists');return name;}
+export const inList=(g,selection)=>selection==='private'?g.friendsPrivate===true:g.tracked&&g.friendsPrivate!==true&&(selection==='all'||selection.startsWith('custom:')&&g.lists.some(n=>n.toLocaleLowerCase()===selection.slice(7).toLocaleLowerCase()));
+export const shouldShare=g=>g.tracked&&g.friendsPrivate!==true;

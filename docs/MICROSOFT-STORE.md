@@ -50,7 +50,7 @@ La app conserva su versión actual. El MSIX usa por defecto **(versión mayor de
 
 La app utiliza `%LOCALAPPDATA%\Checkpoint` y un acceso directo opcional de Inicio. MSIX puede virtualizar las rutas de datos y cambiar el directorio instalado al actualizar. Falta comprobar si la biblioteca portable/MSI aparece en la edición empaquetada y si el acceso directo de arranque sobrevive a las actualizaciones. Si las pruebas lo requieren, habrá que adaptar el arranque al mecanismo de Windows para paquetes.
 
-Antes de cambiar de portable/MSI a Store, exporta una copia `.checkpoint` y luego impórtala en la edición Store. Las sesiones y el consentimiento de compartición no se exportan: vuelve a iniciar sesión y elige los juegos compartidos. La migración, actualización y desinstalación deben probarse antes de prometer conservación de datos; desinstalar MSIX puede eliminar datos del paquete.
+Antes de cambiar de portable/MSI a Store, exporta una copia `.checkpoint` y luego impórtala en la edición Store. La privacidad de los juegos y las listas se exportan; las sesiones y la cola social no. Al entrar de nuevo, los juegos de Mi lista no privados se comparten automáticamente. La migración, actualización y desinstalación deben probarse antes de prometer conservación de datos; desinstalar MSIX puede eliminar datos del paquete.
 
 `runFullTrust` permite ejecutar el widget con contenedor WPF e interfaz CSS en WebView2 con SQLite, bandeja, atajos y copias elegidas por el usuario. Esta explicación debe incluirse para los revisores. No solicita permisos de administrador.
 

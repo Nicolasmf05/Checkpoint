@@ -45,7 +45,9 @@ public sealed class SqliteStore : IDisposable
 
     public void Save(IEnumerable<Game> games, Settings settings) => SaveState(games, settings);
 
-    private void SaveState(IEnumerable<Game> games, Settings settings, DeletedGame? deleted = null, Guid? restored = null)
+    public void SaveListChange(IEnumerable<Game> games, Settings settings, string previous, string? next) => SaveState(games,settings,listChange:(previous,next));
+
+    private void SaveState(IEnumerable<Game> games, Settings settings, DeletedGame? deleted = null, Guid? restored = null, (string Previous,string? Next)? listChange = null)
     {
         var snapshot = games.ToList();
         snapshot.ForEach(GameRules.Validate);
@@ -76,6 +78,17 @@ public sealed class SqliteStore : IDisposable
         {
             using var remove = connection.CreateCommand(); remove.Transaction = transaction;
             remove.CommandText = "DELETE FROM deleted_games WHERE id=$id"; remove.Parameters.AddWithValue("$id", recoveryId.ToString()); remove.ExecuteNonQuery();
+        }
+        if(listChange is { } change)
+        {
+            foreach(var recovery in LoadDeletedGames())
+            {
+                recovery.Game.Lists=GameLists.Normalize(recovery.Game.Lists.Select(n=>n.Equals(change.Previous,StringComparison.OrdinalIgnoreCase)?change.Next??"":n));
+                using var update=connection.CreateCommand();update.Transaction=transaction;
+                update.CommandText="UPDATE deleted_games SET payload=$payload WHERE id=$id";
+                update.Parameters.AddWithValue("$payload",JsonSerializer.Serialize(recovery.Game,DataJson.Options));
+                update.Parameters.AddWithValue("$id",recovery.RecoveryId.ToString());update.ExecuteNonQuery();
+            }
         }
         transaction.Commit();
     }

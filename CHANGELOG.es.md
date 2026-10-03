@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## 0.7.6 — 2026-10-03
+
+- Mi lista visible por defecto para amigos aceptados, privacidad antes del primer guardado o después y vista Privados separada.
+- Varias listas locales sin duplicar juegos; crear, renombrar, quitar y configurar nuevas incorporaciones privadas.
+- Conservar retiradas anteriores y privacidad/listas en las copias; reconciliar operaciones públicas pendientes antes de retirar un juego privado.
+- Disponible en Windows y navegador, con interfaz completa en español o inglés.
+
 ## 0.7.5 — 2026-10-03
 
 - Atajos locales, de Miniatura, reordenación y globales de Windows configurables, con validación, guardado, restauración y ayuda actualizada.

@@ -17,6 +17,21 @@ Reject(()=>Shortcuts.Validate(new Dictionary<string,string>{{"global","F12"}}), 
 var shortcutSettings=new Settings{Shortcuts=new(){{"add","Ctrl+Shift+N"}}};
 var shortcutRoundTrip=JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(shortcutSettings,DataJson.Options),DataJson.Options)!;
 Check(Shortcuts.Effective(shortcutRoundTrip.Shortcuts)["add"]=="Ctrl+Shift+N", "custom shortcut settings survive serialization");
+var listed=new Game{Title="List fixture",FriendsPrivate=false,Lists=["Backlog","Favorites"]};
+Check(GameLists.ShouldShare(listed)&&GameLists.Visible(listed,"all")&&GameLists.Visible(listed,"custom:Backlog"),"tracked games are visible to friends by default and can belong to multiple lists");
+listed.FriendsPrivate=true;
+Check(!GameLists.ShouldShare(listed)&&!GameLists.Visible(listed,"all")&&!GameLists.Visible(listed,"custom:Backlog")&&GameLists.Visible(listed,"private"),"private games stay only in the private view and are never selected for sharing");
+listed.FriendsPrivate=false;listed.Tracked=false;
+Check(!GameLists.ShouldShare(listed)&&!GameLists.Visible(listed,"all"),"untracked Steam library games are not shared by default");
+GameLists.Rename([listed],"Backlog","Next adventures");
+Check(listed.Lists.SequenceEqual(new[]{"Next adventures","Favorites"})&&listed.FriendsPrivate==false,"renaming membership preserves game identity and privacy");
+Reject(()=>GameLists.ValidateName("favorites",["Favorites"]),"list names reject case-insensitive duplicates");
+Reject(()=>GameLists.ValidateName("Privados",[]),"reserved privacy view cannot be confused with a custom list");
+Reject(()=>GameLists.ValidateName("",[]),"empty list names rejected");
+var listsBackup=Path.Combine(root,"lists.json");listed.FriendsPrivate=true;
+BackupFiles.WriteJson(listsBackup,[listed],["Next adventures","Favorites","Empty list"]);
+var restoredLists=BackupFiles.Read(listsBackup);
+Check(restoredLists.Games[0].FriendsPrivate==true&&restoredLists.Games[0].Lists.Count==2&&restoredLists.GameLists!.Contains("Empty list"),"JSON backup restores privacy, multiple memberships and empty lists");
 var game = new Game { Title = "  Test game  ", SteamAppId = 620, Status = GameStatus.Playing,
     Notes = "Keep my notes", Favorite = true, Tasks = [new() { Title = "Last chapter" }] };
 GameRules.Validate(game);
@@ -141,4 +156,14 @@ I18n.SetLanguage("en");
 Check(Themes.Ids.Select(Themes.Name).Distinct().Count()==8 && Themes.Name("ocean")=="Ocean" && Themes.Name("contrast")=="High contrast", "theme labels are distinct and localized in English");
 I18n.SetLanguage("es");
 Check(Themes.Name("ocean")=="Océano" && Themes.Name("forest")=="Bosque", "theme labels are localized in Spanish");
+using(var listsStore=new SqliteStore(Path.Combine(root,"recovered-lists")))
+{
+    var recoverable=new Game{Title="Recovered list fixture",FriendsPrivate=true,Lists=["Weekend","Other"]};
+    var preferences=new Settings{GameLists=["Weekend","Other"]};listsStore.DeleteGame(recoverable,[],preferences);
+    preferences.GameLists=["Renamed","Other"];listsStore.SaveListChange([],preferences,"Weekend","Renamed");
+    Check(listsStore.LoadDeletedGames()[0].Game.Lists.SequenceEqual(new[]{"Renamed","Other"}),"list rename updates deleted recovery membership atomically");
+    preferences.GameLists=["Other"];listsStore.SaveListChange([],preferences,"Renamed",null);
+    var restored=listsStore.RestoreDeletedGame(listsStore.LoadDeletedGames()[0].RecoveryId,[],preferences);
+    Check(restored.FriendsPrivate==true&&restored.Lists.SequenceEqual(new[]{"Other"}),"restoring a deleted game preserves privacy without resurrecting a removed list");
+}
 Console.WriteLine($"{passed} checks passed. Test files: {root}");

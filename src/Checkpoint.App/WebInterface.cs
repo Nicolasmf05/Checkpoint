@@ -22,7 +22,7 @@ public partial class MainWindow
     }
     private object WebSnapshot() => new
     {
-        kind="main", shortcuts=Shortcuts.Effective(Preferences.Shortcuts), language=I18n.Language, light=Themes.IsLight(Preferences), theme=Themes.Id(Preferences),
+        kind="main", collection=Preferences.ActiveList, collections=new[]{new {value="all",label=I18n.T("Mi lista")},new{value="private",label=I18n.T("Privados")}}.Concat(Preferences.GameLists.Select(n=>new{value="custom:"+n,label=n})).ToArray(), shortcuts=Shortcuts.Effective(Preferences.Shortcuts), language=I18n.Language, light=Themes.IsLight(Preferences), theme=Themes.Id(Preferences),
         opacity=EffectiveOpacity, full=IsFullWindow, mini=Preferences.MiniatureView, compact=Preferences.Compact,
         grid=Preferences.GridView, textSize=Preferences.MiniatureTextSize, locked=Preferences.PositionLocked,
         pinned=Preferences.AlwaysOnTop, globalHotkey=hotkeyRegistered, lightweight=Preferences.LightweightMode, busy=syncing,
@@ -37,7 +37,7 @@ public partial class MainWindow
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
             examples=I18n.T("Añadir ejemplos"), finish=I18n.T("Marcar o desmarcar historia terminada"),
             windowMode=I18n.T("Modo de ventana"), fullWindow=I18n.T("Ventana completa"), smallWindow=I18n.T("Ventana pequeña"), miniature=I18n.T("Miniatura"),
-            configureShortcuts=I18n.T("Configurar atajos"), shortcuts=I18n.T("Atajos de teclado"), generalKeys=I18n.T("En la ventana principal"), miniKeys=I18n.T("En miniatura"), orderKeys=I18n.T("Al enfocar el botón de reordenar"),
+            collection=I18n.T("Lista de juegos"),manageLists=I18n.T("Gestionar listas"),makePrivate=I18n.T("Mover a Privados"),makeVisible=I18n.T("Hacer visible para amigos"),configureShortcuts=I18n.T("Configurar atajos"), shortcuts=I18n.T("Atajos de teclado"), generalKeys=I18n.T("En la ventana principal"), miniKeys=I18n.T("En miniatura"), orderKeys=I18n.T("Al enfocar el botón de reordenar"),
             helpHint=I18n.T("Pulsa F1 para ver todos los atajos."), closeHelp=I18n.T("Cerrar ayuda"),
             selectGame=I18n.T("Seleccionar juego"), firstLast=I18n.T("Primer o último juego"), pageGame=I18n.T("Avanzar o retroceder una página"),
             gameMenu=I18n.T("Abrir menú del juego"), reorder=I18n.T("Reordenar juego"),
@@ -47,7 +47,7 @@ public partial class MainWindow
             all=I18n.T("Todos"), statuses=Enum.GetValues<GameStatus>().Select(Labels.Status).ToArray() },
         games=(friendsVisible ? Enumerable.Empty<CardView>() : visibleCards).Select(card => new { id=card.Model.Id, title=card.Model.Title, platform=card.Model.Platform,
             state=(int)card.Model.Status, status=card.Model.StatusText, next=card.Model.NextTask,
-            progress=card.ProgressCaption, percent=card.ProgressVisibility == Visibility.Visible ? (int?)card.Percentage : null, favorite=card.Model.Favorite,
+            progress=card.ProgressCaption, percent=card.ProgressVisibility == Visibility.Visible ? (int?)card.Percentage : null, favorite=card.Model.Favorite, friendsPrivate=card.Model.FriendsPrivate==true,
             cover=Preferences.LightweightMode || Preferences.MiniatureView ? null : CoverOrigin+"game-cover/"+card.Model.Id+"?v="+Uri.EscapeDataString(card.Model.CustomCover ?? "steam") }).ToArray(),
         friendsBusy=FriendsView.Busy, friends=friendsVisible ? friendControls.Capture(FriendsView) : null
     };
@@ -68,6 +68,9 @@ public partial class MainWindow
             case "add": Dialogs.Edit(this,null); break;
             case "edit" when game is not null: Dialogs.Edit(this,game); web?.Event(new { kind="focus-game",id=game.Id }); break;
             case "configure-shortcuts": Dialogs.ShortcutSettings(this); break;
+            case "manage-lists": Dialogs.ManageLists(this);break;
+            case "collection": var collection=message.GetProperty("value").GetString()??"all";if(collection=="all"||collection=="private"||Preferences.GameLists.Any(n=>"custom:"+n==collection)){Preferences.ActiveList=collection;allLibrary=false;friendsVisible=false;Search.Clear();StatusFilter.SelectedIndex=0;Persist();Refresh();}break;
+            case "privacy" when game is not null: game.FriendsPrivate=message.GetProperty("value").GetBoolean();Persist();Refresh();break;
             case "settings": Dialogs.Settings(this); break;
             case "state" when game is not null:
                 if (message.GetProperty("value").TryGetInt32(out int state) && state >= 0 && state <= 4) { GameRules.SetStatus(game,(GameStatus)state); Persist(); Refresh(); }

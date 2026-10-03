@@ -2,11 +2,11 @@
 
 **English** · [Español](../FRIENDS-PLAN.md)
 
-Friends belong to Checkpoint, independently of Steam. The native client and Supabase backend implement accounts, accepted requests, blocks and selected progress sharing. Real two-account testing remains required before general release.
+Friends belong to Checkpoint, independently of Steam. The native client and Supabase backend implement accounts, accepted requests, blocks and default progress sharing with per-game privacy. Real two-account testing remains required before general release.
 
 ## Progress and privacy
 
-The owner publishes selected games from their Checkpoint library; friends never query their Steam account directly. States: pending, playing, paused, finished, abandoned. Story percentage is manual, never inferred from hours or achievements. Tasks and saved Steam achievements show separate completed/total counters. Custom goals can publish their text. Notes, task labels and individual achievements are excluded.
+Tracked games are published by default unless marked private; friends never query their Steam account directly. States: pending, playing, paused, finished, abandoned. Story percentage is manual, never inferred from hours or achievements. Tasks and saved Steam achievements show separate completed/total counters. Custom goals can publish their text. Notes, task labels and individual achievements are excluded.
 
 A game without numerical progress shows its state, not a fabricated 0%. Manual games and other platforms may be shared. Matching the same game across collections needs a common catalog ID or explicit association; local IDs/titles alone do not suffice.
 

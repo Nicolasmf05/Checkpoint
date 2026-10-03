@@ -50,7 +50,7 @@ The app remains on its current preview version. The package defaults to **(app m
 
 The app currently uses `%LOCALAPPDATA%\Checkpoint` and creates an optional Startup shortcut. MSIX can virtualize application data paths, and its installation directory can change with updates. Do not assume portable/MSI libraries automatically appear in the packaged app or that the current startup shortcut survives Store updates. These are open Store compatibility checks; migrate startup to the package-supported Windows startup mechanism if testing requires it.
 
-Before moving from portable/MSI to Store, export a `.checkpoint` backup, then import it in the Store edition. Sessions and sharing consent are excluded: sign in again and choose shared games explicitly. Test actual migration, update and uninstall behavior before promising data preservation; MSIX uninstall may remove package-scoped data.
+Before moving from portable/MSI to Store, export a `.checkpoint` backup, then import it in the Store edition. Game privacy and lists are included; sessions and the publication queue are excluded. After signing in again, tracked non-private games publish automatically. Test actual migration, update and uninstall behavior before promising data preservation; MSIX uninstall may remove package-scoped data.
 
 The `runFullTrust` capability is needed because Checkpoint is a desktop widget with a WPF shell and WebView2 CSS interface with SQLite, a tray icon, keyboard shortcuts and user-selected backups. Provide that explanation to certification reviewers. This capability does not request elevation.
 

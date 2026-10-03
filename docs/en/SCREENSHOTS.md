@@ -4,6 +4,18 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.7.6 — lists and privacy
+
+Windows and browser captures use isolated fixture games. Private games stay separate from normal/custom lists.
+
+| Windows list manager | Windows private games |
+| --- | --- |
+| ![Manage lists](../screenshots/css-lists-en.png) | ![Private games](../screenshots/css-private-games-en.png) |
+
+| Browser list manager | Browser private games |
+| --- | --- |
+| ![Web lists](../screenshots/web-lists-en.png) | ![Web private games](../screenshots/web-private-games-en.png) |
+
 ## 0.7.4 — eight themes
 
 Live palettes from the actual packaged application. Settings → Theme previews immediately; Save keeps the choice and Cancel restores the previous one.

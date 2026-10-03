@@ -60,10 +60,16 @@ public partial class MainWindow
             {
                 var bytes = ProtectedData.Protect(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(session,SocialApi.Json)),null,DataProtectionScope.CurrentUser);
                 File.WriteAllBytes(SocialSessionPath + ".tmp",bytes); File.Move(SocialSessionPath + ".tmp",SocialSessionPath,true);
-                if (Outbox?.UserId != session.UserId) Outbox = SocialOutbox.Load(OutboxPath(session.UserId),session.ProjectUrl,session.UserId);
+                if (Outbox?.UserId != session.UserId) { Outbox = SocialOutbox.Load(OutboxPath(session.UserId),session.ProjectUrl,session.UserId);MigrateVisibility(); }
             }
         };
-        if (api.Session is { } current) Outbox = SocialOutbox.Load(OutboxPath(current.UserId),current.ProjectUrl,current.UserId);
+        if (api.Session is { } current) { Outbox = SocialOutbox.Load(OutboxPath(current.UserId),current.ProjectUrl,current.UserId);MigrateVisibility(); }
+    }
+    private void MigrateVisibility()
+    {
+        if(Outbox is null)return;bool changed=false;
+        foreach(var game in Games.Where(g=>g.FriendsPrivate is null)){game.FriendsPrivate=Outbox.Games.TryGetValue(game.Id,out var entry)&&!entry.Selected;changed=true;}
+        if(changed)Store.Save(Games,Preferences);
     }
     private void StartSocial()
     {
@@ -90,6 +96,8 @@ public partial class MainWindow
     internal void SetShared(Game game, bool share)
     {
         if (Outbox is null) throw new InvalidOperationException(I18n.T("Entra en Checkpoint antes de compartir."));
+        game.FriendsPrivate=!share;if(share)game.Tracked=true;
+        Store.Save(Games,Preferences);
         if (share) { var projection = ProjectGame(game); Outbox.SetDesired(game.Id,projection.Payload,projection.LocalCover); }
         else Outbox.SetDesired(game.Id,null);
         SaveOutbox(); SchedulePublications();
@@ -99,13 +107,13 @@ public partial class MainWindow
         if (Outbox is null) return;
         try
         {
-            foreach (var pair in Outbox.Games.ToArray())
+            MigrateVisibility();
+            foreach(var game in Games)
             {
-                if (!pair.Value.Selected) continue;
-                var game = Games.FirstOrDefault(g => g.Id == pair.Key);
-                if (game is null) Outbox.SetDesired(pair.Key,null);
-                else { var projection = ProjectGame(game); Outbox.SetDesired(game.Id,projection.Payload,projection.LocalCover); }
+                if(GameLists.ShouldShare(game)){var projection=ProjectGame(game);Outbox.SetDesired(game.Id,projection.Payload,projection.LocalCover);}
+                else if(Outbox.Games.ContainsKey(game.Id))Outbox.SetDesired(game.Id,null);
             }
+            foreach(var id in Outbox.Games.Keys.Where(id=>Games.All(g=>g.Id!=id)).ToArray())Outbox.SetDesired(id,null);
             SaveOutbox(); publicationTimer.Stop(); publicationTimer.Start();
         }
         catch (Exception ex) when (ex is IOException or ArgumentException) { Notice(I18n.T("Publicación pendiente: ") + I18n.Error(ex)); }
@@ -124,6 +132,13 @@ public partial class MainWindow
                     if (Outbox != box || api.Session?.UserId != box.UserId) return;
                     var operation = box.Prepare(id); if (operation is null) break;
                     SaveOutbox();
+                    if(operation.Payload is not null && (Games.FirstOrDefault(g=>g.Id==id) is not { } localGame || !GameLists.ShouldShare(localGame)))
+                    {
+                        var remote=(await api.Publications(box.UserId,shutdown.Token)).FirstOrDefault(g=>g.GameId==id);
+                        if(remote is not null)box.Reconcile(id,remote);
+                        else{var entry=box.Entry(id);entry.Pending=null;entry.Published=null;entry.Revision=0;entry.Conflict=false;}
+                        SaveOutbox();continue;
+                    }
                     try
                     {
                         if (operation.Payload?.CoverPath is string path && operation.LocalCover is string local)
@@ -134,6 +149,7 @@ public partial class MainWindow
                                 throw new InvalidDataException(I18n.T("La carátula cambió; revisa la publicación."));
                             await api.UploadCover(path,bytes,shutdown.Token);
                         }
+                        if(operation.Payload is not null && box.Entry(id).Desired is null)continue;
                         long revision = await api.Publish(id,operation,shutdown.Token);
                         box.Acknowledge(id,revision); SaveOutbox();
                     }

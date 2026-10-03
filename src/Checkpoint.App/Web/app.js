@@ -44,8 +44,9 @@ function showMenu(game, x, y) {
   }
   if (game) {
     state.labels.statuses.forEach((label, value) => entry(label, 'state', { id: game.id, value }, game.state === value));
-    menu.append(el('hr')); entry(state.labels.edit, 'edit', { id: game.id }); menu.append(el('hr'));
+    menu.append(el('hr')); entry(state.labels.edit, 'edit', { id: game.id });if(state.labels.makePrivate)entry(game.friendsPrivate?state.labels.makeVisible:state.labels.makePrivate,'privacy',{id:game.id,value:!game.friendsPrivate}); menu.append(el('hr'));
   }
+  if(state.collections){for(const list of state.collections)entry(list.label,'collection',{value:list.value},list.value===state.collection);entry(state.labels.manageLists,'manage-lists');}
   if (state.mini) entry(state.labels.exitMini, 'exit-mini');
   [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((label,value)=>entry(label,'window-mode',{value},value===(state.mini?2:state.full?0:1)));
   entry(state.labels.settings, 'settings'); entry(state.labels.search, 'search'); entry(state.labels.add, 'add');
@@ -67,7 +68,7 @@ function preserveTree(build) {
   [...root.querySelectorAll('.type-scroll')].forEach((node, index) => node.scrollTop = scroll[index] || 0);
   for (const node of root.querySelectorAll('input,textarea')) { if (inputs.has(node.dataset.control)) node.value=inputs.get(node.dataset.control); else if (node.type==='password' && node.dataset.empty !== 'true') node.value=passwords.get(node.dataset.control)||''; }
   if (id) {
-    const target = root.querySelector(`[data-control="${id}"]`);
+    const target = [...root.querySelectorAll('[data-control]')].find(node=>node.dataset.control===id);
     if (target) { target.focus({ preventScroll: true }); if (selection != null && target.setSelectionRange && ['input','textarea'].includes(target.tagName.toLowerCase()) && target.type !== 'range') try { target.setSelectionRange(selection, end); } catch {} }
   }
 }
@@ -127,20 +128,21 @@ function frame() {
   const resize = el('div', 'resize'); resize.setAttribute('aria-hidden', 'true'); let point;
   resize.addEventListener('pointerdown', e => { if (state.locked) return; point = [e.screenX,e.screenY]; resize.setPointerCapture(e.pointerId); e.preventDefault(); });
   resize.addEventListener('pointermove', e => { if (!point) return; const x=e.screenX-point[0], y=e.screenY-point[1]; point=[e.screenX,e.screenY]; if (x || y) action('resize',{x,y}); }); resize.addEventListener('pointerup', () => point = undefined); resize.addEventListener('lostpointercapture', () => point = undefined);
-  windowNode.append(header,intro,navigation,searchbar,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
+  const collectionbar=el('div','collectionbar'),collections=el('select','collection-selector');collections.addEventListener('change',()=>action('collection',{value:collections.value}));collectionbar.append(collections,button('', 'manage-lists', '', {},'manage-lists'));
+  windowNode.append(header,intro,navigation,searchbar,collectionbar,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
   windowNode.addEventListener('contextmenu', e => { if (state.mini && !e.target.closest('[data-game]')) { e.preventDefault(); showMenu(null,e.clientX,e.clientY); } });
 }
 function renderMain() {
   if (dialogMode || !root.querySelector('.window')) frame(); dialogMode = false;
   const host = root.querySelector('.window'); host.classList.toggle('mini', state.mini); host.classList.toggle('full',state.full);
-  if(state.mini && document.activeElement?.closest('.header,.navigation,.searchbar,.footer,.shortcutbar,.web-toolbar'))host.querySelector('.viewport').focus({preventScroll:true});
+  if(state.mini && document.activeElement?.closest('.header,.navigation,.searchbar,.collectionbar,.footer,.shortcutbar,.web-toolbar'))host.querySelector('.viewport').focus({preventScroll:true});
   const modes=host.querySelector('.window-mode'); modes.replaceChildren(); [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((text,index)=>{const option=el('option','',text);option.value=index;modes.append(option);}); modes.value=state.mini?2:state.full?0:1; modes.setAttribute('aria-label',state.labels.windowMode);
   host.style.setProperty('--opacity', state.opacity); host.style.setProperty('--mini-size', `${state.textSize}px`);
   if(state.browser){host.classList.add('browser');host.querySelector('.brand').style.cursor='default';for(const name of ['pin','hide','close'])host.querySelector(`[data-label="${name}"]`).hidden=true;
     if(!host.querySelector('.web-toolbar')){const tools=el('div','web-toolbar');for(const [name,label] of [['import',state.labels.backupImport],['export',state.labels.backupExport],['web-info',state.labels.browserInfo]])tools.append(button(label,name));const link=el('a','',state.labels.windowsDownload);link.href='https://github.com/Nicolasmf05/Checkpoint/releases';link.target='_blank';link.rel='noopener noreferrer';tools.append(link);host.querySelector('.header').after(tools);}}
   host.querySelector('.tagline').textContent = state.labels.tagline;
   host.querySelector('h1').textContent = state.tab === 'friends' ? state.labels.friendsTitle : state.labels.title;
-  host.querySelector('.summary').textContent = state.summary;
+  host.querySelector('.summary').textContent = state.summary;const collectionbar=host.querySelector('.collectionbar');collectionbar.hidden=!state.collections||state.tab!=='list';if(state.collections){const selector=host.querySelector('.collection-selector');selector.replaceChildren();for(const list of state.collections){const option=el('option','',list.label);option.value=list.value;selector.append(option);}selector.value=state.collection;selector.setAttribute('aria-label',state.labels.collection);const manage=host.querySelector('.manage-lists');manage.textContent=state.labels.manageLists;manage.setAttribute('aria-label',state.labels.manageLists);}
   host.querySelectorAll('[data-label]').forEach(node => { const label = state.labels[node.dataset.label]; const key=gestures[node.dataset.label]; node.title = label+(key?' · '+key:''); node.setAttribute('aria-label', label);if(key)node.setAttribute('aria-keyshortcuts',key==='Esc'?'Escape':key.replace('Ctrl+','Control+')); if (node.classList.contains('add')) node.textContent = '+ '+label; });
   host.querySelectorAll('[data-tab]').forEach(node => { node.textContent = state.labels[node.dataset.tab]; node.classList.toggle('active', state.tab === node.dataset.tab); });
   const search = host.querySelector('#search'); if ((pending.get('search')||0) <= (state.ack||0) && search.value !== state.search) search.value = state.search; search.placeholder = state.labels.search+' · '+gestures.search; search.setAttribute('aria-keyshortcuts',gestures.search.replace('Ctrl+','Control+')); search.setAttribute('aria-label',state.labels.search);
@@ -215,10 +217,10 @@ window.addEventListener('resize',renderGames);
 window.chrome?.webview?.addEventListener('message',event=>{
   if (event.data.kind==='focus-game') {selected=event.data.id;requestAnimationFrame(()=>root.querySelector(`[data-game="${selected}"]`)?.focus({preventScroll:true}));return;}
   if (event.data.kind==='focus-search') { requestAnimationFrame(()=>{const search=root.querySelector('#search');search?.focus();search?.select();});return; }
-  const firstDialog=state?.kind!=='dialog' && event.data.kind==='dialog';
+  const firstDialog=event.data.kind==='dialog'&&(state?.kind!=='dialog'||state.root?.pageId!==event.data.root?.pageId);
   state=event.data;if(state.kind==='main')gestures=effectiveShortcuts(state.shortcuts); window.checkpointState=state;
   for (const [key,id] of pending) if (id <= (state.ack||0)) pending.delete(key); document.documentElement.lang=state.language; document.documentElement.dataset.theme=state.theme || (state.light?'light':'dark');
-  if (state.kind==='dialog') {dialogMode=true;preserveTree(()=>{const page=el('main','dialog-page');page.append(schema(state.root));root.replaceChildren(page);});if(firstDialog)root.querySelector('input,select,button')?.focus();}
+  if (state.kind==='dialog') {dialogMode=true;const build=()=>{const page=el('main','dialog-page');page.append(schema(state.root));root.replaceChildren(page);};if(firstDialog)build();else preserveTree(build);if(firstDialog)root.querySelector('input,select,button')?.focus();}
   else renderMain();
 });
 action('ready');

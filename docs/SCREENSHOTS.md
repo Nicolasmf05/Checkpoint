@@ -4,6 +4,10 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.7.6 — listas y privacidad
+
+Las capturas de Windows y navegador muestran Gestionar listas y la vista Privados con datos de prueba. Están en inglés en la [galería correspondiente](en/SCREENSHOTS.md#076--lists-and-privacy).
+
 ## 0.7.4 — ocho temas
 
 En Ajustes → Tema se elige Oscuro, Claro, Medianoche, Océano, Bosque, Ciruela, Ámbar o Alto contraste. La selección muestra los colores al instante y Cancelar recupera el anterior. Las ocho paletas y el selector se muestran en la [galería con interfaz inglesa](en/SCREENSHOTS.md#074--eight-themes). Las capturas siguientes mantienen la interfaz en español.
