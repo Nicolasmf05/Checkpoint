@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.7 — 2026-10-04
+
+- Aspecto de escritorio más sencillo: controles rectos, bordes discretos, colores predeterminados neutros y títulos más pequeños en Windows y navegador. Se conservan los 22 temas.
+- Eliminados el eslogan y los títulos promocionales de la interfaz, accesos directos y README.
+- Release completa y estable con portable, MSI, código fuente y archivos SHA-256; versiones anteriores conservadas como borradores.
+
 ## 0.8.6 — 2026-10-04
 
 - Catorce paletas nuevas para un total de 22 temas: Púrpura cibernético, Azul eléctrico, Lima neón, Negro y rojo, Negro y naranja, Onda sintética, Azul y blanco, Púrpura oscuro, Esmeralda y neutro, Negro y blanco, Marino y cian, Coral y crema, Naranja y carbón e Índigo y gris suave.

@@ -73,7 +73,7 @@
         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" MouseLeftButtonDown="DragTitle" Cursor="SizeAll">
           <Border Width="29" Height="29" CornerRadius="8" Background="{DynamicResource AccentFillBrush}" Margin="0,0,9,0"><Path Data="M8,19 L8,7 L19,7 L16,11 L19,15 L10,15" Stroke="#FF102D27" StrokeThickness="2" StrokeLineJoin="Round"/></Border>
-          <StackPanel VerticalAlignment="Center"><TextBlock Text="checkpoint" FontWeight="Bold" FontSize="17"/><TextBlock Text="{DynamicResource Loc_3070e6c5ed66}" Foreground="{DynamicResource MutedBrush}" FontSize="8"/></StackPanel>
+          <StackPanel VerticalAlignment="Center"><TextBlock Text="checkpoint" FontWeight="Bold" FontSize="17"/></StackPanel>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
           <Button x:Name="PinButton" Content="◇" Click="PinClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_ccd9c24d49b0}" AutomationProperties.Name="{DynamicResource Loc_ccd9c24d49b0}"/>

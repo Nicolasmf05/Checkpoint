@@ -112,8 +112,8 @@ function schema(node) {
 }
 function frame() {
   root.replaceChildren(); const windowNode = el('main', 'window');
-  const header = el('header', 'header'), brand = el('div', 'brand'); brand.append(el('div', 'logo', '⚑'));
-  const wordmark = el('div'); wordmark.append(el('strong', '', 'checkpoint'), el('div', 'tagline')); brand.append(wordmark);
+  const header = el('header', 'header'), brand = el('div', 'brand');
+  const wordmark = el('div'); wordmark.append(el('strong', '', 'Checkpoint')); brand.append(wordmark);
   brand.addEventListener('pointerdown', e => { if (e.button === 0 && !state.locked && !state.browser) action('drag'); }); header.append(brand);
   for (const [icon, name, label] of [['◇','pin','pin'], ['⚙','settings','settings'], ['−','hide','hide'], ['×','close','close']]) { const node = button(icon, name, icon, {}, 'icon'); node.dataset.label = label; header.append(node); }
   if(!state.browser){const modes=el('select','window-mode'); modes.setAttribute('aria-label','Checkpoint'); modes.addEventListener('change',()=>action('window-mode',{value:Number(modes.value)})); header.append(modes);}
@@ -147,8 +147,7 @@ function renderMain() {
   if(state.browser){host.classList.add('browser');host.querySelector('.brand').style.cursor='default';for(const name of ['pin','hide','close'])host.querySelector(`[data-label="${name}"]`).hidden=true;
     if(!host.querySelector('.web-toolbar')){const tools=el('div','web-toolbar');tools.append(button(state.labels.account,'account',state.labels.account,{},'accent web-account'));for(const [name,label] of [['import',state.labels.backupImport],['export',state.labels.backupExport],['web-info',state.labels.browserInfo]])tools.append(button(label,name));const link=el('a','',state.labels.windowsDownload);link.href='https://github.com/Nicolasmf05/Checkpoint/releases';link.target='_blank';link.rel='noopener noreferrer';tools.append(link);host.querySelector('.header').after(tools);}}
   if(state.browser){const account=host.querySelector('.web-account');account.textContent=state.labels.account;account.setAttribute('aria-label',state.labels.account);account.hidden=state.tab==='friends'&&!state.signedIn;}
-  host.querySelector('.tagline').textContent = state.labels.tagline;
-  host.querySelector('h1').textContent = state.tab === 'friends' ? state.labels.friendsTitle : state.labels.title;
+  host.querySelector('h1').textContent = state.labels[state.tab];
   host.querySelector('.summary').textContent = state.summary;const collectionbar=host.querySelector('.collectionbar');collectionbar.hidden=!state.collections||state.tab!=='list';if(state.collections){const selector=host.querySelector('.collection-selector');selector.replaceChildren();for(const list of state.collections){const option=el('option','',list.label);option.value=list.value;selector.append(option);}selector.value=state.collection;selector.setAttribute('aria-label',state.labels.collection);const manage=host.querySelector('.manage-lists');manage.textContent=state.labels.manageLists;manage.setAttribute('aria-label',state.labels.manageLists);}
   host.querySelectorAll('[data-label]').forEach(node => { const label = state.labels[node.dataset.label]; const key=gestures[node.dataset.label]; node.title = label+(key?' · '+key:''); node.setAttribute('aria-label', label);if(key)node.setAttribute('aria-keyshortcuts',key==='Esc'?'Escape':key.replace('Ctrl+','Control+')); if (node.classList.contains('add')) node.textContent = '+ '+label; });
   host.querySelectorAll('[data-tab]').forEach(node => { node.textContent = state.labels[node.dataset.tab]; node.classList.toggle('active', state.tab === node.dataset.tab); });

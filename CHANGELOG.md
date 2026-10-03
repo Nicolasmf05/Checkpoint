@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.7 — 2026-10-04
+
+- A simpler desktop appearance: square controls, restrained borders, neutral default colors and smaller section headings throughout Windows and the browser. All 22 themes remain available.
+- Removed the slogan and promotional headings from the interface, shortcuts and README.
+- Complete stable release with portable, MSI, source and SHA-256 files; older releases retained as drafts.
+
 ## 0.8.6 — 2026-10-04
 
 - Fourteen new palettes, bringing the total to 22 themes: Cyber Purple, Electric Blue, Neon Lime, Black + Red, Black + Orange, Synthwave, Blue + White, Purple + Dark, Emerald + Neutral, Black + White + Accent, Navy + Cyan, Coral/Pink + Cream, Orange + Charcoal and Indigo + Soft Gray.

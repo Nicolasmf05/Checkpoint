@@ -274,7 +274,7 @@ public partial class MainWindow : Window
         visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Themes.IsLight(Preferences), Preferences.LightweightMode || Preferences.MiniatureView)).ToList();
         BindCards();
         EmptyPanel.Visibility = !Preferences.MiniatureView && filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        EmptyTitle.Text = Games.Count == 0 ? I18n.T("Aquí empieza tu próxima partida") : I18n.T("Tu lista tiene espacio para otra aventura");
+        EmptyTitle.Text = I18n.T("Sin juegos en esta lista");
         EmptyText.Text = Games.Count == 0 ? I18n.T("Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano.")
             : allLibrary ? I18n.T("No hay juegos con esos filtros. Prueba otra búsqueda o añade un juego.") : I18n.T("Añade juegos a Mi lista desde su ficha en la biblioteca, o prueba otra búsqueda.");
         ExampleButton.Visibility = Games.Count == 0 ? Visibility.Visible : Visibility.Collapsed;

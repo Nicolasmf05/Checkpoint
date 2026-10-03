@@ -38,7 +38,6 @@
   "Compacta": "Compact",
   "Cuadrícula": "Grid",
   "Cuadrícula de carátulas": "Cover grid",
-  "UN JUEGO CADA VEZ": "ONE GAME AT A TIME",
   "Tu próxima aventura": "Your next adventure",
   "Tu gente, tus aventuras": "Your friends, your adventures",
   "+ Añadir": "+ Add",
@@ -181,7 +180,6 @@
   "Los datos se guardan en tu PC. Sin publicidad ni telemetría. Aplicación independiente, sin afiliación con Valve.": "Data is stored on your PC. No advertising or telemetry. Independent application, not affiliated with Valve.",
   "No se pudieron guardar los ajustes": "Could not save settings",
   "No se puede crear el acceso de inicio.": "Cannot create the startup shortcut.",
-  "Checkpoint · Un juego cada vez": "Checkpoint · One game at a time",
   "No se pudo eliminar el juego": "Could not delete the game",
   "Este juego ya existe en la biblioteca. Se han conservado sus datos actuales; puedes recuperar otro juego desde Ajustes.": "This game already exists in your library. Its current data was preserved; restore another game from Settings.",
   "Copia JSON exportada. Este formato no incluye imágenes.": "JSON backup exported. This format does not include images.",
@@ -573,5 +571,7 @@
   "Marino y cian": "Navy + Cyan",
   "Coral y crema": "Coral/Pink + Cream",
   "Naranja y carbón": "Orange + Charcoal",
-  "Índigo y gris suave": "Indigo + Soft Gray"
+  "Índigo y gris suave": "Indigo + Soft Gray",
+  "Sin juegos en esta lista": "No games in this list",
+  "Recuperar juegos": "Restore games"
 }

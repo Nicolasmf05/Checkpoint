@@ -177,7 +177,7 @@ public partial class MainWindow
         FilterArea.Visibility = friendsVisible || Preferences.MiniatureView ? Visibility.Collapsed : Visibility.Visible;
         GameArea.Visibility = friendsVisible ? Visibility.Collapsed : Visibility.Visible;
         FriendsHost.Visibility = friendsVisible ? Visibility.Visible : Visibility.Collapsed;
-        SummaryTitle.Text = friendsVisible ? I18n.T("Tu gente, tus aventuras") : I18n.T("Tu próxima aventura");
+        SummaryTitle.Text = friendsVisible ? I18n.T("Amigos") : allLibrary ? I18n.T("Biblioteca") : I18n.T("Mi lista");
         FriendsButton.Foreground = (System.Windows.Media.Brush)Application.Current.Resources[friendsVisible ? "AccentBrush" : "TextBrush"];
         if (friendsVisible) Summary.Text = I18n.T("Progreso compartido desde Checkpoint");
     }

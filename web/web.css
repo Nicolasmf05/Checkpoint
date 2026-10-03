@@ -1,15 +1,15 @@
-body { background:rgb(var(--surface)); } #app { display:flex;align-items:center;justify-content:center;padding:12px; }
+body { background:rgb(var(--surface)); } #app { display:flex;align-items:center;justify-content:center;padding:0; }
 .window.browser { width:100%;height:100%;max-width:none;max-height:100%;min-width:0;min-height:0; }
 
 .web-toolbar { display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex:none; } .web-toolbar button,.web-toolbar a { font-size:11px; }
 .web-toolbar a { color:var(--accent);padding:6px 0; } .mini .web-toolbar { display:none; }
-.dialog-page { width:100%;height:100%;min-width:0;border:1px solid var(--line);border-radius:14px; }
+.dialog-page { width:100%;height:100%;min-width:0;border:1px solid var(--line);border-radius:2px; }
 .dialog-page>.type-dock { height:100%;padding:0;min-height:0; } .dialog-page>.type-dock>.type-scroll { padding:22px; } .dialog-page>.type-dock>.type-row { padding:12px 22px;border-top:1px solid var(--line);justify-content:flex-end;flex-shrink:0; }
 .type-slider { width:100%; } .type-file { max-width:100%; } .friends-content { padding:2px; }
 .boot { color:var(--text);font:600 20px "Segoe UI",sans-serif;max-width:500px;padding:24px; }
 @media(max-width:540px) { #app { padding:0; }.window.browser { border-radius:0;border:0;width:100%; }.dialog-page { border-radius:0; }.web-toolbar { gap:4px; }.web-toolbar button { padding:6px; } }
 
-@media(max-height:600px) { .window.browser { gap:8px;padding:10px 14px; }.window.browser .intro h1 { font-size:21px; }.window.browser .shortcutbar { padding-top:5px; } }
+@media(max-height:600px) { .window.browser { gap:8px;padding:10px 14px; }.window.browser .intro h1 { font-size:18px; }.window.browser .shortcutbar { padding-top:5px; } }
 @media(max-width:360px) { .window.browser .navigation { flex-wrap:wrap; }.window.browser .navigation .add { margin-left:0; }.window.browser .searchbar { flex-wrap:wrap; }.window.browser .searchbar input { flex-basis:100%; }.window.browser .collectionbar { flex-wrap:wrap; }.window.browser .manage-lists { width:100%; } }
 
 @media(max-height:480px) { .window.browser { overflow-y:auto; }.window.browser .viewport { flex:none;min-height:160px; } }

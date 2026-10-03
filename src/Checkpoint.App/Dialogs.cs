@@ -67,7 +67,7 @@ internal static partial class Dialogs
         var game = original is null ? new Game { SortOrder = owner.Games.Count, FriendsPrivate=owner.Preferences.NewGamesPrivate||owner.Preferences.ActiveList=="private", Lists=owner.Preferences.ActiveList.StartsWith("custom:")?[owner.Preferences.ActiveList[7..]]:[] } : JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(original, DataJson.Options), DataJson.Options)!;
         var window = Modal(owner, creating ? I18n.T("Añadir juego · Checkpoint") : game.Title + " · Checkpoint");
         var body = Panel(); Layout(window, body, out var footer);
-        Heading(body, creating ? I18n.T("Una nueva aventura") : game.Title, I18n.T("La historia y los logros se guardan como objetivos independientes."));
+        Heading(body, creating ? I18n.T("Añadir juego") : game.Title, I18n.T("La historia y los logros se guardan como objetivos independientes."));
         var title = Input(body, I18n.T("Nombre del juego"), game.Title); title.MaxLength = 140;
         var steamId = Input(body, I18n.T("ID del juego en Steam (opcional)"), game.SteamAppId?.ToString() ?? "");
         var retroId = Input(body, I18n.T("ID del juego en RetroAchievements (opcional)"), game.RetroGameId?.ToString() ?? "");
@@ -196,7 +196,7 @@ internal static partial class Dialogs
     internal static void DeletedGames(MainWindow owner)
     {
         var window = Modal(owner, I18n.T("Juegos eliminados · Checkpoint"), 540, 660); var body = Panel(); Layout(window, body, out var footer);
-        Heading(body, I18n.T("Recupera una aventura"), I18n.T("Se conservan los últimos 20 juegos eliminados, incluso después de reiniciar. Recuperarlos restaura también sus notas, tareas y carátulas."));
+        Heading(body, I18n.T("Recuperar juegos"), I18n.T("Se conservan los últimos 20 juegos eliminados, incluso después de reiniciar. Recuperarlos restaura también sus notas, tareas y carátulas."));
         var notice = new TextBlock { TextWrapping = TextWrapping.Wrap, Foreground = (Brush)Application.Current.Resources["AccentBrush"], Margin = new Thickness(0, 10, 0, 0) }; body.Children.Add(notice);
         var rows = new StackPanel(); body.Children.Add(rows);
         void Render()
@@ -365,7 +365,7 @@ internal static partial class Dialogs
         {
             shortcut.TargetPath = Environment.ProcessPath;
             shortcut.WorkingDirectory = AppContext.BaseDirectory;
-            shortcut.Description = I18n.T("Checkpoint · Un juego cada vez");
+            shortcut.Description = "Checkpoint";
             shortcut.Save();
         }
         finally { Marshal.FinalReleaseComObject(shortcut); Marshal.FinalReleaseComObject(shell); }
