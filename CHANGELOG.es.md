@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.7.5 — 2026-10-03
+
+- Atajos locales, de Miniatura, reordenación y globales de Windows configurables, con validación, guardado, restauración y ayuda actualizada.
+- App utilizable en GitHub Pages, con almacenamiento local, copias JSON, Steam y amigos de Checkpoint.
+- CORS de Steam limitado al origen de Pages; la autenticación se mantiene y las sesiones web no se exportan.
+
 ## 0.7.4 — 2026-10-03
 
 - Ocho temas: Oscuro, Claro, Medianoche, Océano, Bosque, Ciruela, Ámbar y Alto contraste.

@@ -152,7 +152,7 @@ internal sealed class WebControls
         {
             case TextBlock text: node["type"]="text"; node["text"]=text.Text; node["heading"]=text.FontSize >= 18; node["muted"]=text.FontSize <= 11; break;
             case PasswordBox password: node["type"]="password"; node["empty"]=password.Password.Length == 0; node["max"]=password.MaxLength; break;
-            case TextBox text: node["type"]=text.AcceptsReturn ? "textarea" : "input"; node["value"]=text.Text; node["max"]=text.MaxLength; break;
+            case TextBox text: node["shortcut"]=Equals(text.Tag,"shortcut"); node["type"]=text.AcceptsReturn ? "textarea" : "input"; node["value"]=text.Text; node["max"]=text.MaxLength; break;
             case CheckBox check: node["type"]="check"; node["text"]=Text(check.Content); node["checked"]=check.IsChecked == true; break;
             case Button button: node["type"]="button"; node["text"]=Text(button.Content); node["accent"]=ReferenceEquals(button.Style,Application.Current.TryFindResource("AccentButton")); node["dock"]=DockPanel.GetDock(button).ToString(); break;
             case ComboBox combo: node["type"]="select"; node["value"]=combo.SelectedIndex; node["options"]=combo.Items.Cast<object>().Select(item => item is ComboBoxItem entry ? Text(entry.Content) : item.ToString()).ToArray(); break;

@@ -136,3 +136,15 @@ Miniature with text size 18 and adapted rows. This native capture uses Spanish.
 ## Complete friend code
 
 ![Account with the complete Checkpoint friend code](../screenshots/widget-friends-account-en.png)
+
+## Browser application
+
+Browser screenshots use fictional test accounts and simulated services.
+
+![Web library](../screenshots/web-library-en.png)
+
+![Configurable shortcuts](../screenshots/web-shortcuts-en.png)
+
+![Checkpoint friends](../screenshots/web-friends-en.png)
+
+![Narrow-screen settings](../screenshots/web-mobile-en.png)

@@ -429,5 +429,21 @@
   "Ámbar": "Amber",
   "Alto contraste": "High contrast",
   "Oscuro": "Dark",
-  "Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.": "Instant preview. Save to keep the theme; Cancel restores the previous one."
+  "Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.": "Instant preview. Save to keep the theme; Cancel restores the previous one.",
+  "Configurar atajos": "Configure shortcuts",
+  "Pulsa una combinación en cada campo. Tab cambia de campo; Escape cancela. No se permiten atajos repetidos.": "Press a combination in each field. Tab moves between fields; Escape cancels. Duplicate shortcuts are not allowed.",
+  "Los atajos del navegador pueden tener prioridad. El atajo global solo funciona en Windows.": "Browser shortcuts may take priority. The global shortcut only works in Windows.",
+  "Los cambios se aplican al guardar.": "Changes apply when you save.",
+  "Restablecer predeterminados": "Restore defaults",
+  "Combinación no válida. Usa Ctrl, Alt o Shift y una tecla; las letras requieren Ctrl o Alt.": "Invalid combination. Use Ctrl, Alt or Shift and a key; letters require Ctrl or Alt.",
+  "Hay atajos repetidos o reservados. Espacio y Escape se conservan para navegar y cerrar.": "Some shortcuts are duplicated or reserved. Space and Escape are kept for navigation and closing.",
+  "Juego anterior": "Previous game",
+  "Juego siguiente": "Next game",
+  "Primer juego": "First game",
+  "Último juego": "Last game",
+  "Página anterior": "Previous page",
+  "Página siguiente": "Next page",
+  "Mover juego hacia arriba": "Move game up",
+  "Mover juego hacia abajo": "Move game down",
+  "No se pudo registrar el atajo global. Otra aplicación puede estar usándolo.": "Could not register the global shortcut. Another application may be using it."
 }

@@ -286,6 +286,7 @@ internal static class Dialogs
         Label(body, I18n.T("Juegos eliminados")); body.Children.Add(new TextBlock { Text = I18n.T("Los últimos 20 pueden recuperarse con sus datos completos. Los juegos existentes en tu biblioteca se conservan."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         body.Children.Add(Button(I18n.T("Ver juegos eliminados"), (_, _) => DeletedGames(owner)));
         Label(body, "Checkpoint " + typeof(MainWindow).Assembly.GetName().Version?.ToString(3)); body.Children.Add(new TextBlock { Text = I18n.T("Los datos se guardan en tu PC. Sin publicidad ni telemetría. Aplicación independiente, sin afiliación con Valve."), TextWrapping = TextWrapping.Wrap, FontSize = 11 });
+        body.Children.Add(Button(I18n.T("Configurar atajos"), (_, _) => ShortcutSettings(owner,window)));
         bool saved = false;
         footer.Children.Add(Button(I18n.T("Cancelar"), (_, _) => window.Close()));
         footer.Children.Add(Button(I18n.T("Guardar"), (_, _) =>
@@ -308,6 +309,33 @@ internal static class Dialogs
             catch (Exception ex) { LocalizedNotice.Show(window, I18n.Error(ex), I18n.T("No se pudieron guardar los ajustes")); }
         }, true));
         window.Closed += (_, _) => { if (!saved) { prefs.BackgroundOpacity = previousOpacity; prefs.Theme = previousTheme; prefs.LightTheme = previousLight; owner.ApplyPreferences(); owner.Refresh(); owner.Store.SaveSettings(prefs); } }; window.ShowDialog();
+    }
+    internal static void ShortcutSettings(MainWindow owner, Window? parent = null)
+    {
+        var window=Modal(owner,I18n.T("Configurar atajos")); if(parent is not null)window.Owner=parent;
+        var body=Panel(); Layout(window,body,out var footer);
+        Heading(body,I18n.T("Configurar atajos"),I18n.T("Pulsa una combinación en cada campo. Tab cambia de campo; Escape cancela. No se permiten atajos repetidos."));
+        var values=Shortcuts.Effective(owner.Preferences.Shortcuts); var fields=new Dictionary<string,TextBox>();
+        foreach(var key in Shortcuts.Defaults.Keys)
+        {
+            var input=Input(body,I18n.T(Shortcuts.Labels[key]),values[key]); input.Tag="shortcut"; fields[key]=input;
+            input.PreviewKeyDown+=(_,e)=>{if(e.Key is System.Windows.Input.Key.Tab or System.Windows.Input.Key.Escape or System.Windows.Input.Key.LeftCtrl or System.Windows.Input.Key.RightCtrl or System.Windows.Input.Key.LeftAlt or System.Windows.Input.Key.RightAlt or System.Windows.Input.Key.LeftShift or System.Windows.Input.Key.RightShift)return; input.Text=MainWindow.ShortcutGesture(e);e.Handled=true;};
+        }
+        footer.Children.Add(Button(I18n.T("Restablecer predeterminados"),(_,_)=>{foreach(var pair in fields)pair.Value.Text=Shortcuts.Defaults[pair.Key];}));
+        footer.Children.Add(Button(I18n.T("Cancelar"),(_,_)=>window.Close()));
+        footer.Children.Add(Button(I18n.T("Guardar"),(_,_)=>
+        {
+            try
+            {
+                var candidate=Shortcuts.Validate(fields.ToDictionary(p=>p.Key,p=>p.Value.Text));
+                if(candidate["global"]!=Shortcuts.Effective(owner.Preferences.Shortcuts)["global"] && !owner.ChangeGlobalShortcut(candidate["global"]))throw new InvalidOperationException(I18n.T("No se pudo registrar el atajo global. Otra aplicación puede estar usándolo."));
+                var previous=owner.Preferences.Shortcuts; owner.Preferences.Shortcuts=candidate;
+                try{owner.Persist();}catch{owner.Preferences.Shortcuts=previous;owner.ChangeGlobalShortcut(Shortcuts.Effective(previous)["global"]);throw;}
+                owner.Refresh();window.Close();
+            }
+            catch(Exception ex){LocalizedNotice.Show(window,I18n.Error(ex),I18n.T("Configurar atajos"));}
+        },true));
+        window.ShowDialog();
     }
     internal static void RestoreStartupIfMissing()
     {

@@ -7,6 +7,16 @@ Directory.CreateDirectory(root);
 int passed = 0;
 void Check(bool condition, string name) { if (!condition) throw new Exception("FAILED: " + name); passed++; Console.WriteLine("PASS " + name); }
 void Reject(Action action, string name) { try { action(); } catch { passed++; Console.WriteLine("PASS " + name); return; } throw new Exception("FAILED: " + name); }
+Check(Shortcuts.Canonical("shift+control+n")=="Ctrl+Shift+N", "shortcut canonical order");
+Check(Shortcuts.Effective(null)["add"]=="Ctrl+N", "existing settings keep default shortcuts");
+Reject(()=>Shortcuts.Canonical("N"), "bare letters do not steal typing");
+Reject(()=>Shortcuts.Canonical("Ctrl+Ctrl+N"), "repeated modifiers rejected");
+Reject(()=>Shortcuts.Validate(new Dictionary<string,string>{{"add","Ctrl+F"}}), "duplicate shortcuts rejected");
+Reject(()=>Shortcuts.Validate(new Dictionary<string,string>{{"edit","Escape"}}), "Escape reserved for closing");
+Reject(()=>Shortcuts.Validate(new Dictionary<string,string>{{"global","F12"}}), "global shortcut requires a modifier");
+var shortcutSettings=new Settings{Shortcuts=new(){{"add","Ctrl+Shift+N"}}};
+var shortcutRoundTrip=JsonSerializer.Deserialize<Settings>(JsonSerializer.Serialize(shortcutSettings,DataJson.Options),DataJson.Options)!;
+Check(Shortcuts.Effective(shortcutRoundTrip.Shortcuts)["add"]=="Ctrl+Shift+N", "custom shortcut settings survive serialization");
 var game = new Game { Title = "  Test game  ", SteamAppId = 620, Status = GameStatus.Playing,
     Notes = "Keep my notes", Favorite = true, Tasks = [new() { Title = "Last chapter" }] };
 GameRules.Validate(game);

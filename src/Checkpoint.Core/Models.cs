@@ -97,6 +97,7 @@ public sealed class Settings
     public bool StartWithWindows { get; set; }
     public int SyncMinutes { get; set; } = 30;
     public string ServiceUrl { get; set; } = "";
+    public Dictionary<string,string> Shortcuts { get; set; } = [];
     public string? SteamId { get; set; }
 }
 

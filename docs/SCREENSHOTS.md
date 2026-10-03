@@ -110,3 +110,15 @@ Miniatura con tamaño de texto 18 y filas adaptadas.
 ## Código de amigo completo
 
 ![Cuenta con código de amigo de Checkpoint completo](screenshots/widget-friends-account.png)
+
+## Aplicación web
+
+Capturas del navegador con cuentas y servicios de prueba ficticios.
+
+![Biblioteca web](screenshots/web-library-en.png)
+
+![Atajos configurables](screenshots/web-shortcuts-en.png)
+
+![Amigos de Checkpoint](screenshots/web-friends-en.png)
+
+![Ajustes en pantalla estrecha](screenshots/web-mobile-en.png)

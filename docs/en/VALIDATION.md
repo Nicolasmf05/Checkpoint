@@ -126,3 +126,7 @@ Before public release, verify:
 7. Artifact signing, operator/contact/hosting identity and retention procedures.
 
 Transparency is alpha, without blur. SQLite 0.1/0.2 libraries migrate to schema 2; older app versions reject migrated databases. Compatible JSON remains importable; complete backups require 0.3+.
+
+## 0.7.5: shortcuts and browser
+
+Validated 152 core cases, 18 Node service tests, 21 Supabase Steam tests, 175 WPF checks, 62 actual CSS checks and 6 JavaScript UI/shortcut tests. The new editor captures combinations, persists to SQLite, updates hints and executes a custom binding. Another 7 web model tests and 28 browser checks cover backups, language, themes, persistent shortcuts, duplicates, Steam, friends, publication without private notes, narrow screens and offline opening. Browser social/Steam services are simulated. Production CORS returned 204 for Pages, 401 without a session and 403 for an unrelated origin. Real accounts, screen readers and physical keyboard validation remain pending.

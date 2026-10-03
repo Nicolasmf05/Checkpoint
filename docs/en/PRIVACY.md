@@ -25,3 +25,7 @@ Steam/Checkpoint sessions use Windows DPAPI for the current user. Complete `.che
 In the 0.6 Supabase Steam deployment, Steam IDs, session/nonce hashes, library and achievement cache persist in a private database schema in Ireland. Flows expire after 10 minutes, sessions after seven days, user cache after 15 minutes and public definitions after 24 hours. Expired rows are purged during later requests. Unlink revokes the session and clears its game cache. Passwords and plaintext session tokens are never stored in this schema; the operator key stays in server secrets. Supabase logs/backups follow provider retention. The preceding in-memory description applies to the alternative Node service.
 
 The local interface uses WebView2 and stores its browser profile in `webview-profile` beside the library. The interface does not load remote web pages; Steam/Supabase calls are made by native C#. The shared Microsoft runtime updates independently under Microsoft’s settings and terms.
+
+## Web version
+
+The web stores your private library, settings and publication queue in browser IndexedDB, without private cross-device synchronization. Sessions use this tab’s sessionStorage and are excluded from exports; they do not use DPAPI. Clearing site data deletes the local library: keep JSON backups. Offline caches contain public app files, not private service responses. GitHub Pages serves public files and Supabase handles authentication and social data. [Details and limits](WEB.md).

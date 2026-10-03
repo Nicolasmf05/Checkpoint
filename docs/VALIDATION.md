@@ -132,3 +132,7 @@ El MSI se ha compilado y validado por el compilador; no se ha instalado ni desin
 La translucidez es alfa sin desenfoque. La base de datos de versiones 0.1.0 y 0.2.0 migra al esquema 2, que añade el historial de recuperación. Las versiones anteriores rechazan una base de datos ya migrada. Las copias JSON de esas versiones siguen siendo importables y el formato JSON exportado sigue siendo compatible; las copias completas requieren 0.3.0 o posterior.
 
 La validación 0.5.0 comprueba el cambio de idioma desde Ajustes, persistencia, nombres accesibles del editor inglés, progreso compartido y vuelta al español, sin modificar notas ni publicaciones.
+
+## 0.7.5: atajos y navegador
+
+Se comprobaron 152 casos de biblioteca, 18 del servicio Node, 21 de Steam en Supabase, 175 de WPF, 62 de la interfaz CSS real y 6 del modelo/atajos JavaScript. La nueva configuración captura combinaciones, guarda en SQLite, actualiza ayuda y ejecuta el atajo personalizado. Además, 7 pruebas del modelo web y 28 comprobaciones de navegador verifican copias, idiomas, temas, atajos persistentes, duplicados, Steam, amigos, publicación sin notas privadas, pantallas estrechas y apertura sin conexión. Los servicios sociales/Steam de esas pruebas son simulados. El CORS desplegado se verificó con 204 para Pages, 401 sin sesión y 403 para un origen ajeno. Los ensayos con cuentas reales, lectores de pantalla y teclado físico siguen pendientes.

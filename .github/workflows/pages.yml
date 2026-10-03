@@ -1,0 +1,47 @@
+name: Checkpoint Web
+on:
+  push:
+    branches: [main]
+    paths: ['web/**', 'src/Checkpoint.App/Web/**', 'src/Checkpoint.Core/Localization/en.json', 'scripts/build-web.mjs', 'supabase/project.json', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/web/*.test.mjs web/test/*.test.mjs supabase/tests/steam.test.mjs
+      - run: node scripts/build-web.mjs
+      - run: npm --prefix web ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+        working-directory: web
+      - run: node web/test/browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checkpoint-web-validation
+          include-hidden-files: true
+          path: .qa/web-browser
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/web
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

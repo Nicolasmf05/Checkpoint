@@ -134,17 +134,43 @@ public partial class MainWindow : Window
         PreviewKeyDown += (_, e) =>
         {
             if (App.UseCss) return;
-            if (e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control) { Dialogs.Edit(this, null); e.Handled = true; }
-            if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control) { FocusCollectionSearch(); e.Handled = true; }
-            if (e.Key == Key.F6) { CycleView(); e.Handled = true; }
-            if (e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control && Keyboard.FocusedElement is not TextBoxBase) { UndoLastDeletion(); e.Handled = true; }
-            if (e.Key == Key.Escape) { Hide(); e.Handled = true; }
+            if (MatchesShortcut(e,"add")) { Dialogs.Edit(this, null); e.Handled = true; }
+            if (MatchesShortcut(e,"search")) { FocusCollectionSearch(); e.Handled = true; }
+            if (MatchesShortcut(e,"view")) { CycleView(); e.Handled = true; }
+            if (MatchesShortcut(e,"undo") && Keyboard.FocusedElement is not TextBoxBase) { UndoLastDeletion(); e.Handled = true; }
+            if (MatchesShortcut(e,"hide")) { Hide(); e.Handled = true; }
         };
         SourceInitialized += (_, _) =>
         {
             source = HwndSource.FromHwnd(new WindowInteropHelper(this).Handle); source.AddHook(WindowMessage);
-            hotkeyRegistered = RegisterHotKey(source.Handle, HotkeyId, 0x4000 | 0x0001 | 0x0002, 0x43);
+            ChangeGlobalShortcut(Shortcuts.Effective(Preferences.Shortcuts)["global"]);
         };
+    }
+    internal static string ShortcutGesture(KeyEventArgs e)
+    {
+        var key=e.Key==Key.System?e.SystemKey:e.Key;
+        var name=key switch {Key.Up=>"ArrowUp",Key.Down=>"ArrowDown",Key.PageUp=>"PageUp",Key.PageDown=>"PageDown",Key.Return=>"Enter",Key.Space=>"Space",_=>key.ToString()};
+        if(key>=Key.D0 && key<=Key.D9)name=((int)key-(int)Key.D0).ToString();
+        var mods=Keyboard.Modifiers;
+        return string.Join('+',new[]{mods.HasFlag(ModifierKeys.Control)?"Ctrl":null,mods.HasFlag(ModifierKeys.Alt)?"Alt":null,mods.HasFlag(ModifierKeys.Shift)?"Shift":null}.Where(x=>x is not null).Append(name));
+    }
+    private bool MatchesShortcut(KeyEventArgs e,string action)=>!Keyboard.Modifiers.HasFlag(ModifierKeys.Windows)&&ShortcutGesture(e)==Shortcuts.Effective(Preferences.Shortcuts)[action];
+    internal bool ChangeGlobalShortcut(string gesture)
+    {
+        if(source is null)return true;
+        bool Register(string value)
+        {
+            var parts=value.Split('+'); uint modifiers=0x4000;
+            if(parts.Contains("Ctrl"))modifiers|=2;if(parts.Contains("Alt"))modifiers|=1;if(parts.Contains("Shift"))modifiers|=4;
+            var name=parts[^1] switch {"ArrowUp"=>"Up","ArrowDown"=>"Down","Enter"=>"Return",_=>parts[^1]};
+            if(name.Length==1&&char.IsDigit(name[0]))name="D"+name;
+            return Enum.TryParse<Key>(name,out var key)&&RegisterHotKey(source.Handle,HotkeyId,modifiers,(uint)KeyInterop.VirtualKeyFromKey(key));
+        }
+        var previous=Shortcuts.Effective(Preferences.Shortcuts)["global"];
+        if(hotkeyRegistered)UnregisterHotKey(source.Handle,HotkeyId);
+        hotkeyRegistered=Register(gesture);
+        if(hotkeyRegistered)return true;
+        hotkeyRegistered=Register(previous);return false;
     }
     private void ClampToScreen(Forms.Screen? targetScreen = null)
     {
@@ -299,17 +325,20 @@ public partial class MainWindow : Window
         if (!Preferences.MiniatureView || !GameList.IsKeyboardFocusWithin || visibleCards.Count == 0) return;
         var current = (Keyboard.FocusedElement as FrameworkElement)?.DataContext as CardView ?? GameList.SelectedItem as CardView;
         int index = current is null ? -1 : visibleCards.IndexOf(current);
-        if (e.Key is Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown)
+        var configured=Shortcuts.Effective(Preferences.Shortcuts);
+        var command=configured.FirstOrDefault(p=>p.Value==ShortcutGesture(e)).Key;
+        var navigation=command switch {"up"=>Key.Up,"down"=>Key.Down,"first"=>Key.Home,"last"=>Key.End,"pageUp"=>Key.PageUp,"pageDown"=>Key.PageDown,_=>Key.None};
+        if (navigation!=Key.None)
         {
             int pageRows = 1;
-            if (e.Key is Key.PageUp or Key.PageDown)
+            if (navigation is Key.PageUp or Key.PageDown)
             {
                 var container = current is null ? null : GameList.ItemContainerGenerator.ContainerFromItem(current) as ListBoxItem;
                 double rowHeight = container is { ActualHeight: > 0 } ? container.ActualHeight + container.Margin.Top + container.Margin.Bottom : Preferences.MiniatureTextSize + 31;
                 double viewport = FindVisual<ScrollViewer>(GameList)?.ViewportHeight ?? GameList.ActualHeight;
                 pageRows = Math.Max(1,(int)Math.Floor(viewport / rowHeight));
             }
-            int target = e.Key switch
+            int target = navigation switch
             {
                 Key.Home => 0, Key.End => visibleCards.Count - 1,
                 Key.Up => Math.Max(0,index - 1), Key.Down => Math.Min(visibleCards.Count - 1,index + 1),
@@ -318,13 +347,13 @@ public partial class MainWindow : Window
             };
             FocusMiniatureCard(visibleCards[target]); e.Handled = true;
         }
-        else if (e.Key is Key.Enter or Key.Space)
+        else if (command=="gameMenu" || e.Key==Key.Space && Keyboard.Modifiers==ModifierKeys.None)
         {
             var card = index < 0 ? visibleCards[0] : visibleCards[index]; FocusMiniatureCard(card);
             if (GameList.ItemContainerGenerator.ContainerFromItem(card) is ListBoxItem container && FindVisual<Grid>(container) is { ContextMenu: { } menu } row)
             { menu.PlacementTarget = row; menu.IsOpen = true; e.Handled = true; }
         }
-        else if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None && current is not null)
+        else if (MatchesShortcut(e,"edit") && current is not null)
         { e.Handled = true; EditMiniatureGame(current.Model.Id); }
     }
     private void EditMiniatureGame(Guid gameId)
@@ -369,7 +398,7 @@ public partial class MainWindow : Window
             menu.Items.Add(item);
         }
         menu.Items.Add(new Separator());
-        var edit = new System.Windows.Controls.MenuItem { Header = I18n.T("Editar juego"), InputGestureText = "F2" };
+        var edit = new System.Windows.Controls.MenuItem { Header = I18n.T("Editar juego"), InputGestureText = Shortcuts.Effective(Preferences.Shortcuts)["edit"] };
         edit.Click += (_, _) => { menu.IsOpen = false; EditMiniatureGame(card.Model.Id); };
         menu.Items.Add(edit); menu.Items.Add(new Separator());
         AddMiniatureWindowActions(menu);
@@ -491,8 +520,8 @@ public partial class MainWindow : Window
     private void DragHandleKey(object sender, KeyEventArgs e)
     {
         Key key = e.Key == Key.System ? e.SystemKey : e.Key;
-        if ((Keyboard.Modifiers & ModifierKeys.Alt) == 0 || key is not (Key.Up or Key.Down) || ((FrameworkElement)sender).Tag is not Game game) return;
-        int index = visibleCards.FindIndex(c => c.Model.Id == game.Id), step = key == Key.Up ? -1 : 1;
+        if ((!MatchesShortcut(e,"moveUp")&&!MatchesShortcut(e,"moveDown")) || ((FrameworkElement)sender).Tag is not Game game) return;
+        int index = visibleCards.FindIndex(c => c.Model.Id == game.Id), step = MatchesShortcut(e,"moveUp") ? -1 : 1;
         int next = index + step; e.Handled = true;
         if (index < 0 || next < 0 || next >= visibleCards.Count) return;
         if (MoveCard(game.Id, visibleCards[next].Model.Id, step > 0))

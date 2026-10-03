@@ -31,3 +31,7 @@ Las copias completas `.checkpoint` contienen la colección actual y sus carátul
 En el despliegue Steam de Supabase de 0.6, SteamID, hashes de sesiones/respuestas, biblioteca y logros persisten en un esquema privado en Irlanda. Vinculaciones: 10 minutos; sesiones: siete días; caché del usuario: 15 minutos; definiciones públicas: 24 horas. Los registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y limpia su caché de juegos. No se guardan contraseñas ni tokens en texto claro; la clave del operador permanece en los secretos del servidor. Registros/copias siguen la retención de Supabase. La descripción previa en memoria corresponde a la alternativa Node.
 
 La interfaz local utiliza WebView2 y guarda su perfil en `webview-profile` junto a la biblioteca. No carga páginas web remotas; C# realiza las llamadas a Steam/Supabase. El runtime compartido de Microsoft se actualiza por separado según sus ajustes y condiciones.
+
+## Versión web
+
+La web guarda biblioteca privada, ajustes y cola de publicaciones en IndexedDB del navegador, sin sincronización privada entre dispositivos. Las sesiones se guardan en sessionStorage de la pestaña y no se exportan; no utilizan DPAPI. Al borrar los datos del sitio se pierde la biblioteca local: conserva copias JSON. El caché sin conexión contiene archivos públicos de la app, no respuestas privadas del servicio. GitHub Pages sirve los archivos públicos y Supabase mantiene la autenticación y los datos sociales. [Detalles y límites](WEB.md).

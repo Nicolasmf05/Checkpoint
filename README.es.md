@@ -4,6 +4,8 @@
 
 Un juego cada vez. Widget translúcido para organizar los juegos que quieres pasarte en Windows.
 
+**[Usar Checkpoint en el navegador](https://nicolasmf05.github.io/Checkpoint/)** · [Guía web](docs/WEB.md) · [Configurar atajos](docs/SHORTCUTS.md). La biblioteca web se guarda en este navegador; usa JSON para trasladar tus juegos de Windows.
+
 > **AVISO IMPORTANTE — SMARTSCREEN:** los EXE/MSI de GitHub no tienen firma ni certificado de editor. La ausencia de firma y de reputación puede provocar «Windows protegió su PC». **No tengo certificado porque supone un coste; no lo compraré hasta que los ingresos de Checkpoint cubran al menos lo que cueste. Hasta entonces, estas descargas seguirán sin certificado.** Firmar tampoco garantiza que el aviso desaparezca inmediatamente. [Lee el aviso y los requisitos](docs/DOWNLOAD-NOTES.md).
 
 ![Checkpoint: interfaz CSS](docs/screenshots/css-widget-es.png)
@@ -18,12 +20,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.7.4**. En la carpeta `dist` se generan:
+La versión actual es **0.7.5**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.4), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.5), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.7.4-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.7.4-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.7.5-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.7.5-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -85,6 +87,8 @@ Usa el selector de la cabecera o Ajustes → Modo de ventana: **Ventana completa
 **Historia terminada y todos los logros son independientes.** La sincronización nunca decide que has terminado una historia y conserva los datos previos si Steam falla.
 
 **Los atajos están visibles al pie de la ventana.** Pulsa **Atajos de teclado · F1** o **F1** para consultar la guía completa en el idioma elegido. En Miniatura usa F1 o el menú con clic derecho; la lista conserva solo nombres y estados. Esc cierra la ayuda y devuelve el foco.
+
+**Configura tus atajos en Ajustes → Configurar atajos**, o desde la ayuda de teclado. Puedes capturar combinaciones, detectar repetidos y restablecer los originales. Los atajos de la lista siguiente son los predeterminados. [Guía de configuración](docs/SHORTCUTS.md).
 
 Atajos: `Ctrl+Alt+C` muestra u oculta; `Ctrl+N` añade un juego; `Ctrl+F` busca; `F6` alterna lista, compacta, cuadrícula y Miniatura; `Ctrl+Z` recupera el último juego eliminado cuando no estás editando texto; `Escape` oculta. Si otro programa ocupa `Ctrl+Alt+C`, puedes abrir Checkpoint desde la bandeja.
 

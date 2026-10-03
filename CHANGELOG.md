@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.5 — 2026-10-03
+
+- Configurable local, Miniature, ordering and global Windows shortcuts, with conflict validation, persistence, default reset and updated hints.
+- A usable browser application on GitHub Pages, with local storage, JSON backups, Steam and Checkpoint friends.
+- Exact-origin Steam CORS preserves authentication; web sessions stay out of backups.
+
 ## 0.7.4 — 2026-10-03
 
 - Eight themes: Dark, Light, Midnight, Ocean, Forest, Plum, Amber and High contrast.

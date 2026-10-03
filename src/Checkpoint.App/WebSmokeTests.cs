@@ -205,6 +205,18 @@ public partial class MainWindow
             await modesSettings.Browser.CoreWebView2.ExecuteScriptAsync("const mode=document.querySelector('select[aria-label=\"Window mode\"]');mode.value=1;mode.dispatchEvent(new Event('change',{bubbles:true}));"); await Task.Delay(200);
             await modesSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Save').click();"); await Task.Delay(350);
             Check(!IsFullWindow && !Preferences.MiniatureView && !Store.LoadSettings().FullWindow,"CSS settings save the small window mode");
+            _ = Dispatcher.BeginInvoke(new Action(()=>Dialogs.ShortcutSettings(this)));
+            var shortcutsDialog=await Dialog();
+            Check(await Script(shortcutsDialog,"document.querySelectorAll('input').length===17"),"shortcut configuration exposes local, Miniature, reorder and global actions");
+            await shortcutsDialog.Browser.CoreWebView2.ExecuteScriptAsync("document.querySelector('input[aria-label=\"Add game\"]').dispatchEvent(new KeyboardEvent('keydown',{key:'N',ctrlKey:true,shiftKey:true,bubbles:true}));"); await Task.Delay(300);
+            await Capture(shortcutsDialog,"css-configure-shortcuts-en.png");
+            await shortcutsDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();"); await Task.Delay(400);
+            Check(Store.LoadSettings().Shortcuts.GetValueOrDefault("add")=="Ctrl+Shift+N","CSS shortcut editor saves the captured combination to SQLite");
+            Check(await Script(web,"document.querySelector('.shortcutbar').textContent.includes('Ctrl+Shift+N')"),"shortcut hints update to the configured combination");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'N',ctrlKey:true,shiftKey:true,bubbles:true}));");
+            var shortcutEditor=await Dialog();
+            Check(await Script(shortcutEditor,"!!document.querySelector('input[aria-label=\"Game title\"]')"),"custom desktop shortcut opens the game editor");
+            await shortcutEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

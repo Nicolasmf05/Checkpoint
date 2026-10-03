@@ -169,3 +169,16 @@ test('deployment replaces an owned-only persisted library cache without revoking
   assert.equal((await (await f.send('v1/library',undefined,token)).json()).games.length,2);
   const before=f.calls.length;f.restart();assert.equal((await (await f.send('v1/library',undefined,token)).json()).games.length,2);assert.equal(f.calls.length,before);
 });
+
+
+test('Pages browser preflight allows only the authorized origin without credentials or state mutation',async()=>{
+ const f=fixture();const r=await f.direct(new Request(base+'v1/library',{method:'OPTIONS',headers:{origin:'https://nicolasmf05.github.io','access-control-request-method':'GET','access-control-request-headers':'authorization'}}));
+ assert.equal(r.status,204);assert.equal(r.headers.get('access-control-allow-origin'),'https://nicolasmf05.github.io');assert.ok(r.headers.get('access-control-allow-headers').includes('authorization'));assert.equal(r.headers.get('access-control-allow-credentials'),null);assert.equal(f.db.size,0);
+});
+test('browser preflight rejects unrelated, lookalike and opaque origins',async()=>{
+ const f=fixture();for(const origin of ['https://evil.example','https://nicolasmf05.github.io.evil.example','null','http://nicolasmf05.github.io']){const r=await f.direct(new Request(base+'v1/library',{method:'OPTIONS',headers:{origin}}));assert.equal(r.status,403);assert.equal(r.headers.get('access-control-allow-origin'),null);}
+});
+test('Pages CORS responses preserve bound-session authentication and private-data checks',async()=>{
+ const f=fixture();const unauthorized=await f.direct(new Request(base+'v1/library',{headers:{origin:'https://nicolasmf05.github.io'}}));assert.equal(unauthorized.status,401);assert.equal(unauthorized.headers.get('access-control-allow-origin'),'https://nicolasmf05.github.io');
+ const {token}=await f.login();const valid=await f.direct(new Request(base+'v1/library',{headers:{origin:'https://nicolasmf05.github.io',authorization:'Bearer '+token}}));assert.equal(valid.status,200);assert.equal((await valid.json()).games[0].appId,620);assert.equal(valid.headers.get('vary'),'Origin');
+});

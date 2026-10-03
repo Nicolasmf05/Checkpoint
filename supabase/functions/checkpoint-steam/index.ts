@@ -103,7 +103,7 @@ export function createSteamHandler({baseUrl, apiKey='', rpc, fetchImpl=fetch, no
     if(!response.ok||!(await response.text()).split(/\r?\n/).includes('is_valid:true')) throw new Error();
     return {steamId:match[1],nonceHash:await hash(nonce)};
   }
-  return async request=>{
+  const handle = async request=>{
     try {
       const url=new URL(request.url);
       // The gateway may strip /functions/v1 before forwarding to the isolate.
@@ -176,6 +176,20 @@ export function createSteamHandler({baseUrl, apiKey='', rpc, fetchImpl=fetch, no
       }
       throw new ApiError(404,'Ruta no encontrada.');
     } catch(error) { return json(error instanceof ApiError?error.status:503,{error:error instanceof ApiError?error.message:'El servicio de Steam todavía no está configurado o no está disponible.'}); }
+  };
+  // Browser tokens stay on the client. CORS permits this owner's Pages origin only;
+  // authentication, privacy gates and rate limits remain in the same handler.
+  return async request=>{
+    const origin=request.headers.get('origin');
+    const allowed=origin==='https://nicolasmf05.github.io';
+    if(request.method==='OPTIONS') return new Response(null,{status:allowed?204:403,headers:allowed?{
+      'access-control-allow-origin':origin,'access-control-allow-methods':'GET, POST, OPTIONS',
+      'access-control-allow-headers':'authorization, content-type, apikey','access-control-max-age':'600','vary':'Origin'
+    }:{'vary':'Origin'}});
+    const response=await handle(request);
+    if(!allowed) return response;
+    const outgoing=new Headers(response.headers); outgoing.set('access-control-allow-origin',origin); outgoing.set('vary','Origin');
+    return new Response(response.body,{status:response.status,headers:outgoing});
   };
 }
 
