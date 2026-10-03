@@ -25,6 +25,7 @@ function showMenu(game, x, y) {
     menu.append(el('hr')); entry(state.labels.edit, 'edit', { id: game.id }); menu.append(el('hr'));
   }
   if (state.mini) entry(state.labels.exitMini, 'exit-mini');
+  [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((label,value)=>entry(label,'window-mode',{value},value===(state.mini?2:state.full?0:1)));
   entry(state.labels.settings, 'settings'); entry(state.labels.search, 'search'); entry(state.labels.add, 'add');
   menu.append(el('hr')); entry(state.labels.pin, 'pin', {}, state.pinned); entry(state.labels.locked, 'lock', {}, state.locked);
   document.body.append(menu);
@@ -86,6 +87,7 @@ function frame() {
   const wordmark = el('div'); wordmark.append(el('strong', '', 'checkpoint'), el('div', 'tagline')); brand.append(wordmark);
   brand.addEventListener('pointerdown', e => { if (e.button === 0 && !state.locked) action('drag'); }); header.append(brand);
   for (const [icon, name, label] of [['◇','pin','pin'], ['⚙','settings','settings'], ['−','hide','hide'], ['×','close','close']]) { const node = button(icon, name, icon, {}, 'icon'); node.dataset.label = label; header.append(node); }
+  const modes=el('select','window-mode'); modes.setAttribute('aria-label','Checkpoint'); modes.addEventListener('change',()=>action('window-mode',{value:Number(modes.value)})); header.append(modes);
   const intro = el('section', 'intro'); intro.append(el('h1'), el('div', 'summary'));
   const navigation = el('nav', 'navigation');
   for (const name of ['list','library','friends']) { const node = button('', 'tab', '', { value: name }); node.dataset.tab = name; navigation.append(node); }
@@ -104,7 +106,8 @@ function frame() {
 }
 function renderMain() {
   if (dialogMode || !root.querySelector('.window')) frame(); dialogMode = false;
-  const host = root.querySelector('.window'); host.classList.toggle('mini', state.mini);
+  const host = root.querySelector('.window'); host.classList.toggle('mini', state.mini); host.classList.toggle('full',state.full);
+  const modes=host.querySelector('.window-mode'); modes.replaceChildren(); [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((text,index)=>{const option=el('option','',text);option.value=index;modes.append(option);}); modes.value=state.mini?2:state.full?0:1; modes.setAttribute('aria-label',state.labels.windowMode);
   host.style.setProperty('--opacity', state.opacity); host.style.setProperty('--mini-size', `${state.textSize}px`);
   host.querySelector('.tagline').textContent = state.labels.tagline;
   host.querySelector('h1').textContent = state.tab === 'friends' ? state.labels.friendsTitle : state.labels.title;
@@ -112,10 +115,10 @@ function renderMain() {
   host.querySelectorAll('[data-label]').forEach(node => { const label = state.labels[node.dataset.label]; node.title = label; node.setAttribute('aria-label', label); if (node.classList.contains('add')) node.textContent = '+ '+label; });
   host.querySelectorAll('[data-tab]').forEach(node => { node.textContent = state.labels[node.dataset.tab]; node.classList.toggle('active', state.tab === node.dataset.tab); });
   const search = host.querySelector('#search'); if ((pending.get('search')||0) <= (state.ack||0) && search.value !== state.search) search.value = state.search; search.placeholder = state.labels.search; search.setAttribute('aria-label',state.labels.search);
-  const filter = host.querySelector('select'); filter.replaceChildren(); [state.labels.all,...state.labels.statuses].forEach((text,index) => { const option=el('option','',text); option.value=index; filter.append(option); }); filter.value = state.filter;
+  const filter = host.querySelector('.searchbar select'); filter.replaceChildren(); [state.labels.all,...state.labels.statuses].forEach((text,index) => { const option=el('option','',text); option.value=index; filter.append(option); }); filter.value = state.filter;
   host.querySelector('.connection').textContent = state.connection; host.querySelector('.notice').textContent = state.notice;
   host.querySelector('[data-label="undo"]').hidden = !state.undo; host.querySelector('[data-label="sync"]').disabled = state.busy;
-  host.querySelector('.resize').hidden = state.locked; host.querySelector('.dragstrip').hidden = !state.mini; host.querySelector('[data-label="pin"]').textContent = state.pinned ? '◆' : '◇';
+  host.querySelector('.resize').hidden = state.locked || state.full; host.querySelector('.dragstrip').hidden = !state.mini; host.querySelector('[data-label="pin"]').textContent = state.pinned ? '◆' : '◇';
   host.querySelector('[data-label="view"]').textContent = state.mini ? '☷' : state.grid ? '▦' : state.compact ? '≡' : '▤';
   if (selected && !state.games.some(game => game.id === selected)) selected = undefined;
   if (state.tab === 'friends') preserveTree(() => { const viewport=host.querySelector('.viewport'); const content=el('div','friends-content'); content.append(schema(state.friends)); if (state.friendsBusy) content.querySelectorAll('button,input,select').forEach(node=>node.disabled=true); viewport.replaceChildren(content); });

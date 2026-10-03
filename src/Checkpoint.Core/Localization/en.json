@@ -396,5 +396,9 @@
   "Entendido": "OK",
   "Añadir ejemplos": "Add examples",
   "Checkpoint necesita Microsoft Edge WebView2 Runtime para mostrar la interfaz. Instálalo y vuelve a abrir la aplicación.": "Checkpoint needs Microsoft Edge WebView2 Runtime to display the interface. Install it and reopen the app.",
-  "Descargar WebView2": "Download WebView2"
+  "Descargar WebView2": "Download WebView2",
+  "Modo de ventana": "Window mode",
+  "Ventana completa": "Full window",
+  "Ventana pequeña": "Small window",
+  "La ventana completa ocupa el área de trabajo y utiliza opacidad al 100 %. La pequeña y Miniatura conservan tu opacidad.": "Full window fills the work area and uses 100% opacity. Small window and Miniature keep your opacity."
 }

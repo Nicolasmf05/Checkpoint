@@ -227,6 +227,11 @@ internal static class Dialogs
         opacity.ValueChanged += (_, _) => { prefs.BackgroundOpacity = opacity.Value; opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles"); owner.ApplyPreferences(); };
         opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles");
         var top = Check(body, I18n.T("Mantener siempre visible"), prefs.AlwaysOnTop); var position = Check(body, I18n.T("Bloquear posición y tamaño"), prefs.PositionLocked);
+        Label(body, I18n.T("Modo de ventana"));
+        int initialMode = prefs.MiniatureView ? 2 : prefs.FullWindow ? 0 : 1;
+        var windowMode = new ComboBox { ItemsSource = new[] { I18n.T("Ventana completa"), I18n.T("Ventana pequeña"), I18n.T("Miniatura") }, SelectedIndex = initialMode };
+        System.Windows.Automation.AutomationProperties.SetName(windowMode, I18n.T("Modo de ventana")); body.Children.Add(windowMode);
+        body.Children.Add(new TextBlock { Text = I18n.T("La ventana completa ocupa el área de trabajo y utiliza opacidad al 100 %. La pequeña y Miniatura conservan tu opacidad."), TextWrapping = TextWrapping.Wrap, FontSize = 11 });
         Label(body, I18n.T("Vista de la colección"));
         var view = new ComboBox { ItemsSource = new[] { I18n.T("Lista"), I18n.T("Compacta"), I18n.T("Cuadrícula de carátulas"), I18n.T("Miniatura") }, SelectedIndex = prefs.MiniatureView ? 3 : prefs.GridView ? 2 : prefs.Compact ? 1 : 0 };
         System.Windows.Automation.AutomationProperties.SetName(view, I18n.T("Vista de la colección")); body.Children.Add(view);
@@ -285,8 +290,9 @@ internal static class Dialogs
                 if (!string.IsNullOrWhiteSpace(endpoint.Text)) SteamClient.ValidateServiceUrl(endpoint.Text);
                 if ((startup.IsChecked == true) != prefs.StartWithWindows) SetStartup(startup.IsChecked == true);
                 prefs.BackgroundOpacity = opacity.Value; prefs.AlwaysOnTop = top.IsChecked == true; prefs.PositionLocked = position.IsChecked == true;
-                prefs.MiniatureView = view.SelectedIndex == 3;
-                if (!prefs.MiniatureView) { prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; }
+                prefs.FullWindow = windowMode.SelectedIndex == 0;
+                prefs.MiniatureView = windowMode.SelectedIndex != initialMode ? windowMode.SelectedIndex == 2 : view.SelectedIndex == 3;
+                if (!prefs.MiniatureView && view.SelectedIndex != 3) { prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; }
                 prefs.LightTheme = light.IsChecked == true; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";

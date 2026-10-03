@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.7.1 — modos de ventana
+
+Han pasado 375 comprobaciones: 130 de biblioteca, 15 del servicio, 14 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 37 CSS reales. Las nuevas pruebas verifican área de trabajo y CSS opaco de la completa, modo guardado en SQLite sin sobrescribir tamaño/opacidad de la pequeña, vuelta a pequeña, cambios desde Miniatura y Ajustes traducidos. Las preferencias anteriores conservan pequeña como predeterminado. Captura de la completa en WebView2 real. Siguen pendientes varios monitores/DPI físicos, actualizaciones instaladas y cuentas reales.
+
 ## 0.7.0 — interfaz CSS
 
 Han pasado 366 comprobaciones: 128 de biblioteca, 15 Node del servicio, 14 Edge de Supabase, 175 de regresión de controladores nativos, 4 del modelo de interfaz y 30 en WebView2 real. El ZIP extraído ejecuta ambas pruebas con datos nuevos y aislados. CSS comprueba carátulas locales, juegos/notas guardados en SQLite, confirmación de valores escritos, contraseñas conservadas sin aparecer en instantáneas, español/inglés, ajustes, acceso a amigos, menús/foco/edición en Miniatura, virtualización de 1.004 juegos, cuadrícula, compacta clara, orden por teclado, texto seguro y bloqueo de navegación remota. Las capturas proceden de WebView2, no de los controles WPF antiguos.

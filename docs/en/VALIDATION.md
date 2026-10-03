@@ -1,5 +1,9 @@
 # Validation
 
+## 0.7.1 — window modes
+
+375 checks passed: 130 core, 15 service, 14 Edge, 175 native controllers, 4 frontend model and 37 actual CSS checks. New coverage verifies work-area dimensions and opaque CSS in Full window, SQLite mode persistence without overwriting small bounds/opacity, return to Small window, Miniature context transitions and localized Settings. Older settings default to Small window. Full-window screenshots use actual WebView2. Physical multi-monitor/DPI, installed upgrades and real-account limitations remain pending.
+
 ## 0.7.0 — CSS interface
 
 366 checks passed: 128 core, 15 service Node, 14 Supabase Edge, 175 native controller regression, 4 frontend model and 30 actual WebView2 checks. The extracted ZIP runs both native and CSS test suites with fresh isolated data. CSS checks exercise local cover loading, game/notes SQLite persistence, input acknowledgement, password preservation without snapshot disclosure, Spanish/English, settings, friends login, Miniature menus/focus/editing, 1,004-game virtualization, grid, light compact view, keyboard ordering, safe text rendering and blocked remote navigation. Screenshots are captured from WebView2 rather than legacy WPF controls.

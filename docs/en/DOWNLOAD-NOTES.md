@@ -20,6 +20,10 @@ Microsoft Store MSIX is an alternative: Microsoft signs approved apps without bu
 
 Portable: extract the ZIP and run `Checkpoint.exe` inside `Checkpoint`. Keep the files together. MSI installs for the current user. Both editions include this notice and its Spanish translation.
 
+## Window modes
+
+Choose Full window, Small window or Miniature in the header or Settings → Window mode. Full window fills the work area (taskbar stays available) at 100% opacity. Returning to Small window restores its saved size, position and opacity. Miniature keeps only names/states and its own dimensions; its right-click menu offers all three modes. Mode is saved. The opacity slider configures Small window/Miniature; it never makes Full window translucent.
+
 ## Miniature view
 
 Choose **Settings → Collection view → Miniature**, or cycle with F6. Shows only **game name and state** for My list, without covers, row buttons or progress bars. Header, navigation, filters and footer are hidden. The window can shrink to 240 × 90 Windows logical units. Drag the top edge and resize from the bottom-right corner. **F6 or right-click → Exit miniature view** returns to the normal view. Both sizes are saved independently; progress/files are unchanged. No covers are loaded while active.

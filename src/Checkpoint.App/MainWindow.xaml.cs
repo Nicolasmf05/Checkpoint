@@ -46,6 +46,22 @@ public partial class MainWindow : Window
     private Border? dropBorder;
     private int dragScrollDirection;
     private bool? miniatureApplied;
+    private bool fullWindowApplied;
+    internal bool IsFullWindow => Preferences.FullWindow && !Preferences.MiniatureView;
+    internal double EffectiveOpacity => IsFullWindow ? 1 : Preferences.BackgroundOpacity;
+    internal void SetWindowMode(int mode)
+    {
+        if (mode < 0 || mode > 2) return;
+        Preferences.FullWindow = mode == 0; Preferences.MiniatureView = mode == 2;
+        ApplyPreferences(); Persist(); Refresh();
+    }
+    private void FillWorkArea(Forms.Screen? target = null)
+    {
+        var scale = VisualTreeHelper.GetDpi(this);
+        var area = (target ?? Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle)).WorkingArea;
+        Left = area.Left / scale.DpiScaleX; Top = area.Top / scale.DpiScaleY;
+        Width = area.Width / scale.DpiScaleX; Height = area.Height / scale.DpiScaleY;
+    }
 
     public MainWindow(string directory, bool demo)
     {
@@ -149,16 +165,19 @@ public partial class MainWindow : Window
 
     internal void ApplyPreferences()
     {
-        if (miniatureApplied != Preferences.MiniatureView)
+        if (miniatureApplied != Preferences.MiniatureView || fullWindowApplied != IsFullWindow)
         {
             var currentScreen = ready ? Forms.Screen.FromHandle(new WindowInteropHelper(this).Handle) : null;
             if (miniatureApplied.HasValue) CaptureBounds();
+            bool leavingFull = fullWindowApplied;
             miniatureApplied = Preferences.MiniatureView;
+            fullWindowApplied = IsFullWindow;
             MinWidth = Preferences.MiniatureView ? 240 : 365;
             MinHeight = Preferences.MiniatureView ? 90 : 440;
             Width = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureWidth : Preferences.Width, MinWidth, SystemParameters.VirtualScreenWidth);
             Height = Math.Clamp(Preferences.MiniatureView ? Preferences.MiniatureHeight : Preferences.Height, MinHeight, SystemParameters.VirtualScreenHeight);
-            if (ready) ClampToScreen(currentScreen);
+            if (fullWindowApplied) FillWorkArea(currentScreen);
+            else { if (leavingFull) { Left = Preferences.Left ?? Left; Top = Preferences.Top ?? Top; } if (ready) ClampToScreen(currentScreen); }
             if (Preferences.MiniatureView) { friendsVisible = false; allLibrary = false; Search.Clear(); StatusFilter.SelectedIndex = 0; }
         }
         bool miniature = Preferences.MiniatureView;
@@ -186,10 +205,10 @@ public partial class MainWindow : Window
         resources["LineBrush"] = Brush(light ? "#607D8EA1" : "#405F6B85");
         resources["AccentBrush"] = Brush(light ? "#FF0B7554" : "#FF8CEBC6");
         var rgb = light ? Color.FromRgb(238, 244, 248) : Color.FromRgb(17, 24, 39);
-        rgb.A = (byte)Math.Round(Math.Clamp(Preferences.BackgroundOpacity, .35, 1) * 255);
+        rgb.A = (byte)Math.Round(Math.Clamp(EffectiveOpacity, .35, 1) * 255);
         Shell.Background = new SolidColorBrush(rgb);
         Topmost = Preferences.AlwaysOnTop; PinButton.Content = Topmost ? "◆" : "◇";
-        ResizeGrip.Visibility = Preferences.PositionLocked ? Visibility.Collapsed : Visibility.Visible;
+        ResizeGrip.Visibility = Preferences.PositionLocked || IsFullWindow ? Visibility.Collapsed : Visibility.Visible;
         timer.Interval = TimeSpan.FromMinutes(Math.Clamp(Preferences.SyncMinutes, 15, 120));
         Covers.SetEnabled(!Preferences.LightweightMode && !miniature);
         ViewButton.Content = miniature ? "☷" : Preferences.GridView ? "▦" : Preferences.Compact ? "≡" : "▤";
@@ -202,6 +221,7 @@ public partial class MainWindow : Window
     internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); }
     private void CaptureBounds()
     {
+        if (fullWindowApplied) return;
         if (miniatureApplied == true) { Preferences.MiniatureWidth = Width; Preferences.MiniatureHeight = Height; }
         else { Preferences.Width = Width; Preferences.Height = Height; }
         Preferences.Left = Left; Preferences.Top = Top;
@@ -517,7 +537,7 @@ public partial class MainWindow : Window
         });
         Persist(); Notice(I18n.T("Juegos de ejemplo añadidos. El progreso de Steam aún no se ha consultado."));
     }
-    internal void ShowWidget() { Show(); WindowState = WindowState.Normal; if (ready) ClampToScreen(); Activate(); }
+    internal void ShowWidget() { Show(); WindowState = WindowState.Normal; if (ready) { if (IsFullWindow) FillWorkArea(); else ClampToScreen(); } Activate(); }
     private void ToggleVisible() { if (IsVisible) Hide(); else ShowWidget(); }
     internal void Exit() { exiting = true; Close(); }
     protected override void OnClosing(CancelEventArgs e)

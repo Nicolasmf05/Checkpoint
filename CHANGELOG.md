@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.1 — 2026-10-03
+
+- Three explicit window modes in the header, Settings and context menu: Full window, Small window and Miniature.
+- Full window fills the current monitor work area with 100% opacity, while preserving small-window size, position and translucency for returning.
+- Saved mode, compatibility with older preferences and actual CSS transition/settings tests.
+
 ## 0.7.0 — 2026-10-03
 
 - Visible interface migrated to local HTML/CSS/JavaScript in transparent WebView2: collection, Miniature, friends, forms and app notices.

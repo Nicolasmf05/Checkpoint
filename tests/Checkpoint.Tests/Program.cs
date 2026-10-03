@@ -107,4 +107,11 @@ var resourceKeys = JsonSerializer.Deserialize<Dictionary<string,string>>(File.Re
 Check(resourceKeys.Values.All(key => I18n.TryTranslateKnown(key, out _)), "all XAML strings have English translations");
 Check(translatedLiterals > 250, "all literal app and core messages have English translations");
 I18n.SetLanguage("es");
+Check(!JsonSerializer.Deserialize<Settings>("{\"Width\":480,\"MiniatureView\":false}")!.FullWindow, "previous settings retain the small window default");
+using (var modes = new SqliteStore(Path.Combine(root,"window-modes")))
+{
+    modes.SaveSettings(new Settings { FullWindow=true, Width=480, Height=650, BackgroundOpacity=.57 });
+    var restored=modes.LoadSettings();
+    Check(restored.FullWindow && restored.Width==480 && restored.Height==650 && restored.BackgroundOpacity==.57,"full window preference retains small dimensions and opacity through SQLite reload");
+}
 Console.WriteLine($"{passed} checks passed. Test files: {root}");

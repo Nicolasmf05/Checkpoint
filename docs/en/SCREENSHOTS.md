@@ -4,6 +4,10 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.7.1 — full window
+
+![Full window, 100% opacity](../screenshots/css-full-window-en.png)
+
 ## 0.7.0 — current CSS interface
 
 ![English widget](../screenshots/css-widget-en.png)

@@ -18,13 +18,13 @@ Current captures come from the actual local HTML/CSS interface in WebView2, usin
 
 ## Download and run
 
-Current version: **0.7.0**. Build outputs in `dist`:
+Current version: **0.7.1**. Build outputs in `dist`:
 
-- `Checkpoint-0.7.0-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.7.0-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.7.1-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.7.1-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.0), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.1), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
@@ -36,6 +36,10 @@ Windows x64 (Windows 11 tested), **Microsoft Edge WebView2 Evergreen Runtime**, 
 ## Interface technology
 
 The visible collection, Miniature, friends, editors, settings and app notices use **local HTML, CSS and JavaScript in WebView2**. Style them in `src/Checkpoint.App/Web/app.css`. C#/.NET handles SQLite, Steam, Supabase, the tray and native window. WPF remains the window shell and existing form controllers; Windows file pickers and the missing-runtime notice remain native. No JavaScript framework or remote interface is required. [Architecture and development](docs/en/CSS-INTERFACE.md).
+
+## Window modes
+
+Use the header selector or Settings → Window mode: **Full window**, **Small window**, **Miniature**. Full window fills the current monitor work area, leaving the taskbar available, and always uses **100% opacity**. Small window restores its saved size and chosen opacity. Miniature keeps the names/states-only list and its own saved dimensions; right-click to choose any window mode. The mode persists across restarts. Collection layouts (list, compact, grid) remain separate.
 
 ## Features
 
@@ -127,13 +131,13 @@ dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PW
 
 Native tests reject existing libraries/sessions/publications and exercise real controls with simulated Steam/social responses. Demo adds examples only to an empty library. Build extracts and tests its self-contained ZIP, including language switching and virtualized rendering of 1,003 games. The CSS suite separately launches the actual HTML interface with 1,004 games, forms, menus and language changes. Reports and captures: `.qa/package-…/render` and `.qa/web-package-…/render`.
 
-Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.7.0-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
+Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.7.1-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
 
 ## GitHub
 
 MIT license, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
-`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.7.0.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
+`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.7.1.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 
 See [roadmap](docs/en/ROADMAP.md) and [changelog](CHANGELOG.md). Notifications, monthly statistics and private-library cloud sync are future work.
 
@@ -141,4 +145,4 @@ Checkpoint is independent of Valve. Games, artwork and trademarks belong to thei
 
 Checkpoint notices, menus and windows follow the language selected in Settings. External technical errors appear as translated explanations. Game titles, notes, tasks and player names keep their original content. System dialogs, including file pickers and SmartScreen, follow the Windows language.
 
-Your complete friend code appears and copies from Friends → Account: `checkpoint-` followed by 12 characters. Use Checkpoint 0.7.0 or later to enter this format; codes copied from earlier versions still identify the same account.
+Your complete friend code appears and copies from Friends → Account: `checkpoint-` followed by 12 characters. Use Checkpoint 0.7.1 or later to enter this format; codes copied from earlier versions still identify the same account.

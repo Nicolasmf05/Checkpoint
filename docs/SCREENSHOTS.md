@@ -4,6 +4,10 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.7.1 — ventana completa
+
+La captura inglesa muestra la ventana completa con opacidad al 100 %: [ver captura](screenshots/css-full-window-en.png). El selector también está traducido a español en las capturas siguientes.
+
 ## 0.7.0 — interfaz CSS actual
 
 Capturas de HTML/CSS real en WebView2 mediante `CapturePreviewAsync`, con datos aislados. La carátula verde es una imagen local de prueba. Las imágenes WPF siguientes se conservan como archivo histórico.

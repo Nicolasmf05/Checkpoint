@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.7.1 — 2026-10-03
+
+- Tres modos explícitos en cabecera, Ajustes y menú contextual: Ventana completa, Ventana pequeña y Miniatura.
+- La completa ocupa el área de trabajo del monitor al 100 % de opacidad, conservando tamaño, posición y translucidez de la pequeña al volver.
+- Modo guardado, compatibilidad con preferencias anteriores y pruebas reales de cambios y ajustes en CSS.
+
 ## 0.7.0 — 2026-10-03
 
 - Interfaz visible migrada a HTML/CSS/JavaScript locales en WebView2 transparente: colección, Miniatura, amigos, formularios y avisos propios.

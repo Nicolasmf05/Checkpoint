@@ -22,7 +22,7 @@ public partial class MainWindow
             throw new TimeoutException("CSS UI condition timed out");
         }
         async Task<bool> Script(WebSurface surface,string script) => await surface.Browser.CoreWebView2.ExecuteScriptAsync(script) == "true";
-        async Task Run(string script) { await web!.Browser.CoreWebView2.ExecuteScriptAsync(script); await Task.Delay(350); }
+        async Task Run(string script) { await web!.Browser.CoreWebView2.ExecuteScriptAsync("(() => {"+script+"})()"); await Task.Delay(350); }
         async Task<WebSurface> Dialog()
         {
             WebSurface? found=null;
@@ -87,7 +87,7 @@ public partial class MainWindow
             Check(await Script(web,"document.activeElement.matches('.minirow')"),"CSS Miniature keyboard navigation focuses an HTML game row");
             var activeGameId=Guid.Parse(JsonSerializer.Deserialize<string>(await web.Browser.CoreWebView2.ExecuteScriptAsync("document.activeElement.dataset.game"))!);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
-            Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===7"),"Miniature state and window actions render in an HTML context menu");
+            Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===10"),"Miniature state and window actions render in an HTML context menu");
             await Run("[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Playing')).click();");
             Check(Store.LoadGames().Single(g=>g.Id==activeGameId).Status==GameStatus.Playing,"HTML state actions persist through the native controller");
             await Capture(web,"css-miniature-en.png");
@@ -133,6 +133,27 @@ public partial class MainWindow
             Check(await Script(notice,"document.body.innerText.includes('The operation could not be completed') && [...document.querySelectorAll('button')].some(b=>b.textContent==='OK')"),"app notices render English text and buttons in CSS");
             await Capture(notice,"css-notice-en.png");
             await notice.Browser.CoreWebView2.ExecuteScriptAsync("document.querySelector('button').click();"); await Task.Delay(200);
+            double smallWidth=Width, smallHeight=Height;
+            Preferences.BackgroundOpacity=.61; Persist(); Refresh();
+            await Run("const mode=document.querySelector('.window-mode');mode.value=0;mode.dispatchEvent(new Event('change',{bubbles:true}));");
+            var area=System.Windows.Forms.Screen.FromHandle(new System.Windows.Interop.WindowInteropHelper(this).Handle).WorkingArea;
+            var dpi=System.Windows.Media.VisualTreeHelper.GetDpi(this);
+            Check(IsFullWindow && Math.Abs(Width-area.Width/dpi.DpiScaleX)<2 && Math.Abs(Height-area.Height/dpi.DpiScaleY)<2 && await Script(web,"window.checkpointState.opacity===1 && getComputedStyle(document.querySelector('.window')).borderRadius==='0px'"),"full window fills monitor work area and renders at maximum opacity");
+            Check(Store.LoadSettings().FullWindow && Math.Abs(Store.LoadSettings().Width-smallWidth)<2 && Math.Abs(Store.LoadSettings().BackgroundOpacity-.61)<.001,"full window saves its mode without overwriting small dimensions or translucency");
+            await Capture(web,"css-full-window-en.png");
+            await Run("const mode=document.querySelector('.window-mode');mode.value=1;mode.dispatchEvent(new Event('change',{bubbles:true}));");
+            Check(!IsFullWindow && Math.Abs(Width-smallWidth)<2 && Math.Abs(Height-smallHeight)<2 && await Script(web,"window.checkpointState.opacity===0.61 && document.querySelector('.window-mode').value==='1'"),"small window restores saved dimensions and translucency");
+            await Run("const mode=document.querySelector('.window-mode');mode.value=2;mode.dispatchEvent(new Event('change',{bubbles:true}));");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
+            Check(Preferences.MiniatureView && await Script(web,"[...document.querySelectorAll('.menu button')].some(button=>button.textContent.includes('Full window')) && window.checkpointState.opacity===0.61"),"Miniature keeps translucency and offers all three window modes");
+            await Run("[...document.querySelectorAll('.menu button')].find(button=>button.textContent.includes('Full window')).click();");
+            Check(IsFullWindow && !Preferences.MiniatureView && Store.LoadSettings().FullWindow,"Miniature context menu restores the opaque full window");
+            await Run("document.querySelector('[data-label=settings]').click();");
+            var modesSettings=await Dialog();
+            Check(await Script(modesSettings,"document.querySelector('select[aria-label=\"Window mode\"]').value==='0' && document.body.innerText.includes('100% opacity')"),"settings expose localized window modes and the full-opacity explanation");
+            await modesSettings.Browser.CoreWebView2.ExecuteScriptAsync("const mode=document.querySelector('select[aria-label=\"Window mode\"]');mode.value=1;mode.dispatchEvent(new Event('change',{bubbles:true}));"); await Task.Delay(200);
+            await modesSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Save').click();"); await Task.Delay(350);
+            Check(!IsFullWindow && !Preferences.MiniatureView && !Store.LoadSettings().FullWindow,"CSS settings save the small window mode");
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

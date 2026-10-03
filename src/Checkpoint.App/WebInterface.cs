@@ -23,7 +23,7 @@ public partial class MainWindow
     private object WebSnapshot() => new
     {
         kind="main", language=I18n.Language, light=Preferences.LightTheme,
-        opacity=Preferences.BackgroundOpacity, mini=Preferences.MiniatureView, compact=Preferences.Compact,
+        opacity=EffectiveOpacity, full=IsFullWindow, mini=Preferences.MiniatureView, compact=Preferences.Compact,
         grid=Preferences.GridView, textSize=Preferences.MiniatureTextSize, locked=Preferences.PositionLocked,
         pinned=Preferences.AlwaysOnTop, lightweight=Preferences.LightweightMode, busy=syncing,
         tab=friendsVisible ? "friends" : allLibrary ? "library" : "list", search=Search.Text, filter=StatusFilter.SelectedIndex,
@@ -36,6 +36,7 @@ public partial class MainWindow
             steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
             examples=I18n.T("Añadir ejemplos"), finish=I18n.T("Marcar o desmarcar historia terminada"),
+            windowMode=I18n.T("Modo de ventana"), fullWindow=I18n.T("Ventana completa"), smallWindow=I18n.T("Ventana pequeña"), miniature=I18n.T("Miniatura"),
             all=I18n.T("Todos"), statuses=Enum.GetValues<GameStatus>().Select(Labels.Status).ToArray() },
         games=(friendsVisible ? Enumerable.Empty<CardView>() : visibleCards).Select(card => new { id=card.Model.Id, title=card.Model.Title, platform=card.Model.Platform,
             state=(int)card.Model.Status, status=card.Model.StatusText, next=card.Model.NextTask,
@@ -53,6 +54,7 @@ public partial class MainWindow
         switch (action)
         {
             case "ready": break;
+            case "window-mode": if (message.GetProperty("value").TryGetInt32(out int mode)) SetWindowMode(mode); break;
             case "tab":
                 switch (message.GetProperty("value").GetString()) { case "friends": Click(FriendsButton); break; case "library": Click(LibraryButton); break; case "list": Click(TrackedButton); break; }
                 break;
@@ -76,9 +78,9 @@ public partial class MainWindow
             case "exit-mini": Preferences.MiniatureView=false; ApplyPreferences(); Persist(); Refresh(); break;
             case "hide": Hide(); break;
             case "close": Close(); break;
-            case "drag": if (!Preferences.PositionLocked && System.Windows.Input.Mouse.LeftButton == System.Windows.Input.MouseButtonState.Pressed) DragMove(); break;
+            case "drag": if (!IsFullWindow && !Preferences.PositionLocked && System.Windows.Input.Mouse.LeftButton == System.Windows.Input.MouseButtonState.Pressed) DragMove(); break;
             case "resize":
-                if (!Preferences.PositionLocked && message.GetProperty("x").TryGetDouble(out double x) && message.GetProperty("y").TryGetDouble(out double y) && double.IsFinite(x) && double.IsFinite(y))
+                if (!IsFullWindow && !Preferences.PositionLocked && message.GetProperty("x").TryGetDouble(out double x) && message.GetProperty("y").TryGetDouble(out double y) && double.IsFinite(x) && double.IsFinite(y))
                 { Width=Math.Clamp(Width+Math.Clamp(x,-200,200),MinWidth,SystemParameters.VirtualScreenWidth); Height=Math.Clamp(Height+Math.Clamp(y,-200,200),MinHeight,SystemParameters.VirtualScreenHeight); }
                 break;
             case "move" when game is not null:
