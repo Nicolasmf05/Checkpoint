@@ -64,3 +64,10 @@ The outline marks the focused row. Up/Down and Home/End select games; Enter/Spac
 Right-click the background → Add game, including with no rows. This native capture uses Spanish.
 
 ![Empty Miniature menu, Spanish capture](../screenshots/miniature-empty-menu.png)
+
+
+## Page navigation — 0.6.12
+
+PageUp/PageDown adapt the jump to Miniature height. Native capture uses Spanish and a large sample collection.
+
+![Miniature page navigation, Spanish capture](../screenshots/widget-miniature-pages.png)

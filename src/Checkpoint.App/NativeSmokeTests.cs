@@ -386,7 +386,7 @@ public partial class MainWindow
             retainedGame.Favorite = retainedFavorite; retainedGame.SortOrder = retainedOrder;
             Keyboard.ClearFocus(); Refresh();
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
-            Check((GameList.SelectedItem as CardView)?.Model.Id == retainedGame.Id && Keyboard.FocusedElement is null, "miniature refresh preserves selection without acquiring absent keyboard focus");
+            Check((GameList.SelectedItem as CardView)?.Model.Id == retainedGame.Id && !GameList.IsKeyboardFocusWithin, "miniature refresh preserves selection without acquiring absent keyboard focus");
             retainedGame.Tracked = false; Refresh();
             Check(GameList.SelectedItem is null, "miniature refresh clears a selection that is no longer in the list");
             retainedGame.Tracked = true; Refresh(); FocusMiniatureCard(visibleCards[0]);
@@ -397,6 +397,25 @@ public partial class MainWindow
             Console.WriteLine($"Virtual keyboard: selected={GameList.SelectedItem == visibleCards[^1]}, focused={(Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1]}, realized={VisualChildren(GameList).OfType<ListBoxItem>().Count()}");
             Check(GameList.SelectedItem == visibleCards[^1] && (Keyboard.FocusedElement as FrameworkElement)?.DataContext == visibleCards[^1] &&
                 VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "miniature End focuses a distant virtualized row in a large collection");
+            MiniatureKey(Key.PageDown);
+            Check(GameList.SelectedItem == visibleCards[^1], "miniature PageDown stops at the last game");
+            MiniatureKey(Key.Home); MiniatureKey(Key.PageDown);
+            int smallPageIndex = GameList.SelectedIndex;
+            Check(smallPageIndex > 1 && smallPageIndex < visibleCards.Count - 1 &&
+                (Keyboard.FocusedElement as FrameworkElement)?.DataContext == GameList.SelectedItem, "miniature PageDown moves a visible page and retains row focus");
+            MiniatureKey(Key.PageUp); MiniatureKey(Key.PageUp);
+            Check(GameList.SelectedItem == visibleCards[0], "miniature PageUp returns by a page and stops at the first game");
+            double pageHeight = Height; Height = 360;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            MiniatureKey(Key.Home); MiniatureKey(Key.PageDown);
+            Check(GameList.SelectedIndex > smallPageIndex && VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30,
+                "miniature page navigation adapts to a taller viewport without disabling virtualization");
+            Render(this,"widget-miniature-pages.png");
+            Height = pageHeight;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            MiniatureKey(Key.End);
+            for (int i = 0; i < 10 && (Keyboard.FocusedElement as FrameworkElement)?.DataContext != visibleCards[^1]; i++)
+            { await Task.Delay(10); await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle); }
             var distantId = visibleCards[^1].Model.Id;
             Refresh();
             for (int i = 0; i < 10 && (Keyboard.FocusedElement as FrameworkElement)?.DataContext != GameList.SelectedItem; i++)
@@ -404,6 +423,15 @@ public partial class MainWindow
             Check((GameList.SelectedItem as CardView)?.Model.Id == distantId &&
                 (Keyboard.FocusedElement as FrameworkElement)?.DataContext == GameList.SelectedItem &&
                 VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "miniature refresh restores a distant row without disabling virtualization");
+            Keyboard.ClearFocus();
+            var miniatureScroll = FindVisual<ScrollViewer>(GameList)!;
+            miniatureScroll.ScrollToVerticalOffset(10000);
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            double readingOffset = miniatureScroll.VerticalOffset;
+            Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(readingOffset > 1000 && Math.Abs(miniatureScroll.VerticalOffset - readingOffset) < 1 && !GameList.IsKeyboardFocusWithin &&
+                VisualChildren(GameList).OfType<ListBoxItem>().Count() < 30, "miniature refresh retains an unfocused reading position in a large virtualized collection");
             Games.RemoveAll(g => keyboardBulk.Contains(g)); Refresh(); FocusMiniatureCard(visibleCards[0]);
             var miniatureRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
             var miniatureGame = ((CardView)miniatureRow.DataContext).Model;

@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.12 — page navigation
+
+289 checks passed: 108 core, 15 Node, 14 Edge and 152 native WPF. Five new checks cover PageDown at the final boundary, page advance with focus, PageUp/first boundary, larger jumps in a taller viewport and reading-offset retention after an unfocused refresh. The collection has 1,003 games with fewer than 30 realized rows. The no-focus check permits focus on the outer window without acquiring list focus. Search now closes its menu first; its existing focus test passes. Native page-navigation screenshot included. Physical keyboard, installed packages and real accounts remain pending.
+
 ## 0.6.11 — adding from empty Miniature
 
 284 checks passed: 108 core, 15 Node, 14 Edge and 147 native WPF. Four new checks cover Add game in empty Miniature, cancellation with no data on disk, saved notes/new row without covers or changing view, and English labels/Ctrl+N in both menus. The real background menu is opened and native controls captured using isolated data. Physical keyboard/drag, installed packages and real accounts remain pending.

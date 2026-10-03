@@ -37,6 +37,8 @@ Updates preserve the selected game and restore its keyboard focus only if the li
 
 **Right-click the background or a game → Add game**, also available with an empty list. The normal editor opens while Miniature stays active. Save creates the game; Cancel leaves no entry. Games marked Show in My list appear as name/state rows. Ctrl+N remains available. No extra empty-state controls are added.
 
+**PageUp/PageDown** navigate Miniature by a visible page, based on the current viewport and row height. Resizing the window adjusts the jump. Navigation stops at the first/last game and keeps the active row focused; large lists stay virtualized. Updates without list focus retain the existing reading offset. Search closes the menu before focusing the normal search field.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

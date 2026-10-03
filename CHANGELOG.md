@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.12 — 2026-10-03
+
+- Miniature supports PageUp/PageDown with a jump based on visible height and actual row size; keeps keyboard focus and clamps to first/last game.
+- Search closes the context menu before focusing the visible search field.
+- Regression coverage confirms unfocused reading position persists through refresh without losing virtualization.
+
 ## 0.6.11 — 2026-10-03
 
 - Miniature background/game menus include Add game with its Ctrl+N hint, including when My list is empty.

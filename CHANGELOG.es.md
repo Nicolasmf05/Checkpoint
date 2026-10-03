@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.6.12 — 2026-10-03
+
+- Miniatura admite Re Pág/Av Pág con salto según altura visible y tamaño real de fila, foco de teclado y límites en el primer/último juego.
+- Buscar cierra el menú contextual antes de enfocar el buscador visible.
+- La prueba de regresión confirma que una actualización conserva el desplazamiento de lectura sin perder virtualización.
+
 ## 0.6.11 — 2026-10-03
 
 - Menús de fondo/juego de Miniatura incluyen Añadir juego y el atajo Ctrl+N, también con Mi lista vacía.

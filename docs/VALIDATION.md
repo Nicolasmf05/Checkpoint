@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.12 — navegación por páginas
+
+Han pasado 289 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 152 WPF. Cinco nuevas comprueban Av Pág en el límite final, avance con foco, retroceso/límite inicial, salto mayor al ampliar la ventana y conservación del desplazamiento al actualizar sin foco en la lista. Se usa una colección de 1.003 juegos con menos de 30 filas creadas. La comprobación de ausencia de foco admite foco en la ventana exterior, sin adquirirlo en la lista. La búsqueda cierra primero el menú; su prueba existente sigue pasando. Se incluye captura nativa de navegación por páginas. Teclado físico, instalación y cuentas reales siguen pendientes.
+
 ## 0.6.11 — alta desde Miniatura vacía
 
 Han pasado 284 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 147 WPF. Cuatro nuevas prueban el menú de alta con Miniatura vacía, cancelación sin datos en disco, guardado de notas/nueva fila sin carátulas ni cambio de vista y traducción inglesa con Ctrl+N en ambos menús. Se abre el menú real del fondo y se capturan los controles nativos con datos aislados. Siguen pendientes teclado/arrastre físicos, instalación y cuentas reales.

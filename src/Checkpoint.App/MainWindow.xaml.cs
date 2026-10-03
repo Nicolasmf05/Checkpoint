@@ -271,9 +271,23 @@ public partial class MainWindow : Window
         if (!Preferences.MiniatureView || !GameList.IsKeyboardFocusWithin || visibleCards.Count == 0) return;
         var current = (Keyboard.FocusedElement as FrameworkElement)?.DataContext as CardView ?? GameList.SelectedItem as CardView;
         int index = current is null ? -1 : visibleCards.IndexOf(current);
-        if (e.Key is Key.Up or Key.Down or Key.Home or Key.End)
+        if (e.Key is Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown)
         {
-            int target = e.Key switch { Key.Home => 0, Key.End => visibleCards.Count - 1, Key.Up => Math.Max(0,index - 1), _ => Math.Min(visibleCards.Count - 1,index + 1) };
+            int pageRows = 1;
+            if (e.Key is Key.PageUp or Key.PageDown)
+            {
+                var container = current is null ? null : GameList.ItemContainerGenerator.ContainerFromItem(current) as ListBoxItem;
+                double rowHeight = container is { ActualHeight: > 0 } ? container.ActualHeight + container.Margin.Top + container.Margin.Bottom : 43;
+                double viewport = FindVisual<ScrollViewer>(GameList)?.ViewportHeight ?? GameList.ActualHeight;
+                pageRows = Math.Max(1,(int)Math.Floor(viewport / rowHeight));
+            }
+            int target = e.Key switch
+            {
+                Key.Home => 0, Key.End => visibleCards.Count - 1,
+                Key.Up => Math.Max(0,index - 1), Key.Down => Math.Min(visibleCards.Count - 1,index + 1),
+                Key.PageUp => Math.Max(0,index - pageRows),
+                _ => Math.Min(visibleCards.Count - 1,Math.Max(0,index) + pageRows)
+            };
             FocusMiniatureCard(visibleCards[target]); e.Handled = true;
         }
         else if (e.Key is Key.Enter or Key.Space)
@@ -340,7 +354,7 @@ public partial class MainWindow : Window
         settings.Click += (_, _) => Dialogs.Settings(this);
         menu.Items.Add(restore); menu.Items.Add(settings);
         var search = new System.Windows.Controls.MenuItem { Header = I18n.T("Buscar juego"), InputGestureText = "Ctrl+F" };
-        search.Click += (_, _) => FocusCollectionSearch();
+        search.Click += (_, _) => { menu.IsOpen = false; FocusCollectionSearch(); };
         menu.Items.Add(search);
         var add = new System.Windows.Controls.MenuItem { Header = I18n.T("Añadir juego"), InputGestureText = "Ctrl+N" };
         add.Click += (_, _) => { menu.IsOpen = false; Dialogs.Edit(this, null); };

@@ -37,6 +37,8 @@ Las actualizaciones conservan el juego seleccionado y recuperan su foco de tecla
 
 **Clic derecho en el fondo o un juego → Añadir juego**, también con la lista vacía. Se abre la ficha habitual manteniendo Miniatura activa. Guardar crea el juego y Cancelar no deja una entrada. Los juegos marcados Mostrar en Mi lista aparecen como filas de nombre/estado. Ctrl+N sigue disponible. La vista vacía conserva su interfaz mínima.
 
+**Re Pág/Av Pág** recorren Miniatura por una página visible, según la altura actual de ventana y fila. Redimensionar cambia el salto. Se detiene en el primer/último juego y conserva el foco en la fila activa; las listas grandes siguen virtualizadas. Actualizar sin foco en la lista conserva el desplazamiento de lectura existente. Buscar cierra el menú antes de enfocar el buscador normal.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.

@@ -18,13 +18,13 @@ Captures use real WPF controls rendered during native tests. Games, users and fr
 
 ## Download and run
 
-Current version: **0.6.11**. Build outputs in `dist`:
+Current version: **0.6.12**. Build outputs in `dist`:
 
-- `Checkpoint-0.6.11-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.6.11-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.6.12-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.6.12-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.6.11), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.6.12), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
@@ -40,6 +40,7 @@ Windows x64 (Windows 11 tested), a user-writable folder and disk space. **No .NE
 - **Search from any view:** Ctrl+F opens collection search and selects its current query. From Miniature it returns to the normal list, preserving the small size for next time; from Friends it returns to the collection. Miniature menus also offer Search games.
 - **Edit from Miniature:** right-click a game → Edit game, or F2 on the selected game. Opens its normal editor without leaving Miniature; closing returns focus if it remains in My list.
 - **Add from Miniature:** right-click the background or a game → Add game, including when My list is empty. Opens the normal editor without leaving Miniature; Ctrl+N remains available.
+- **Page navigation in Miniature:** PageUp/PageDown move by a visible page, adapting to window height and keeping the active row focused.
 - **Miniature keyboard controls:** Up/Down select a game, Home/End jump to the first/last, Enter/Space open its state menu. A focus outline marks the active row; focus returns after closing the menu or changing state.
 - **Miniature view:** only game names and states in a small translucent window. Settings → Collection view → Miniature, or cycle with F6. Right-click → Exit miniature view. Resize it independently from the normal widget; drag the top edge. Shows My list with no filters or cover downloads.
 - **Optional lightweight mode:** Settings → Lightweight mode (no covers). Hides collection/friend covers, skips new image downloads and clears the decoded cover cache. Progress and saved images are preserved.
@@ -119,13 +120,13 @@ dotnet run --project src/Checkpoint.App -c Release --no-build -- --data-dir "$PW
 
 Native tests reject existing libraries/sessions/publications and exercise real controls with simulated Steam/social responses. Demo adds examples only to an empty library. Build extracts and tests its self-contained ZIP, including language switching and virtualized rendering of 1,003 games. Reports and captures: `.qa/package-…/render`.
 
-Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.6.11-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
+Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.6.12-win-x64.zip`. ARM64 execution needs Windows ARM64 hardware. [Validation](docs/en/VALIDATION.md) lists remaining real-account/Storage and clean-machine MSI checks.
 
 ## GitHub
 
 MIT license, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
-`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.6.11.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
+`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.6.12.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 
 See [roadmap](docs/en/ROADMAP.md) and [changelog](CHANGELOG.md). Notifications, monthly statistics and private-library cloud sync are future work.
 

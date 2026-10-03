@@ -60,3 +60,10 @@ El contorno indica la fila enfocada. ↑/↓ e Inicio/Fin recorren juegos; Enter
 Clic derecho en el fondo → Añadir juego, también sin ninguna fila.
 
 ![Menú de Miniatura vacía](screenshots/miniature-empty-menu.png)
+
+
+## Navegación por páginas — 0.6.12
+
+Re Pág/Av Pág adaptan el salto a la altura de Miniatura. Datos de prueba de una colección grande.
+
+![Miniatura con navegación por páginas](screenshots/widget-miniature-pages.png)

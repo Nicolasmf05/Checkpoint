@@ -40,5 +40,5 @@ if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $stderr; throw "Falló l
 $reportPath = Join-Path $render 'smoke.json'
 if (!(Test-Path -LiteralPath $reportPath)) { throw 'La app no produjo el informe de comprobación.' }
 $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json
-if (!$report.ok -or $report.checks -lt 147) { throw 'La comprobación nativa del paquete quedó incompleta.' }
+if (!$report.ok -or $report.checks -lt 152) { throw 'La comprobación nativa del paquete quedó incompleta.' }
 Write-Output "Paquete validado: $($report.checks) comprobaciones. Imágenes e informe: $render"
