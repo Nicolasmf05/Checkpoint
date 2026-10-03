@@ -27,13 +27,13 @@ Current captures come from the actual local HTML/CSS interface in WebView2, usin
 
 ## Download and run
 
-Current version: **0.8.2**. Build outputs in `dist`:
+Current version: **0.8.3**. Build outputs in `dist`:
 
-- `Checkpoint-0.8.2-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.8.2-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.8.3-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.8.3-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.2), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.3), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
@@ -66,9 +66,9 @@ Use the header selector or Settings → Window mode: **Full window**, **Small wi
 - **Add from Miniature:** right-click the background or a game → Add game, including when My list is empty. Opens the normal editor without leaving Miniature; Ctrl+N remains available.
 - **Page navigation in Miniature:** PageUp/PageDown move by a visible page, adapting to window height and keeping the active row focused.
 - **Miniature text size:** Settings → Miniature text size, 12–20 (default 12). Names, states and row height grow together; other views keep their text size.
-- **Return from Miniature:** right-click → Exit miniature view restores the previous list, compact or grid layout. Saving Settings while Miniature is active preserves that choice. F6 keeps cycling all four views; Search opens the normal list.
+- **Return from Miniature:** the visible **Exit miniature view** button above the list (or right-click → Exit miniature view) restores the previous list, compact or grid layout. Saving Settings while Miniature is active preserves that choice. F6 keeps cycling all four views; Search opens the normal list.
 - **Miniature keyboard controls:** Up/Down select a game, Home/End jump to the first/last, Enter/Space open its state menu. A focus outline marks the active row; focus returns after closing the menu or changing state.
-- **Miniature view:** only game names and states in a small translucent window. Settings → Collection view → Miniature, or cycle with F6. Right-click → Exit miniature view. Resize it independently from the normal widget; drag the top edge. Shows My list with no filters or cover downloads.
+- **Miniature view:** a name/status list in a small translucent window, with a visible exit button. Settings → Collection view → Miniature, or cycle with F6. Use the visible **Exit miniature view** button above the list. Resize it independently from the normal widget; drag the top edge. Shows My list with no filters or cover downloads.
 - **Optional lightweight mode:** Settings → Lightweight mode (no covers). Hides collection/friend covers, skips new image downloads and clears the decoded cover cache. Progress and saved images are preserved.
 - Frameless, movable, resizable widget; saved bounds; background opacity 35–100%; readable text/covers. Alpha translucency persists across focus changes, without Acrylic blur.
 - Dark/light themes, list/compact/cover-grid views, always-on-top and position locking.

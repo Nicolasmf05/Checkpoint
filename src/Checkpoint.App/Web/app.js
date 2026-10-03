@@ -131,12 +131,15 @@ function frame() {
   resize.addEventListener('pointerdown', e => { if (state.locked) return; point = [e.screenX,e.screenY]; resize.setPointerCapture(e.pointerId); e.preventDefault(); });
   resize.addEventListener('pointermove', e => { if (!point) return; const x=e.screenX-point[0], y=e.screenY-point[1]; point=[e.screenX,e.screenY]; if (x || y) action('resize',{x,y}); }); resize.addEventListener('pointerup', () => point = undefined); resize.addEventListener('lostpointercapture', () => point = undefined);
   const collectionbar=el('div','collectionbar'),collections=el('select','collection-selector');collections.addEventListener('change',()=>action('collection',{value:collections.value}));collectionbar.append(collections,button('', 'manage-lists', '', {},'manage-lists'));
-  windowNode.append(header,intro,navigation,searchbar,collectionbar,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
+  const miniControls=el('div','mini-controls');miniControls.append(button('', 'exit-mini', '', {}, 'mini-exit'));
+  windowNode.append(header,intro,navigation,searchbar,collectionbar,miniControls,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
   windowNode.addEventListener('contextmenu', e => { if (state.mini && !e.target.closest('[data-game]')) { e.preventDefault(); showMenu(null,e.clientX,e.clientY); } });
 }
 function renderMain() {
   if (dialogMode || !root.querySelector('.window')) frame(); dialogMode = false;
   const host = root.querySelector('.window'); host.classList.toggle('mini', state.mini); host.classList.toggle('full',state.full);
+  const miniExit=host.querySelector('.mini-exit');miniExit.textContent='↗ '+state.labels.exitMini;miniExit.title=state.labels.exitMini;miniExit.setAttribute('aria-label',state.labels.exitMini);
+  if(!state.mini && document.activeElement?.closest('.mini-controls'))host.querySelector('.viewport').focus({preventScroll:true});
   if(state.mini && document.activeElement?.closest('.header,.navigation,.searchbar,.collectionbar,.footer,.shortcutbar,.web-toolbar'))host.querySelector('.viewport').focus({preventScroll:true});
   const modes=host.querySelector('.window-mode'); if(modes){modes.replaceChildren(); [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((text,index)=>{const option=el('option','',text);option.value=index;modes.append(option);}); modes.value=state.mini?2:state.full?0:1; modes.setAttribute('aria-label',state.labels.windowMode);}
   host.style.setProperty('--opacity', state.opacity); host.style.setProperty('--mini-size', `${state.textSize}px`);

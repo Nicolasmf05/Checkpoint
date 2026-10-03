@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.3 — salir de miniatura con un clic
+
+El botón **Salir de miniatura** aparece encima de la lista y recupera la vista normal anterior sin usar el teclado ni abrir un menú.
+
+![Miniatura con botón para volver](screenshots/css-miniature-es.png)
+
 ## 0.8.2 — logros destacados y descripciones
 
 Acceso directo desde cada juego, resumen con progreso y botón para mostrar u ocultar la descripción. Datos de prueba; [guía](ACHIEVEMENTS.md).

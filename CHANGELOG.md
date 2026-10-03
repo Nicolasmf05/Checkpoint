@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.3 — 2026-10-03
+
+- Visible, localized **Exit miniature view** button above the game list: one click restores and saves the previous normal layout.
+- The control reserves its own space without covering names or states; it disappears in normal views.
+- English/Spanish real WebView2 tests verify visibility, placement and restoration. Updated screenshots and documentation.
+
 ## 0.8.2 — 2026-10-03
 
 - Direct achievement buttons and counters on game cards in Windows and the browser; compact and cover-grid layouts accommodate the new action.

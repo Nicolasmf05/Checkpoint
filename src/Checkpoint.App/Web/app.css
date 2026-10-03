@@ -61,3 +61,7 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .achievement-card button { align-self:flex-start; }
 .achievement-description { background:var(--input); border-radius:8px; padding:12px; font-size:13px; line-height:1.6; }
 @media(max-width:400px) { .achievement-summary { padding:14px; } .achievement-summary .heading { font-size:21px; } .achievement-card { padding:12px; } }
+
+.mini-controls { display:none; }
+.mini .mini-controls { display:flex; justify-content:flex-end; flex:none; padding:2px 0 6px; }
+.mini-exit { min-height:28px; padding:4px 8px; font-size:11px; color:var(--accent); }

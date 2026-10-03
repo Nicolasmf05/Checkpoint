@@ -27,12 +27,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.8.2**. En la carpeta `dist` se generan:
+La versión actual es **0.8.3**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.2), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.3), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.8.2-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.8.2-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.8.3-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.8.3-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -71,9 +71,9 @@ Usa el selector de la cabecera o Ajustes → Modo de ventana: **Ventana completa
 - **Añadir desde Miniatura:** clic derecho en el fondo o un juego → Añadir juego, también con Mi lista vacía. Abre la ficha habitual sin salir de Miniatura; Ctrl+N sigue disponible.
 - **Navegación por páginas en Miniatura:** Re Pág/Av Pág avanzan una página visible, adaptándose a la altura de la ventana y manteniendo el foco en la fila activa.
 - **Texto de Miniatura:** Ajustes → Tamaño de texto en Miniatura, de 12 a 20 (predeterminado 12). Nombres, estados y altura de fila crecen juntos; el texto de otras vistas se conserva.
-- **Volver desde Miniatura:** clic derecho → Salir de miniatura recupera lista, compacta o cuadrícula anterior. Guardar Ajustes en Miniatura conserva esa elección. F6 recorre las cuatro vistas; Buscar abre la lista normal.
+- **Volver desde Miniatura:** botón visible **Salir de miniatura** encima de la lista (o clic derecho → Salir de miniatura) recupera lista, compacta o cuadrícula anterior. Guardar Ajustes en Miniatura conserva esa elección. F6 recorre las cuatro vistas; Buscar abre la lista normal.
 - **Teclado en Miniatura:** ↑/↓ recorren juegos, Inicio/Fin van al primero/último y Enter/Espacio abren el menú de estados. Un contorno marca la fila activa; recupera el foco al cerrar el menú o cambiar estado.
-- **Vista Miniatura:** solo nombres y estados en una ventana pequeña y translúcida. Ajustes → Vista de la colección → Miniatura, o cambia con F6. Clic derecho → Salir de miniatura. Tamaño independiente del widget normal; se mueve desde el borde superior. Muestra Mi lista, sin filtros ni descargas de carátulas.
+- **Vista Miniatura:** lista de nombres y estados en una ventana pequeña y translúcida, con un botón visible para volver. Ajustes → Vista de la colección → Miniatura, o cambia con F6. Pulsa **Salir de miniatura** encima de la lista. Tamaño independiente del widget normal; se mueve desde el borde superior. Muestra Mi lista, sin filtros ni descargas de carátulas.
 - **Modo ligero opcional:** Ajustes → Modo ligero (sin carátulas). Oculta imágenes de colección/amigos, evita nuevas descargas y vacía la caché decodificada. Conserva el progreso y los archivos guardados.
 - Widget sin marco, movible, redimensionable, con posición guardada y opacidad del **fondo** ajustable entre 35 % y 100 %.
 - Translucidez que conserva su apariencia al perder el foco. Esta edición utiliza transparencia alfa, **sin desenfoque Acrylic**.

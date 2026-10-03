@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.3 — 2026-10-03
+
+- Botón visible **Salir de miniatura** encima de la lista: un clic recupera y guarda la vista normal anterior.
+- El botón tiene su propio espacio y no tapa nombres ni estados; desaparece en las vistas normales.
+- Pruebas reales de WebView2 en español e inglés de visibilidad, posición y restauración. Capturas y documentación actualizadas.
+
 ## 0.8.2 — 2026-10-03
 
 - Botones y contadores de logros directamente en cada juego de Windows y del navegador, también en las vistas compacta y de carátulas.

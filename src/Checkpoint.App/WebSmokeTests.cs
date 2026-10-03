@@ -168,10 +168,16 @@ public partial class MainWindow
             Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===10+window.checkpointState.collections.length"),"Miniature state and window actions render in an HTML context menu");
             await Run("[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Playing')).click();");
             Check(Store.LoadGames().Single(g=>g.Id==activeGameId).Status==GameStatus.Playing,"HTML state actions persist through the native controller");
+            Check(await Script(web,"document.querySelector('.mini-exit').getAttribute('aria-label')==='Exit miniature view' && document.querySelector('.mini-exit').getBoundingClientRect().bottom<=document.querySelector('.viewport').getBoundingClientRect().top"),"Miniature offers a visible English exit button above the game list");
             await Capture(web,"css-miniature-en.png");
             Preferences.Language="es"; I18n.SetLanguage("es"); ApplyPreferences(); Refresh(); await Task.Delay(300);
             Check(await Script(web,"document.documentElement.lang==='es' && [...document.querySelectorAll('.minirow .status')].some(node=>node.textContent==='Jugando')"),"CSS Miniature changes all state labels to Spanish");
+            Check(await Script(web,"document.querySelector('.mini-exit').textContent.includes('Salir de miniatura') && !document.querySelector('.mini-exit').textContent.includes('Exit')"),"Miniature exit button follows the selected Spanish language");
             await Capture(web,"css-miniature-es.png");
+            bool previousGrid=Preferences.GridView,previousCompact=Preferences.Compact;
+            await Run("document.querySelector('.mini-exit').click();");
+            Check(!Preferences.MiniatureView && !Store.LoadSettings().MiniatureView && Preferences.GridView==previousGrid && Preferences.Compact==previousCompact && await Script(web,"!window.checkpointState.mini && getComputedStyle(document.querySelector('.mini-controls')).display==='none'"),"clicking visible Miniature exit restores and saves the previous normal layout");
+            Preferences.MiniatureView=true;ApplyPreferences();Persist();Refresh();await Task.Delay(300);
             Preferences.Language="en"; I18n.SetLanguage("en"); ApplyPreferences(); Refresh(); await Task.Delay(300);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'F2',bubbles:true}));");
             var edit=await Dialog();
