@@ -2,6 +2,16 @@
 
 Checkpoint for Windows checks running processes every 10 seconds while open, including in the tray. Detecting a saved library game opens an independent pending-achievement window without taking focus. No administrator privileges are required. Closing it suppresses reopening for that running session; launching the game again can open a new window. Disable this in **Settings → Detect games and open achievements automatically**.
 
+## Direct access and descriptions
+
+On any game card, select **View achievements** or **Achievements · completed / total**. The action is available in list, compact and cover-grid layouts in Windows and the browser. Miniature keeps its name/status-only list.
+
+The panel emphasizes the completion count, progress bar and pending achievements. Choose **Show description** on a card to read how to earn the achievement; **Hide description** collapses it again. Long descriptions wrap to the available width. Missing provider descriptions are indicated explicitly.
+
+Secret achievements conceal both names and descriptions until you enable the reveal option. Revealing names does not automatically expand descriptions. API-provided achievement titles and descriptions retain the provider's language.
+
+Windows card/panel counters reflect visible Checkpoint goals (Steam, RetroAchievements and personal goals), including local completion overrides. The browser displays official Steam progress. Story/task progress remains separate, and friend publications retain official progress.
+
 ## Steam
 
 Connect Steam in Settings and save a game with its Steam ID. Checkpoint reads installed Steam library folders and recognizes executables inside that game's folder. If those folders are inaccessible or the executable is elsewhere, set **Executable to detect** in its editor. Steam Family games may require manual addition when absent from the API. Your Steam game details and achievements must be accessible.

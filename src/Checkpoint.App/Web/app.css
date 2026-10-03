@@ -51,3 +51,13 @@ kbd { font-family:inherit; font-size:11px; font-weight:600; white-space:nowrap; 
 input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 
 .collectionbar {display:flex;align-items:center;gap:8px;flex:none}.collectionbar[hidden],.mini .collectionbar{display:none}.collection-selector{flex:1;min-width:0}.manage-lists{flex:none}
+
+.achievement-link { color:var(--accent); font-size:12px; font-weight:700; text-align:left; width:100%; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:7px 9px; margin-top:auto; border-color:var(--accent); }
+.achievement-summary { border-color:var(--accent); padding:20px; background:var(--panel); }
+.achievement-summary .heading { font-size:26px; color:var(--accent); }
+.achievement-summary progress { height:10px; margin:8px 0; }
+.achievement-card { border-left:4px solid var(--accent); padding:16px; }
+.achievement-card .heading { font-size:18px; line-height:1.4; }
+.achievement-card button { align-self:flex-start; }
+.achievement-description { background:var(--input); border-radius:8px; padding:12px; font-size:13px; line-height:1.6; }
+@media(max-width:400px) { .achievement-summary { padding:14px; } .achievement-summary .heading { font-size:21px; } .achievement-card { padding:12px; } }

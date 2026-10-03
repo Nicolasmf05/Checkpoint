@@ -2,6 +2,16 @@
 
 Checkpoint para Windows revisa los procesos cada 10 segundos mientras permanece abierto, incluso en la bandeja. Al detectar un juego guardado en su biblioteca abre una ventana independiente de logros pendientes, sin activar el foco. No requiere permisos de administrador. Una ejecución no reabre la ventana después de cerrarla; al volver a iniciar el juego se puede abrir otra vez. La detección se puede desactivar en **Ajustes → Detectar juegos y abrir sus logros automáticamente**.
 
+## Acceso directo y descripciones
+
+Desde cada tarjeta de juego, pulsa **Ver logros** o el botón **Logros · completados / total**. Está disponible en la lista, la vista compacta y la cuadrícula, tanto en Windows como en el navegador. La miniatura mantiene solo nombres y estados.
+
+El panel destaca el contador, la barra de progreso y los logros pendientes. Pulsa **Ver descripción** en una tarjeta para consultar cómo conseguir ese logro; **Ocultar descripción** la vuelve a plegar. Las descripciones largas se ajustan al ancho de la ventana. Si el proveedor no da una descripción, se indica claramente.
+
+Los logros secretos no muestran su nombre ni su descripción hasta activar la opción de revelar secretos. Revelar el nombre no despliega automáticamente la descripción. Los títulos y descripciones proporcionados por las APIs conservan el idioma del proveedor.
+
+El contador de la tarjeta y del panel de Windows refleja los objetivos visibles de Checkpoint (Steam, RetroAchievements y manuales), con tus marcas personales. La web muestra el progreso oficial de Steam. El avance de historia o tareas se conserva separado; los amigos siguen recibiendo el progreso oficial.
+
 ## Steam
 
 Vincula Steam en Ajustes y guarda el juego con su ID de Steam. Checkpoint lee las carpetas de las bibliotecas instaladas de Steam y reconoce los ejecutables dentro de la carpeta del juego. Si no puede leer esa información o el juego se ejecuta fuera de ella, configura **Ejecutable para detectar** en el editor. Los juegos de una familia de Steam pueden necesitar añadirse manualmente si no aparecen en la API. Los detalles y logros de tu perfil deben estar accesibles para Steam.

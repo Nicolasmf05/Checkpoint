@@ -110,5 +110,13 @@
   "La interfaz se adapta al tamaño de tu navegador. Usa Mi lista o Biblioteca; la bandeja y los atajos globales están en la app de Windows.": "The interface adapts to your browser size. Use My list or Library; the tray and global shortcuts are available in the Windows app.",
   "Accede con tu usuario y contraseña de Checkpoint.": "Sign in with your Checkpoint username and password.",
   "Crea una cuenta de Checkpoint para compartir tu progreso.": "Create a Checkpoint account to share your progress.",
-  "Ya tengo cuenta": "I already have an account"
+  "Ya tengo cuenta": "I already have an account",
+  "Ver logros": "View achievements",
+  "Ver descripción": "Show description",
+  "Ocultar descripción": "Hide description",
+  "Este logro no tiene descripción.": "This achievement has no description.",
+  "Todavía no hay logros. Sincroniza o añade un objetivo manual.": "No achievements yet. Sync or add a personal goal.",
+  " logros pendientes": " achievements remaining",
+  "logros completados": "achievements completed",
+  "Activa la opción superior para revelar este logro.": "Enable the option above to reveal this achievement."
 }

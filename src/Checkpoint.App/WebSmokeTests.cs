@@ -70,7 +70,12 @@ public partial class MainWindow
             Check(Store.LoadGames().Single(g=>g.Title=="CSS test game").Notes=="Offline CSS notes","CSS editor saves a game and notes to existing SQLite storage");
             var achievementFixture=Games.Single(g=>g.Title=="CSS test game");
             achievementFixture.Achievements=[new(){Id="api-first",Name="API fixture",Description="Official pending"}];
-            OpenDetectedAchievements(achievementFixture);var achievementDialog=await Dialog();
+            Refresh();await Wait(()=>Script(web,"!!document.querySelector('.achievement-link')"));
+            await Run("document.querySelector('[data-game=\""+achievementFixture.Id+"\"] .achievement-link').click();");var achievementDialog=await Dialog();
+            Check(await Script(achievementDialog,"!!document.querySelector('.achievement-summary progress') && !document.body.innerText.includes('Official pending')"),"library opens achievement overview directly with collapsed descriptions");
+            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Ver descripción').click();");
+            await Wait(()=>Script(achievementDialog,"document.body.innerText.includes('Official pending')"));
+            Check(await Script(achievementDialog,"!!document.querySelector('.achievement-description')"),"achievement description expands inside its emphasized CSS card");
             Check(await Script(achievementDialog,"document.body.innerText.includes('No desbloquean logros en Steam') && !!document.querySelector('input[aria-label=\"Nombre del logro manual\"]')"),"detected achievement window renders localized manual controls in CSS");
             await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("const name=document.querySelector('input[aria-label=\"Nombre del logro manual\"]');name.value='CSS manual goal';name.dispatchEvent(new Event('input',{bubbles:true}));[...document.querySelectorAll('button')].find(b=>b.textContent==='Añadir logro manual').click();");
             await Wait(()=>Task.FromResult(achievementFixture.ManualAchievements.Count==1));
@@ -99,6 +104,8 @@ public partial class MainWindow
             Controls<System.Windows.Controls.CheckBox>(achievementWindows[englishAchievements.Id]).Single(c=>(string?)c.Content=="Show pending only").IsChecked=false;
             await Wait(()=>Script(englishAchievementDialog,"document.body.innerText.includes('Personal challenge') && document.body.innerText.includes('Completed in Checkpoint')"));
             Check(await Script(englishAchievementDialog,"document.body.innerText.includes('Steam') && document.body.innerText.includes('RetroAchievements') && !document.body.innerText.includes('Completado en')"),"English achievement window separates providers and local completion with translated controls");
+            await englishAchievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Show description').click();");
+            await Wait(()=>Script(englishAchievementDialog,"document.body.innerText.includes('Complete the first chapter')"));
             await Capture(englishAchievementDialog,"css-achievements-en.png");achievementWindows[englishAchievements.Id].Close();Games.Remove(englishAchievements);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'F1',bubbles:true}));");
             Check(await Script(web,"document.querySelector('.shortcut-help:modal h2').textContent==='Keyboard shortcuts' && document.querySelector('.shortcut-help').textContent.includes('Enter / Space') && !document.querySelector('.shortcut-help').textContent.includes('Atajos')"),"F1 opens shortcut help entirely in the selected English language");

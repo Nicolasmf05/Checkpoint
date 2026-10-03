@@ -77,6 +77,7 @@ function schema(node) {
   let element;
   const update = value => pending.set(String(node.id),send({ action: 'value', control: node.id, value }));
   switch (node.type) {
+    case 'progress': element=el('progress','type-progress');element.max=node.max||100;element.value=node.value||0;break;
     case 'text': element = el('div', `type-text${node.heading ? ' heading' : ''}${node.muted ? ' muted' : ''}`, node.text); break;
     case 'button': element = el('button', `type-button${node.accent ? ' accent' : ''}`, node.text); element.type = 'button'; element.addEventListener('click', () => send({ action: 'click', control: node.id })); break;
     case 'input': case 'password': case 'textarea':
@@ -98,6 +99,7 @@ function schema(node) {
     case 'details': element = el('details', 'type-details'); element.open = node.open; element.append(el('summary', '', node.text)); element.addEventListener('toggle', () => { if (element.open !== node.open) update(element.open); }); break;
     default: element = el('div', `type-${node.type}`); break;
   }
+  if(['achievement-card','achievement-summary','achievement-description'].includes(node.style))element.classList.add(node.style);
   if (node.type === 'grid') { element.style.gridTemplateColumns = node.columnWidths?.join(' ') || `repeat(${node.columns},minmax(0,1fr))`; if (node.rows?.length) element.style.gridTemplateRows = node.rows.join(' '); }
   element.dataset.control = node.id; if (node.name) element.setAttribute('aria-label', node.name); if (node.tip) element.title = node.tip;
   if ('disabled' in element) element.disabled = !node.enabled;
@@ -163,7 +165,7 @@ function renderGames() {
   if (!state.games.length && !state.mini) { const empty=el('div','empty'); empty.append(el('h2','',state.emptyTitle),el('p','',state.emptyText),button(state.labels.add,'add'),button(state.labels.steam,'steam')); if (state.examples) empty.append(button(state.labels.examples,'examples')); viewport.replaceChildren(empty); return; }
   const focusWasRow = document.activeElement?.closest('[data-game]');
   const columns = state.grid && !state.mini ? Math.max(1,Math.floor(viewport.clientWidth / 155)) : 1;
-  const rowHeight = state.mini ? state.textSize + 31 : state.grid ? 230 : state.compact ? 94 : 144;
+  const rowHeight = state.mini ? state.textSize + 31 : state.grid ? 274 : state.compact ? 126 : 184;
   layout = { columns, rowHeight, viewport };
   viewport.scrollTop=Math.min(viewport.scrollTop,Math.max(0,Math.ceil(state.games.length/columns)*rowHeight-viewport.clientHeight));
   const range=visibleRange(state.games.length,viewport.scrollTop,viewport.clientHeight,rowHeight,columns), rows=el('div','rows'); rows.style.height=`${range.height}px`;
@@ -177,7 +179,9 @@ function renderGames() {
     else {
       if (!state.lightweight) { const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)))); cover.addEventListener('click',()=>action('edit',{id:game.id})); row.append(cover); }
       const details=el('div','details'); details.append(el('div','game-title ellipsis',game.title),el('div','platform ellipsis',game.platform),el('div',`status state-${game.state}`,game.status),el('div','next ellipsis',game.next),el('div','progress ellipsis',game.progress+(game.percent==null?'':` · ${game.percent}%`)));
-      if (game.percent != null) { const progress=el('progress'); progress.max=100; progress.value=game.percent; progress.setAttribute('aria-label',game.progress); details.append(progress); } row.append(details);
+      if (game.percent != null) { const progress=el('progress'); progress.max=100; progress.value=game.percent; progress.setAttribute('aria-label',game.progress); details.append(progress); }
+      details.append(button('🏆 '+(game.achievementCaption||state.labels.achievements),'achievements',state.labels.achievements,{id:game.id},'achievement-link'));
+      row.append(details);
       const tools=el('div','game-tools'); tools.append(button(game.state===3?'✓':'○','finish',state.labels.finish,{id:game.id},'icon'),button('⋯','edit',state.labels.edit,{id:game.id},'icon'));
       const reorder=el('button','icon','⠿'); reorder.title=state.labels.reorder+' · '+gestures.moveUp+' / '+gestures.moveDown;reorder.setAttribute('aria-keyshortcuts',gestures.moveUp+' '+gestures.moveDown); reorder.setAttribute('aria-label',game.title); reorder.draggable=true; reorder.addEventListener('keydown',e=>{if(matches(e,gestures.moveUp)||matches(e,gestures.moveDown)){e.preventDefault();const index=state.games.findIndex(item=>item.id===game.id),target=state.games[index+(matches(e,gestures.moveUp)?-1:1)];if(target)action('move',{id:game.id,target:target.id,after:matches(e,gestures.moveDown)});}}); reorder.addEventListener('dragstart',e=>{dragId=game.id;e.dataTransfer.setData('text/plain',game.id);}); tools.append(reorder); row.append(tools);
       row.addEventListener('dragover',e=>e.preventDefault()); row.addEventListener('drop',e=>{e.preventDefault();if(dragId)action('move',{id:dragId,target:game.id,after:e.clientY>row.getBoundingClientRect().top+row.clientHeight/2});dragId=undefined;});

@@ -4,6 +4,14 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.8.2 — achievement overview and descriptions
+
+Direct game-card access, prominent completion progress and per-achievement description toggles. Fixture data; [guide](ACHIEVEMENTS.md).
+
+![Windows achievement overview](../screenshots/css-achievements-focus-en.png)
+
+![Browser achievement description](../screenshots/web-achievements-en.png)
+
 ## 0.8.1 — updater
 
 [Update flow and portable behavior](UPDATES.md). Actual CSS/WebView2 capture with an isolated library.

@@ -524,5 +524,12 @@
   "No se pudo instalar la actualización. Se conserva la biblioteca; revisa Actualizaciones en Ajustes.": "The update could not be installed. Your library is preserved; check Updates in Settings.",
   "Hay una actualización de Checkpoint: ": "A Checkpoint update is available: ",
   ". Abre Ajustes → Actualizaciones para instalarla.": ". Open Settings → Updates to install it.",
-  "No se pudo iniciar el instalador. Puedes descargar la versión desde GitHub.": "Could not start the installer. You can download the release from GitHub."
+  "No se pudo iniciar el instalador. Puedes descargar la versión desde GitHub.": "Could not start the installer. You can download the release from GitHub.",
+  "Ver descripción": "Show description",
+  "Ocultar descripción": "Hide description",
+  "Este logro no tiene descripción.": "This achievement has no description.",
+  "Todavía no hay logros. Sincroniza o añade un objetivo manual.": "No achievements yet. Sync or add a personal goal.",
+  " logros pendientes": " achievements remaining",
+  "logros completados": "achievements completed",
+  "Logros": "Achievements"
 }

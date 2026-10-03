@@ -148,8 +148,10 @@ internal sealed class WebControls
         var node = new Dictionary<string,object?> { ["id"]=id, ["enabled"]=element.IsEnabled,
             ["name"]=System.Windows.Automation.AutomationProperties.GetName(element), ["tip"]=element.ToolTip?.ToString(),
             ["row"]=Grid.GetRow(element)+1, ["column"]=Grid.GetColumn(element)+1 };
+        if(element.Tag is string style && style is "achievement-card" or "achievement-summary" or "achievement-description")node["style"]=style;
         switch (element)
         {
+            case ProgressBar progress: node["type"]="progress";node["value"]=progress.Value;node["max"]=progress.Maximum;break;
             case TextBlock text: node["type"]="text"; node["text"]=text.Text; node["heading"]=text.FontSize >= 18; node["muted"]=text.FontSize <= 11; break;
             case PasswordBox password: node["type"]="password"; node["empty"]=password.Password.Length == 0; node["max"]=password.MaxLength; break;
             case TextBox text: node["shortcut"]=Equals(text.Tag,"shortcut"); node["type"]=text.AcceptsReturn ? "textarea" : "input"; node["value"]=text.Text; node["max"]=text.MaxLength; break;

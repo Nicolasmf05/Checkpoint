@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.2 — 2026-10-03
+
+- Direct achievement buttons and counters on game cards in Windows and the browser; compact and cover-grid layouts accommodate the new action.
+- Prominent completion summaries, progress bars and achievement cards with larger titles.
+- Per-achievement Show/Hide description actions, with secret names and descriptions protected until explicitly revealed.
+- Spanish/English controls, screenshots and regression checks for descriptions, secrets and direct navigation; Miniature retains its name/status-only list.
+
 ## 0.8.1 — 2026-10-03
 
 - Optional daily startup update checks and a bilingual Settings → Updates window.

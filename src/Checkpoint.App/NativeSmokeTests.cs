@@ -115,7 +115,11 @@ public partial class MainWindow
                 Check(Texts(window).Contains("○  Logro secreto") && !Texts(window).Contains("○  Secreto de prueba") && !Texts(window).Contains("✓  Logro desbloqueado"), "achievement dialog hides secrets and completed entries");
                 Render(window, "dialog-achievements.png");
                 Controls<CheckBox>(window).Single(c => ((string?)c.Content)?.StartsWith("Mostrar nombres") == true).IsChecked = true;
-                Check(Texts(window).Contains("○  Secreto de prueba") && Texts(window).Contains("Spoiler de prueba"), "achievement spoiler toggle reveals details");
+                Check(Texts(window).Contains("○  Secreto de prueba") && !Texts(window).Contains("Spoiler de prueba"), "revealing secret names keeps descriptions collapsed");
+                Controls<Button>(window).Single(b=>AutomationProperties.GetName(b)=="Ver descripción · Secreto de prueba").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Check(Texts(window).Contains("Spoiler de prueba"),"achievement description opens on demand");
+                Click(window,"Ocultar descripción");
+                Check(!Texts(window).Contains("Spoiler de prueba"),"achievement description collapses on demand");
                 Controls<CheckBox>(window).Single(c => (string?)c.Content == "Mostrar solo los pendientes").IsChecked = false;
                 Check(Texts(window).Contains("✓  Logro desbloqueado"), "achievement pending filter includes unlocked entries when disabled");
                 Controls<TextBox>(window).Single(b=>AutomationProperties.GetName(b)=="Nombre del logro manual").Text="Objetivo manual";

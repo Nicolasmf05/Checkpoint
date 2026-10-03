@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## 0.8.2 — 2026-10-03
+
+- Botones y contadores de logros directamente en cada juego de Windows y del navegador, también en las vistas compacta y de carátulas.
+- Resumen destacado de completados, barra de progreso y tarjetas de logros con títulos más grandes.
+- Botón Ver/Ocultar descripción por logro; los nombres y descripciones secretos siguen protegidos hasta que se decide revelarlos.
+- Controles, capturas y pruebas en español e inglés; la miniatura conserva su lista de nombres y estados.
+
 ## 0.7.6 — 2026-10-03
 
 - Mi lista visible por defecto para amigos aceptados, privacidad antes del primer guardado o después y vista Privados separada.

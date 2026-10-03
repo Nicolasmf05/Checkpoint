@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.2 — logros destacados y descripciones
+
+Acceso directo desde cada juego, resumen con progreso y botón para mostrar u ocultar la descripción. Datos de prueba; [guía](ACHIEVEMENTS.md).
+
+![Logros destacados en Windows](screenshots/css-achievements-focus-es.png)
+
 ## 0.8.1 — actualizador
 
 [Funcionamiento y edición portable](UPDATES.md). [Captura de la ventana en inglés](en/SCREENSHOTS.md#081--updater), con pruebas aisladas.

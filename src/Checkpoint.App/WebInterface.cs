@@ -33,7 +33,7 @@ public partial class MainWindow
             friendsTitle=I18n.T("Tu gente, tus aventuras"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
             add=I18n.T("Añadir juego"), settings=I18n.T("Ajustes"), hide=I18n.T("Ocultar widget"), close=I18n.T("Cerrar"),
             pin=I18n.T("Mantener siempre visible"), search=I18n.T("Buscar juego"), sync=I18n.T("Actualizar"),
-            steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
+            achievements=I18n.T("Ver logros"), steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
             examples=I18n.T("Añadir ejemplos"), finish=I18n.T("Marcar o desmarcar historia terminada"),
             windowMode=I18n.T("Modo de ventana"), fullWindow=I18n.T("Ventana completa"), smallWindow=I18n.T("Ventana pequeña"), miniature=I18n.T("Miniatura"),
@@ -47,10 +47,15 @@ public partial class MainWindow
             all=I18n.T("Todos"), statuses=Enum.GetValues<GameStatus>().Select(Labels.Status).ToArray() },
         games=(friendsVisible ? Enumerable.Empty<CardView>() : visibleCards).Select(card => new { id=card.Model.Id, title=card.Model.Title, platform=card.Model.Platform,
             state=(int)card.Model.Status, status=card.Model.StatusText, next=card.Model.NextTask,
-            progress=card.ProgressCaption, percent=card.ProgressVisibility == Visibility.Visible ? (int?)card.Percentage : null, favorite=card.Model.Favorite, friendsPrivate=card.Model.FriendsPrivate==true,
+            achievementCaption=AchievementCaption(card.Model), progress=card.ProgressCaption, percent=card.ProgressVisibility == Visibility.Visible ? (int?)card.Percentage : null, favorite=card.Model.Favorite, friendsPrivate=card.Model.FriendsPrivate==true,
             cover=Preferences.LightweightMode || Preferences.MiniatureView ? null : CoverOrigin+"game-cover/"+card.Model.Id+"?v="+Uri.EscapeDataString(card.Model.CustomCover ?? "steam") }).ToArray(),
         friendsBusy=FriendsView.Busy, friends=friendsVisible ? friendControls.Capture(FriendsView) : null
     };
+    private static string AchievementCaption(Game game)
+    {
+        var items=AchievementTracking.Items(game).ToArray();
+        return items.Length==0?I18n.T("Ver logros"):I18n.T("Logros")+" · "+items.Count(a=>a.Completed)+" / "+items.Length;
+    }
     private void WebCommand(JsonElement message)
     {
         if (message.TryGetProperty("control",out _)) { if (friendsVisible) friendControls.Dispatch(message); return; }
@@ -66,6 +71,7 @@ public partial class MainWindow
                 switch (message.GetProperty("value").GetString()) { case "friends": Click(FriendsButton); break; case "library": Click(LibraryButton); break; case "list": Click(TrackedButton); break; }
                 break;
             case "add": Dialogs.Edit(this,null); break;
+            case "achievements" when game is not null: Dialogs.Achievements(this,game); break;
             case "edit" when game is not null: Dialogs.Edit(this,game); web?.Event(new { kind="focus-game",id=game.Id }); break;
             case "configure-shortcuts": Dialogs.ShortcutSettings(this); break;
             case "manage-lists": Dialogs.ManageLists(this);break;
