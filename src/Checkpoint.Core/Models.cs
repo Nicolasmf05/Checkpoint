@@ -88,6 +88,7 @@ public sealed class Settings
     public bool MiniatureView { get; set; }
     public double MiniatureWidth { get; set; } = 300;
     public double MiniatureHeight { get; set; } = 220;
+    public int MiniatureTextSize { get; set; } = 12;
     public bool LightTheme { get; set; }
     public bool LightweightMode { get; set; }
     public bool CloseToTray { get; set; } = true;

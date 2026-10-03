@@ -229,6 +229,10 @@ internal static class Dialogs
         Label(body, I18n.T("Vista de la colección"));
         var view = new ComboBox { ItemsSource = new[] { I18n.T("Lista"), I18n.T("Compacta"), I18n.T("Cuadrícula de carátulas"), I18n.T("Miniatura") }, SelectedIndex = prefs.MiniatureView ? 3 : prefs.GridView ? 2 : prefs.Compact ? 1 : 0 };
         System.Windows.Automation.AutomationProperties.SetName(view, I18n.T("Vista de la colección")); body.Children.Add(view);
+        Label(body, I18n.T("Tamaño de texto en Miniatura"));
+        var miniatureText = new ComboBox { ItemsSource = Enumerable.Range(12,9).ToArray(), SelectedItem = Math.Clamp(prefs.MiniatureTextSize,12,20) };
+        System.Windows.Automation.AutomationProperties.SetName(miniatureText, I18n.T("Tamaño de texto en Miniatura")); body.Children.Add(miniatureText);
+        body.Children.Add(new TextBlock { Text = I18n.T("Amplía Miniatura si los nombres se recortan. El texto de las otras vistas no cambia."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         var light = Check(body, I18n.T("Tema claro"), prefs.LightTheme);
         var lightweight = Check(body, I18n.T("Modo ligero (sin carátulas)"), prefs.LightweightMode);
         body.Children.Add(new TextBlock { Text = I18n.T("Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
@@ -284,6 +288,7 @@ internal static class Dialogs
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
                 prefs.LightweightMode = lightweight.IsChecked == true;
+                prefs.MiniatureTextSize = (int)miniatureText.SelectedItem;
                 owner.ApplyPreferences(); owner.Persist(); saved = true; window.Close(); owner.ApplyLanguage();
             }
             catch (Exception ex) { MessageBox.Show(window, ex.Message, I18n.T("No se pudieron guardar los ajustes")); }

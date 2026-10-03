@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.13 — 2026-10-03
+
+- Settings adds Miniature text size, 12–20 with default 12, saved independently of other views. Names/states and row height grow together.
+- Page navigation measures larger rows and reduces the jump accordingly. No new runtime dependency.
+
 ## 0.6.12 — 2026-10-03
 
 - Miniature supports PageUp/PageDown with a jump based on visible height and actual row size; keeps keyboard focus and clamps to first/last game.

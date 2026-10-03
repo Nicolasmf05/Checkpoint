@@ -382,5 +382,7 @@
   "Modo ligero (sin carátulas)": "Lightweight mode (no covers)",
   "Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso.": "Hide covers in your list and friends, avoid new image downloads and release the cover cache. Games, goals and progress are preserved.",
   "Miniatura": "Miniature",
-  "Salir de miniatura": "Exit miniature view"
+  "Salir de miniatura": "Exit miniature view",
+  "Tamaño de texto en Miniatura": "Miniature text size",
+  "Amplía Miniatura si los nombres se recortan. El texto de las otras vistas no cambia.": "Widen Miniature if names are cut off. Text in other views stays unchanged."
 }

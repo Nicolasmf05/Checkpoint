@@ -172,6 +172,10 @@ public partial class MainWindow : Window
         }
         else Shell.ContextMenu = null;
         var resources = Application.Current.Resources;
+        Preferences.MiniatureTextSize = Math.Clamp(Preferences.MiniatureTextSize,12,20);
+        resources["MiniatureNameSize"] = (double)Preferences.MiniatureTextSize;
+        resources["MiniatureStateSize"] = (double)Preferences.MiniatureTextSize - 2;
+        resources["MiniatureRowHeight"] = (double)Preferences.MiniatureTextSize + 16;
         bool light = Preferences.LightTheme;
         resources["TextBrush"] = Brush(light ? "#FF152338" : "#FFF2F4FA");
         resources["MutedBrush"] = Brush(light ? "#FF4B5D73" : "#FFADB6CA");
@@ -277,7 +281,7 @@ public partial class MainWindow : Window
             if (e.Key is Key.PageUp or Key.PageDown)
             {
                 var container = current is null ? null : GameList.ItemContainerGenerator.ContainerFromItem(current) as ListBoxItem;
-                double rowHeight = container is { ActualHeight: > 0 } ? container.ActualHeight + container.Margin.Top + container.Margin.Bottom : 43;
+                double rowHeight = container is { ActualHeight: > 0 } ? container.ActualHeight + container.Margin.Top + container.Margin.Bottom : Preferences.MiniatureTextSize + 31;
                 double viewport = FindVisual<ScrollViewer>(GameList)?.ViewportHeight ?? GameList.ActualHeight;
                 pageRows = Math.Max(1,(int)Math.Floor(viewport / rowHeight));
             }

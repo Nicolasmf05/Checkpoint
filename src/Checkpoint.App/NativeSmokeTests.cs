@@ -307,6 +307,27 @@ public partial class MainWindow
             Check(VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.Title == t.Text)).All(t =>
                 t.Foreground is SolidColorBrush brush && brush.Color == ((SolidColorBrush)Application.Current.Resources["TextBrush"]).Color), "miniature names use the readable theme foreground");
             Render(this,"widget-miniature.png");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Tamaño de texto en Miniatura").SelectedItem = 18;
+                Click(window,"Guardar");
+            });
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(Preferences.MiniatureTextSize == 18 && Store.LoadSettings().MiniatureTextSize == 18 && Preferences.MiniatureView,
+                "miniature text size saves through settings and survives SQLite reload");
+            Check(VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.Title == t.Text)).All(t => t.FontSize == 18) &&
+                VisualChildren(GameList).OfType<TextBlock>().Where(t => Games.Any(g => g.StatusText == t.Text)).All(t => t.FontSize == 16) &&
+                VisualChildren(GameList).OfType<Grid>().Where(g => g.DataContext is CardView && g.ContextMenu is not null).All(g => g.Height == 34),
+                "miniature text and row height grow together without clipping their line height");
+            Render(this,"widget-miniature-large-text.png");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Tamaño de texto en Miniatura").SelectedItem = 20;
+                Click(window,"Cancelar");
+            });
+            Check(Preferences.MiniatureTextSize == 18 && Store.LoadSettings().MiniatureTextSize == 18, "canceling miniature text settings preserves the saved size");
+            Preferences.MiniatureTextSize = 12; ApplyPreferences(); Persist(); Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             MenuItem MiniatureAction(System.Windows.Controls.ContextMenu menu, string text) => menu.Items.OfType<MenuItem>().Single(i => (string?)i.Header == I18n.T(text));
             var miniatureFixtures = Games.ToList(); Games.Clear(); Persist(); Refresh();
             Check(GameList.Items.Count == 0 && EmptyPanel.Visibility == Visibility.Collapsed && HeaderArea.Visibility == Visibility.Collapsed &&
@@ -405,6 +426,13 @@ public partial class MainWindow
                 (Keyboard.FocusedElement as FrameworkElement)?.DataContext == GameList.SelectedItem, "miniature PageDown moves a visible page and retains row focus");
             MiniatureKey(Key.PageUp); MiniatureKey(Key.PageUp);
             Check(GameList.SelectedItem == visibleCards[0], "miniature PageUp returns by a page and stops at the first game");
+            Preferences.MiniatureTextSize = 20; ApplyPreferences(); Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            FocusMiniatureCard(visibleCards[0]); MiniatureKey(Key.PageDown);
+            Check(GameList.SelectedIndex >= 1 && GameList.SelectedIndex < smallPageIndex &&
+                (Keyboard.FocusedElement as FrameworkElement)?.DataContext == GameList.SelectedItem,
+                "miniature page jumps shrink for larger text while retaining row focus");
+            Preferences.MiniatureTextSize = 12; ApplyPreferences(); Refresh();
             double pageHeight = Height; Height = 360;
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             MiniatureKey(Key.Home); MiniatureKey(Key.PageDown);
@@ -514,6 +542,11 @@ public partial class MainWindow
                 MiniatureAction(miniatureRow.ContextMenu,"Editar juego").InputGestureText == "F2", "miniature edit action switches to English and exposes F2");
             Check((string?)MiniatureAction(Shell.ContextMenu,"Añadir juego").Header == "Add game" &&
                 MiniatureAction(miniatureRow.ContextMenu,"Añadir juego").InputGestureText == "Ctrl+N", "miniature add action switches to English and exposes Ctrl+N in both menus");
+            RunModal(() => Dialogs.Settings(this), window =>
+            {
+                Check(Controls<ComboBox>(window).Any(c => AutomationProperties.GetName(c) == "Miniature text size"), "miniature text size setting is localized in English");
+                Click(window,"Cancel");
+            });
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu-en.png"));
             miniatureRow.ContextMenu.IsOpen = false;
             Preferences.Language = "es"; ApplyLanguage();

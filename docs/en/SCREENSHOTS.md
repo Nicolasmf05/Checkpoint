@@ -71,3 +71,10 @@ Right-click the background → Add game, including with no rows. This native cap
 PageUp/PageDown adapt the jump to Miniature height. Native capture uses Spanish and a large sample collection.
 
 ![Miniature page navigation, Spanish capture](../screenshots/widget-miniature-pages.png)
+
+
+## Larger text — 0.6.13
+
+Miniature with text size 18 and adapted rows. This native capture uses Spanish.
+
+![Miniature with larger text, Spanish capture](../screenshots/widget-miniature-large-text.png)

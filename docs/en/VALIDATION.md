@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.13 — configurable Miniature text
+
+294 checks passed: 108 core, 15 Node, 14 Edge and 157 native WPF. Five new checks save size 18 through Settings and reload SQLite, verify larger names/states and row height, cancel without changing the saved value, verify the English label and reduce page jumps for large text. Native large-text screenshot included. Real dialogs use isolated data; physical keyboard, screen reader, installed packages and real accounts remain pending.
+
 ## 0.6.12 — page navigation
 
 289 checks passed: 108 core, 15 Node, 14 Edge and 152 native WPF. Five new checks cover PageDown at the final boundary, page advance with focus, PageUp/first boundary, larger jumps in a taller viewport and reading-offset retention after an unfocused refresh. The collection has 1,003 games with fewer than 30 realized rows. The no-focus check permits focus on the outer window without acquiring list focus. Search now closes its menu first; its existing focus test passes. Native page-navigation screenshot included. Physical keyboard, installed packages and real accounts remain pending.

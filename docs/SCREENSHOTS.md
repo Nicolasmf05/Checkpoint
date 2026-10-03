@@ -67,3 +67,10 @@ Clic derecho en el fondo → Añadir juego, también sin ninguna fila.
 Re Pág/Av Pág adaptan el salto a la altura de Miniatura. Datos de prueba de una colección grande.
 
 ![Miniatura con navegación por páginas](screenshots/widget-miniature-pages.png)
+
+
+## Texto ampliado — 0.6.13
+
+Miniatura con tamaño de texto 18 y filas adaptadas.
+
+![Miniatura con texto ampliado](screenshots/widget-miniature-large-text.png)

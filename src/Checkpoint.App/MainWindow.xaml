@@ -51,11 +51,11 @@
       </ItemsControl>
     </DataTemplate>
     <DataTemplate x:Key="MiniatureTemplate">
-      <Grid Margin="2,3" Height="28" Background="Transparent" Focusable="True" AutomationProperties.Name="{Binding MiniatureName}">
+      <Grid Margin="2,3" Height="{DynamicResource MiniatureRowHeight}" Background="Transparent" Focusable="True" AutomationProperties.Name="{Binding MiniatureName}">
         <Grid.ContextMenu><ContextMenu Opened="MiniatureMenuOpened" Closed="MiniatureMenuClosed"/></Grid.ContextMenu>
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-        <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="12" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" ToolTip="{Binding Model.Title}"/>
-        <TextBlock Grid.Column="1" Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" VerticalAlignment="Center" FontSize="{DynamicResource MiniatureNameSize}" TextTrimming="CharacterEllipsis" Margin="0,0,12,0" ToolTip="{Binding Model.Title}"/>
+        <TextBlock Grid.Column="1" Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="{DynamicResource MiniatureStateSize}" VerticalAlignment="Center"/>
       </Grid>
     </DataTemplate>
     <Style x:Key="MiniatureItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">

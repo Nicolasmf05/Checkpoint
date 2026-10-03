@@ -39,6 +39,8 @@ Updates preserve the selected game and restore its keyboard focus only if the li
 
 **PageUp/PageDown** navigate Miniature by a visible page, based on the current viewport and row height. Resizing the window adjusts the jump. Navigation stops at the first/last game and keeps the active row focused; large lists stay virtualized. Updates without list focus retain the existing reading offset. Search closes the menu before focusing the normal search field.
 
+**Settings → Miniature text size** offers values from 12 to 20, default 12. Save applies and stores the choice; Cancel preserves the saved value. Names, states and row height scale together. PageUp/PageDown adapt to the larger rows. Other views retain their text size. Widen Miniature if long names are cut off; their tooltip keeps the full title. No additional installation is needed.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

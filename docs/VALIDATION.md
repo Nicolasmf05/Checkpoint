@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.13 — texto configurable en Miniatura
+
+Han pasado 294 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 157 WPF. Cinco nuevas prueban guardar tamaño 18 desde Ajustes y recargar SQLite, nombres/estados y altura de fila ampliados, cancelar sin cambiar el valor guardado, etiqueta inglesa y menor salto por página con texto grande. Captura nativa del texto ampliado. Pruebas con diálogos reales y datos aislados; teclado físico, lector de pantalla, instalación y cuentas reales siguen pendientes.
+
 ## 0.6.12 — navegación por páginas
 
 Han pasado 289 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 152 WPF. Cinco nuevas comprueban Av Pág en el límite final, avance con foco, retroceso/límite inicial, salto mayor al ampliar la ventana y conservación del desplazamiento al actualizar sin foco en la lista. Se usa una colección de 1.003 juegos con menos de 30 filas creadas. La comprobación de ausencia de foco admite foco en la ventana exterior, sin adquirirlo en la lista. La búsqueda cierra primero el menú; su prueba existente sigue pasando. Se incluye captura nativa de navegación por páginas. Teclado físico, instalación y cuentas reales siguen pendientes.

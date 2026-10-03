@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.13 — 2026-10-03
+
+- Ajustes incluye Tamaño de texto en Miniatura, de 12 a 20 y predeterminado 12, guardado sin cambiar otras vistas. Nombres/estados y altura de fila crecen juntos.
+- La navegación por páginas mide las filas ampliadas y reduce el salto. Sin dependencias nuevas.
+
 ## 0.6.12 — 2026-10-03
 
 - Miniatura admite Re Pág/Av Pág con salto según altura visible y tamaño real de fila, foco de teclado y límites en el primer/último juego.

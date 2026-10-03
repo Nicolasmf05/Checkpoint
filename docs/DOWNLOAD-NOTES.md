@@ -39,6 +39,8 @@ Las actualizaciones conservan el juego seleccionado y recuperan su foco de tecla
 
 **Re Pág/Av Pág** recorren Miniatura por una página visible, según la altura actual de ventana y fila. Redimensionar cambia el salto. Se detiene en el primer/último juego y conserva el foco en la fila activa; las listas grandes siguen virtualizadas. Actualizar sin foco en la lista conserva el desplazamiento de lectura existente. Buscar cierra el menú antes de enfocar el buscador normal.
 
+**Ajustes → Tamaño de texto en Miniatura** permite valores de 12 a 20, con 12 como predeterminado. Guardar aplica y conserva la elección; Cancelar mantiene el valor guardado. Nombres, estados y altura de fila crecen juntos. Re Pág/Av Pág se adaptan a las filas ampliadas. El texto de otras vistas se conserva. Amplía Miniatura si se recortan nombres largos; su tooltip mantiene el título completo. No necesita instalaciones adicionales.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.
