@@ -166,4 +166,31 @@ using(var listsStore=new SqliteStore(Path.Combine(root,"recovered-lists")))
     var restored=listsStore.RestoreDeletedGame(listsStore.LoadDeletedGames()[0].RecoveryId,[],preferences);
     Check(restored.FriendsPrivate==true&&restored.Lists.SequenceEqual(new[]{"Other"}),"restoring a deleted game preserves privacy without resurrecting a removed list");
 }
+var trackedAchievements=new Game{Title="Achievement fixture",SteamAppId=620,Achievements=[new(){Id="first",Name="First",Unlocked=false}],RetroGameId=1,RetroAchievements=[new(){Id="first",Name="Retro first",Unlocked=true}]};
+trackedAchievements.AchievementOverrides["steam:first"]=true;
+Check(AchievementTracking.Items(trackedAchievements).Count(a=>a.Completed)==2&&!trackedAchievements.Achievements[0].Unlocked,"local completion is isolated from provider data and provider IDs do not collide");
+trackedAchievements.Achievements=[new(){Id="first",Name="Updated first",Unlocked=false}];
+Check(AchievementTracking.Items(trackedAchievements).First().Completed,"provider refresh preserves manual completion");
+AchievementTracking.Remove(trackedAchievements,AchievementTracking.Items(trackedAchievements).First());
+Check(AchievementTracking.Items(trackedAchievements).Count()==1&&trackedAchievements.Achievements.Count==1,"removing an official achievement hides it locally without deleting provider data");
+trackedAchievements.RemovedAchievements.Clear();
+Check(!AchievementTracking.Items(trackedAchievements).First().Completed,"restoring a removed achievement uses its original provider state");
+var manualAchievement=AchievementTracking.Add(trackedAchievements,"Personal goal","Description");trackedAchievements.AchievementOverrides["manual:"+manualAchievement.Id]=true;
+using(var achievementsStore=new SqliteStore(Path.Combine(root,"achievement-fixture")))
+{
+    achievementsStore.Save([trackedAchievements],new Settings());var restored=achievementsStore.LoadGames().Single();
+    Check(restored.RetroGameId==1&&AchievementTracking.Items(restored).Last().Completed,"RetroAchievements mapping and manual completion survive SQLite reload");
+}
+var achievementBackup=JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(trackedAchievements,DataJson.Options),DataJson.Options)!;
+Check(achievementBackup.ManualAchievements.Count==1&&achievementBackup.RetroAchievements!.Count==1&&achievementBackup.AchievementOverrides.Count==1,"portable JSON retains personal achievement state");
+AchievementTracking.Remove(trackedAchievements,AchievementTracking.Items(trackedAchievements).Last());
+Check(trackedAchievements.ManualAchievements.Count==0&&trackedAchievements.AchievementOverrides.Count==0,"deleting a manual achievement also removes its completion override");
+Reject(()=>AchievementTracking.Add(trackedAchievements," ",""),"manual achievements require a name");
+Reject(()=>GameRules.Validate(new Game{Title="Invalid",RetroGameId=-1}),"negative RetroAchievements mapping is rejected");
+var detected=new Game{Title="Detection",SteamAppId=620};var installed=new[]{new InstalledSteamGame(620,"Portal",Path.Combine(root,"portal"))};
+Check(GameDetection.Matches(detected,new(123,"portal","",Path.Combine(root,"portal","bin","game.exe")),installed),"installed Steam game is detected by executable folder");
+Check(!GameDetection.Matches(detected,new(123,"portal","",Path.Combine(root,"portal-other","game.exe")),installed),"Steam detection requires a directory boundary");
+detected.DetectionProcess="retroarch.exe";detected.DetectionWindowTitle="Super Mario";
+Check(GameDetection.Matches(detected,new(1,"RetroArch","RetroArch - Super Mario World",null),[]),"emulator detection works without process path using a game-specific window title");
+Check(!GameDetection.Matches(detected,new(1,"retroarch","RetroArch - Zelda",null),[]),"emulator detection does not confuse games using the same executable");
 Console.WriteLine($"{passed} checks passed. Test files: {root}");

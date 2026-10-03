@@ -31,3 +31,7 @@ The local interface uses WebView2 and stores its browser profile in `webview-pro
 The web stores your private library, settings and publication queue in browser IndexedDB, without private cross-device synchronization. Sessions use this tab’s sessionStorage and are excluded from exports; they do not use DPAPI. Clearing site data deletes the local library: keep JSON backups. Offline caches contain public app files, not private service responses. GitHub Pages serves public files and Supabase handles authentication and social data. [Details and limits](WEB.md).
 
 Backups include privacy, memberships and empty list names.
+
+## RetroAchievements and local detection
+
+Detection reads process names/paths and window titles locally; the process inventory is never sent to servers. Optional RetroAchievements queries send your username, game ID and Web API key to its official domain over HTTPS. The key uses DPAPI and is excluded from backups. Manual goals and overrides are not published to friends. [Guide](ACHIEVEMENTS.md).

@@ -63,3 +63,7 @@ Código, documentación y descargas: [Nicolasmf05/Checkpoint](https://github.com
 **Idioma coherente:** los avisos y sus botones siguen el idioma elegido en Ajustes, incluido Miniatura y las ventanas de edición. Los cuadros propios de Windows siguen el idioma del sistema.
 
 **Código de amigo completo:** Amigos → Cuenta muestra y copia `checkpoint-` seguido de 12 caracteres. Introduce este formato en Checkpoint 0.6.16 o posterior; los códigos anteriores siguen funcionando.
+
+## Logros y detección
+
+La detección funciona solo en Windows mientras Checkpoint esté abierto. Steam utiliza su vinculación actual; RetroAchievements necesita usuario y clave web personal opcionales en Ajustes y un ID del juego. La clave se cifra en el equipo. Los logros manuales funcionan sin conexión y no desbloquean logros oficiales. [Guía](ACHIEVEMENTS.md).

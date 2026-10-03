@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.0 — detección y logros
+
+[Guía](ACHIEVEMENTS.md)
+
+![Checkpoint](screenshots/css-achievements-es.png)
+
 ## Navegador adaptable
 
 La web ocupa el espacio disponible sin modos de tamaño de escritorio. [Capturas de navegador ancho y estrecho con interfaz inglesa](en/SCREENSHOTS.md#responsive-browser-layout), con datos de prueba.

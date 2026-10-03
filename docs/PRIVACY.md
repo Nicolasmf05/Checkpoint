@@ -37,3 +37,7 @@ La interfaz local utiliza WebView2 y guarda su perfil en `webview-profile` junto
 La web guarda biblioteca privada, ajustes y cola de publicaciones en IndexedDB del navegador, sin sincronización privada entre dispositivos. Las sesiones se guardan en sessionStorage de la pestaña y no se exportan; no utilizan DPAPI. Al borrar los datos del sitio se pierde la biblioteca local: conserva copias JSON. El caché sin conexión contiene archivos públicos de la app, no respuestas privadas del servicio. GitHub Pages sirve los archivos públicos y Supabase mantiene la autenticación y los datos sociales. [Detalles y límites](WEB.md).
 
 Las copias incluyen privacidad, pertenencias y nombres de listas vacías.
+
+## RetroAchievements y detección local
+
+La detección consulta nombres/rutas de procesos y títulos de ventanas localmente; no envía esa lista a servidores. Las consultas opcionales a RetroAchievements transmiten tu usuario, ID del juego y clave web al dominio oficial mediante HTTPS. La clave se cifra con DPAPI y se excluye de copias. Los objetivos y marcas manuales no se publican a amigos. [Guía](ACHIEVEMENTS.md).

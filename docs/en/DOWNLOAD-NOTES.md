@@ -63,3 +63,7 @@ Source, documentation and downloads: [Nicolasmf05/Checkpoint](https://github.com
 **Consistent language:** notices and their buttons follow the language selected in Settings, including Miniature and editing windows. Windows system dialogs follow the operating system language.
 
 **Complete friend code:** Friends → Account displays and copies `checkpoint-` followed by 12 characters. Enter this format in Checkpoint 0.6.16 or later; earlier codes still work.
+
+## Achievements and detection
+
+Detection works only in Windows while Checkpoint is open. Steam uses its existing connection; optional RetroAchievements requires a username, personal Web API key in Settings and a game ID. The key is encrypted locally. Manual achievements work offline and never unlock official achievements. [Guide](ACHIEVEMENTS.md).

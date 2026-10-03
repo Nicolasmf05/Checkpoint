@@ -10,11 +10,13 @@ namespace Checkpoint.App;
 
 public partial class App : Application
 {
+    internal static bool Diagnostics { get; private set; }
     internal static bool UseCss { get; private set; } = true;
     private Mutex? singleInstance;
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        Diagnostics = e.Args.Any(a => a is "--smoke-test" or "--web-smoke-test" or "--demo");
         UseCss = !e.Args.Contains("--smoke-test");
         int index = Array.IndexOf(e.Args, "--data-dir");
         int smokeIndex = Array.IndexOf(e.Args, "--smoke-test");
@@ -26,7 +28,7 @@ public partial class App : Application
         {
             if (!explicitDirectory) directory = Path.Combine(Path.GetTempPath(), "Checkpoint-smoke-" + Guid.NewGuid().ToString("N"));
             if (File.Exists(Path.Combine(directory, "checkpoint.db")) || File.Exists(Path.Combine(directory, "steam-session.dat"))
-                || File.Exists(Path.Combine(directory,"checkpoint-session.dat")) || Directory.Exists(Path.Combine(directory,"social")))
+                || File.Exists(Path.Combine(directory,"retro-session.dat")) || File.Exists(Path.Combine(directory,"checkpoint-session.dat")) || Directory.Exists(Path.Combine(directory,"social")))
             { Console.Error.WriteLine(I18n.T("La prueba nativa requiere una carpeta nueva sin biblioteca, sesiones ni publicaciones.")); Shutdown(1); return; }
         }
         // Read only the saved language before notices that precede the main window.

@@ -70,6 +70,10 @@ internal static partial class Dialogs
         Heading(body, creating ? I18n.T("Una nueva aventura") : game.Title, I18n.T("La historia y los logros se guardan como objetivos independientes."));
         var title = Input(body, I18n.T("Nombre del juego"), game.Title); title.MaxLength = 140;
         var steamId = Input(body, I18n.T("ID del juego en Steam (opcional)"), game.SteamAppId?.ToString() ?? "");
+        var retroId = Input(body, I18n.T("ID del juego en RetroAchievements (opcional)"), game.RetroGameId?.ToString() ?? "");
+        var detectionProcess = Input(body, I18n.T("Ejecutable para detectar (opcional, por ejemplo retroarch.exe)"), game.DetectionProcess);
+        var detectionTitle = Input(body, I18n.T("Texto del título de ventana (opcional, para distinguir juegos del emulador)"), game.DetectionWindowTitle);
+        body.Children.Add(new TextBlock { Text = I18n.T("Steam se detecta por su carpeta de instalación. Para emuladores, indica el ejecutable y un texto del título específico del juego."), TextWrapping = TextWrapping.Wrap });
         var platform = Input(body, I18n.T("Plataforma"), game.Platform); platform.MaxLength = 60;
         Label(body, I18n.T("Estado")); var state = new ComboBox { ItemsSource = Enum.GetValues<GameStatus>().Select(Labels.Status).ToList(), SelectedIndex = (int)game.Status }; body.Children.Add(state);
         Label(body, I18n.T("Objetivo")); var goal = new ComboBox { ItemsSource = Enum.GetValues<GameGoal>().Select(Labels.Goal).ToList(), SelectedIndex = (int)game.Goal }; body.Children.Add(goal);
@@ -145,6 +149,10 @@ internal static partial class Dialogs
                 if (string.IsNullOrWhiteSpace(steamId.Text)) game.SteamAppId = null;
                 else if (int.TryParse(steamId.Text.Trim(), out int id) && id > 0) game.SteamAppId = id;
                 else throw new ArgumentException(I18n.T("El ID de Steam debe ser un número positivo."));
+                if (string.IsNullOrWhiteSpace(retroId.Text)) game.RetroGameId = null;
+                else if (int.TryParse(retroId.Text.Trim(), out int retroNumber) && retroNumber > 0) game.RetroGameId = retroNumber;
+                else throw new ArgumentException(I18n.T("El ID de RetroAchievements debe ser un número positivo."));
+                game.DetectionProcess = detectionProcess.Text.Trim(); game.DetectionWindowTitle = detectionTitle.Text.Trim();
                 if (owner.Games.Any(g => g.Id != game.Id && g.SteamAppId is not null && g.SteamAppId == game.SteamAppId)) throw new ArgumentException(I18n.T("Ese juego de Steam ya está en la biblioteca."));
                 if (!int.TryParse(priority.Text, out int order)) throw new ArgumentException(I18n.T("El orden debe ser un número entero."));
                 game.FriendsPrivate=friendsPrivate.IsChecked==true; game.Lists=listChecks.Where(p=>p.Value.IsChecked==true).Select(p=>p.Key).ToList();
@@ -156,6 +164,19 @@ internal static partial class Dialogs
                     // A background refresh may have completed while this editor was open.
                     game.Achievements = original.Achievements; game.SyncedAt = original.SyncedAt;
                     game.PlaytimeMinutes = original.PlaytimeMinutes;
+                }
+                if (original is not null)
+                {
+                    game.ManualAchievements = original.ManualAchievements;
+                    game.RemovedAchievements = original.RemovedAchievements.ToList();
+                    game.AchievementOverrides = new(original.AchievementOverrides);
+                    game.RetroAchievements = original.RetroGameId == game.RetroGameId ? original.RetroAchievements : null;
+                    foreach(var provider in new[]{"steam", "retro"})
+                        if(provider == "steam" ? original.SteamAppId != game.SteamAppId : original.RetroGameId != game.RetroGameId)
+                        {
+                            game.RemovedAchievements.RemoveAll(k => k.StartsWith(provider+":"));
+                            foreach(var key in game.AchievementOverrides.Keys.Where(k=>k.StartsWith(provider+":")).ToArray()) game.AchievementOverrides.Remove(key);
+                        }
                 }
                 AddTask();
                 if (creating) owner.Games.Add(game); else owner.Games[owner.Games.IndexOf(original!)] = game;
@@ -195,31 +216,6 @@ internal static partial class Dialogs
         Render(); footer.Children.Add(Button(I18n.T("Cerrar"), (_, _) => window.Close(), true)); window.ShowDialog();
     }
 
-    internal static void Achievements(MainWindow owner, Game game)
-    {
-        var window = Modal(owner, I18n.T("Logros · ") + game.Title, 540, 660); var body = Panel(); Layout(window, body, out var footer);
-        Heading(body, I18n.T("Logros de ") + game.Title);
-        var summary = new TextBlock { Margin = new Thickness(0, 0, 0, 8) }; body.Children.Add(summary);
-        var spoilers = Check(body, I18n.T("Mostrar nombres y descripciones de logros secretos"), false);
-        var locked = Check(body, I18n.T("Mostrar solo los pendientes"), true); var list = new StackPanel(); body.Children.Add(list);
-        void Render()
-        {
-            list.Children.Clear(); summary.Text = game.Achievements is null ? I18n.T("Sin datos sincronizados.") : game.Achievements.Count == 0 ? I18n.T("Este juego no tiene logros disponibles.") : (I18n.IsEnglish ? $"{game.UnlockedCount} of {game.Achievements.Count} unlocked · {game.AchievementPercent}%" : $"{game.UnlockedCount} de {game.Achievements.Count} desbloqueados · {game.AchievementPercent}%");
-            foreach (var item in (game.Achievements ?? []).Where(a => locked.IsChecked != true || !a.Unlocked).OrderBy(a => a.Unlocked))
-            {
-                bool secret = item.Hidden && !item.Unlocked && spoilers.IsChecked != true;
-                var panel = new StackPanel { Margin = new Thickness(0, 12, 0, 8) };
-                panel.Children.Add(new TextBlock { Text = (item.Unlocked ? "✓  " : "○  ") + (secret ? I18n.T("Logro secreto") : item.Name), FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
-                panel.Children.Add(new TextBlock { Text = secret ? I18n.T("Activa la opción superior para revelar este logro.") : item.Description, FontSize = 11, TextWrapping = TextWrapping.Wrap, Foreground = (Brush)Application.Current.Resources["MutedBrush"], Margin = new Thickness(0, 5, 0, 0) });
-                if (item.UnlockedAt is { } date) panel.Children.Add(new TextBlock { Text = date.ToLocalTime().ToString("dd/MM/yyyy"), FontSize = 10, Margin = new Thickness(0, 4, 0, 0) });
-                list.Children.Add(panel);
-            }
-        }
-        spoilers.Checked += (_, _) => Render(); spoilers.Unchecked += (_, _) => Render(); locked.Checked += (_, _) => Render(); locked.Unchecked += (_, _) => Render(); Render();
-        var sync = Button(I18n.T("Actualizar"), async (_, _) => { await owner.Sync(false, game); Render(); }); sync.IsEnabled = owner.Steam.Session is not null && game.SteamAppId.HasValue; footer.Children.Add(sync);
-        footer.Children.Add(Button(I18n.T("Cerrar"), (_, _) => window.Close(), true)); window.ShowDialog();
-    }
-
     internal static void Settings(MainWindow owner)
     {
         var prefs = owner.Preferences; var window = Modal(owner, I18n.T("Ajustes · Checkpoint"), 540, 700); var body = Panel(); Layout(window, body, out var footer);
@@ -255,6 +251,8 @@ internal static partial class Dialogs
         body.Children.Add(new TextBlock { Text = I18n.T("Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         var tray = Check(body, I18n.T("Ocultar en la bandeja al cerrar"), prefs.CloseToTray); var startup = Check(body, I18n.T("Iniciar con Windows"), prefs.StartWithWindows);
         Label(body, I18n.T("Atajos")); body.Children.Add(new TextBlock { Text = I18n.T("Ctrl+Alt+C · mostrar / ocultar\nCtrl+N · añadir juego     Ctrl+F · buscar\nF6 · cambiar vista     Escape · ocultar\nAlt+↑ / Alt+↓ · reordenar desde el asa ⠿\nCtrl+Z · recuperar el último juego eliminado"), FontSize = 12, LineHeight = 20 });
+        var detectGames = Check(body, I18n.T("Detectar juegos y abrir sus logros automáticamente"), prefs.DetectGames);
+        body.Children.Add(Button(I18n.T("Configurar RetroAchievements"), (_, _) => RetroSettings(owner, window)));
         Label(body, "Steam"); var steamSummary = new TextBlock { Text = owner.Steam.Session is null ? I18n.T("Cuenta sin vincular. El inicio de sesión se realiza en Steam.") : I18n.T("Cuenta vinculada: ") + owner.Steam.Session.SteamId, TextWrapping = TextWrapping.Wrap, FontSize = 12 }; body.Children.Add(steamSummary);
         var steamActions = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 10, 0, 0) }; body.Children.Add(steamActions);
         var advanced = new StackPanel(); var endpoint = Input(advanced, I18n.T("Dirección del servicio"), prefs.ServiceUrl);
@@ -309,7 +307,7 @@ internal static partial class Dialogs
                 prefs.Theme = Themes.Ids[Math.Clamp(theme.SelectedIndex, 0, Themes.Ids.Count - 1)]; prefs.LightTheme = prefs.Theme == "light"; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
-                prefs.LightweightMode = lightweight.IsChecked == true;
+                prefs.LightweightMode = lightweight.IsChecked == true; prefs.DetectGames = detectGames.IsChecked == true;
                 prefs.MiniatureTextSize = (int)miniatureText.SelectedItem;
                 owner.ApplyPreferences(); owner.Persist(); saved = true; window.Close(); owner.ApplyLanguage();
             }

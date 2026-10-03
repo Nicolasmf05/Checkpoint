@@ -5,12 +5,19 @@ const text=(v,n)=>typeof v==='string'?v.slice(0,n):'';
 const integer=(v,max)=>Number.isInteger(Number(v))&&Number(v)>=0&&Number(v)<=max?Number(v):0;
 const enumeration=(value,values)=>typeof value==='number'&&values[value]?value:Math.max(0,values.findIndex(x=>x.toLowerCase()===String(value).toLowerCase()));
 export const uuid=v=>typeof v==='string'&&/^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(v);
+const achievement=a=>({id:text(a?.id,250),name:text(a?.name,250),description:text(a?.description,2000),hidden:a?.hidden===true,unlocked:a?.unlocked===true,unlockedAt:typeof a?.unlockedAt==='string'?a.unlockedAt:null});
 export function normalize(raw) {
   if(!raw||typeof raw!=='object'||!text(raw.title,140).trim())throw new Error('invalid-game');
   if(raw.friendsPrivate!=null&&typeof raw.friendsPrivate!=='boolean')throw new Error('invalid-game');
   const steam=Number(raw.steamAppId);
   return {id:uuid(raw.id)?raw.id:crypto.randomUUID(),title:text(raw.title,140).trim(),platform:text(raw.platform,40)||'PC',
     steamAppId:Number.isInteger(steam)&&steam>0&&steam<=2147483647?steam:null,
+    retroGameId:Number.isInteger(raw.retroGameId)&&raw.retroGameId>0&&raw.retroGameId<=2147483647?raw.retroGameId:null,
+    detectionProcess:text(raw.detectionProcess,260),detectionWindowTitle:text(raw.detectionWindowTitle,250),
+    retroAchievements:Array.isArray(raw.retroAchievements)?raw.retroAchievements.slice(0,10000).map(achievement):null,
+    manualAchievements:(Array.isArray(raw.manualAchievements)?raw.manualAchievements:[]).slice(0,200).map(achievement),
+    removedAchievements:(Array.isArray(raw.removedAchievements)?raw.removedAchievements:[]).slice(0,20000).filter(v=>typeof v==='string'&&v.length<=260),
+    achievementOverrides:Object.fromEntries(Object.entries(raw.achievementOverrides&&typeof raw.achievementOverrides==='object'?raw.achievementOverrides:{}).slice(0,20000).filter(([k,v])=>k.length<=260&&typeof v==='boolean')),
     status:enumeration(raw.status,statuses),goal:enumeration(raw.goal,goals),customGoal:text(raw.customGoal,250),
     storyPercent:raw.storyPercent==null||raw.storyPercent===''?null:Math.min(100,integer(raw.storyPercent,100)),
     friendsPrivate:typeof raw.friendsPrivate==='boolean'?raw.friendsPrivate:null,lists:normalizeLists(raw.lists),notes:text(raw.notes,20000),tracked:raw.tracked!==false,favorite:raw.favorite===true,sortOrder:integer(raw.sortOrder,100000),

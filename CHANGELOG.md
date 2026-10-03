@@ -2,6 +2,16 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.0 — 2026-10-03
+
+- Windows game detection opens an independent pending-achievement window once per game process session; default enabled and configurable.
+- Steam installation folders and optional executable/window-title associations for emulators.
+- Direct RetroAchievements game progress, personal DPAPI-encrypted credentials and Hardcore mode.
+- Add/remove personal achievements and completion overrides, restore hidden official entries, retain manual choices across provider refreshes.
+- Refresh open detected windows every 60 seconds; Steam's existing 15-minute server cache still applies.
+- Private manual goals and credentials stay out of friend publications. Desktop backups and web normalization retain the new library fields.
+- Spanish/English controls and setup documentation. RetroAchievements tested with simulated HTTP; real personal credentials remain user setup.
+
 ## 0.7.6 — 2026-10-03
 
 - Tracked games visible to accepted friends by default, with private-from-first-save, later withdrawal and a separate Private games view.

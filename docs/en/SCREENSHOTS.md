@@ -4,6 +4,12 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.8.0 — detection and achievements
+
+[Setup guide](ACHIEVEMENTS.md)
+
+![Checkpoint](../screenshots/css-achievements-en.png)
+
 ## Responsive browser layout
 
 The browser app fills the current viewport automatically, without desktop size presets. These isolated test captures show wide and narrow browser sizes.

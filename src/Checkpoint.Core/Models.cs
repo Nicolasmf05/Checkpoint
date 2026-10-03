@@ -28,6 +28,13 @@ public sealed class Game
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Title { get; set; } = "";
     public int? SteamAppId { get; set; }
+    public int? RetroGameId { get; set; }
+    public string DetectionProcess { get; set; } = "";
+    public string DetectionWindowTitle { get; set; } = "";
+    public List<Achievement>? RetroAchievements { get; set; }
+    public List<Achievement> ManualAchievements { get; set; } = [];
+    public List<string> RemovedAchievements { get; set; } = [];
+    public Dictionary<string,bool> AchievementOverrides { get; set; } = [];
     public string Platform { get; set; } = "PC";
     public GameStatus Status { get; set; }
     public GameGoal Goal { get; set; }
@@ -77,6 +84,7 @@ public static class Labels
 
 public sealed class Settings
 {
+    public bool DetectGames { get; set; } = true;
     public string Language { get; set; } = "es";
     public double Width { get; set; } = 510;
     public double Height { get; set; } = 740;
@@ -163,6 +171,11 @@ public static class GameRules
         game.Title ??= ""; game.Platform ??= "PC"; game.Notes ??= ""; game.CustomGoal ??= ""; game.Tasks ??= [];
         if (game.Tasks.Any(t => t is null || t.Title is null)) throw new ArgumentException(I18n.T("Una tarea no es válida."));
         if (game.Achievements?.Any(a => a is null || a.Id is null || a.Name is null || a.Description is null) == true)
+            throw new ArgumentException(I18n.T("Los logros guardados no son válidos."));
+        game.ManualAchievements ??= [];game.RemovedAchievements ??= [];game.AchievementOverrides ??= [];game.DetectionProcess ??= "";game.DetectionWindowTitle ??= "";
+        if(game.RetroGameId is <=0 || (game.RetroAchievements?.Count??0)>10000 || game.ManualAchievements.Count>200 || game.RemovedAchievements.Count>20000 || game.AchievementOverrides.Count>20000 || game.RemovedAchievements.Any(k=>k is null||k.Length>260) || game.AchievementOverrides.Keys.Any(k=>k.Length>260) || game.DetectionProcess.Length>260 || game.DetectionWindowTitle.Length>250)
+            throw new ArgumentException(I18n.T("La configuración de logros o detección no es válida."));
+        if(game.ManualAchievements.Concat(game.RetroAchievements??[]).Any(a=>a is null||string.IsNullOrWhiteSpace(a.Id)||a.Id.Length>250||string.IsNullOrWhiteSpace(a.Name)||a.Name.Length>250||a.Description is null||a.Description.Length>2000))
             throw new ArgumentException(I18n.T("Los logros guardados no son válidos."));
         game.Lists = GameLists.Normalize(game.Lists);
         game.Title = game.Title.Trim();

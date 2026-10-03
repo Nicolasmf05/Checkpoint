@@ -128,6 +128,7 @@ public partial class MainWindow : Window
             timer.Tick += async (_, _) => { if (Steam.Session is not null && !syncing) await Sync(true); };
             timer.Start();
             StartSocial();
+            StartGameDetection();
             if (App.UseCss) StartWebInterface();
             if (Steam.Session is not null) _ = Sync(true);
         };
@@ -584,7 +585,7 @@ public partial class MainWindow : Window
     }
     protected override void OnClosed(EventArgs e)
     {
-        shutdown.Cancel(); timer.Stop(); boundsTimer.Stop(); dragScrollTimer.Stop(); if (hotkeyRegistered && source is not null) UnregisterHotKey(source.Handle, HotkeyId);
+        shutdown.Cancel(); detectionTimer.Stop();foreach(var window in achievementWindows.Values.ToArray())window.Close();Retro?.Dispose(); timer.Stop(); boundsTimer.Stop(); dragScrollTimer.Stop(); if (hotkeyRegistered && source is not null) UnregisterHotKey(source.Handle, HotkeyId);
         socialTimer.Stop(); publicationTimer.Stop(); Social?.Dispose();
         tray.Dispose(); Steam.Dispose(); Covers.Dispose(); Store.Dispose(); base.OnClosed(e); Application.Current.Shutdown(Environment.ExitCode);
     }

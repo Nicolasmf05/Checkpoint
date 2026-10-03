@@ -118,6 +118,13 @@ public partial class MainWindow
                 Check(Texts(window).Contains("○  Secreto de prueba") && Texts(window).Contains("Spoiler de prueba"), "achievement spoiler toggle reveals details");
                 Controls<CheckBox>(window).Single(c => (string?)c.Content == "Mostrar solo los pendientes").IsChecked = false;
                 Check(Texts(window).Contains("✓  Logro desbloqueado"), "achievement pending filter includes unlocked entries when disabled");
+                Controls<TextBox>(window).Single(b=>AutomationProperties.GetName(b)=="Nombre del logro manual").Text="Objetivo manual";
+                Click(window,"Añadir logro manual");
+                Check(added.ManualAchievements.Count==1,"achievement dialog adds manual goals");
+                var completion=Controls<CheckBox>(window).Single(c=>(string?)c.Content=="Completado en Checkpoint" && ((StackPanel)c.Parent).Children.OfType<TextBlock>().Any(t=>t.Text.Contains("Objetivo manual")));completion.IsChecked=true;
+                Check(AchievementTracking.Items(added).Last().Completed&&!added.ManualAchievements[0].Unlocked,"achievement dialog records personal completion separately");
+                Controls<Button>(window).Single(b=>(string?)b.Content=="Quitar de mi lista" && ((StackPanel)b.Parent).Children.OfType<TextBlock>().Any(t=>t.Text.Contains("Objetivo manual"))).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Check(added.ManualAchievements.Count==0,"achievement dialog removes manual goals");
                 Click(window, "Cerrar");
             });
             RunModal(() => Dialogs.Settings(this), window =>
@@ -228,6 +235,7 @@ public partial class MainWindow
             // Return the fixture to the three real demo games; no simulated logs are delivered in the app.
             Games.Remove(added); Persist();
             await RenderSteamSmokeTest(outputDirectory,Check);
+            await RenderRetroSmokeTest(outputDirectory,Check);
             await RenderSocialSmokeTest(outputDirectory,Check);
 
             var bulk = Enumerable.Range(0, 1000).Select(i => new Game { Title = $"Virtual game {i:0000}", SortOrder = i + 3, CustomCover = originalCover }).ToList();
