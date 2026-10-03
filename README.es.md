@@ -18,12 +18,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.7.2**. En la carpeta `dist` se generan:
+La versión actual es **0.7.3**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.2), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.3), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.7.2-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.7.2-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.7.3-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.7.3-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -79,6 +79,8 @@ Usa el selector de la cabecera o Ajustes → Modo de ventana: **Ventana completa
 - Porcentaje manual de historia, publicación explícita de juegos y reintentos de publicación al recuperar la conexión.
 
 **Historia terminada y todos los logros son independientes.** La sincronización nunca decide que has terminado una historia y conserva los datos previos si Steam falla.
+
+**Los atajos están visibles al pie de la ventana.** Pulsa **Atajos de teclado · F1** o **F1** para consultar la guía completa en el idioma elegido. En Miniatura usa F1 o el menú con clic derecho; la lista conserva solo nombres y estados. Esc cierra la ayuda y devuelve el foco.
 
 Atajos: `Ctrl+Alt+C` muestra u oculta; `Ctrl+N` añade un juego; `Ctrl+F` busca; `F6` alterna lista, compacta, cuadrícula y Miniatura; `Ctrl+Z` recupera el último juego eliminado cuando no estás editando texto; `Escape` oculta. Si otro programa ocupa `Ctrl+Alt+C`, puedes abrir Checkpoint desde la bandeja.
 

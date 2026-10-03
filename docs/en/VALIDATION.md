@@ -1,5 +1,9 @@
 # Validation
 
+## 0.7.3 — visible keyboard shortcuts
+
+389 checks passed: 130 core, 18 Node service, 18 Edge, 175 native controller, 4 interface model and 44 actual CSS checks. Seven new checks cover visible and accessible gestures, Spanish/English help, blocking underlying commands, Escape without hiding the window, Miniature context-menu help and restoration of its selected row focus. Captures come from the extracted ZIP with isolated data. Occupied global gestures are explained; tests do not close another user instance. Physical keyboard and screen-reader validation remain pending.
+
 ## 0.7.2 — automatic synchronization
 
 382 checks passed: 130 core, 18 Node service, 18 Edge, 175 native controller, 4 interface model and 37 actual CSS checks. Startup and the timer now use the same library and achievements sync as Refresh. Existing tests cover preservation of manual states, deduplicated imports, Steam errors and localized interfaces. Startup with a real Steam account remains unverified; service tests use simulated responses.

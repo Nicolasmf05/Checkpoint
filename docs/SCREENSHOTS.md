@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.7.3 — atajos visibles
+
+La franja inferior muestra las teclas más útiles; F1 abre la guía completa. En Miniatura se accede desde F1 o el menú con clic derecho.
+
+![Guía de atajos en español](screenshots/css-shortcuts-es.png)
+
 ## 0.7.1 — ventana completa
 
 La captura inglesa muestra la ventana completa con opacidad al 100 %: [ver captura](screenshots/css-full-window-en.png). El selector también está traducido a español en las capturas siguientes.

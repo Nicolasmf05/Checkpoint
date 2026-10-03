@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.7.3 — atajos visibles
+
+389 comprobaciones superadas: 130 de biblioteca, 18 del servicio Node, 18 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 44 CSS reales. Siete nuevas verifican la franja visible y teclas accesibles, ayuda en español e inglés, bloqueo de comandos de fondo, cierre con Esc sin ocultar la ventana, acceso desde el menú de Miniatura y recuperación del foco de su juego. Las capturas se obtienen del ZIP extraído con datos aislados. La tecla global ocupada se explica; las pruebas no cierran otra instancia del usuario. Sigue pendiente comprobar teclado físico y lectores de pantalla.
+
 ## 0.7.2 — sincronización automática
 
 382 comprobaciones superadas: 130 de biblioteca, 18 del servicio Node, 18 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 37 CSS reales. El arranque y el temporizador usan ahora la misma sincronización de biblioteca y logros que el botón Actualizar. Las pruebas existentes comprueban conservación de estados manuales, importación sin duplicados, errores de Steam e interfaz traducida. No se ha probado el arranque con una cuenta Steam real; las pruebas del servicio usan respuestas simuladas.

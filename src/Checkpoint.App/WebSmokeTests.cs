@@ -40,6 +40,15 @@ public partial class MainWindow
             Check(web!.Browser.DefaultBackgroundColor.A == 0 && AllowsTransparency,"composition web control retains transparent window support");
             Check(!web.Browser.CoreWebView2.Settings.AreHostObjectsAllowed && !web.Browser.CoreWebView2.Settings.AreDefaultContextMenusEnabled,"web host disables native object access and browser context menus");
             Check(await Script(web,"document.documentElement.lang === 'es' && document.querySelector('[data-tab=list]').textContent === 'Mi lista'"),"CSS main navigation uses Spanish");
+            Check(await Script(web,"document.querySelector('.shortcutbar').textContent.includes('Ctrl+N') && document.querySelector('.shortcutbar').textContent.includes('F6') && document.querySelector('[data-label=add]').getAttribute('aria-keyshortcuts')==='Control+N'"),"useful shortcuts are visible and controls expose accessible key gestures");
+            await Run("document.querySelector('.shortcut-button').click();");
+            Check(await Script(web,"document.querySelector('.shortcut-help:modal h2').textContent==='Atajos de teclado' && document.querySelector('.shortcut-help').textContent.includes('Intro / Espacio') && document.querySelector('.shortcut-help').textContent.includes('Ctrl+Alt+C')"),"shortcut button opens a localized Spanish guide with global and Miniature keys");
+            var helpGameCount=Games.Count;
+            await Run("document.querySelector('.shortcut-help').dispatchEvent(new KeyboardEvent('keydown',{key:'n',ctrlKey:true,bubbles:true}));");
+            Check(Games.Count==helpGameCount && Application.Current.Windows.Count==1 && await Script(web,"!!document.querySelector('.shortcut-help:modal') && document.querySelector('.shortcut-help').contains(document.activeElement)"),"shortcut guide is modal and prevents underlying game commands");
+            await Capture(web,"css-shortcuts-es.png");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
+            Check(IsVisible && await Script(web,"!document.querySelector('.shortcut-help') && document.activeElement.matches('.shortcut-button')"),"Escape closes shortcut help and restores focus without hiding the widget");
             var coverGame=Games.First();
             var fixture=System.Windows.Media.Imaging.BitmapSource.Create(1,1,96,96,System.Windows.Media.PixelFormats.Bgra32,null,new byte[] {130,210,170,255},4);
             coverGame.CustomCover=Covers.SavePrepared(WebSurface.ImageBytes(fixture)); Persist(); Refresh();
@@ -67,6 +76,10 @@ public partial class MainWindow
             await settings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Guardar').click();");
             await Wait(()=>Script(web,"document.documentElement.lang==='en'"));
             Check(Preferences.Language=="en" && Store.LoadSettings().Language=="en" && await Script(web,"document.querySelector('[data-tab=library]').textContent==='Library'"),"CSS settings save language and update the main interface immediately");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'F1',bubbles:true}));");
+            Check(await Script(web,"document.querySelector('.shortcut-help:modal h2').textContent==='Keyboard shortcuts' && document.querySelector('.shortcut-help').textContent.includes('Enter / Space') && !document.querySelector('.shortcut-help').textContent.includes('Atajos')"),"F1 opens shortcut help entirely in the selected English language");
+            await Capture(web,"css-shortcuts-en.png");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
             await Capture(web,"css-widget-en.png");
             await Run("document.querySelector('[data-tab=friends]').click();");
             await Wait(()=>Script(web,"!!document.querySelector('input[aria-label=\"Checkpoint username\"]')"));
@@ -145,6 +158,11 @@ public partial class MainWindow
             Check(!IsFullWindow && Math.Abs(Width-smallWidth)<2 && Math.Abs(Height-smallHeight)<2 && await Script(web,"window.checkpointState.opacity===0.61 && document.querySelector('.window-mode').value==='1'"),"small window restores saved dimensions and translucency");
             await Run("const mode=document.querySelector('.window-mode');mode.value=2;mode.dispatchEvent(new Event('change',{bubbles:true}));");
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
+            await Run("[...document.querySelectorAll('.menu button')].find(button=>button.getAttribute('aria-keyshortcuts')==='F1').click();");
+            Check(await Script(web,"!!document.querySelector('.shortcut-help:modal') && !document.querySelector('.menu') && getComputedStyle(document.querySelector('.shortcutbar')).display==='none'"),"Miniature context menu opens the guide without adding controls to its list");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
+            Check(Preferences.MiniatureView && await Script(web,"!document.querySelector('.shortcut-help') && document.activeElement.matches('.minirow')"),"closing Miniature help restores the selected row focus");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
             Check(Preferences.MiniatureView && await Script(web,"[...document.querySelectorAll('.menu button')].some(button=>button.textContent.includes('Full window')) && window.checkpointState.opacity===0.61"),"Miniature keeps translucency and offers all three window modes");
             await Run("[...document.querySelectorAll('.menu button')].find(button=>button.textContent.includes('Full window')).click();");
             Check(IsFullWindow && !Preferences.MiniatureView && Store.LoadSettings().FullWindow,"Miniature context menu restores the opaque full window");

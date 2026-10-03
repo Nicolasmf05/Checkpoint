@@ -1,7 +1,7 @@
 import { visibleRange, nextIndex } from './ui-model.mjs';
 
 const root = document.querySelector('#app');
-let state, selected, menu, dragId, layout, dialogMode;
+let state, selected, menu, dragId, layout, dialogMode, help, helpFocus, helpLanguage;
 let requestId = 0;
 const pending = new Map();
 const send = value => { const id=++requestId; window.chrome?.webview?.postMessage({...value,requestId:id}); return id; };
@@ -12,13 +12,34 @@ function button(text, name, title, values = {}, className = '') {
   node.setAttribute('aria-label', title || text); node.addEventListener('click', () => action(name, values)); return node;
 }
 function dismissMenu() { const hadMenu=!!menu; menu?.remove(); menu=undefined; if (hadMenu && state?.mini && selected) root.querySelector(`[data-game="${selected}"]`)?.focus({preventScroll:true}); }
+const gestures = {add:'Ctrl+N', search:'Ctrl+F', undo:'Ctrl+Z', view:'F6', hide:'Esc', shortcuts:'F1'};
+function showHelp(event) {
+  if (!state || state.kind !== 'main') return;
+  const invoker=event?.currentTarget; dismissMenu(); helpFocus = invoker?.isConnected ? invoker : document.activeElement;
+  help = el('dialog', 'shortcut-help'); help.setAttribute('aria-labelledby','shortcut-title');
+  help.addEventListener('close', () => {help?.remove(); help=undefined; helpLanguage=undefined; if(helpFocus?.isConnected)helpFocus.focus({preventScroll:true}); else if(state?.mini && selected)root.querySelector(`[data-game="${selected}"]`)?.focus({preventScroll:true});});
+  help.addEventListener('click',e=>{if(e.target===help){const r=help.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)help.close();}});
+  document.body.append(help); renderHelp(); help.showModal(); help.querySelector('button').focus();
+}
+function renderHelp() {
+  if (!help || helpLanguage === state.language) return;
+  helpLanguage=state.language; const l=state.labels; help.replaceChildren();
+  const header=el('div','shortcut-header'), title=el('h2','',l.shortcuts);title.id='shortcut-title';
+  const close=el('button','',l.closeHelp);close.type='button';close.addEventListener('click',()=>help.close()); header.append(title,close);help.append(header);
+  const content=el('div','shortcut-content');
+  function section(title,rows) {const group=el('section');group.append(el('h3','',title));const list=el('dl');for(const [keys,label,note] of rows){const row=el('div','shortcut-row'),term=el('dt'),description=el('dd','',label);term.append(el('kbd','',keys));if(note)description.append(el('small','',note));row.append(term,description);list.append(row);}group.append(list);content.append(group);}
+  const general=[['F1',l.shortcuts],['Ctrl+N',l.add],['Ctrl+F',l.search],['Ctrl+Z',l.undo,l.undoContext],['F6',l.view],['Esc',l.hide,l.hideContext]];
+  general.push(['Ctrl+Alt+C',l.globalKeys,state.globalHotkey?null:l.globalUnavailable]);
+  section(l.generalKeys,general);section(l.miniKeys,[['↑ / ↓',l.selectGame],[l.homeEnd,l.firstLast],[l.pageKeys,l.pageGame],[l.enterSpace,l.gameMenu],['F2',l.edit]]);section(l.orderKeys,[['Alt+↑ / Alt+↓',l.reorder]]);help.append(content);
+}
+
 function showMenu(game, x, y) {
   dismissMenu(); if (!state || state.kind !== 'main') return;
   menu = el('div', 'menu'); menu.setAttribute('role', 'menu');
   function entry(text, command, values = {}, checked) {
     const item = button((checked == null ? '' : checked ? '✓  ' : '    ') + text, command, text, values);
     item.setAttribute('role', checked == null ? 'menuitem' : 'menuitemradio'); if (checked != null) item.setAttribute('aria-checked', String(checked));
-    item.addEventListener('click', dismissMenu); menu.append(item);
+    const key=gestures[command];if(key){item.append(el('kbd','',key));item.setAttribute('aria-keyshortcuts',key==='Esc'?'Escape':key.replace('Ctrl+','Control+'));} item.addEventListener('click', dismissMenu); menu.append(item);
   }
   if (game) {
     state.labels.statuses.forEach((label, value) => entry(label, 'state', { id: game.id, value }, game.state === value));
@@ -27,6 +48,7 @@ function showMenu(game, x, y) {
   if (state.mini) entry(state.labels.exitMini, 'exit-mini');
   [state.labels.fullWindow,state.labels.smallWindow,state.labels.miniature].forEach((label,value)=>entry(label,'window-mode',{value},value===(state.mini?2:state.full?0:1)));
   entry(state.labels.settings, 'settings'); entry(state.labels.search, 'search'); entry(state.labels.add, 'add');
+  const helpItem=el('button','',state.labels.shortcuts);helpItem.setAttribute('role','menuitem');helpItem.setAttribute('aria-keyshortcuts','F1');helpItem.append(el('kbd','','F1'));helpItem.addEventListener('click',showHelp);menu.append(helpItem);
   menu.append(el('hr')); entry(state.labels.pin, 'pin', {}, state.pinned); entry(state.labels.locked, 'lock', {}, state.locked);
   document.body.append(menu);
   menu.style.left = `${Math.max(4, Math.min(x, innerWidth - menu.offsetWidth - 4))}px`;
@@ -97,11 +119,12 @@ function frame() {
   const viewport = el('section', 'viewport'); viewport.setAttribute('aria-label', 'Checkpoint'); viewport.tabIndex = -1; viewport.addEventListener('scroll', renderGames);
   const footer = el('footer', 'footer'), messages = el('div'); messages.append(el('div', 'connection'), el('div', 'notice')); footer.append(messages);
   const tools = el('div', 'tools'); for (const [icon,name] of [['↶','undo'], ['▤','cycle'], ['↻','sync']]) { const node = button(icon, name, icon, {}, 'icon'); node.dataset.label = name === 'cycle' ? 'view' : name; tools.append(node); } footer.append(tools);
+  const shortcutbar=el('div','shortcutbar'), hints=el('div','shortcut-hints');shortcutbar.append(hints);const helpButton=el('button','shortcut-button');helpButton.type='button';helpButton.setAttribute('aria-keyshortcuts','F1');helpButton.addEventListener('click',showHelp);shortcutbar.append(helpButton);
   const strip = el('div', 'dragstrip'); strip.hidden = true; strip.addEventListener('pointerdown', e => { if (e.button === 0 && !state.locked) action('drag'); });
   const resize = el('div', 'resize'); resize.setAttribute('aria-hidden', 'true'); let point;
   resize.addEventListener('pointerdown', e => { if (state.locked) return; point = [e.screenX,e.screenY]; resize.setPointerCapture(e.pointerId); e.preventDefault(); });
   resize.addEventListener('pointermove', e => { if (!point) return; const x=e.screenX-point[0], y=e.screenY-point[1]; point=[e.screenX,e.screenY]; if (x || y) action('resize',{x,y}); }); resize.addEventListener('pointerup', () => point = undefined); resize.addEventListener('lostpointercapture', () => point = undefined);
-  windowNode.append(header,intro,navigation,searchbar,viewport,footer,strip,resize); root.append(windowNode);
+  windowNode.append(header,intro,navigation,searchbar,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
   windowNode.addEventListener('contextmenu', e => { if (state.mini && !e.target.closest('[data-game]')) { e.preventDefault(); showMenu(null,e.clientX,e.clientY); } });
 }
 function renderMain() {
@@ -112,10 +135,11 @@ function renderMain() {
   host.querySelector('.tagline').textContent = state.labels.tagline;
   host.querySelector('h1').textContent = state.tab === 'friends' ? state.labels.friendsTitle : state.labels.title;
   host.querySelector('.summary').textContent = state.summary;
-  host.querySelectorAll('[data-label]').forEach(node => { const label = state.labels[node.dataset.label]; node.title = label; node.setAttribute('aria-label', label); if (node.classList.contains('add')) node.textContent = '+ '+label; });
+  host.querySelectorAll('[data-label]').forEach(node => { const label = state.labels[node.dataset.label]; const key=gestures[node.dataset.label]; node.title = label+(key?' · '+key:''); node.setAttribute('aria-label', label);if(key)node.setAttribute('aria-keyshortcuts',key==='Esc'?'Escape':key.replace('Ctrl+','Control+')); if (node.classList.contains('add')) node.textContent = '+ '+label; });
   host.querySelectorAll('[data-tab]').forEach(node => { node.textContent = state.labels[node.dataset.tab]; node.classList.toggle('active', state.tab === node.dataset.tab); });
-  const search = host.querySelector('#search'); if ((pending.get('search')||0) <= (state.ack||0) && search.value !== state.search) search.value = state.search; search.placeholder = state.labels.search; search.setAttribute('aria-label',state.labels.search);
+  const search = host.querySelector('#search'); if ((pending.get('search')||0) <= (state.ack||0) && search.value !== state.search) search.value = state.search; search.placeholder = state.labels.search+' · Ctrl+F'; search.setAttribute('aria-keyshortcuts','Control+F'); search.setAttribute('aria-label',state.labels.search);
   const filter = host.querySelector('.searchbar select'); filter.replaceChildren(); [state.labels.all,...state.labels.statuses].forEach((text,index) => { const option=el('option','',text); option.value=index; filter.append(option); }); filter.value = state.filter;
+  const hints=host.querySelector('.shortcut-hints');hints.replaceChildren();for(const [keys,label] of [['Ctrl+N',state.labels.add],['Ctrl+F',state.labels.search],['F6',state.labels.view]]){const hint=el('span');hint.append(el('kbd','',keys),el('span','',label));hints.append(hint);}const helpButton=host.querySelector('.shortcut-button');helpButton.replaceChildren(el('span','',state.labels.shortcuts),el('kbd','','F1'));helpButton.title=state.labels.helpHint;renderHelp();
   host.querySelector('.connection').textContent = state.connection; host.querySelector('.notice').textContent = state.notice;
   host.querySelector('[data-label="undo"]').hidden = !state.undo; host.querySelector('[data-label="sync"]').disabled = state.busy;
   host.querySelector('.resize').hidden = state.locked || state.full; host.querySelector('.dragstrip').hidden = !state.mini; host.querySelector('[data-label="pin"]').textContent = state.pinned ? '◆' : '◇';
@@ -136,7 +160,7 @@ function renderGames() {
   const range=visibleRange(state.games.length,viewport.scrollTop,viewport.clientHeight,rowHeight,columns), rows=el('div','rows'); rows.style.height=`${range.height}px`;
   for (let index=range.start; index<Math.min(range.end,state.games.length); index++) {
     const game=state.games[index], row=el('article',state.mini ? 'minirow' : `game${state.grid ? ' grid' : state.compact ? ' compact' : ''}`);
-    row.dataset.game=game.id; row.tabIndex=selected===game.id ? 0 : -1; row.classList.toggle('selected',selected===game.id); row.style.top=`${Math.floor(index/columns)*rowHeight}px`;
+    row.dataset.game=game.id;if(state.mini){row.title=state.labels.edit+' · F2';row.setAttribute('aria-keyshortcuts','F2 Enter Space ArrowUp ArrowDown Home End PageUp PageDown');} row.tabIndex=selected===game.id ? 0 : -1; row.classList.toggle('selected',selected===game.id); row.style.top=`${Math.floor(index/columns)*rowHeight}px`;
     if (!state.mini) { row.style.left=`${(index%columns)*100/columns}%`; row.style.width=`calc(${100/columns}% - ${columns>1 ? 8 : 0}px)`; row.style.height=`${rowHeight-10}px`; }
     else row.style.height=`${rowHeight-3}px`;
     row.addEventListener('focus',()=>selected=game.id); row.addEventListener('contextmenu',e=>{ e.preventDefault(); selected=game.id; showMenu(game,e.clientX,e.clientY); });
@@ -146,7 +170,7 @@ function renderGames() {
       const details=el('div','details'); details.append(el('div','game-title ellipsis',game.title),el('div','platform ellipsis',game.platform),el('div',`status state-${game.state}`,game.status),el('div','next ellipsis',game.next),el('div','progress ellipsis',game.progress+(game.percent==null?'':` · ${game.percent}%`)));
       if (game.percent != null) { const progress=el('progress'); progress.max=100; progress.value=game.percent; progress.setAttribute('aria-label',game.progress); details.append(progress); } row.append(details);
       const tools=el('div','game-tools'); tools.append(button(game.state===3?'✓':'○','finish',state.labels.finish,{id:game.id},'icon'),button('⋯','edit',state.labels.edit,{id:game.id},'icon'));
-      const reorder=el('button','icon','⠿'); reorder.title=game.title; reorder.setAttribute('aria-label',game.title); reorder.draggable=true; reorder.addEventListener('keydown',e=>{if(e.altKey && ['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();const index=state.games.findIndex(item=>item.id===game.id),target=state.games[index+(e.key==='ArrowUp'?-1:1)];if(target)action('move',{id:game.id,target:target.id,after:e.key==='ArrowDown'});}}); reorder.addEventListener('dragstart',e=>{dragId=game.id;e.dataTransfer.setData('text/plain',game.id);}); tools.append(reorder); row.append(tools);
+      const reorder=el('button','icon','⠿'); reorder.title=state.labels.reorder+' · Alt+↑ / Alt+↓';reorder.setAttribute('aria-keyshortcuts','Alt+ArrowUp Alt+ArrowDown'); reorder.setAttribute('aria-label',game.title); reorder.draggable=true; reorder.addEventListener('keydown',e=>{if(e.altKey && ['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();const index=state.games.findIndex(item=>item.id===game.id),target=state.games[index+(e.key==='ArrowUp'?-1:1)];if(target)action('move',{id:game.id,target:target.id,after:e.key==='ArrowDown'});}}); reorder.addEventListener('dragstart',e=>{dragId=game.id;e.dataTransfer.setData('text/plain',game.id);}); tools.append(reorder); row.append(tools);
       row.addEventListener('dragover',e=>e.preventDefault()); row.addEventListener('drop',e=>{e.preventDefault();if(dragId)action('move',{id:dragId,target:game.id,after:e.clientY>row.getBoundingClientRect().top+row.clientHeight/2});dragId=undefined;});
     }
     rows.append(row);
@@ -155,6 +179,9 @@ function renderGames() {
   if (focusWasRow && selected) rows.querySelector(`[data-game="${selected}"]`)?.focus({preventScroll:true});
 }
 document.addEventListener('keydown',e=>{
+  if(e.key==='F1' && e.repeat){e.preventDefault();return;}
+  if(help?.open){if(e.key==='Escape'||e.key==='F1'){e.preventDefault();help.close();}return;}
+  if(e.key==='F1' && state?.kind==='main' && !dialogMode){e.preventDefault();showHelp();return;}
   if (dialogMode) { if (e.key==='Escape') { e.preventDefault(); send({action:'cancel-dialog'}); } return; }
   if (!state) return;
   const input=e.target.closest?.('input,textarea,select');

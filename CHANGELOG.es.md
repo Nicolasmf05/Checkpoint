@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.7.3 — 2026-10-03
+
+- Franja visible de atajos, teclas destacadas en menús, indicaciones y accesibilidad.
+- Guía de atajos desde F1 o su botón, traducida por completo; Miniatura ofrece F1 y acceso desde el menú sin añadir controles a la lista.
+- La ayuda conserva el foco y se cierra con Esc; se indica si el atajo global está ocupado. Siete pruebas CSS reales nuevas.
+
 ## 0.7.2 — 2026-10-03
 
 - Sincronización automática de la biblioteca de Steam, horas jugadas y logros de los juegos seguidos al abrir y en el intervalo configurado (30 minutos por defecto).

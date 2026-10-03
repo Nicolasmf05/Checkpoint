@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.3 — 2026-10-03
+
+- Visible shortcut strip, keyboard badges in menus, tooltips and accessible key gestures.
+- Keyboard shortcuts guide via F1 or its button, fully localized; Miniature offers F1 and a context-menu entry without adding list controls.
+- Modal help preserves focus and closes with Escape; an occupied global shortcut is explained. Seven new actual CSS checks.
+
 ## 0.7.2 — 2026-10-03
 
 - Automatically sync the Steam library, playtime and tracked achievements on each launch and at the configured interval (30 minutes by default).
