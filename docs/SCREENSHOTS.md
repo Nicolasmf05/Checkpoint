@@ -4,6 +4,10 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.1 — actualizador
+
+[Funcionamiento y edición portable](UPDATES.md). [Captura de la ventana en inglés](en/SCREENSHOTS.md#081--updater), con pruebas aisladas.
+
 ## 0.8.0 — detección y logros
 
 [Guía](ACHIEVEMENTS.md)

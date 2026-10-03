@@ -106,6 +106,11 @@ public partial class MainWindow
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
             await Run("document.querySelector('[data-label=settings]').click();");
             var themeSettings=await Dialog();
+            await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Updates').click();");
+            WebSurface? updateDialog=null;
+            await Wait(async()=>{updateDialog=Application.Current.Windows.OfType<Window>().FirstOrDefault(w=>w.Title=="Updates · Checkpoint")?.Tag as WebSurface;return updateDialog?.Browser.CoreWebView2 is not null&&await Script(updateDialog,"window.checkpointState?.kind==='dialog'");});
+            Check(await Script(updateDialog!,"document.body.innerText.includes('Installed version:') && document.body.innerText.includes('once a day') && [...document.querySelectorAll('button')].some(b=>b.textContent==='Download and install' && b.disabled) && !document.body.innerText.includes('Descargar e instalar')"),"CSS update dialog renders English daily checking, installed version and disabled installation without a release");
+            await Capture(updateDialog!,"css-updates-en.png");await updateDialog!.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");
             Check(await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').options.length===8 && document.body.innerText.includes('Instant preview') && [...document.querySelector('select[aria-label=\"Theme\"]').options].some(option=>option.textContent==='High contrast')"),"settings offer eight localized themes with preview instructions");
             string initialTheme=Themes.Id(Preferences);
             var paletteColors=new HashSet<string>();

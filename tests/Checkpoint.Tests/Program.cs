@@ -193,4 +193,20 @@ Check(!GameDetection.Matches(detected,new(123,"portal","",Path.Combine(root,"por
 detected.DetectionProcess="retroarch.exe";detected.DetectionWindowTitle="Super Mario";
 Check(GameDetection.Matches(detected,new(1,"RetroArch","RetroArch - Super Mario World",null),[]),"emulator detection works without process path using a game-specific window title");
 Check(!GameDetection.Matches(detected,new(1,"retroarch","RetroArch - Zelda",null),[]),"emulator detection does not confuse games using the same executable");
+var updateDigest=new string('a',64);
+object Release(string version,bool draft=false,bool bad=false,string runtime="win-x64",bool checksum=true)=>new {tag_name="v"+version,draft,prerelease=true,assets=new[]{new{name=$"Checkpoint-{version}-{runtime}.msi",browser_download_url=$"https://github.com/{(bad?"other/Checkpoint":"Nicolasmf05/Checkpoint")}/releases/download/v{version}/Checkpoint-{version}-{runtime}.msi",size=100,state="uploaded",digest="sha256:"+updateDigest},new{name=$"Checkpoint-{version}-{runtime}.msi.sha256",browser_download_url=$"https://github.com/Nicolasmf05/Checkpoint/releases/download/v{version}/Checkpoint-{version}-{runtime}.msi.sha256",size=checksum?100:0,state="uploaded",digest=""}}};
+var updateJson=JsonSerializer.Serialize(new[]{Release("2.0.0"),Release("3.0.0",draft:true),Release("4.0.0",bad:true),Release("5.0.0",runtime:"win-arm64"),Release("6.0.0",checksum:false)});
+var offeredUpdate=AppUpdates.Select(updateJson,new Version(1,0,0),"win-x64")!;
+Check(offeredUpdate.Version==new Version(2,0,0)&&offeredUpdate.Preview,"updater selects the newest complete compatible published release and rejects drafts or unrelated URLs");
+Check(AppUpdates.Select(JsonSerializer.Serialize(new[]{Release("2.0.0")}),new Version(2,0,0),"win-x64") is null,"updater never offers the same or an older version");
+Check(AppUpdates.Select(updateJson,new Version(1,0,0),"win-arm64")?.Version==new Version(5,0,0),"updater matches the running architecture");
+Check(AppUpdates.Checksum(updateDigest+"  "+offeredUpdate.Name,offeredUpdate)==updateDigest,"updater binds checksum to the exact installer name and GitHub digest");
+Reject(()=>AppUpdates.Checksum(updateDigest+"  other.msi",offeredUpdate),"updater rejects a checksum for a different filename");
+Reject(()=>AppUpdates.Checksum(new string('b',64)+"  "+offeredUpdate.Name,offeredUpdate),"updater rejects conflicting GitHub and checksum-file digests");
+Reject(()=>AppUpdates.Validate(offeredUpdate with{Installer=new Uri("https://evil.example/update.msi")}),"updater validates the installer origin again before downloading");
+using(var updateStore=new SqliteStore(Path.Combine(root,"update-settings")))
+{
+    var setting=new Settings{AutomaticUpdates=false,LastUpdateCheck=DateTimeOffset.UtcNow};updateStore.SaveSettings(setting);var loaded=updateStore.LoadSettings();
+    Check(!loaded.AutomaticUpdates&&loaded.LastUpdateCheck==setting.LastUpdateCheck,"update checking preferences and daily timestamp survive restart");
+}
 Console.WriteLine($"{passed} checks passed. Test files: {root}");

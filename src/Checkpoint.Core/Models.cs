@@ -85,6 +85,8 @@ public static class Labels
 public sealed class Settings
 {
     public bool DetectGames { get; set; } = true;
+    public bool AutomaticUpdates { get; set; } = true;
+    public DateTimeOffset LastUpdateCheck { get; set; }
     public string Language { get; set; } = "es";
     public double Width { get; set; } = 510;
     public double Height { get; set; } = 740;

@@ -11,6 +11,8 @@ Un juego cada vez. Widget translúcido para organizar los juegos que quieres pas
 ![Checkpoint: interfaz CSS](docs/screenshots/css-widget-es.png)
 
 
+Ajustes → Actualizaciones comprueba nuevas versiones al abrir y permite descargar e instalar un MSI verificado, con copia previa y conservación de datos. [Detalles y edición portable](docs/UPDATES.md).
+
 ## Detección de juegos y logros personales
 
 La edición Windows abre los logros pendientes al detectar un juego de tu biblioteca. Incluye Steam, RetroAchievements y objetivos manuales que puedes añadir, quitar y marcar completados. RetroAchievements necesita tu usuario y clave web personal en Ajustes, además del ID del juego y asociación del emulador. [Configuración, privacidad y límites](docs/ACHIEVEMENTS.md).
@@ -25,12 +27,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.8.0**. En la carpeta `dist` se generan:
+La versión actual es **0.8.1**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.0), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.1), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.8.0-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.8.0-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.8.1-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.8.1-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.

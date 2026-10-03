@@ -2,6 +2,14 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.1 — 2026-10-03
+
+- Optional daily startup update checks and a bilingual Settings → Updates window.
+- Official GitHub release/version/architecture selection, bounded HTTPS downloads and size/SHA-256 verification against both asset digest and checksum file.
+- Explicit download/install action creates a library backup, closes the app, rechecks the hash and upgrades with the per-user MSI before restarting with the same data folder.
+- Portable users migrate to the Start menu installation; original portable files are preserved.
+- Tests use simulated installer downloads and verify helper integrity rejection without installing into the user's personal environment.
+
 ## Web sign-in fix — 2026-10-03
 
 - The visible Sign in action opens an existing-account form with username/password only.

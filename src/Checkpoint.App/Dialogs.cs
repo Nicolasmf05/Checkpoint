@@ -292,6 +292,7 @@ internal static partial class Dialogs
         Label(body, "Checkpoint " + typeof(MainWindow).Assembly.GetName().Version?.ToString(3)); body.Children.Add(new TextBlock { Text = I18n.T("Los datos se guardan en tu PC. Sin publicidad ni telemetría. Aplicación independiente, sin afiliación con Valve."), TextWrapping = TextWrapping.Wrap, FontSize = 11 });
         body.Children.Add(Button(I18n.T("Gestionar listas"),(_,_)=>ManageLists(owner,window)));
         body.Children.Add(Button(I18n.T("Configurar atajos"), (_, _) => ShortcutSettings(owner,window)));
+        body.Children.Add(Button(I18n.T("Actualizaciones"), (_, _) => AppUpdatesDialog(owner,window)));
         bool saved = false;
         footer.Children.Add(Button(I18n.T("Cancelar"), (_, _) => window.Close()));
         footer.Children.Add(Button(I18n.T("Guardar"), (_, _) =>
