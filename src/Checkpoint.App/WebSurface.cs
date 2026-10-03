@@ -114,7 +114,8 @@ internal sealed class WebSurface : IDisposable
         string directory = (Application.Current.MainWindow as MainWindow)?.Store.DirectoryPath
             ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Checkpoint");
         var surface = new WebSurface(window,directory,() => new { kind="dialog", language=I18n.Language,
-            light=(Application.Current.MainWindow as MainWindow)?.Preferences.LightTheme == true, title=window.Title, root=controls.Capture(root) },message => { if (message.TryGetProperty("action",out var action) && action.GetString() == "cancel-dialog") window.Close(); else controls.Dispatch(message); });
+            light=(Application.Current.MainWindow as MainWindow) is MainWindow main && Themes.IsLight(main.Preferences),
+            theme=(Application.Current.MainWindow as MainWindow) is MainWindow themed ? Themes.Id(themed.Preferences) : "dark", title=window.Title, root=controls.Capture(root) },message => { if (message.TryGetProperty("action",out var action) && action.GetString() == "cancel-dialog") window.Close(); else controls.Dispatch(message); });
         window.Tag = surface;
     }
     internal static string ImageUri(BitmapSource image) => imageCache.GetValue(image,key => new EncodedImage("data:image/png;base64,"+Convert.ToBase64String(ImageBytes(key)))).Value;

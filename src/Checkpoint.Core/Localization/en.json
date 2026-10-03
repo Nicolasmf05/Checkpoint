@@ -419,5 +419,15 @@
   "Inicio / Fin": "Home / End",
   "RePág / AvPág": "Page Up / Page Down",
   "Intro / Espacio": "Enter / Space",
-  "No disponible: otra aplicación puede estar usando este atajo.": "Unavailable: another application may be using this shortcut."
+  "No disponible: otra aplicación puede estar usando este atajo.": "Unavailable: another application may be using this shortcut.",
+  "Tema": "Theme",
+  "Claro": "Light",
+  "Medianoche": "Midnight",
+  "Océano": "Ocean",
+  "Bosque": "Forest",
+  "Ciruela": "Plum",
+  "Ámbar": "Amber",
+  "Alto contraste": "High contrast",
+  "Oscuro": "Dark",
+  "Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.": "Instant preview. Save to keep the theme; Cancel restores the previous one."
 }

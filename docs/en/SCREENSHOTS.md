@@ -4,6 +4,28 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.7.4 — eight themes
+
+Live palettes from the actual packaged application. Settings → Theme previews immediately; Save keeps the choice and Cancel restores the previous one.
+
+| Dark | Light |
+| --- | --- |
+| ![Dark](../screenshots/css-theme-dark-en.png) | ![Light](../screenshots/css-theme-light-en.png) |
+
+| Midnight | Ocean |
+| --- | --- |
+| ![Midnight](../screenshots/css-theme-midnight-en.png) | ![Ocean](../screenshots/css-theme-ocean-en.png) |
+
+| Forest | Plum |
+| --- | --- |
+| ![Forest](../screenshots/css-theme-forest-en.png) | ![Plum](../screenshots/css-theme-plum-en.png) |
+
+| Amber | High contrast |
+| --- | --- |
+| ![Amber](../screenshots/css-theme-amber-en.png) | ![High contrast](../screenshots/css-theme-contrast-en.png) |
+
+![Theme selector](../screenshots/css-theme-settings-en.png)
+
 ## 0.7.3 — visible keyboard shortcuts
 
 The bottom strip shows useful key gestures; F1 opens the complete guide. Miniature offers F1 and a context-menu entry.

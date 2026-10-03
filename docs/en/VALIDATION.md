@@ -1,5 +1,9 @@
 # Validation
 
+## 0.7.4 — eight themes
+
+417 checks passed: 144 core, 18 Node service, 18 Edge, 175 native controller, 4 interface model and 58 actual CSS checks. The 28 new checks cover legacy preferences, unknown identifiers, SQLite persistence for each theme, localized names, eight distinct rendered backgrounds, preview in main/settings, cancel/save and themes in Miniature/notices. Friends also retains the selected palette. Captures use the extracted ZIP with isolated data. No accessibility certification is claimed; screen readers, physical keyboard and older hardware remain unverified.
+
 ## 0.7.3 — visible keyboard shortcuts
 
 389 checks passed: 130 core, 18 Node service, 18 Edge, 175 native controller, 4 interface model and 44 actual CSS checks. Seven new checks cover visible and accessible gestures, Spanish/English help, blocking underlying commands, Escape without hiding the window, Miniature context-menu help and restoration of its selected row focus. Captures come from the extracted ZIP with isolated data. Occupied global gestures are explained; tests do not close another user instance. Physical keyboard and screen-reader validation remain pending.

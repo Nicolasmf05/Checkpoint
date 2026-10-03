@@ -2,6 +2,10 @@
 
 Checkpoint 0.7.0 muestra colección, Miniatura, amigos, formularios y avisos con HTML/CSS/JavaScript locales en Microsoft Edge WebView2. Sin alojar una web, React, compilación npm ni interfaz remota.
 
+## Temas
+
+Las ocho paletas usan variables de `Web/app.css` y `data-theme` en el documento. `Checkpoint.Core/Themes.cs` define los identificadores permitidos y nombres traducidos; `Settings.Theme` guarda la elección en SQLite. Sin una elección válida se respeta la antigua preferencia `LightTheme`. Los formularios, amigos y ayuda comparten las variables de color. Ajustes aplica la vista previa a las ventanas CSS; Cancelar restaura y vuelve a guardar los valores anteriores, incluso si se produjo un guardado mientras se mostraba la vista previa. El tema no modifica la opacidad ni el modo de ventana.
+
 ## Dónde modificarla
 
 - `src/Checkpoint.App/Web/app.css`: colores, translucidez, distribución, tipografía, reglas adaptables y formularios.

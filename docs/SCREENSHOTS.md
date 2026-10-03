@@ -4,6 +4,10 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.7.4 — ocho temas
+
+En Ajustes → Tema se elige Oscuro, Claro, Medianoche, Océano, Bosque, Ciruela, Ámbar o Alto contraste. La selección muestra los colores al instante y Cancelar recupera el anterior. Las ocho paletas y el selector se muestran en la [galería con interfaz inglesa](en/SCREENSHOTS.md#074--eight-themes). Las capturas siguientes mantienen la interfaz en español.
+
 ## 0.7.3 — atajos visibles
 
 La franja inferior muestra las teclas más útiles; F1 abre la guía completa. En Miniatura se accede desde F1 o el menú con clic derecho.

@@ -14,5 +14,5 @@ $process.WaitForExit()
 Get-Content -LiteralPath $stdout
 if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $stderr; throw "CSS application validation failed. See $caseRoot" }
 $report = Get-Content -LiteralPath (Join-Path $render 'web-smoke.json') -Raw | ConvertFrom-Json
-if (!$report.ok -or $report.checks -lt 44) { throw 'The CSS interface validation is incomplete.' }
+if (!$report.ok -or $report.checks -lt 58) { throw 'The CSS interface validation is incomplete.' }
 Write-Output "CSS interface verified: $($report.checks) checks. Evidence: $render"

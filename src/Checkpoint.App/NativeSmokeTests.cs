@@ -32,7 +32,7 @@ public partial class MainWindow
         async Task SetView(bool grid, bool compact, bool light, double width, double height)
         {
             Width = width; Height = height;
-            Preferences.GridView = grid; Preferences.Compact = compact; Preferences.LightTheme = light;
+            Preferences.GridView = grid; Preferences.Compact = compact; Preferences.LightTheme = light; Preferences.Theme = light ? "light" : "dark";
             ApplyPreferences(); Refresh();
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
         }

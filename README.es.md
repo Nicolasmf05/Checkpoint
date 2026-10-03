@@ -18,12 +18,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.7.3**. En la carpeta `dist` se generan:
+La versión actual es **0.7.4**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.3), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.4), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.7.3-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.7.3-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.7.4-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.7.4-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -44,6 +44,10 @@ WebView2 se comparte con otras aplicaciones y viene incluido en Windows 11. Si f
 ## Tecnología de la interfaz
 
 La colección, Miniatura, amigos, editores, ajustes y avisos propios se muestran con **HTML, CSS y JavaScript locales en WebView2**. El diseño se modifica en `src/Checkpoint.App/Web/app.css`. C#/.NET conserva SQLite, Steam, Supabase, bandeja y ventana nativa. WPF sigue como contenedor y controladores de formularios; los selectores de archivos de Windows y el aviso de falta de WebView2 son nativos. Sin framework JavaScript ni interfaz remota. [Arquitectura y desarrollo](docs/CSS-INTERFACE.md).
+
+## Temas
+
+Elige en **Ajustes → Tema**: Oscuro, Claro, Medianoche, Océano, Bosque, Ciruela, Ámbar o Alto contraste. Los colores se muestran al elegirlos en la ventana principal, Miniatura, amigos, cuadros y ayuda de atajos. **Guardar** conserva la elección; **Cancelar** recupera el aspecto anterior. Las preferencias claras/oscuras antiguas conservan su aspecto. Opacidad y modo de ventana son independientes. Los selectores de archivos de Windows usan el aspecto del sistema.
 
 ## Modos de ventana
 

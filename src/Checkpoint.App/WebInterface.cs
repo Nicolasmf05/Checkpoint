@@ -22,7 +22,7 @@ public partial class MainWindow
     }
     private object WebSnapshot() => new
     {
-        kind="main", language=I18n.Language, light=Preferences.LightTheme,
+        kind="main", language=I18n.Language, light=Themes.IsLight(Preferences), theme=Themes.Id(Preferences),
         opacity=EffectiveOpacity, full=IsFullWindow, mini=Preferences.MiniatureView, compact=Preferences.Compact,
         grid=Preferences.GridView, textSize=Preferences.MiniatureTextSize, locked=Preferences.PositionLocked,
         pinned=Preferences.AlwaysOnTop, globalHotkey=hotkeyRegistered, lightweight=Preferences.LightweightMode, busy=syncing,

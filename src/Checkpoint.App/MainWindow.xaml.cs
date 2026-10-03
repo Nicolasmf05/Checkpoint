@@ -197,7 +197,7 @@ public partial class MainWindow : Window
         resources["MiniatureNameSize"] = (double)Preferences.MiniatureTextSize;
         resources["MiniatureStateSize"] = (double)Preferences.MiniatureTextSize - 2;
         resources["MiniatureRowHeight"] = (double)Preferences.MiniatureTextSize + 16;
-        bool light = Preferences.LightTheme;
+        bool light = Themes.IsLight(Preferences);
         resources["TextBrush"] = Brush(light ? "#FF152338" : "#FFF2F4FA");
         resources["MutedBrush"] = Brush(light ? "#FF4B5D73" : "#FFADB6CA");
         resources["PanelBrush"] = Brush(light ? "#60FFFFFF" : "#40242E44");
@@ -236,7 +236,7 @@ public partial class MainWindow : Window
         var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || g.Tracked)
             .Where(g => g.Title.Contains(Search.Text, StringComparison.CurrentCultureIgnoreCase))
             .Where(g => StatusFilter.SelectedIndex <= 0 || (int)g.Status == StatusFilter.SelectedIndex - 1)).ToList();
-        visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Preferences.LightTheme, Preferences.LightweightMode || Preferences.MiniatureView)).ToList();
+        visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Themes.IsLight(Preferences), Preferences.LightweightMode || Preferences.MiniatureView)).ToList();
         BindCards();
         EmptyPanel.Visibility = !Preferences.MiniatureView && filtered.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         EmptyTitle.Text = Games.Count == 0 ? I18n.T("Aquí empieza tu próxima partida") : I18n.T("Tu lista tiene espacio para otra aventura");

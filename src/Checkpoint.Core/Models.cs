@@ -91,6 +91,7 @@ public sealed class Settings
     public double MiniatureHeight { get; set; } = 220;
     public int MiniatureTextSize { get; set; } = 12;
     public bool LightTheme { get; set; }
+    public string Theme { get; set; } = "";
     public bool LightweightMode { get; set; }
     public bool CloseToTray { get; set; } = true;
     public bool StartWithWindows { get; set; }

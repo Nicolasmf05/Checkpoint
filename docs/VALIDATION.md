@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.7.4 — ocho temas
+
+417 comprobaciones superadas: 144 de biblioteca, 18 del servicio Node, 18 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 58 CSS reales. Las 28 nuevas verifican compatibilidad con preferencias antiguas, identificadores desconocidos, guardado SQLite de cada tema, nombres traducidos, ocho colores de fondo distintos, vista previa en principal y Ajustes, cancelar/guardar y tema en Miniatura y avisos. Amigos también conserva la paleta elegida. Capturas reales del ZIP extraído con datos aislados. No se afirma certificación de accesibilidad; lectores de pantalla, teclado físico y hardware antiguo siguen pendientes.
+
 ## 0.7.3 — atajos visibles
 
 389 comprobaciones superadas: 130 de biblioteca, 18 del servicio Node, 18 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 44 CSS reales. Siete nuevas verifican la franja visible y teclas accesibles, ayuda en español e inglés, bloqueo de comandos de fondo, cierre con Esc sin ocultar la ventana, acceso desde el menú de Miniatura y recuperación del foco de su juego. Las capturas se obtienen del ZIP extraído con datos aislados. La tecla global ocupada se explica; las pruebas no cierran otra instancia del usuario. Sigue pendiente comprobar teclado físico y lectores de pantalla.

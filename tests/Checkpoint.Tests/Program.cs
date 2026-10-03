@@ -114,4 +114,21 @@ using (var modes = new SqliteStore(Path.Combine(root,"window-modes")))
     var restored=modes.LoadSettings();
     Check(restored.FullWindow && restored.Width==480 && restored.Height==650 && restored.BackgroundOpacity==.57,"full window preference retains small dimensions and opacity through SQLite reload");
 }
+Check(Themes.Id(new Settings()) == "dark", "new settings retain the default dark theme");
+Check(Themes.Id(JsonSerializer.Deserialize<Settings>("{\"LightTheme\":true}")!) == "light", "legacy light preferences retain their appearance");
+Check(Themes.Id(new Settings { Theme="unknown", LightTheme=true }) == "light" && Themes.Id(new Settings { Theme=null! }) == "dark", "invalid theme identifiers safely fall back to legacy appearance");
+Check(Themes.Id(new Settings { Theme="forest", LightTheme=true }) == "forest", "an explicit theme takes priority over legacy appearance");
+using (var themes = new SqliteStore(Path.Combine(root,"themes")))
+{
+    foreach (var id in Themes.Ids)
+    {
+        themes.SaveSettings(new Settings { Theme=id, LightTheme=id=="light", BackgroundOpacity=.63, MiniatureView=true });
+        var restored=themes.LoadSettings();
+        Check(Themes.Id(restored)==id && restored.BackgroundOpacity==.63 && restored.MiniatureView,"theme survives SQLite reload without changing opacity or window mode: "+id);
+    }
+}
+I18n.SetLanguage("en");
+Check(Themes.Ids.Select(Themes.Name).Distinct().Count()==8 && Themes.Name("ocean")=="Ocean" && Themes.Name("contrast")=="High contrast", "theme labels are distinct and localized in English");
+I18n.SetLanguage("es");
+Check(Themes.Name("ocean")=="Océano" && Themes.Name("forest")=="Bosque", "theme labels are localized in Spanish");
 Console.WriteLine($"{passed} checks passed. Test files: {root}");

@@ -210,7 +210,7 @@ window.chrome?.webview?.addEventListener('message',event=>{
   if (event.data.kind==='focus-search') { requestAnimationFrame(()=>{const search=root.querySelector('#search');search?.focus();search?.select();});return; }
   const firstDialog=state?.kind!=='dialog' && event.data.kind==='dialog';
   state=event.data; window.checkpointState=state;
-  for (const [key,id] of pending) if (id <= (state.ack||0)) pending.delete(key); document.documentElement.lang=state.language; document.documentElement.dataset.theme=state.light?'light':'dark';
+  for (const [key,id] of pending) if (id <= (state.ack||0)) pending.delete(key); document.documentElement.lang=state.language; document.documentElement.dataset.theme=state.theme || (state.light?'light':'dark');
   if (state.kind==='dialog') {dialogMode=true;preserveTree(()=>{const page=el('main','dialog-page');page.append(schema(state.root));root.replaceChildren(page);});if(firstDialog)root.querySelector('input,select,button')?.focus();}
   else renderMain();
 });

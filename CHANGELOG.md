@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.4 — 2026-10-03
+
+- Eight themes: Dark, Light, Midnight, Ocean, Forest, Plum, Amber and High contrast.
+- Theme selector with live preview throughout the CSS interface; Save persists the choice and Cancel restores the original appearance.
+- Preserve legacy light/dark preferences, validate unknown identifiers and keep opacity/window mode independent.
+- Fourteen core and fourteen actual CSS theme checks; screenshot gallery included.
+
 ## 0.7.3 — 2026-10-03
 
 - Visible shortcut strip, keyboard badges in menus, tooltips and accessible key gestures.

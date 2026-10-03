@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## 0.7.4 — 2026-10-03
+
+- Ocho temas: Oscuro, Claro, Medianoche, Océano, Bosque, Ciruela, Ámbar y Alto contraste.
+- Selector con vista previa en toda la interfaz CSS; Guardar conserva la elección y Cancelar recupera el aspecto anterior.
+- Compatibilidad con preferencias claras/oscuras antiguas, identificadores desconocidos seguros y opacidad/modo de ventana independientes.
+- Catorce pruebas de biblioteca y catorce CSS reales de temas; galería de capturas incluida.
+
 ## 0.7.3 — 2026-10-03
 
 - Franja visible de atajos, teclas destacadas en menús, indicaciones y accesibilidad.

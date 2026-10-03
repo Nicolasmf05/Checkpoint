@@ -18,13 +18,13 @@ Current captures come from the actual local HTML/CSS interface in WebView2, usin
 
 ## Download and run
 
-Current version: **0.7.3**. Build outputs in `dist`:
+Current version: **0.7.4**. Build outputs in `dist`:
 
-- `Checkpoint-0.7.3-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.7.3-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.7.4-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.7.4-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.3), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.4), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
@@ -39,6 +39,10 @@ Windows x64 (Windows 11 tested), **Microsoft Edge WebView2 Evergreen Runtime**, 
 ## Interface technology
 
 The visible collection, Miniature, friends, editors, settings and app notices use **local HTML, CSS and JavaScript in WebView2**. Style them in `src/Checkpoint.App/Web/app.css`. C#/.NET handles SQLite, Steam, Supabase, the tray and native window. WPF remains the window shell and existing form controllers; Windows file pickers and the missing-runtime notice remain native. No JavaScript framework or remote interface is required. [Architecture and development](docs/en/CSS-INTERFACE.md).
+
+## Themes
+
+Choose **Settings → Theme**: Dark, Light, Midnight, Ocean, Forest, Plum, Amber or High contrast. Colors preview immediately across the main window, Miniature, friends, dialogs and keyboard help. **Save** keeps your choice; **Cancel** restores the previous appearance. Existing light/dark preferences retain their appearance. Opacity and window mode remain independent. Native Windows file pickers use the system appearance.
 
 ## Window modes
 
