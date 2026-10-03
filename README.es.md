@@ -18,12 +18,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.7.1**. En la carpeta `dist` se generan:
+La versión actual es **0.7.2**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.1), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.7.2), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.7.1-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.7.1-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.7.2-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.7.2-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -31,6 +31,9 @@ Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herram
 El MSI y el EXE aún no tienen firma digital. Windows puede mostrar un aviso o bloqueo: [mensajes de seguridad](docs/WINDOWS-SECURITY.md). El proyecto no incluye certificados privados.
 
 La distribución por Microsoft Store se prepara por separado: [guía de MSIX y publicación](docs/MICROSOFT-STORE.md). El MSIX de prueba sin firma es para validar el empaquetado; no elimina los avisos de las descargas actuales de GitHub.
+
+Con Steam vinculado, la biblioteca, horas jugadas y logros de juegos seguidos se sincronizan automáticamente al iniciar y cada 30 minutos por defecto. En Ajustes puedes elegir 15, 30, 60 o 120 minutos. Los nuevos juegos aparecen en Biblioteca; se conservan los estados y notas manuales.
+
 
 ## Requisitos para utilizarla
 
