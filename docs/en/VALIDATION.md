@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.11 — adding from empty Miniature
+
+284 checks passed: 108 core, 15 Node, 14 Edge and 147 native WPF. Four new checks cover Add game in empty Miniature, cancellation with no data on disk, saved notes/new row without covers or changing view, and English labels/Ctrl+N in both menus. The real background menu is opened and native controls captured using isolated data. Physical keyboard/drag, installed packages and real accounts remain pending.
+
 ## 0.6.10 — editing from Miniature
 
 280 checks passed: 108 core, 15 Node, 14 Edge and 143 native WPF. Five new checks exercise the game-menu editor, persisted notes and same-game focus, F2/cancellation, untracking with cleared selection and English label/shortcut. Real dialogs and controls use isolated data; this does not replace physical keyboard testing. Native menus captured in both languages. Installed packages and real accounts remain pending.

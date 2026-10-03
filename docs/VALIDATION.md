@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.11 — alta desde Miniatura vacía
+
+Han pasado 284 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 147 WPF. Cuatro nuevas prueban el menú de alta con Miniatura vacía, cancelación sin datos en disco, guardado de notas/nueva fila sin carátulas ni cambio de vista y traducción inglesa con Ctrl+N en ambos menús. Se abre el menú real del fondo y se capturan los controles nativos con datos aislados. Siguen pendientes teclado/arrastre físicos, instalación y cuentas reales.
+
 ## 0.6.10 — edición desde Miniatura
 
 Han pasado 280 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 143 WPF. Cinco nuevas prueban apertura de la ficha del juego desde el menú, guardado de notas y foco en el mismo juego, F2/cancelación, retirada de Mi lista con selección limpia y traducción inglesa/atajo. Se usan diálogos y controles reales con datos aislados; no sustituye teclado físico. Capturas nativas de menús en ambos idiomas. Siguen pendientes instalación y cuentas reales.

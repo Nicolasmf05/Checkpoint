@@ -35,6 +35,8 @@ Las actualizaciones conservan el juego seleccionado y recuperan su foco de tecla
 
 **Clic derecho en un juego → Editar juego, o F2 sobre el seleccionado** abre su ficha habitual manteniendo Miniatura activa. Puedes editar notas, tareas y los demás campos del editor. Guardar aplica los cambios; Cancelar conserva los datos guardados. Al cerrar recupera el foco si el juego sigue visible. Desmarcar Mostrar en Mi lista retira su fila de Miniatura sin borrar el juego de la biblioteca. Las filas siguen mostrando solo nombre y estado.
 
+**Clic derecho en el fondo o un juego → Añadir juego**, también con la lista vacía. Se abre la ficha habitual manteniendo Miniatura activa. Guardar crea el juego y Cancelar no deja una entrada. Los juegos marcados Mostrar en Mi lista aparecen como filas de nombre/estado. Ctrl+N sigue disponible. La vista vacía conserva su interfaz mínima.
+
 ## Modo ligero opcional
 
 Actívalo en **Ajustes → Modo ligero (sin carátulas)**. Oculta las carátulas de colección y amigos, evita nuevas descargas de imágenes y vacía la caché de imágenes decodificadas. Los juegos, objetivos, progreso, archivos de carátulas y publicaciones se conservan; puedes desactivarlo cuando quieras. La elección queda guardada. Una descarga ya iniciada puede terminar. No desactiva Steam, la sincronización ni el envío de publicaciones pendientes.

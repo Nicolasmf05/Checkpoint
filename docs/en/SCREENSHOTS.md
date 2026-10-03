@@ -46,9 +46,9 @@ Only name and state. Enable from Settings or F6; right-click to exit.
 
 ![Miniature](../screenshots/widget-miniature-en.png)
 
-## Change state in Miniature — 0.6.5
+## Miniature game menu — 0.6.11
 
-Right-click a game. Its current state is checked; rows still show only name and state.
+The menu includes states, editing, search, adding and window settings; rows still show only name and state.
 
 ![State menu](../screenshots/miniature-state-menu-en.png)
 
@@ -57,3 +57,10 @@ Right-click a game. Its current state is checked; rows still show only name and 
 The outline marks the focused row. Up/Down and Home/End select games; Enter/Space open the menu. Capture uses Spanish.
 
 ![Keyboard focus](../screenshots/widget-miniature-keyboard.png)
+
+
+## Add from empty Miniature — 0.6.11
+
+Right-click the background → Add game, including with no rows. This native capture uses Spanish.
+
+![Empty Miniature menu, Spanish capture](../screenshots/miniature-empty-menu.png)

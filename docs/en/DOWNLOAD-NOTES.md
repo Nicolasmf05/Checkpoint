@@ -35,6 +35,8 @@ Updates preserve the selected game and restore its keyboard focus only if the li
 
 **Right-click a game → Edit game, or F2 on the selected game** opens its normal editor while keeping Miniature active. Edit notes, tasks and other normal editor fields. Save applies changes; Cancel preserves the saved data. Closing restores game focus if it remains visible. Unchecking Show in My list removes its Miniature row without deleting the library entry. Rows still show only name and state.
 
+**Right-click the background or a game → Add game**, also available with an empty list. The normal editor opens while Miniature stays active. Save creates the game; Cancel leaves no entry. Games marked Show in My list appear as name/state rows. Ctrl+N remains available. No extra empty-state controls are added.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

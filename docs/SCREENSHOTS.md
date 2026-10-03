@@ -42,9 +42,9 @@ Solo nombre y estado. Se activa en Ajustes o con F6; clic derecho para salir.
 
 ![Miniatura](screenshots/widget-miniature.png)
 
-## Cambiar estado desde Miniatura — 0.6.5
+## Menú de juego en Miniatura — 0.6.11
 
-Clic derecho en un juego. El estado actual aparece marcado; las filas siguen mostrando solo nombre y estado.
+El menú incluye estados, edición, búsqueda, alta y ajustes de ventana; las filas siguen mostrando solo nombre y estado.
 
 ![Menú de estados](screenshots/miniature-state-menu.png)
 
@@ -53,3 +53,10 @@ Clic derecho en un juego. El estado actual aparece marcado; las filas siguen mos
 El contorno indica la fila enfocada. ↑/↓ e Inicio/Fin recorren juegos; Enter/Espacio abren su menú.
 
 ![Foco de teclado](screenshots/widget-miniature-keyboard.png)
+
+
+## Añadir con Miniatura vacía — 0.6.11
+
+Clic derecho en el fondo → Añadir juego, también sin ninguna fila.
+
+![Menú de Miniatura vacía](screenshots/miniature-empty-menu.png)

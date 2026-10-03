@@ -342,6 +342,9 @@ public partial class MainWindow : Window
         var search = new System.Windows.Controls.MenuItem { Header = I18n.T("Buscar juego"), InputGestureText = "Ctrl+F" };
         search.Click += (_, _) => FocusCollectionSearch();
         menu.Items.Add(search);
+        var add = new System.Windows.Controls.MenuItem { Header = I18n.T("Añadir juego"), InputGestureText = "Ctrl+N" };
+        add.Click += (_, _) => { menu.IsOpen = false; Dialogs.Edit(this, null); };
+        menu.Items.Add(add);
         menu.Items.Add(new Separator());
         var pin = new System.Windows.Controls.MenuItem { Header = I18n.T("Mantener siempre visible"), IsCheckable = true, IsChecked = Preferences.AlwaysOnTop };
         pin.Click += (_, _) => { Preferences.AlwaysOnTop = pin.IsChecked; ApplyPreferences(); Persist(); };

@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.11 — 2026-10-03
+
+- Miniature background/game menus include Add game with its Ctrl+N hint, including when My list is empty.
+- Uses the normal editor without leaving Miniature; saving adds the row, canceling leaves no data. Empty view keeps its minimal layout.
+
 ## 0.6.10 — 2026-10-03
 
 - Miniature game menus add Edit game; F2 opens the selected game editor. Notes/tasks and normal editor actions are available without changing view or adding row controls.

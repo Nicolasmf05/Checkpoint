@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.11 — 2026-10-03
+
+- Menús de fondo/juego de Miniatura incluyen Añadir juego y el atajo Ctrl+N, también con Mi lista vacía.
+- Abre la ficha habitual sin salir de Miniatura; Guardar añade la fila y Cancelar no deja datos. La vista vacía conserva su interfaz mínima.
+
 ## 0.6.10 — 2026-10-03
 
 - Menú de juego de Miniatura incluye Editar juego; F2 abre la ficha seleccionada. Notas/tareas y acciones habituales del editor sin cambiar de vista ni añadir controles a las filas.

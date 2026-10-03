@@ -308,6 +308,28 @@ public partial class MainWindow
                 t.Foreground is SolidColorBrush brush && brush.Color == ((SolidColorBrush)Application.Current.Resources["TextBrush"]).Color), "miniature names use the readable theme foreground");
             Render(this,"widget-miniature.png");
             MenuItem MiniatureAction(System.Windows.Controls.ContextMenu menu, string text) => menu.Items.OfType<MenuItem>().Single(i => (string?)i.Header == I18n.T(text));
+            var miniatureFixtures = Games.ToList(); Games.Clear(); Persist(); Refresh();
+            Check(GameList.Items.Count == 0 && EmptyPanel.Visibility == Visibility.Collapsed && HeaderArea.Visibility == Visibility.Collapsed &&
+                MiniatureAction(Shell.ContextMenu,"Añadir juego").InputGestureText == "Ctrl+N", "empty miniature keeps its minimal layout and offers add game in the background menu");
+            Shell.ContextMenu.PlacementTarget = Shell; Shell.ContextMenu.IsOpen = true;
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            RenderElement(Shell.ContextMenu,Path.Combine(outputDirectory,"miniature-empty-menu.png"));
+            RunModal(() => MiniatureAction(Shell.ContextMenu,"Añadir juego").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)), window =>
+            {
+                Input(window,"Nombre del juego").Text = "No crear desde Miniatura"; Click(window,"Cancelar");
+            });
+            Check(Preferences.MiniatureView && Games.Count == 0 && Store.LoadGames().Count == 0, "canceling add from empty miniature leaves no game on disk");
+            RunModal(() => MiniatureAction(Shell.ContextMenu,"Añadir juego").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)), window =>
+            {
+                Input(window,"Nombre del juego").Text = "Juego desde Miniatura";
+                Input(window,"Notas · dónde lo dejaste").Text = "Guardado desde la lista vacía"; Click(window,"Guardar");
+            });
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+            Check(Preferences.MiniatureView && visibleCards.Count == 1 && visibleCards[0].Model.Title == "Juego desde Miniatura" &&
+                Store.LoadGames().Single().Notes == "Guardado desde la lista vacía" && !VisualChildren(GameList).OfType<Image>().Any(),
+                "adding from empty miniature persists a game and shows its row without covers or leaving the view");
+            Games.Clear(); Games.AddRange(miniatureFixtures); Persist(); Refresh();
+            await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             bool priorPin = Preferences.AlwaysOnTop, priorLock = Preferences.PositionLocked;
             Check(MiniatureAction(Shell.ContextMenu,"Mantener siempre visible").IsChecked == priorPin &&
                 MiniatureAction(Shell.ContextMenu,"Bloquear posición y tamaño").IsChecked == priorLock, "miniature quick window actions reflect saved settings");
@@ -462,6 +484,8 @@ public partial class MainWindow
                 MiniatureAction(Shell.ContextMenu,"Buscar juego").InputGestureText == "Ctrl+F", "miniature search action is localized and exposes its shortcut");
             Check((string?)MiniatureAction(miniatureRow.ContextMenu,"Editar juego").Header == "Edit game" &&
                 MiniatureAction(miniatureRow.ContextMenu,"Editar juego").InputGestureText == "F2", "miniature edit action switches to English and exposes F2");
+            Check((string?)MiniatureAction(Shell.ContextMenu,"Añadir juego").Header == "Add game" &&
+                MiniatureAction(miniatureRow.ContextMenu,"Añadir juego").InputGestureText == "Ctrl+N", "miniature add action switches to English and exposes Ctrl+N in both menus");
             RenderElement(miniatureRow.ContextMenu,Path.Combine(outputDirectory,"miniature-state-menu-en.png"));
             miniatureRow.ContextMenu.IsOpen = false;
             Preferences.Language = "es"; ApplyLanguage();
