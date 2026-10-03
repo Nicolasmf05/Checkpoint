@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## Web sign-in fix — 2026-10-03
+
+- The visible Sign in action opens an existing-account form with username/password only.
+- Registration requires choosing Create account; switching back clears the password and registration-only fields disappear.
+- Spanish/English browser regression checks verify both modes and password authentication.
+
 ## 0.8.0 — 2026-10-03
 
 - Windows game detection opens an independent pending-achievement window once per game process session; default enabled and configurable.
