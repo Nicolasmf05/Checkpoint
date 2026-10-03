@@ -2,9 +2,10 @@
 
 **English** · [Español](../WEB.md)
 
-[**Open the web app**](https://nicolasmf05.github.io/Checkpoint/). No Checkpoint or .NET installation is required. Use a modern browser with JavaScript and IndexedDB enabled.
+[**Checkpoint overview**](https://nicolasmf05.github.io/Checkpoint/) · [**Open the app directly**](https://nicolasmf05.github.io/Checkpoint/app.html). The main address shows a presentation page; Open Checkpoint enters the application. The Overview link returns to the presentation without signing out in the same tab or deleting games. An installed PWA opens the library directly. No Checkpoint or .NET installation is required. Use a modern browser with JavaScript and IndexedDB enabled.
+![Checkpoint overview](../screenshots/web-presentation-en.png)
 
-Create and edit games, state and manual story progress, private notes, tasks, favorites, local covers, list/compact/grid layouts, eight themes, Spanish or English and [configurable shortcuts](SHORTCUTS.md). The interface automatically fills the available browser viewport and adapts when resized; no full/small/Miniature window presets are offered. Layout selection only changes game presentation.
+Create and edit games, state and manual story progress, private notes, tasks, favorites, local covers, list/compact/grid layouts, 22 themes, Spanish or English and [configurable shortcuts](SHORTCUTS.md). The interface automatically fills the available browser viewport and adapts when resized; no full/small/Miniature window presets are offered. Layout selection only changes game presentation.
 
 Link Steam in Settings using the official Steam login page. Library and achievements refresh on launch, reconnection and every 15/30/60/120 minutes while the tab is visible. Relevant Steam data must be public. Family games returned through licenses or recent activity are included; the entire family catalog is not guaranteed. Steam never completes the story or overwrites manual state and notes.
 

@@ -3,7 +3,7 @@ import {readFile,mkdir,copyFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),out=path.join(root,'dist','web');await mkdir(out,{recursive:true});
-const files=['index.html','start.mjs','bridge.mjs','model.mjs','store.mjs','api.mjs','web.css','sw.js','icon.svg','manifest.webmanifest'];
+const files=['index.html','app.html','presentation.mjs','presentation.css','start.mjs','bridge.mjs','model.mjs','store.mjs','api.mjs','web.css','sw.js','icon.svg','manifest.webmanifest'];
 for(const file of ['LICENSE','ATTRIBUTION.md','ATTRIBUTION.es.md'])await copyFile(path.join(root,file),path.join(out,file));
 for(const file of files)await copyFile(path.join(root,'web',file),path.join(out,file));
 for(const [from,to] of [['app.css','app.css'],['app.js','ui.js'],['ui-model.mjs','ui-model.mjs'],['shortcuts.mjs','shortcuts.mjs']])await copyFile(path.join(root,'src','Checkpoint.App','Web',from),path.join(out,to));
@@ -16,7 +16,7 @@ for(const file of [...files,'ui.js','ui-model.mjs','shortcuts.mjs']){
  if(!/\.(?:mjs|js|html)$/.test(file)||file==='sw.js')continue;
  let source=await readFile(path.join(out,file),'utf8');
  source=source.replace(/(['"])(\.\/[\w.-]+\.(?:mjs|js))\1/g,(_,quote,url)=>quote+url+'?v='+revision+quote);
- if(file==='index.html')source=source.replace(/((?:href|src)=")((?:app|web)\.css|start\.mjs)(")/g,(_,prefix,url,suffix)=>prefix+url+'?v='+revision+suffix);
+ if(file.endsWith('.html'))source=source.replace(/((?:href|src)=")((?:app|web|presentation)\.css|(?:start|presentation)\.mjs)(")/g,(_,prefix,url,suffix)=>prefix+url+'?v='+revision+suffix);
  await writeFile(path.join(out,file),source);
 }
 const sw=await readFile(path.join(out,'sw.js'),'utf8');await writeFile(path.join(out,'sw.js'),sw.replace('checkpoint-web-1','checkpoint-web-'+revision).replace(/'([\w.-]+\.(?:mjs|js|css))'/g,(_,url)=>"'"+url+'?v='+revision+"'"));

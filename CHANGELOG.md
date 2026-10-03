@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## Web — 2026-10-04
+
+- The main web address opens a bilingual presentation. Open Checkpoint enters the existing app; app.html provides direct access. Returning to the overview retains same-tab sessions and local games. Installed PWAs open the app directly.
+
 ## 0.8.7 — 2026-10-04
 
 - A simpler desktop appearance: square controls, restrained borders, neutral default colors and smaller section headings throughout Windows and the browser. All 22 themes remain available.

@@ -13,3 +13,8 @@ body { background:rgb(var(--surface)); } #app { display:flex;align-items:center;
 @media(max-width:360px) { .window.browser .navigation { flex-wrap:wrap; }.window.browser .navigation .add { margin-left:0; }.window.browser .searchbar { flex-wrap:wrap; }.window.browser .searchbar input { flex-basis:100%; }.window.browser .collectionbar { flex-wrap:wrap; }.window.browser .manage-lists { width:100%; } }
 
 @media(max-height:480px) { .window.browser { overflow-y:auto; }.window.browser .viewport { flex:none;min-height:160px; } }
+
+.app-page { display:flex; flex-direction:column; }
+.app-page #app { height:auto; flex:1; min-height:0; }
+.site-nav { flex:none; border-bottom:1px solid var(--line); padding:4px 14px; font-size:12px; }
+.site-nav a { color:var(--accent-ink,var(--accent)); }

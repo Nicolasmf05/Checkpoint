@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## Web — 2026-10-04
+
+- La dirección principal abre una presentación bilingüe. Abrir Checkpoint entra en la app existente; app.html permite el acceso directo. Volver a la presentación conserva la sesión de la pestaña y los juegos locales. Las PWA instaladas abren directamente la app.
+
 ## 0.8.7 — 2026-10-04
 
 - Aspecto de escritorio más sencillo: controles rectos, bordes discretos, colores predeterminados neutros y títulos más pequeños en Windows y navegador. Se conservan los 22 temas.

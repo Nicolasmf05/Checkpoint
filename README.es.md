@@ -4,7 +4,7 @@
 
 Widget translúcido para organizar los juegos que quieres pasarte en Windows.
 
-**[Usar Checkpoint en el navegador](https://nicolasmf05.github.io/Checkpoint/)** · [Guía web](docs/WEB.md) · [Configurar atajos](docs/SHORTCUTS.md). La biblioteca web se guarda en este navegador; usa JSON para trasladar tus juegos de Windows.
+**[Presentación de Checkpoint](https://nicolasmf05.github.io/Checkpoint/)** · [Abrir la app web](https://nicolasmf05.github.io/Checkpoint/app.html) · [Guía web](docs/WEB.md) · [Configurar atajos](docs/SHORTCUTS.md). La biblioteca web se guarda en este navegador; usa JSON para trasladar tus juegos de Windows.
 
 > **AVISO IMPORTANTE — SMARTSCREEN:** los EXE/MSI de GitHub no tienen firma ni certificado de editor. La ausencia de firma y de reputación puede provocar «Windows protegió su PC». **No tengo certificado porque supone un coste; no lo compraré hasta que los ingresos de Checkpoint cubran al menos lo que cueste. Hasta entonces, estas descargas seguirán sin certificado.** Firmar tampoco garantiza que el aviso desaparezca inmediatamente. [Lee el aviso y los requisitos](docs/DOWNLOAD-NOTES.md).
 

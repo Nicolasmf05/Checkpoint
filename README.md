@@ -4,7 +4,7 @@
 
 A translucent Windows desktop widget for the games you want to finish, with cover art, goals and progress shared with Checkpoint friends.
 
-**[Use Checkpoint in your browser](https://nicolasmf05.github.io/Checkpoint/)** · [Web guide](docs/en/WEB.md) · [Configure shortcuts](docs/en/SHORTCUTS.md). The web library lives in this browser; use JSON to transfer your Windows games.
+**[Checkpoint overview](https://nicolasmf05.github.io/Checkpoint/)** · [Open the web app](https://nicolasmf05.github.io/Checkpoint/app.html) · [Web guide](docs/en/WEB.md) · [Configure shortcuts](docs/en/SHORTCUTS.md). The web library lives in this browser; use JSON to transfer your Windows games.
 
 > **IMPORTANT — SMARTSCREEN:** GitHub EXE/MSI downloads have no digital signature or publisher certificate. Their unsigned status and lack of reputation can trigger “Windows protected your PC”. **I have no certificate because it costs money; I will not buy one until Checkpoint income covers at least its cost. Until then, these downloads will remain without a certificate.** Signing does not guarantee that warnings immediately disappear. [Read the notice and requirements](docs/en/DOWNLOAD-NOTES.md).
 
