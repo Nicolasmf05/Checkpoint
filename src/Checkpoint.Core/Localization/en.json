@@ -544,5 +544,20 @@
   "Has rechazado 200 carátulas para este juego. No se harán más búsquedas.": "You have rejected 200 covers for this game. No further searches will be made.",
   "No hay otra carátula de IGDB disponible para este nombre.": "No other IGDB cover is available for this name.",
   "Buscar otra carátula en IGDB": "Search IGDB for another cover",
-  "Se conserva la carátula anterior.": "The previous cover is preserved."
+  "Se conserva la carátula anterior.": "The previous cover is preserved.",
+  "Ver ficha completa": "View full game details",
+  "Ficha del juego": "Game details",
+  "Juego no disponible": "Game unavailable",
+  "Progreso": "Progress",
+  "Sin sincronizar": "Not synchronized",
+  "Objetivos manuales": "Manual goals",
+  "Tiempo jugado": "Playtime",
+  "Visibilidad": "Visibility",
+  "Visible para mis amigos": "Visible to my friends",
+  "Listas": "Lists",
+  "Sin listas adicionales": "No additional lists",
+  "Sin tareas": "No tasks",
+  "Añadido": "Added",
+  "Última sincronización": "Last synchronization",
+  "Notas": "Notes"
 }

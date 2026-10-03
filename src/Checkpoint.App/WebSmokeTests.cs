@@ -298,6 +298,16 @@ public partial class MainWindow
             await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
             var acceptedCover=Store.LoadGames().Single(g=>g.Id==privateFixture.Id);
             Check(acceptedCover.IgdbCoverImageId=="fixture_second"&&BackupFiles.IsCustomCoverName(acceptedCover.CustomCover)&&File.Exists(Path.Combine(Covers.DirectoryPath,acceptedCover.CustomCover!)),"accepted IGDB cover is saved locally and survives SQLite reload");
+            await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"] .game-title').click();");
+            var gameSheet=await Dialog();
+            Check(await Script(gameSheet,"document.body.innerText.includes('Game details') && document.body.innerText.includes('Visibility: Private to my friends') && document.body.innerText.includes('Notes') && document.body.innerText.includes('RetroAchievements')"),"clicking a game opens its complete localized CSS sheet without editing");
+            await Capture(gameSheet,"css-game-details-en.png");
+            await gameSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(250);
+            Preferences.MiniatureView=true;ApplyPreferences();Refresh();await Task.Delay(350);
+            await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"]').click();");gameSheet=await Dialog();
+            Check(await Script(gameSheet,"document.body.innerText.includes('Game details') && document.body.innerText.includes('Private list fixture')"),"a Miniature row opens the full game sheet by mouse without changing window mode");
+            await gameSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            Preferences.MiniatureView=false;ApplyPreferences();Refresh();
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

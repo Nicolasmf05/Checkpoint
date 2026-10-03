@@ -1,0 +1,42 @@
+using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using Checkpoint.Core;
+namespace Checkpoint.App;
+internal static partial class Dialogs
+{
+    internal static void GameDetails(MainWindow owner,Game game)
+    {
+        var window=Modal(owner,I18n.T("Ficha del juego")+" · "+game.Title,620,760);
+        var body=Panel();Layout(window,body,out var footer);
+        Heading(body,game.Title,I18n.T("Ficha del juego"));
+        var image=new Image { Height=240,Tag="cover-preview",Visibility=Visibility.Collapsed };
+        if(!owner.Preferences.LightweightMode)body.Children.Add(image);
+        window.Loaded+=async(_,_)=>{if(owner.Preferences.LightweightMode)return;try{image.Source=await owner.Covers.Get(game);if(image.Source is not null)image.Visibility=Visibility.Visible;}catch(Exception error) when(error is not OutOfMemoryException){} };
+        void Line(string text)=>body.Children.Add(new TextBlock { Text=text,TextWrapping=TextWrapping.Wrap });
+        void Section(string title)=>body.Children.Add(new TextBlock { Text=I18n.T(title),FontSize=22,FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap });
+        Line(game.Platform+" · "+game.StatusText);
+        Line(I18n.T("Objetivo")+": "+game.GoalText);
+        if(game.StoryPercent is {} percent){Line(I18n.T("Historia")+": "+percent+"%");body.Children.Add(new ProgressBar { Minimum=0,Maximum=100,Value=percent,Height=10 });}
+        var achievements=AchievementTracking.Items(game).ToArray();
+        Section("Logros");Line(achievements.Count(a=>a.Completed)+" / "+achievements.Length+I18n.T(" completados en Checkpoint"));
+        if(achievements.Length>0)body.Children.Add(new ProgressBar { Minimum=0,Maximum=100,Value=achievements.Count(a=>a.Completed)*100d/achievements.Length,Height=10 });
+        Line("Steam: "+(game.Achievements is null?I18n.T("Sin sincronizar"):game.UnlockedCount+" / "+game.Achievements.Count));
+        Line("RetroAchievements: "+(game.RetroAchievements is null?I18n.T("Sin sincronizar"):game.RetroAchievements.Count(a=>a.Unlocked)+" / "+game.RetroAchievements.Count));
+        Line(I18n.T("Objetivos manuales")+": "+game.ManualAchievements.Count);
+        Line(I18n.T("Tiempo jugado")+": "+(game.PlaytimeMinutes/60d).ToString("0.#",I18n.IsEnglish?System.Globalization.CultureInfo.GetCultureInfo("en-US"):System.Globalization.CultureInfo.GetCultureInfo("es-ES"))+" h");
+        Line(I18n.T("Visibilidad")+": "+I18n.T(game.FriendsPrivate==true?"Privado para mis amigos":"Visible para mis amigos"));
+        Line(I18n.T("Listas")+": "+(game.Lists.Count>0?string.Join(", ",game.Lists):I18n.T("Sin listas adicionales")));
+        Section("Tareas");if(game.Tasks.Count==0)Line(I18n.T("Sin tareas"));foreach(var task in game.Tasks)Line((task.Done?"✓ ":"○ ")+task.Title);
+        Section("Notas");Line(string.IsNullOrWhiteSpace(game.Notes)?I18n.T("Sin notas"):game.Notes);
+        string Date(DateTimeOffset value)=>value.ToLocalTime().ToString("g",System.Globalization.CultureInfo.GetCultureInfo(I18n.IsEnglish?"en-US":"es-ES"));
+        Line(I18n.T("Añadido")+": "+Date(game.AddedAt));Line(I18n.T("Última sincronización")+": "+(game.SyncedAt is {} synced?Date(synced):I18n.T("Sin sincronizar")));
+        if(game.FinishedAt is {} finished)Line(I18n.T("Historia terminada")+": "+Date(finished));
+        if(game.SteamAppId is {} steam)Line("Steam ID: "+steam);if(game.RetroGameId is {} retro)Line("RetroAchievements ID: "+retro);
+        footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));
+        footer.Children.Add(Button(I18n.T("Editar juego"),(_,_)=>{window.Close();Edit(owner,game);}));
+        footer.Children.Add(Button(I18n.T("Ver logros"),(_,_)=>{window.Close();Achievements(owner,game);},true));
+        window.ShowDialog();
+    }
+}

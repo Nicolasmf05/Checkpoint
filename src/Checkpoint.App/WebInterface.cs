@@ -34,7 +34,7 @@ public partial class MainWindow
             friendsTitle=I18n.T("Tu gente, tus aventuras"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
             add=I18n.T("Añadir juego"), settings=I18n.T("Ajustes"), hide=I18n.T("Ocultar widget"), close=I18n.T("Cerrar"),
             pin=I18n.T("Mantener siempre visible"), search=I18n.T("Buscar juego"), sync=I18n.T("Actualizar"),
-            achievements=I18n.T("Ver logros"), steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
+            details=I18n.T("Ver ficha completa"), achievements=I18n.T("Ver logros"), steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
             examples=I18n.T("Añadir ejemplos"), finish=I18n.T("Marcar o desmarcar historia terminada"),
             windowMode=I18n.T("Modo de ventana"), fullWindow=I18n.T("Ventana completa"), smallWindow=I18n.T("Ventana pequeña"), miniature=I18n.T("Miniatura"),
@@ -74,6 +74,7 @@ public partial class MainWindow
                 break;
             case "add": Dialogs.Edit(this,null); break;
             case "achievements" when game is not null: Dialogs.Achievements(this,game); break;
+            case "details" when game is not null: Dialogs.GameDetails(this,game); web?.Event(new { kind="focus-game",id=game.Id }); break;
             case "edit" when game is not null: Dialogs.Edit(this,game); web?.Event(new { kind="focus-game",id=game.Id }); break;
             case "configure-shortcuts": Dialogs.ShortcutSettings(this); break;
             case "manage-lists": Dialogs.ManageLists(this);break;

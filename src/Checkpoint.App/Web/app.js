@@ -178,12 +178,15 @@ function renderGames() {
     row.dataset.game=game.id;if(state.mini){row.title=state.labels.edit+' · '+gestures.edit;row.setAttribute('aria-keyshortcuts',[gestures.edit,gestures.gameMenu,'Space',gestures.up,gestures.down,gestures.first,gestures.last,gestures.pageUp,gestures.pageDown].join(' '));} row.tabIndex=selected===game.id ? 0 : -1; row.classList.toggle('selected',selected===game.id); row.style.top=`${Math.floor(index/columns)*rowHeight}px`;
     if (!state.mini) { row.style.left=`${(index%columns)*100/columns}%`; row.style.width=`calc(${100/columns}% - ${columns>1 ? 8 : 0}px)`; row.style.height=`${rowHeight-10}px`; }
     else row.style.height=`${rowHeight-3}px`;
+    row.title=state.labels.details; row.setAttribute('aria-label',game.title+' · '+state.labels.details);
+    row.addEventListener('click',e=>{if(e.target.closest('button,input,select,a'))return;selected=game.id;action('details',{id:game.id});});
+    row.addEventListener('keydown',e=>{if(e.target===row&&e.key==='Enter'&&(!state.mini||!matches(e,gestures.gameMenu))){e.preventDefault();e.stopPropagation();action('details',{id:game.id});}});
     row.addEventListener('focus',()=>selected=game.id); row.addEventListener('contextmenu',e=>{ e.preventDefault(); selected=game.id; showMenu(game,e.clientX,e.clientY); });
-    if (state.mini) { const name=el('div','game-title ellipsis',game.title); name.title=game.title; row.append(name,el('div',`status state-${game.state}`,game.status)); row.addEventListener('click',()=>{selected=game.id;row.focus();}); }
+    if (state.mini) { const name=el('div','game-title ellipsis',game.title); name.title=game.title; row.append(name,el('div',`status state-${game.state}`,game.status));  }
     else {
       if (!state.lightweight) {
         const missing=()=>{const key=game.id+'|'+game.title+'|'+game.cover;if(missingCoverSignals.has(key))return;missingCoverSignals.add(key);action('cover-missing',{id:game.id});};
-        const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>{cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)));missing();});if(!game.cover)queueMicrotask(missing); cover.addEventListener('click',()=>action('edit',{id:game.id})); row.append(cover); }
+        const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>{cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)));missing();});if(!game.cover)queueMicrotask(missing); row.append(cover); }
       const details=el('div','details'); details.append(el('div','game-title ellipsis',game.title),el('div','platform ellipsis',game.platform),el('div',`status state-${game.state}`,game.status),el('div','next ellipsis',game.next),el('div','progress ellipsis',game.progress+(game.percent==null?'':` · ${game.percent}%`)));
       if (game.percent != null) { const progress=el('progress'); progress.max=100; progress.value=game.percent; progress.setAttribute('aria-label',game.progress); details.append(progress); }
       details.append(button('🏆 '+(game.achievementCaption||state.labels.achievements),'achievements',state.labels.achievements,{id:game.id},'achievement-link'));

@@ -67,3 +67,5 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .mini-exit { min-height:28px; padding:4px 8px; font-size:11px; color:var(--accent); }
 
 .type-image.cover-preview { align-self:center; max-height:260px; max-width:200px; }
+
+.game,.minirow { cursor:pointer; }

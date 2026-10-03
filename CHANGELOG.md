@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.5 — 2026-10-04
+
+- Click any game card, title, cover or Miniature row to open its full game sheet; buttons retain their direct actions.
+- Status, goal, achievement overview, playtime, privacy, lists, tasks, notes, dates and provider IDs, with dedicated Edit game and View achievements actions.
+- Localized Windows/browser sheets, keyboard access and regression checks.
+
 ## 0.8.4 — 2026-10-04
 
 - IGDB cover suggestions when Steam artwork is unavailable, with closest-title matching and explicit preview approval in Windows and the browser.

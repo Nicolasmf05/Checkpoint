@@ -4,6 +4,12 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## 0.8.5 — full game details
+
+Clicking a game opens its status, goal, achievements, notes and tasks, with direct editing/achievement actions. Miniature opens the same complete sheet. Isolated fixture data.
+
+![Checkpoint](../screenshots/css-game-details-en.png)
+
 ## 0.8.4 — IGDB cover proposals
 
 Explicit preview approval and persistent rejection. Solid-color fixture artwork; [guide](IGDB.md).

@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.5 — 2026-10-04
+
+- Pulsa la tarjeta, el nombre, la carátula o la fila de Miniatura para abrir la ficha completa; los botones conservan sus acciones directas.
+- Estado, objetivo, resumen de logros, tiempo jugado, privacidad, listas, tareas, notas, fechas e identificadores, con botones para editar y ver los logros.
+- Fichas en Windows y navegador traducidas, acceso con teclado y pruebas de navegación.
+
 ## 0.8.4 — 2026-10-04
 
 - Propuestas de carátulas de IGDB cuando falla Steam, con búsqueda del nombre más parecido y aprobación explícita en Windows y navegador.

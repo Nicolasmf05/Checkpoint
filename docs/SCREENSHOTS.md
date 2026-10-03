@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.5 — ficha completa del juego
+
+Al pulsar un juego se abren su estado, objetivo, logros, notas y tareas, con acciones para editar y ver logros. Miniatura abre la misma ficha completa. Datos aislados de prueba.
+
+![Checkpoint](screenshots/css-game-details-en.png)
+
 ## 0.8.4 — propuestas de carátulas de IGDB
 
 Vista previa con aprobación explícita y rechazo persistente. Imagen de color de prueba; [guía](IGDB.md).
