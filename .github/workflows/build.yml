@@ -12,6 +12,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify complete release safeguards
+        run: python -W error::ResourceWarning tests/release_policy_test.py
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'

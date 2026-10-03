@@ -199,6 +199,10 @@ La integración con una cuenta real y la instalación/desinstalación del MSI de
 
 **Checkpoint creado originalmente por Nicolasmf05.** El código actual usa [Checkpoint Attribution License 1.0](LICENSE): las redistribuciones y versiones derivadas alojadas públicamente deben conservar un crédito accesible al creador y el enlace al proyecto original. Se permite usarlo y distribuirlo comercialmente cumpliendo sus condiciones. [Requisitos de atribución](ATTRIBUTION.es.md). Las descargas originales de v0.8.5 y anteriores conservan su licencia MIT.
 
+## Releases completas
+
+Solo se mantiene pública la release completa y estable más reciente. Las anteriores se conservan como borradores con sus archivos. Cada publicación incluye ZIP portable, MSI, ZIP del código fuente y sus tres archivos SHA-256. [Política y comando de publicación](docs/RELEASES.md).
+
 ## Publicar en GitHub
 
 El proyecto incluye `.gitignore`, licencia Checkpoint Attribution License 1.0, documentación, pruebas y un workflow que genera artefactos al ejecutar GitHub Actions. Define la variable de repositorio `CHECKPOINT_SERVICE_URL` si quieres que las ediciones lleven el servicio configurado. El workflow **no publica automáticamente una release** ni contiene la clave de Steam.

@@ -173,6 +173,10 @@ Repeat using `./scripts/Verify-Package.ps1 -ZipPath ./dist/Checkpoint-0.7.1-win-
 
 **Checkpoint originally created by Nicolasmf05.** Current source is licensed under [Checkpoint Attribution License 1.0](LICENSE): redistributed and publicly hosted derivatives must retain an accessible creator credit and original project link. Use and commercial distribution remain permitted subject to these terms. [Attribution requirements](ATTRIBUTION.md). Original v0.8.5 and earlier downloads retain their included MIT license.
 
+## Complete releases
+
+Only the newest complete stable release is public. Earlier releases are retained as drafts, with their assets preserved. Each release includes portable ZIP, MSI, source ZIP and all three SHA-256 files. [Publishing policy and command](docs/en/RELEASES.md).
+
 ## GitHub
 
 The Checkpoint Attribution License 1.0, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.

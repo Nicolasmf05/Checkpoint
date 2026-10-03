@@ -1,6 +1,6 @@
 # Actualizaciones de Windows
 
-A partir de **0.8.1**, entra en **Ajustes → Actualizaciones**. La aplicación comprueba las releases públicas de `Nicolasmf05/Checkpoint` al abrir, como máximo una vez cada 24 horas. Puedes desactivarlo o pulsar **Buscar actualizaciones** cuando quieras. Incluye las versiones preliminares publicadas con etiqueta numérica, porque Checkpoint todavía distribuye versiones anteriores a 1.0 como preliminares. No requiere una cuenta ni token de GitHub y no envía tu biblioteca, sesiones ni datos de Steam.
+A partir de **0.8.1**, entra en **Ajustes → Actualizaciones**. La aplicación comprueba las releases públicas de `Nicolasmf05/Checkpoint` al abrir, como máximo una vez cada 24 horas. Puedes desactivarlo o pulsar **Buscar actualizaciones** cuando quieras. Desde 0.8.6 se publica únicamente la release completa y estable más reciente; las anteriores se conservan como borradores. No requiere una cuenta ni token de GitHub y no envía tu biblioteca, sesiones ni datos de Steam.
 
 Si hay una versión superior compatible, aparece **Descargar e instalar**. La descarga comprueba el tamaño y SHA-256 del MSI contra su archivo `.sha256` y el digest de GitHub. Solo se aceptan el repositorio oficial y las redirecciones HTTPS de sus servidores de archivos. Una descarga incompleta o alterada no se instala. Se comprueba de nuevo el hash antes de ejecutar el instalador.
 

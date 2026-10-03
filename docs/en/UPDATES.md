@@ -1,6 +1,6 @@
 # Windows updates
 
-Starting in **0.8.1**, open **Settings → Updates**. Checkpoint checks public `Nicolasmf05/Checkpoint` releases on launch, at most once every 24 hours. Disable automatic checks or choose **Check for updates** at any time. Published previews with numeric tags are included because Checkpoint currently distributes pre-1.0 releases as previews. No GitHub account/token is needed, and your library, sessions and Steam data are not sent.
+Starting in **0.8.1**, open **Settings → Updates**. Checkpoint checks public `Nicolasmf05/Checkpoint` releases on launch, at most once every 24 hours. Disable automatic checks or choose **Check for updates** at any time. Starting with 0.8.6, only the latest complete stable release is public; previous releases are retained as drafts. No GitHub account/token is needed, and your library, sessions and Steam data are not sent.
 
 A newer compatible release enables **Download and install**. Download size and MSI SHA-256 must match both the `.sha256` file and GitHub's digest. Only official repository URLs and HTTPS GitHub asset-server redirects are accepted. Incomplete/tampered downloads cannot be installed. The helper checks the hash again before running the installer.
 

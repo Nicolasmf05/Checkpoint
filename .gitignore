@@ -11,6 +11,8 @@ artifacts/
 *.dat
 .vs/
 node_modules/
+__pycache__/
+*.py[cod]
 supabase/.temp/
 supabase/.branches/
 .env
