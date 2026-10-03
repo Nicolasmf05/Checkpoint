@@ -54,3 +54,11 @@ Solo se usa el host público `api.steampowered.com`, con la clave en `x-webapi-k
 - No hay telemetría, notificaciones push, modificación de logros ni almacenamiento de contraseñas.
 
 La cuenta del operador puede tener restricciones para registrar claves. Las condiciones y disponibilidad dependen de Valve. Referencias: [Web API](https://partner.steamgames.com/doc/webapi_overview), [claves](https://partner.steamgames.com/doc/webapi_overview/auth), [OpenID](https://partner.steamgames.com/doc/features/auth), [condiciones](https://steamcommunity.com/dev/apiterms).
+
+## Importación de Steam Families
+
+El servicio solicita licencias familiares junto a los juegos propios y combina los juegos jugados recientemente como fuente complementaria. Los AppID duplicados conservan el mayor tiempo total comunicado. Solo se importan los juegos que Steam expone para el perfil visible del usuario vinculado; no es una enumeración completa de juegos familiares todavía sin jugar. No se importan credenciales ni progreso de otros familiares.
+
+Los logros se solicitan para el SteamID vinculado, también en juegos prestados presentes en la biblioteca visible combinada. Los perfiles privados siguen restringidos. Si falla la consulta de recientes, se conserva la biblioteca propia. La caché dura 15 minutos. El servicio alojado reemplaza automáticamente las cachés antiguas de juegos propios; pulsa Actualizar en el widget y abre Biblioteca. Las versiones actuales del escritorio funcionan sin reinstalar.
+
+El parámetro `include_family_licenses` se utiliza como indicación de compatibilidad; Valve puede ignorarlo o limitar los datos devueltos. La consulta de recientes está documentada por [Valve](https://partner.steamgames.com/doc/webapi/IPlayerService). Sigue pendiente validar una cuenta familiar real; las pruebas HTTP simuladas no demuestran que todos los juegos compartidos sean accesibles para cualquier perfil.

@@ -54,20 +54,30 @@ export function createSteamHandler({baseUrl, apiKey='', rpc, fetchImpl=fetch, no
     if(!response.ok) throw new ApiError(502,'Steam no ha devuelto estos datos. Comprueba la privacidad de tus detalles de juegos.');
     try { return await response.json(); } catch { throw new ApiError(502,'Steam ha devuelto una respuesta no válida.'); }
   }
-  async function cached(id,produce,ttl=900) {
-    const old=await state('get','cache',id); if(old!==null) return old;
+  async function cached(id,produce,ttl=900,valid=()=>true) {
+    const old=await state('get','cache',id); if(old!==null&&valid(old)) return old;
     const value=await produce(); await state('put','cache',id,value,ttl); return value;
   }
   async function library(steamId) {
-    return cached('library:'+steamId,async()=>{
-      const data=await steam('IPlayerService/GetOwnedGames/v1/',{steamid:steamId,include_appinfo:true,include_played_free_games:true});
-      if(!Array.isArray(data.response?.games)) {
-        if(data.response?.game_count===0) return {games:[]};
+    const result=await cached('library:'+steamId,async()=>{
+      const data=await steam('IPlayerService/GetOwnedGames/v1/',{steamid:steamId,include_appinfo:true,include_played_free_games:true,include_family_licenses:true});
+      if(!Array.isArray(data.response?.games)&&data.response?.game_count!==0)
         throw new ApiError(403,'Steam no permite consultar tu biblioteca. Revisa la visibilidad de Detalles de juegos en Steam.');
+      const owned=data.response.games||[];
+      let recent=[];
+      try { const played=await steam('IPlayerService/GetRecentlyPlayedGames/v1/',{steamid:steamId,count:0}); if(Array.isArray(played.response?.games)) recent=played.response.games; }
+      catch(error) { if(!(error instanceof ApiError)) throw error; } // Optional recent data must not hide the owned library.
+      const games=new Map();
+      for(const game of [...owned.slice(0,10000),...recent.slice(0,10000)]) {
+        if(!Number.isInteger(game?.appid)||game.appid<=0||game.appid>2147483647||typeof game.name!=='string'||!game.name.trim()) continue;
+        const minutes=Math.min(2147483647,Math.floor(Math.max(0,Number(game.playtime_forever)||0)));
+        const previous=games.get(game.appid);
+        if(previous) previous.playtimeMinutes=Math.max(previous.playtimeMinutes,minutes);
+        else if(games.size<10000) games.set(game.appid,{appId:game.appid,name:game.name.trim().slice(0,140),playtimeMinutes:minutes});
       }
-      return {games:data.response.games.slice(0,10000).filter(g=>Number.isInteger(g.appid)&&g.appid>0&&g.appid<=2147483647&&typeof g.name==='string')
-        .map(g=>({appId:g.appid,name:g.name,playtimeMinutes:Math.max(0,Number(g.playtime_forever)||0)}))};
-    });
+      return {libraryRevision:2,games:[...games.values()]};
+    },900,value=>value.libraryRevision===2);
+    return {games:result.games};
   }
   const headers={'cache-control':'no-store','x-content-type-options':'nosniff','referrer-policy':'no-referrer',
     'content-security-policy':"default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"};
@@ -101,7 +111,7 @@ export function createSteamHandler({baseUrl, apiKey='', rpc, fetchImpl=fetch, no
       const prefix=[base.pathname,'/checkpoint-steam/'].find(p=>incoming.startsWith(p));
       if(!prefix) throw new ApiError(404,'Ruta no encontrada.');
       const path='/'+incoming.slice(prefix.length),method=request.method;
-      if(method==='GET'&&path==='/health') return json(200,{ok:true,version:'0.6.0',steamConfigured:Boolean(apiKey)});
+      if(method==='GET'&&path==='/health') return json(200,{ok:true,version:'0.6.0',steamConfigured:Boolean(apiKey),libraryImportVersion:2});
       if(method==='GET'&&path==='/privacy') return page(
         'Independent application, not affiliated with Valve. Operator: Checkpoint. Contact: https://github.com/Nicolasmf05/Checkpoint/issues. Steam ID, visible games, playtime and achievements are processed on Supabase (Ireland). Login flows expire after 10 minutes, session hashes after 7 days, library and progress cache after 15 minutes and public achievement definitions after 24 hours. Expired rows are removed during subsequent requests. Unlinking revokes the session and clears its game cache. Passwords and plaintext session tokens are never stored in the database. Local data remains on your PC. Hosting logs/backups follow Supabase retention. Steam data availability and accuracy depend on Valve.',
         'Aplicación independiente, sin afiliación con Valve. Responsable: Checkpoint. Contacto: https://github.com/Nicolasmf05/Checkpoint/issues. SteamID, juegos visibles, horas y logros se procesan en Supabase (Irlanda). Vinculaciones: 10 minutos; hashes de sesiones: 7 días; caché de biblioteca y progreso: 15 minutos; definiciones públicas: 24 horas. Los registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y elimina su caché de juegos. No almacenamos contraseñas ni tokens de sesión en texto claro. Los datos locales permanecen en tu PC. Registros y copias de seguridad siguen la retención de Supabase. Los datos dependen de Valve.');

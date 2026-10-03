@@ -20,7 +20,8 @@ async function fixture(t, options = {}) {
   const upstream = async (input, init) => {
     const url = new URL(input); calls.push({ url, init });
     if (url.hostname === 'steamcommunity.com') return new Response('ns:http://specs.openid.net/auth/2.0\nis_valid:true\n');
-    if (url.pathname.includes('GetOwnedGames')) return Response.json(options.privateLibrary ? { response: {} } : { response: { games: [{ appid: 620, name: 'Portal 2', playtime_forever: 70 }] } });
+    if (url.pathname.includes('GetOwnedGames')) return Response.json(options.privateLibrary ? { response: {} } : { response: { games: [{ appid: 620, name: 'Portal 2', playtime_forever: 70 },...(url.searchParams.get('include_family_licenses')==='true'?options.familyGames||[]:[])] } });
+    if(url.pathname.includes('GetRecentlyPlayedGames')) return options.recentUnavailable ? new Response('',{status:503}) : Response.json({response:{games:options.recentGames||[]}});
     if (url.pathname.includes('GetSchemaForGame')) return Response.json({ game: { availableGameStats: { achievements: [
       { name: 'FIRST', displayName: 'First', description: 'First step', hidden: 0 }, { name: 'SECRET', displayName: 'Secret', description: 'Spoiler', hidden: 1 }
     ] } } });
@@ -107,7 +108,7 @@ test('library is mapped, Steam API key stays in server header, and requests are 
   assert.ok(!text.includes('server-only-secret'));
   await send('/v1/library', undefined, token);
   const steam = calls.filter(call => call.url.hostname === 'api.steampowered.com');
-  assert.equal(steam.length, 1); assert.equal(steam[0].init.headers['x-webapi-key'], 'server-only-secret'); assert.ok(!steam[0].url.searchParams.has('key'));
+  assert.equal(steam.length, 2); assert.equal(steam[0].init.headers['x-webapi-key'], 'server-only-secret'); assert.ok(!steam[0].url.searchParams.has('key'));
 });
 test('achievement mapping keeps secrets marked and story state is absent', async t => {
   const { send, login } = await fixture(t); const { token } = await login();
@@ -138,4 +139,27 @@ test('login rate limit bounds unauthenticated flow creation', async t => {
   const { send } = await fixture(t);
   for (let i = 0; i < 10; i++) assert.equal((await send('/v1/auth/start', {})).status, 200);
   assert.equal((await send('/v1/auth/start', {})).status, 429);
+});
+
+test('family licenses and recently played borrowed games merge without duplicates and use the linked player achievements',async t=>{
+  const options={familyGames:[{appid:998,name:'Family game',playtime_forever:50}],recentGames:[{appid:620,name:'Portal 2',playtime_forever:100},{appid:999,name:'Recently borrowed',playtime_forever:25}]};
+  const f=await fixture(t,options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
+  const library=await (await send('/v1/library')).json();
+  assert.deepEqual(library.games.map(game=>game.appId),[620,998,999]);assert.equal(library.games[0].playtimeMinutes,100);
+  assert.equal(f.calls.find(call=>call.url.pathname.includes('GetOwnedGames')).url.searchParams.get('include_family_licenses'),'true');
+  const response=await send('/v1/games/999/achievements?steamid=76561198099999999');assert.equal(response.status,200);
+  assert.equal(f.calls.find(call=>call.url.pathname.includes('GetPlayerAchievements')).url.searchParams.get('steamid'),steamId);
+  assert.equal((await send('/v1/games/1000/achievements')).status,403);
+});
+test('optional recent lookup failures retain the owned library and do not bypass private profiles',async t=>{
+  const options={recentUnavailable:true};const f=await fixture(t,options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
+  assert.equal((await (await send('/v1/library')).json()).games[0].appId,620);
+  const hidden=await fixture(t,{privateLibrary:true,recentGames:[{appid:999,name:'Borrowed'}]});const hiddenSession=await hidden.login();
+  assert.equal((await hidden.send('/v1/library',undefined,hiddenSession.token)).status,403);
+  assert.ok(!hidden.calls.some(call=>call.url.pathname.includes('GetRecentlyPlayedGames')));
+});
+test('recent library entries reject invalid IDs and names and normalize time without duplicate games',async t=>{
+  const options={recentGames:[null,{appid:0,name:'Invalid'},{appid:2147483648,name:'Invalid'},{appid:999,name:' '},{appid:999,name:'Borrowed',playtime_forever:-2},{appid:999,name:'Borrowed',playtime_forever:2.9}]};
+  const f=await fixture(t,options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
+  assert.deepEqual((await (await send('/v1/library')).json()).games,[{appId:620,name:'Portal 2',playtimeMinutes:70},{appId:999,name:'Borrowed',playtimeMinutes:2}]);
 });

@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## Servicio Steam alojado — 2026-10-03
+
+- Solicitar licencias familiares y combinar juegos recientes con propios, sin duplicar AppID y conservando el tiempo total.
+- Los juegos prestados visibles permiten sincronizar logros del usuario vinculado. Se conservan las restricciones de perfiles privados.
+- Renovar la caché persistente de bibliotecas antiguas; las versiones actuales usan el cambio sin reinstalar.
+- 36 comprobaciones HTTP entre ambas implementaciones; sigue pendiente probar una cuenta familiar real.
+
 ## 0.7.1 — 2026-10-03
 
 - Tres modos explícitos en cabecera, Ajustes y menú contextual: Ventana completa, Ventana pequeña y Miniatura.

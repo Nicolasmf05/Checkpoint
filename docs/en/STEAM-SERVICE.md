@@ -53,3 +53,11 @@ Uses `api.steampowered.com` and `x-webapi-key`. The partner host does not accept
 - No telemetry, push notifications, achievement modification or password storage.
 
 Eligibility/availability depend on Valve. [Web API](https://partner.steamgames.com/doc/webapi_overview) · [Keys](https://partner.steamgames.com/doc/webapi_overview/auth) · [OpenID](https://partner.steamgames.com/doc/features/auth) · [Terms](https://steamcommunity.com/dev/apiterms).
+
+## Steam Families import
+
+The service requests family licenses alongside owned games and merges Steam's recently played games as a supplemental source. Duplicate AppIDs keep the largest reported total playtime. Import is limited to games Steam exposes for the linked user's visible profile; this is not a complete enumeration of unplayed family-group games. No other family member's credentials or progress is imported.
+
+Achievements are requested for the linked SteamID, including borrowed games present in the combined visible library. Private profiles remain restricted. If the recent-games endpoint fails, the owned library is retained. Steam results cache for 15 minutes. The hosted service replaces old owned-only cache entries automatically; use the widget's Update button and open Library. Existing desktop releases work without reinstalling.
+
+The `include_family_licenses` flag is treated as a compatibility hint; Valve may ignore it or restrict returned data. The recent-games route is documented by [Valve](https://partner.steamgames.com/doc/webapi/IPlayerService). Family-account validation remains pending; passing simulated HTTP tests is not proof that every shared game is available for every profile.

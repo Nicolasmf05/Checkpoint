@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## Hosted Steam service — 2026-10-03
+
+- Request family licenses and merge recently played games with owned games; deduplicate AppIDs and preserve total playtime.
+- Borrowed visible games can sync the linked player's achievements. Private-library restrictions remain enforced.
+- Replace old persistent library caches; existing desktop versions use the server update without reinstalling.
+- 36 HTTP checks pass across both service implementations; real family-account coverage remains pending.
+
 ## 0.7.1 — 2026-10-03
 
 - Three explicit window modes in the header, Settings and context menu: Full window, Small window and Miniature.

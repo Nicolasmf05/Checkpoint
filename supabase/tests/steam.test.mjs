@@ -36,7 +36,8 @@ function fixture(options={}) {
   const upstream=async (input,init)=>{
     const url=new URL(input);calls.push({url,init});
     if(url.hostname==='steamcommunity.com') return new Response(options.invalidAssertion?'is_valid:false':'is_valid:true\n');
-    if(url.pathname.includes('GetOwnedGames')) return Response.json(options.privateLibrary?{response:{}}:{response:{games:[{appid:620,name:'Portal 2',playtime_forever:70}]}});
+    if(url.pathname.includes('GetOwnedGames')) return Response.json(options.privateLibrary?{response:{}}:{response:{games:[{appid:620,name:'Portal 2',playtime_forever:70},...(url.searchParams.get('include_family_licenses')==='true'?options.familyGames||[]:[])]}});
+    if(url.pathname.includes('GetRecentlyPlayedGames')) return options.recentUnavailable ? new Response('',{status:503}) : Response.json({response:{games:options.recentGames||[]}});
     if(url.pathname.includes('GetSchemaForGame')) return Response.json({game:{availableGameStats:{achievements:[{name:'FIRST',displayName:url.searchParams.get('l'),hidden:0}]}}});
     if(url.pathname.includes('GetPlayerAchievements')) return Response.json(options.privateAchievements?{playerstats:{success:false}}:{playerstats:{success:true,achievements:[{apiname:'FIRST',achieved:1,unlocktime:1000}]}});
     throw new Error('Unexpected upstream');
@@ -137,4 +138,34 @@ test('oversized chunked request, arrays and missing auth are rejected',async()=>
 test('database failure returns a generic error without service secrets',async()=>{
   const h=createSteamHandler({baseUrl:base,apiKey:'secret-key',rpc:()=>{throw new Error('service-role-secret');}});
   const r=await h(new Request(base+'v1/library'));assert.equal(r.status,503);assert.ok(!(await r.text()).includes('service-role-secret'));
+});
+
+test('family licenses and recently played borrowed games merge without duplicates and use the linked player achievements',async t=>{
+  const options={familyGames:[{appid:998,name:'Family game',playtime_forever:50}],recentGames:[{appid:620,name:'Portal 2',playtime_forever:100},{appid:999,name:'Recently borrowed',playtime_forever:25}]};
+  const f=fixture(options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
+  const library=await (await send('v1/library')).json();
+  assert.deepEqual(library.games.map(game=>game.appId),[620,998,999]);assert.equal(library.games[0].playtimeMinutes,100);
+  assert.equal(f.calls.find(call=>call.url.pathname.includes('GetOwnedGames')).url.searchParams.get('include_family_licenses'),'true');
+  const response=await send('v1/games/999/achievements?steamid=76561198099999999');assert.equal(response.status,200);
+  assert.equal(f.calls.find(call=>call.url.pathname.includes('GetPlayerAchievements')).url.searchParams.get('steamid'),steamId);
+  assert.equal((await send('v1/games/1000/achievements')).status,403);
+});
+test('optional recent lookup failures retain the owned library and do not bypass private profiles',async t=>{
+  const options={recentUnavailable:true};const f=fixture(options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
+  assert.equal((await (await send('v1/library')).json()).games[0].appId,620);
+  const hidden=fixture({privateLibrary:true,recentGames:[{appid:999,name:'Borrowed'}]});const hiddenSession=await hidden.login();
+  assert.equal((await hidden.send('v1/library',undefined,hiddenSession.token)).status,403);
+  assert.ok(!hidden.calls.some(call=>call.url.pathname.includes('GetRecentlyPlayedGames')));
+});
+test('recent library entries reject invalid IDs and names and normalize time without duplicate games',async t=>{
+  const options={recentGames:[null,{appid:0,name:'Invalid'},{appid:2147483648,name:'Invalid'},{appid:999,name:' '},{appid:999,name:'Borrowed',playtime_forever:-2},{appid:999,name:'Borrowed',playtime_forever:2.9}]};
+  const f=fixture(options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
+  assert.deepEqual((await (await send('v1/library')).json()).games,[{appId:620,name:'Portal 2',playtimeMinutes:70},{appId:999,name:'Borrowed',playtimeMinutes:2}]);
+});
+
+test('deployment replaces an owned-only persisted library cache without revoking the session',async()=>{
+  const f=fixture({recentGames:[{appid:999,name:'Borrowed',playtime_forever:25}]}),{token}=await f.login();
+  f.db.set('cache:library:'+steamId,{expires:timestamp+900000,value:{games:[{appId:620,name:'Portal 2',playtimeMinutes:70}]}});
+  assert.equal((await (await f.send('v1/library',undefined,token)).json()).games.length,2);
+  const before=f.calls.length;f.restart();assert.equal((await (await f.send('v1/library',undefined,token)).json()).games.length,2);assert.equal(f.calls.length,before);
 });

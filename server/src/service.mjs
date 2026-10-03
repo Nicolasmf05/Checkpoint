@@ -51,13 +51,23 @@ export function createService({ apiKey = '', publicUrl = 'http://127.0.0.1:34871
     try { return await value; } catch (error) { cache.delete(key); throw error; }
   }
   async function library(steamId) {
-    return cached('library:' + steamId, async () => {
-      const payload = await steam('IPlayerService/GetOwnedGames/v1/', { steamid: steamId, include_appinfo: true, include_played_free_games: true });
-      if (!Array.isArray(payload.response?.games)) {
-        if (payload.response?.game_count === 0) return { games: [] };
-        throw new ApiError(403, 'Steam no permite consultar tu biblioteca. Revisa la visibilidad de Detalles de juegos en Steam.');
+    return cached('library:'+steamId,async()=>{
+      const data=await steam('IPlayerService/GetOwnedGames/v1/',{steamid:steamId,include_appinfo:true,include_played_free_games:true,include_family_licenses:true});
+      if(!Array.isArray(data.response?.games)&&data.response?.game_count!==0)
+        throw new ApiError(403,'Steam no permite consultar tu biblioteca. Revisa la visibilidad de Detalles de juegos en Steam.');
+      const owned=data.response.games||[];
+      let recent=[];
+      try { const played=await steam('IPlayerService/GetRecentlyPlayedGames/v1/',{steamid:steamId,count:0}); if(Array.isArray(played.response?.games)) recent=played.response.games; }
+      catch(error) { if(!(error instanceof ApiError)) throw error; } // Optional recent data must not hide the owned library.
+      const games=new Map();
+      for(const game of [...owned.slice(0,10000),...recent.slice(0,10000)]) {
+        if(!Number.isInteger(game?.appid)||game.appid<=0||game.appid>2147483647||typeof game.name!=='string'||!game.name.trim()) continue;
+        const minutes=Math.min(2147483647,Math.floor(Math.max(0,Number(game.playtime_forever)||0)));
+        const previous=games.get(game.appid);
+        if(previous) previous.playtimeMinutes=Math.max(previous.playtimeMinutes,minutes);
+        else if(games.size<10000) games.set(game.appid,{appId:game.appid,name:game.name.trim().slice(0,140),playtimeMinutes:minutes});
       }
-      return { games: payload.response.games.slice(0, 10000).map(game => ({ appId: game.appid, name: game.name, playtimeMinutes: game.playtime_forever ?? 0 })) };
+      return {games:[...games.values()]};
     });
   }
   function page(res, title, text) {
