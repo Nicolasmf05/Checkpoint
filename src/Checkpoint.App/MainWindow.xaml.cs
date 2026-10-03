@@ -125,11 +125,11 @@ public partial class MainWindow : Window
                 try { Dialogs.RestoreStartupIfMissing(); }
                 catch (Exception ex) { Notice(I18n.T("No se pudo restaurar el inicio con Windows: ") + I18n.Error(ex)); }
             }
-            timer.Tick += async (_, _) => { if (Steam.Session is not null && !syncing) await Sync(false); };
+            timer.Tick += async (_, _) => { if (Steam.Session is not null && !syncing) await Sync(true); };
             timer.Start();
             StartSocial();
             if (App.UseCss) StartWebInterface();
-            if (Steam.Session is not null) _ = Sync(false);
+            if (Steam.Session is not null) _ = Sync(true);
         };
         PreviewKeyDown += (_, e) =>
         {

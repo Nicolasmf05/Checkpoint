@@ -248,7 +248,7 @@ internal static class Dialogs
         var steamActions = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 10, 0, 0) }; body.Children.Add(steamActions);
         var advanced = new StackPanel(); var endpoint = Input(advanced, I18n.T("Dirección del servicio"), prefs.ServiceUrl);
         var expander = new Expander { Header = I18n.T("Conexión avanzada"), Content = advanced, Foreground = (Brush)Application.Current.Resources["TextBrush"], Margin = new Thickness(0, 12, 0, 0) }; body.Children.Add(expander);
-        Label(body, I18n.T("Actualizar progreso cada…")); var interval = new ComboBox { ItemsSource = new[] { I18n.T("15 minutos"), I18n.T("30 minutos"), I18n.T("60 minutos"), I18n.T("120 minutos") }, SelectedIndex = Array.IndexOf(new[] { 15, 30, 60, 120 }, prefs.SyncMinutes) }; if (interval.SelectedIndex < 0) interval.SelectedIndex = 1; body.Children.Add(interval);
+        Label(body, I18n.T("Sincronizar biblioteca y logros al abrir y cada…")); var interval = new ComboBox { ItemsSource = new[] { I18n.T("15 minutos"), I18n.T("30 minutos"), I18n.T("60 minutos"), I18n.T("120 minutos") }, SelectedIndex = Array.IndexOf(new[] { 15, 30, 60, 120 }, prefs.SyncMinutes) }; if (interval.SelectedIndex < 0) interval.SelectedIndex = 1; body.Children.Add(interval);
         steamActions.Children.Add(Button(I18n.T("Vincular Steam"), async (_, _) =>
         {
             try

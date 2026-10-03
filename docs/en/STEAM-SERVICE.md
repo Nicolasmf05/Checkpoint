@@ -4,6 +4,10 @@
 
 Version 0.6 source includes a dependency-free Supabase Edge Function. Node remains available for local development; no `npm install` is needed.
 
+## Automatic desktop synchronization
+
+When Steam is linked, Checkpoint checks the library and playtime on every launch and every 30 minutes by default. Settings offers 15, 30, 60 or 120 minutes. No Refresh click is required. New games appear in Library; adding them to My list remains manual. Each cycle updates achievements for up to 20 tracked games, starting with the least recently synced. Manual states, notes and story progress are preserved. Offline failures keep saved data and retry at the next cycle. Sync requests never overlap.
+
 ## Supabase deployment
 
 1. Apply `supabase/migrations/202610020002_checkpoint_steam.sql` after the social migration. Run `supabase/tests/steam.sql`; fixtures roll back.

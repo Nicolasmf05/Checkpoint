@@ -4,6 +4,10 @@
 
 El código de 0.6 incluye una función de Supabase sin dependencias externas. Node sigue disponible para desarrollo local y no necesita `npm install`.
 
+## Sincronización automática en la aplicación
+
+Con Steam vinculado, Checkpoint consulta la biblioteca y las horas jugadas cada vez que se inicia y cada 30 minutos por defecto. En Ajustes puedes elegir 15, 30, 60 o 120 minutos. No hace falta pulsar Actualizar. Los nuevos juegos aparecen en Biblioteca; añadirlos a Mi lista sigue siendo una decisión manual. Se actualizan los logros de hasta 20 juegos seguidos por ciclo, empezando por los menos recientes. Los estados, notas y progreso de historia manual no se sobrescriben. Sin conexión se conserva lo guardado y se vuelve a intentar en el siguiente ciclo. No se ejecutan dos sincronizaciones a la vez.
+
 ## Despliegue en Supabase
 
 1. Aplica `supabase/migrations/202610020002_checkpoint_steam.sql` después de la migración social. Ejecuta `supabase/tests/steam.sql`; las pruebas terminan con ROLLBACK.

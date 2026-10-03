@@ -1,5 +1,9 @@
 # Validation
 
+## 0.7.2 — automatic synchronization
+
+382 checks passed: 130 core, 18 Node service, 18 Edge, 175 native controller, 4 interface model and 37 actual CSS checks. Startup and the timer now use the same library and achievements sync as Refresh. Existing tests cover preservation of manual states, deduplicated imports, Steam errors and localized interfaces. Startup with a real Steam account remains unverified; service tests use simulated responses.
+
 ## 0.7.1 — window modes
 
 375 checks passed: 130 core, 15 service, 14 Edge, 175 native controllers, 4 frontend model and 37 actual CSS checks. New coverage verifies work-area dimensions and opaque CSS in Full window, SQLite mode persistence without overwriting small bounds/opacity, return to Small window, Miniature context transitions and localized Settings. Older settings default to Small window. Full-window screenshots use actual WebView2. Physical multi-monitor/DPI, installed upgrades and real-account limitations remain pending.

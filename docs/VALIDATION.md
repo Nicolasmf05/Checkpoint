@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.7.2 — sincronización automática
+
+382 comprobaciones superadas: 130 de biblioteca, 18 del servicio Node, 18 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 37 CSS reales. El arranque y el temporizador usan ahora la misma sincronización de biblioteca y logros que el botón Actualizar. Las pruebas existentes comprueban conservación de estados manuales, importación sin duplicados, errores de Steam e interfaz traducida. No se ha probado el arranque con una cuenta Steam real; las pruebas del servicio usan respuestas simuladas.
+
 ## 0.7.1 — modos de ventana
 
 Han pasado 375 comprobaciones: 130 de biblioteca, 15 del servicio, 14 Edge, 175 de controladores nativos, 4 del modelo de interfaz y 37 CSS reales. Las nuevas pruebas verifican área de trabajo y CSS opaco de la completa, modo guardado en SQLite sin sobrescribir tamaño/opacidad de la pequeña, vuelta a pequeña, cambios desde Miniatura y Ajustes traducidos. Las preferencias anteriores conservan pequeña como predeterminado. Captura de la completa en WebView2 real. Siguen pendientes varios monitores/DPI físicos, actualizaciones instaladas y cuentas reales.

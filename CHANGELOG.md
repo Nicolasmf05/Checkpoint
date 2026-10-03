@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.7.2 — 2026-10-03
+
+- Automatically sync the Steam library, playtime and tracked achievements on each launch and at the configured interval (30 minutes by default).
+- Settings explain automatic startup and periodic sync. Offline errors preserve saved progress; overlapping requests are skipped.
+
 ## Hosted Steam service — 2026-10-03
 
 - Request family licenses and merge recently played games with owned games; deduplicate AppIDs and preserve total playtime.

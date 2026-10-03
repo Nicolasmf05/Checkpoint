@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.7.2 — 2026-10-03
+
+- Sincronización automática de la biblioteca de Steam, horas jugadas y logros de los juegos seguidos al abrir y en el intervalo configurado (30 minutos por defecto).
+- Ajustes explica la sincronización al abrir y periódica. Los errores sin conexión conservan el progreso y se evitan peticiones simultáneas.
+
 ## Servicio Steam alojado — 2026-10-03
 
 - Solicitar licencias familiares y combinar juegos recientes con propios, sin duplicar AppID y conservando el tiempo total.
