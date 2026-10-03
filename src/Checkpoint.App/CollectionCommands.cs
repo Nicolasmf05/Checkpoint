@@ -30,7 +30,7 @@ public partial class MainWindow
     {
         if (DeletedGames.Count == 0) return;
         try { RestoreDeleted(DeletedGames[0].RecoveryId); }
-        catch (Exception ex) { Notice(ex.Message); }
+        catch (Exception ex) { Notice(I18n.Error(ex)); }
     }
     internal void ExportBackup(string path)
     {

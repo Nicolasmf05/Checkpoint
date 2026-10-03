@@ -49,7 +49,7 @@ public partial class MainWindow : Window
 
     public MainWindow(string directory, bool demo)
     {
-        Store = new(directory); Games = Store.LoadGames(); Preferences = Store.LoadSettings(); DeletedGames = Store.LoadDeletedGames();
+        Store = new(directory); Preferences = Store.LoadSettings(); I18n.SetLanguage(Preferences.Language); Games = Store.LoadGames(); DeletedGames = Store.LoadDeletedGames();
         Steam = new(directory); Covers = new(directory);
         if (string.IsNullOrEmpty(Preferences.ServiceUrl))
         {
@@ -107,7 +107,7 @@ public partial class MainWindow : Window
             if (Preferences.StartWithWindows)
             {
                 try { Dialogs.RestoreStartupIfMissing(); }
-                catch (Exception ex) { Notice(I18n.T("No se pudo restaurar el inicio con Windows: ") + ex.Message); }
+                catch (Exception ex) { Notice(I18n.T("No se pudo restaurar el inicio con Windows: ") + I18n.Error(ex)); }
             }
             timer.Tick += async (_, _) => { if (Steam.Session is not null && !syncing) await Sync(false); };
             timer.Start();
@@ -519,7 +519,7 @@ public partial class MainWindow : Window
     protected override void OnClosing(CancelEventArgs e)
     {
         if (!exiting && Preferences.CloseToTray) { e.Cancel = true; Hide(); Persist(); return; }
-        try { Persist(); } catch (Exception ex) { MessageBox.Show(I18n.T("No se pudo guardar: ") + ex.Message, "Checkpoint"); e.Cancel = true; return; }
+        try { Persist(); } catch (Exception ex) { LocalizedNotice.Show(I18n.T("No se pudo guardar: ") + I18n.Error(ex), "Checkpoint"); e.Cancel = true; return; }
         base.OnClosing(e);
     }
     protected override void OnClosed(EventArgs e)
@@ -557,7 +557,7 @@ public partial class MainWindow : Window
             }
         }
         catch (OperationCanceledException) { if (!shutdown.IsCancellationRequested) Notice(I18n.T("Vinculación cancelada o agotada. Puedes volver a intentarlo.")); }
-        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or ArgumentException or IOException) { Notice(ex.Message); }
+        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or ArgumentException or IOException) { Notice(I18n.Error(ex)); }
         finally { syncing = false; if (!shutdown.IsCancellationRequested) Refresh(); }
         if (!shutdown.IsCancellationRequested && Steam.Session is not null) await Sync(true);
     }
@@ -588,14 +588,14 @@ public partial class MainWindow : Window
                     var result = await Steam.Achievements(Preferences.ServiceUrl, appId, shutdown.Token);
                     game.Achievements = result.Achievements.ToList(); game.SyncedAt = DateTimeOffset.UtcNow;
                 }
-                catch (InvalidOperationException ex) { errors.Add(game.Title + ": " + ex.Message); }
+                catch (InvalidOperationException ex) { errors.Add(game.Title + ": " + I18n.Error(ex)); }
             }
             Persist();
             if (errors.Count > 0) Notice(errors[0]);
             else if (selected.Count > 0) Notice(I18n.T("Última sincronización: ") + DateTime.Now.ToString("HH:mm") + ".");
         }
         catch (OperationCanceledException) { if (!shutdown.IsCancellationRequested) Notice(I18n.T("Se agotó el tiempo. Se conserva el progreso anterior.")); }
-        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or ArgumentException or IOException) { Notice(ex.Message); }
+        catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or ArgumentException or IOException) { Notice(I18n.Error(ex)); }
         finally { syncing = false; if (!shutdown.IsCancellationRequested) Refresh(); }
     }
 

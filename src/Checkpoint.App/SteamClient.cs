@@ -70,7 +70,7 @@ public sealed class SteamClient : IDisposable
             try
             {
                 using var error = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellation));
-                if (error.RootElement.TryGetProperty("error", out var field) && field.GetString() is { Length: > 0 and < 300 } detail) message = I18n.T(detail);
+                if (error.RootElement.TryGetProperty("error", out var field) && field.GetString() is { Length: > 0 and < 300 } detail) { if (I18n.TryTranslateKnown(detail, out var localized)) message = localized; }
             }
             catch (JsonException) { }
             throw new InvalidOperationException(message);

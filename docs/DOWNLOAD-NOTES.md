@@ -54,3 +54,5 @@ La interfaz virtualiza las listas; las carátulas recicladas liberan sus referen
 No hay un mínimo de RAM/CPU medido en equipos antiguos. No se promete una cifra inventada: el consumo depende del tamaño de la biblioteca, la ventana y las imágenes. Las carátulas y copias pueden aumentar el espacio utilizado; el usuario controla sus datos.
 
 Código, documentación y descargas: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). Guía: [seguridad de Windows](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/WINDOWS-SECURITY.md). [Reputación de SmartScreen según Microsoft](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
+
+**Idioma coherente:** los avisos y sus botones siguen el idioma elegido en Ajustes, incluido Miniatura y las ventanas de edición. Los cuadros propios de Windows siguen el idioma del sistema.

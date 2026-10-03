@@ -54,3 +54,5 @@ Lists are virtualized; recycled cover cards release image references and the dec
 There is no measured minimum RAM/CPU on older hardware. No arbitrary minimum is promised: usage depends on library size, window size and images. Covers and backups can increase disk use; users control their data.
 
 Source, documentation and downloads: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). See [Windows security](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/en/WINDOWS-SECURITY.md) and [Microsoft SmartScreen reputation guidance](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
+
+**Consistent language:** notices and their buttons follow the language selected in Settings, including Miniature and editing windows. Windows system dialogs follow the operating system language.

@@ -51,6 +51,19 @@ public partial class MainWindow
         check(language=="?lang=en","English Steam requests select English achievements");
         I18n.SetLanguage("es");await client.Achievements(endpoint,620,CancellationToken.None);
         check(language=="?lang=es","Spanish Steam requests select Spanish achievements");
+        using (var errorClient = new SteamClient(Path.Combine(output,"steam-error-fixture"), new NativeSteamHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent("{\"error\":\"Unexpected foreign server message\"}") })))
+        {
+            foreach (var selectedLanguage in new[] { "es", "en" })
+            {
+                I18n.SetLanguage(selectedLanguage);
+                bool localized = false;
+                try { await errorClient.BeginLogin(endpoint,CancellationToken.None); }
+                catch (InvalidOperationException error) { localized = error.Message == I18n.T("No se pudo consultar Steam. Se conserva el último progreso guardado."); }
+                check(localized, "unknown Steam errors retain the selected language " + selectedLanguage);
+            }
+            I18n.SetLanguage("es");
+        }
         bool wrongServer=false;try{await client.Library("https://another.example/",CancellationToken.None);}catch(InvalidOperationException){wrongServer=true;}
         check(wrongServer,"Steam session cannot be sent to a different service");
         bool malformed=false;try{client.SaveSession(endpoint,new LoginResult("complete","bad",steamId));}catch(InvalidDataException){malformed=true;}

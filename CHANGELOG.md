@@ -2,6 +2,14 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.15 — 2026-10-03
+
+- App-owned notices use buttons in Checkpoint's language, independently of Windows.
+- External technical errors use translated explanations; known validation messages retain their translations.
+- Translated recovered-task counters, untitled publications, language choices and accessible names.
+- Saved language loads before startup notices and applies to thread culture.
+- Automatic catalog checks and window and error tests in both languages.
+
 ## 0.6.14 — 2026-10-03
 
 - Exit miniature view restores the previous normal layout: list, compact or cover grid. Settings keeps that layout when entering Miniature or saving while it is active.

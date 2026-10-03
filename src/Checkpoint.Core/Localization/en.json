@@ -348,7 +348,7 @@
   "El servicio de Steam todavía no está configurado o no está disponible.": "The Steam service is not configured yet or is unavailable.",
   "Se agotó el tiempo. Se conserva el progreso anterior.": "The request timed out. Previous progress is preserved.",
   "Idioma": "Language",
-  "Español": "Español",
+  "Español": "Spanish",
   "English": "English",
   "La copia contiene una referencia de carátula no válida.": "The backup contains an invalid cover reference.",
   "Recuperar el último juego eliminado · Ctrl+Z": "Restore last deleted game · Ctrl+Z",
@@ -384,5 +384,14 @@
   "Miniatura": "Miniature",
   "Salir de miniatura": "Exit miniature view",
   "Tamaño de texto en Miniatura": "Miniature text size",
-  "Amplía Miniatura si los nombres se recortan. El texto de las otras vistas no cambia.": "Widen Miniature if names are cut off. Text in other views stays unchanged."
+  "Amplía Miniatura si los nombres se recortan. El texto de las otras vistas no cambia.": "Widen Miniature if names are cut off. Text in other views stays unchanged.",
+  " tareas · ": " tasks · ",
+  "Publicación de otro PC": "Publication from another PC",
+  "Inglés": "English",
+  "La operación se canceló o agotó el tiempo de espera. Vuelve a intentarlo.": "The operation was canceled or timed out. Try again.",
+  "No tienes permiso para acceder a este archivo o carpeta.": "You do not have permission to access this file or folder.",
+  "No se pudo leer o guardar el archivo. Comprueba que esté disponible y vuelve a intentarlo.": "The file could not be read or saved. Check that it is available and try again.",
+  "Los datos recibidos no tienen un formato válido.": "The received data is not in a valid format.",
+  "No se pudo completar la operación. Vuelve a intentarlo.": "The operation could not be completed. Try again.",
+  "Entendido": "OK"
 }

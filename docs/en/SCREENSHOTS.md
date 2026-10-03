@@ -78,3 +78,7 @@ PageUp/PageDown adapt the jump to Miniature height. Native capture uses Spanish 
 Miniature with text size 18 and adapted rows. This native capture uses Spanish.
 
 ![Miniature with larger text, Spanish capture](../screenshots/widget-miniature-large-text.png)
+
+## Notices in English
+
+![Notice with English text and button](../screenshots/dialog-notice-en.png)

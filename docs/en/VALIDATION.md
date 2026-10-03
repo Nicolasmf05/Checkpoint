@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.15 — consistent language
+
+316 checks passed: 118 core, 15 Node, 14 Edge and 169 WPF. Coverage checks literal messages and XAML resources, unknown system and Steam errors, thread culture, notices and language choices in actual Spanish and English windows. Windows system dialogs follow the operating system language. Tests use isolated data; real accounts, installation, physical keyboard and screen readers remain pending.
+
 ## 0.6.14 — restore the normal layout
 
 300 checks passed: 108 core, 15 Node, 14 Edge and 163 native WPF. Six new checks exercise list, compact and grid through real Settings, entering Miniature, another save, SQLite settings reload and background/game exit menus. Persisted flags and restored templates are checked. Existing tests retain F6 cycling, Search, dimensions and text. Installed packages, physical keyboard and real accounts remain pending.

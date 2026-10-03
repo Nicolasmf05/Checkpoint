@@ -85,4 +85,26 @@ using (var database = new SqliteConnection("Data Source=" + Path.Combine(root, "
 BackupChecks.Run(root, Check, Reject);
 await SocialChecks.Run(root, Check, Reject);
 Reject(() => { using var unsupported = new SqliteStore(root); }, "future database version preserved");
+foreach (var language in new[] { "es", "en" })
+{
+    I18n.SetLanguage(language);
+    Check(I18n.Error(new IOException("An English operating system error")) == I18n.T("No se pudo leer o guardar el archivo. Comprueba que esté disponible y vuelve a intentarlo."), "system errors follow " + language);
+    Check(I18n.Error(new InvalidOperationException("Un error externo desconocido")) == I18n.T("No se pudo completar la operación. Vuelve a intentarlo."), "unknown errors follow " + language);
+    Check(I18n.TryTranslateKnown("El usuario o la contraseña no son correctos.", out var known) && known == I18n.T("El usuario o la contraseña no son correctos."), "known validation follows " + language);
+    Check(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == language, "thread culture follows " + language);
+}
+I18n.SetLanguage("en");
+var sources = Directory.GetFiles("src/Checkpoint.App", "*.cs").Concat(Directory.GetFiles("src/Checkpoint.Core", "*.cs")).Where(p => !p.Contains("Tests"));
+int translatedLiterals = 0;
+foreach (var source in sources)
+    foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(File.ReadAllText(source), "I18n\\.T\\(\"((?:[^\"\\\\]|\\\\.)*)\"\\)"))
+    {
+        var key = JsonSerializer.Deserialize<string>("\"" + match.Groups[1].Value + "\"")!;
+        translatedLiterals++;
+        if (!I18n.TryTranslateKnown(key, out _)) throw new Exception("Missing English translation: " + key);
+    }
+var resourceKeys = JsonSerializer.Deserialize<Dictionary<string,string>>(File.ReadAllText("src/Checkpoint.App/LocalizationKeys.json"))!;
+Check(resourceKeys.Values.All(key => I18n.TryTranslateKnown(key, out _)), "all XAML strings have English translations");
+Check(translatedLiterals > 250, "all literal app and core messages have English translations");
+I18n.SetLanguage("es");
 Console.WriteLine($"{passed} checks passed. Test files: {root}");

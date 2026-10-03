@@ -49,7 +49,7 @@ internal sealed class FriendsPanel : ScrollViewer
         Busy = true;
         try { await action(); }
         catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or InvalidOperationException or IOException or ArgumentException or OperationCanceledException or System.Security.Cryptography.CryptographicException)
-        { message = ex is System.Net.Http.HttpRequestException ? I18n.T("Sin conexión. Puedes seguir usando tu biblioteca local.") : ex is System.Security.Cryptography.CryptographicException ? I18n.T("Windows no pudo guardar la sesión de forma segura. Vuelve a abrir Checkpoint con tu usuario habitual.") : ex.Message; }
+        { message = ex is System.Net.Http.HttpRequestException ? I18n.T("Sin conexión. Puedes seguir usando tu biblioteca local.") : ex is System.Security.Cryptography.CryptographicException ? I18n.T("Windows no pudo guardar la sesión de forma segura. Vuelve a abrir Checkpoint con tu usuario habitual.") : I18n.Error(ex); }
         finally { Busy = false; Render(); owner.Refresh(); }
     }
     public async Task Reload()
@@ -225,7 +225,7 @@ internal sealed class FriendsPanel : ScrollViewer
                 System.Windows.Automation.AutomationProperties.SetName(check,I18n.T("Compartir ") + game.Title);
                 check.Click += (_, _) => {
                     try { owner.SetShared(game,check.IsChecked == true); message = I18n.T("Cambio guardado. Se publicará cuando haya conexión."); }
-                    catch (Exception ex) when (ex is IOException or ArgumentException or InvalidOperationException) { check.IsChecked = entry?.Selected == true; message = ex.Message; }
+                    catch (Exception ex) when (ex is IOException or ArgumentException or InvalidOperationException) { check.IsChecked = entry?.Selected == true; message = I18n.Error(ex); }
                     owner.Notice(message);
                 };
                 row.Children.Add(check);
@@ -241,7 +241,7 @@ internal sealed class FriendsPanel : ScrollViewer
         search.TextChanged += (_, _) => Fill(); Fill();
         foreach (var remote in ownPublications.Where(p => p.IsShared && owner.Outbox?.Games.GetValueOrDefault(p.GameId)?.Selected != true))
         {
-            var card = Card(remote.Payload?.Title ?? "Publicación de otro PC",I18n.T("Publicado en tu cuenta; puedes retirarlo desde aquí."));
+            var card = Card(remote.Payload?.Title ?? I18n.T("Publicación de otro PC"),I18n.T("Publicado en tu cuenta; puedes retirarlo desde aquí."));
             card.Children.Add(Action(I18n.T("Retirar publicación de ") + (remote.Payload?.Title ?? remote.GameId.ToString()),async () => {
                 if (owner.SocialSyncing) throw new InvalidOperationException(I18n.T("Espera a que termine la publicación en curso."));
                 owner.Outbox!.Reconcile(remote.GameId,remote); owner.Outbox.SetDesired(remote.GameId,null);

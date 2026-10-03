@@ -267,7 +267,7 @@ public partial class MainWindow
             Check(!Preferences.LightweightMode && visibleCards.All(c => c.CoverVisibility == Visibility.Visible) && Store.LoadGames().Count == 3, "disabling lightweight mode restores cover layout without changing games");
             RunModal(() => Dialogs.Settings(this), window =>
             {
-                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Language / Idioma").SelectedIndex = 1;
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == I18n.T("Idioma")).SelectedIndex = 1;
                 Click(window,"Guardar");
             });
             Check(Preferences.Language == "en" && Store.LoadSettings().Language == "en" && (string?)LibraryButton.Content == "Library" && Summary.Text.Contains("in your list"), "settings save English and update the interface immediately");
@@ -283,10 +283,26 @@ public partial class MainWindow
                 Check(Texts(window).Contains("Language") && Texts(window).Contains("Background opacity"), "English settings translate labels");
                 Check(Controls<CheckBox>(window).Any(c => (string?)c.Content == "Lightweight mode (no covers)"), "English lightweight setting is localized");
                 Render(window,"dialog-settings-en.png");
-                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Language / Idioma").SelectedIndex = 0;
+                Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == I18n.T("Idioma")).SelectedIndex = 0;
                 Click(window,"Save");
             });
             Check(Preferences.Language == "es" && (string?)FriendsButton.Content == "Amigos", "switching back to Spanish restores the interface");
+            foreach (var languageCode in new[] { "es", "en" })
+            {
+                Preferences.Language = languageCode; ApplyLanguage();
+                RunModal(() => LocalizedNotice.Show(this, I18n.Error(new IOException("Foreign operating system message")), "Checkpoint"), window =>
+                {
+                    Check(Texts(window).Contains(I18n.T("No se pudo leer o guardar el archivo. Comprueba que esté disponible y vuelve a intentarlo.")) && Controls<Button>(window).Any(b => (string?)b.Content == I18n.T("Entendido")), "notice text and button follow " + languageCode);
+                    Render(window, "dialog-notice-" + languageCode + ".png"); Click(window, I18n.T("Entendido"));
+                });
+                RunModal(() => Dialogs.Settings(this), window =>
+                {
+                    var choices = Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == I18n.T("Idioma"));
+                    Check(choices.Items.Cast<string>().SequenceEqual(new[] { I18n.T("Español"), I18n.T("Inglés") }), "language selector labels follow " + languageCode);
+                    Click(window, I18n.T("Cancelar"));
+                });
+            }
+            Preferences.Language = "es"; ApplyLanguage();
             double normalWidth = Width, normalHeight = Height;
             RunModal(() => Dialogs.Settings(this), window =>
             {

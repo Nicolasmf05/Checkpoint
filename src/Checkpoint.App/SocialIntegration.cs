@@ -40,7 +40,7 @@ public partial class MainWindow
                 AttachSocial(new(project,session:session));
             }
         }
-        catch (Exception ex) when (ex is IOException or JsonException or ArgumentException) { socialStartupError = I18n.T("Amigos: ") + ex.Message; }
+        catch (Exception ex) when (ex is IOException or JsonException or ArgumentException) { socialStartupError = I18n.T("Amigos: ") + I18n.Error(ex); }
         FriendsView = new(this); FriendsHost.Child = FriendsView;
         publicationTimer.Tick += async (_, _) => { publicationTimer.Stop(); await PublishSocial(); };
         socialTimer.Tick += async (_, _) => { await PublishSocial(); if (ShouldRefreshFriends && !FriendsView.Busy) await FriendsView.Reload(); };
@@ -108,7 +108,7 @@ public partial class MainWindow
             }
             SaveOutbox(); publicationTimer.Stop(); publicationTimer.Start();
         }
-        catch (Exception ex) when (ex is IOException or ArgumentException) { Notice(I18n.T("Publicación pendiente: ") + ex.Message); }
+        catch (Exception ex) when (ex is IOException or ArgumentException) { Notice(I18n.T("Publicación pendiente: ") + I18n.Error(ex)); }
     }
     internal async Task PublishSocial()
     {
@@ -148,7 +148,7 @@ public partial class MainWindow
             }
         }
         catch (Exception ex) when (ex is System.Net.Http.HttpRequestException or IOException or InvalidOperationException or OperationCanceledException)
-        { if (!shutdown.IsCancellationRequested) Notice("Checkpoint: " + ex.Message); }
+        { if (!shutdown.IsCancellationRequested) Notice("Checkpoint: " + I18n.Error(ex)); }
         finally { socialSyncing = false; }
     }
     internal bool SocialSyncing => socialSyncing;

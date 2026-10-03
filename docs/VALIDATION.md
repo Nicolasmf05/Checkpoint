@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.15 — idioma coherente
+
+Han pasado 316 comprobaciones: 118 de biblioteca, 15 Node, 14 Edge y 169 WPF. Se comprueban el catálogo literal y los recursos XAML, errores desconocidos del sistema y de Steam, cultura de hilos, avisos y opciones de idioma en ventanas reales para español e inglés. Los cuadros propios de Windows siguen el idioma del sistema. Las pruebas usan datos aislados; cuentas reales, instalación, teclado físico y lectores de pantalla siguen pendientes.
+
 ## 0.6.14 — restaurar la vista normal
 
 Han pasado 300 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 163 WPF. Seis nuevas recorren lista, compacta y cuadrícula con Ajustes reales, entrada en Miniatura, nuevo guardado, recarga de preferencias SQLite y salida mediante menús de fondo/juego. Se verifican flags persistidos y plantillas de interfaz restauradas. Las pruebas existentes mantienen el ciclo F6, Buscar, tamaños y texto. Instalación, teclado físico y cuentas reales siguen pendientes.

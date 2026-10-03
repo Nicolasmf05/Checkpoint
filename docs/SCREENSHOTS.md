@@ -74,3 +74,7 @@ Re Pág/Av Pág adaptan el salto a la altura de Miniatura. Datos de prueba de un
 Miniatura con tamaño de texto 18 y filas adaptadas.
 
 ![Miniatura con texto ampliado](screenshots/widget-miniature-large-text.png)
+
+## Avisos en español
+
+![Aviso con texto y botón en español](screenshots/dialog-notice-es.png)

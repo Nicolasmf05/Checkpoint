@@ -105,7 +105,7 @@ internal static class Dialogs
             if (picker.ShowDialog(window) == true)
             {
                 try { game.CustomCover = owner.Covers.Import(picker.FileName); coverNotice.Text = I18n.T("Carátula personalizada preparada."); }
-                catch (Exception ex) { MessageBox.Show(window, I18n.T("No se pudo leer la imagen: ") + ex.Message, "Checkpoint"); }
+                catch (Exception ex) { LocalizedNotice.Show(window, I18n.T("No se pudo leer la imagen: ") + I18n.Error(ex), "Checkpoint"); }
             }
         }));
         imageButtons.Children.Add(Button(I18n.T("Automática"), (_, _) => { game.CustomCover = null; coverNotice.Text = I18n.T("Se usará la carátula de Steam, si está disponible."); }));
@@ -124,7 +124,7 @@ internal static class Dialogs
             body.Children.Add(Button(I18n.T("Eliminar juego"), (_, _) =>
             {
                 try { owner.DeleteGame(original!); window.Close(); }
-                catch (Exception ex) { MessageBox.Show(window, ex.Message, I18n.T("No se pudo eliminar el juego")); }
+                catch (Exception ex) { LocalizedNotice.Show(window, I18n.Error(ex), I18n.T("No se pudo eliminar el juego")); }
             }));
         }
         footer.Children.Add(Button(I18n.T("Cancelar"), (_, _) => window.Close()));
@@ -154,7 +154,7 @@ internal static class Dialogs
                 if (creating) owner.Games.Add(game); else owner.Games[owner.Games.IndexOf(original!)] = game;
                 owner.Persist(); owner.Refresh(); window.DialogResult = true;
             }
-            catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException) { MessageBox.Show(window, ex.Message, I18n.T("Revisa el juego")); }
+            catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException) { LocalizedNotice.Show(window, I18n.Error(ex), I18n.T("Revisa el juego")); }
         }, true));
         window.Loaded += (_, _) => title.Focus(); window.ShowDialog();
     }
@@ -175,11 +175,11 @@ internal static class Dialogs
                 var details = new StackPanel { Margin = new Thickness(0, 0, 12, 0) };
                 details.Children.Add(new TextBlock { Text = deleted.Game.Title, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
                 details.Children.Add(new TextBlock { Text = deleted.Game.StatusText + " · " + deleted.DeletedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm"), FontSize = 11, Foreground = (Brush)Application.Current.Resources["MutedBrush"], Margin = new Thickness(0, 5, 0, 0) });
-                details.Children.Add(new TextBlock { Text = deleted.Game.Tasks.Count + " tareas · " + (string.IsNullOrWhiteSpace(deleted.Game.Notes) ? I18n.T("Sin notas") : I18n.T("Notas guardadas")), FontSize = 11, Margin = new Thickness(0, 4, 0, 0) }); row.Children.Add(details);
+                details.Children.Add(new TextBlock { Text = deleted.Game.Tasks.Count + I18n.T(" tareas · ") + (string.IsNullOrWhiteSpace(deleted.Game.Notes) ? I18n.T("Sin notas") : I18n.T("Notas guardadas")), FontSize = 11, Margin = new Thickness(0, 4, 0, 0) }); row.Children.Add(details);
                 var restore = Button(I18n.T("Recuperar"), (_, _) =>
                 {
                     try { var game = owner.RestoreDeleted(deleted.RecoveryId); notice.Text = "«" + game.Title + I18n.T("» recuperado."); Render(); }
-                    catch (Exception ex) { notice.Text = ex.Message; }
+                    catch (Exception ex) { notice.Text = I18n.Error(ex); }
                 }, true);
                 System.Windows.Automation.AutomationProperties.SetName(restore, I18n.T("Recuperar ") + deleted.Game.Title);
                 restore.Tag = deleted.RecoveryId; restore.VerticalAlignment = VerticalAlignment.Center; Grid.SetColumn(restore, 1); row.Children.Add(restore); rows.Children.Add(row);
@@ -220,8 +220,8 @@ internal static class Dialogs
         Label(body, I18n.T("Opacidad del fondo")); var opacity = new Slider { Minimum = .35, Maximum = 1, Value = prefs.BackgroundOpacity, TickFrequency = .05, IsSnapToTickEnabled = true }; body.Children.Add(opacity);
         var opacityText = new TextBlock { FontSize = 11, Margin = new Thickness(0, 6, 0, 8) }; body.Children.Add(opacityText);
         Label(body, I18n.T("Idioma"));
-        var language = new ComboBox { ItemsSource = new[] { "Español", "English" }, SelectedIndex = prefs.Language == "en" ? 1 : 0 };
-        System.Windows.Automation.AutomationProperties.SetName(language, "Language / Idioma"); body.Children.Add(language);
+        var language = new ComboBox { ItemsSource = new[] { I18n.T("Español"), I18n.T("Inglés") }, SelectedIndex = prefs.Language == "en" ? 1 : 0 };
+        System.Windows.Automation.AutomationProperties.SetName(language, I18n.T("Idioma")); body.Children.Add(language);
         double previousOpacity = prefs.BackgroundOpacity;
         opacity.ValueChanged += (_, _) => { prefs.BackgroundOpacity = opacity.Value; opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles"); owner.ApplyPreferences(); };
         opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles");
@@ -247,10 +247,10 @@ internal static class Dialogs
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(endpoint.Text)) { expander.IsExpanded = true; MessageBox.Show(window, I18n.T("Esta edición todavía no tiene configurado el servicio de Steam. Introduce su dirección en Conexión avanzada o usa la biblioteca local."), "Steam"); return; }
+                if (string.IsNullOrWhiteSpace(endpoint.Text)) { expander.IsExpanded = true; LocalizedNotice.Show(window, I18n.T("Esta edición todavía no tiene configurado el servicio de Steam. Introduce su dirección en Conexión avanzada o usa la biblioteca local."), "Steam"); return; }
                 prefs.ServiceUrl = SteamClient.ValidateServiceUrl(endpoint.Text).AbsoluteUri; owner.Persist(); window.Close(); await owner.ConnectSteam();
             }
-            catch (ArgumentException ex) { MessageBox.Show(window, ex.Message, "Steam"); }
+            catch (ArgumentException ex) { LocalizedNotice.Show(window, I18n.Error(ex), "Steam"); }
         }, true));
         steamActions.Children.Add(Button(I18n.T("Desvincular"), async (_, _) => { await owner.Steam.Disconnect(); prefs.SteamId = null; steamSummary.Text = I18n.T("Cuenta desvinculada. Se conserva tu biblioteca local."); owner.Persist(); owner.Refresh(); }));
         Label(body, I18n.T("Copias de seguridad")); body.Children.Add(new TextBlock { Text = I18n.T("La copia completa incluye tu colección actual, notas, tareas, último progreso y carátulas personalizadas. No incluye la sesión de Steam. También puedes usar el formato JSON anterior, sin imágenes."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
@@ -261,7 +261,7 @@ internal static class Dialogs
             var picker = new SaveFileDialog { Filter = I18n.T("Copia completa de Checkpoint|*.checkpoint|JSON compatible (sin imágenes)|*.json"), DefaultExt = ".checkpoint", FileName = "checkpoint-" + DateTime.Now.ToString("yyyy-MM-dd") };
             if (picker.ShowDialog(window) == true)
                 try { owner.ExportBackup(picker.FileName); backupNotice.Text = I18n.T("Copia exportada: ") + Path.GetFileName(picker.FileName); }
-                catch (Exception ex) { backupNotice.Text = I18n.T("No se pudo exportar: ") + ex.Message; }
+                catch (Exception ex) { backupNotice.Text = I18n.T("No se pudo exportar: ") + I18n.Error(ex); }
         }));
         backups.Children.Add(Button(I18n.T("Importar"), (_, _) =>
         {
@@ -270,7 +270,7 @@ internal static class Dialogs
             {
                 var result = owner.ImportBackup(picker.FileName); backupNotice.Text = (I18n.IsEnglish ? $"{result.Added} games imported · {result.Skipped} already in your library." : $"{result.Added} juegos importados · {result.Skipped} ya estaban en tu biblioteca.");
             }
-            catch (Exception ex) { backupNotice.Text = I18n.T("No se pudo importar: ") + ex.Message; }
+            catch (Exception ex) { backupNotice.Text = I18n.T("No se pudo importar: ") + I18n.Error(ex); }
         }));
         Label(body, I18n.T("Juegos eliminados")); body.Children.Add(new TextBlock { Text = I18n.T("Los últimos 20 pueden recuperarse con sus datos completos. Los juegos existentes en tu biblioteca se conservan."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         body.Children.Add(Button(I18n.T("Ver juegos eliminados"), (_, _) => DeletedGames(owner)));
@@ -293,7 +293,7 @@ internal static class Dialogs
                 prefs.MiniatureTextSize = (int)miniatureText.SelectedItem;
                 owner.ApplyPreferences(); owner.Persist(); saved = true; window.Close(); owner.ApplyLanguage();
             }
-            catch (Exception ex) { MessageBox.Show(window, ex.Message, I18n.T("No se pudieron guardar los ajustes")); }
+            catch (Exception ex) { LocalizedNotice.Show(window, I18n.Error(ex), I18n.T("No se pudieron guardar los ajustes")); }
         }, true));
         window.Closed += (_, _) => { if (!saved) { prefs.BackgroundOpacity = previousOpacity; owner.ApplyPreferences(); } }; window.ShowDialog();
     }

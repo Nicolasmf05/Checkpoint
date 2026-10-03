@@ -2,6 +2,14 @@
 
 # Historial de cambios
 
+## 0.6.15 — 2026-10-03
+
+- Avisos propios con botones en el idioma de Checkpoint, independientes del idioma de Windows.
+- Errores externos con explicaciones traducidas; los mensajes de validación conocidos conservan su traducción.
+- Traducidos contadores de tareas recuperadas, publicaciones sin título, opciones del idioma y nombres accesibles.
+- Idioma guardado disponible antes de los avisos de inicio y aplicado a la cultura de los hilos.
+- Comprobación automática de traducciones y pruebas de ventanas y errores en ambos idiomas.
+
 ## 0.6.14 — 2026-10-03
 
 - Salir de miniatura recupera la vista normal anterior: lista, compacta o cuadrícula. Ajustes conserva esa vista al entrar en Miniatura o guardar mientras está activa.
