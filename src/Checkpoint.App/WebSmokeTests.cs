@@ -118,7 +118,7 @@ public partial class MainWindow
             await Wait(async()=>{updateDialog=Application.Current.Windows.OfType<Window>().FirstOrDefault(w=>w.Title=="Updates · Checkpoint")?.Tag as WebSurface;return updateDialog?.Browser.CoreWebView2 is not null&&await Script(updateDialog,"window.checkpointState?.kind==='dialog'");});
             Check(await Script(updateDialog!,"document.body.innerText.includes('Installed version:') && document.body.innerText.includes('once a day') && [...document.querySelectorAll('button')].some(b=>b.textContent==='Download and install' && b.disabled) && !document.body.innerText.includes('Descargar e instalar')"),"CSS update dialog renders English daily checking, installed version and disabled installation without a release");
             await Capture(updateDialog!,"css-updates-en.png");await updateDialog!.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");
-            Check(await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').options.length===8 && document.body.innerText.includes('Instant preview') && [...document.querySelector('select[aria-label=\"Theme\"]').options].some(option=>option.textContent==='High contrast')"),"settings offer eight localized themes with preview instructions");
+            Check(await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').options.length===22 && document.body.innerText.includes('Instant preview') && [...document.querySelector('select[aria-label=\"Theme\"]').options].some(option=>option.textContent==='High contrast')"),"settings offer 22 localized themes with preview instructions");
             string initialTheme=Themes.Id(Preferences);
             var paletteColors=new HashSet<string>();
             for(int index=0;index<Themes.Ids.Count;index++)
@@ -127,10 +127,10 @@ public partial class MainWindow
                 await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("(() => {const theme=document.querySelector('select[aria-label=\"Theme\"]');theme.value="+index+";theme.dispatchEvent(new Event('change',{bubbles:true}));})()");
                 await Wait(async ()=> await Script(web,"document.documentElement.dataset.theme==='"+id+"'") && await Script(themeSettings,"document.documentElement.dataset.theme==='"+id+"'"));
                 Check(Themes.Id(Preferences)==id && await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').value==='"+index+"'"),"theme previews immediately in both main and settings windows: "+id);
-                paletteColors.Add((await web.Browser.CoreWebView2.ExecuteScriptAsync("getComputedStyle(document.querySelector('.window')).backgroundColor")));
+                paletteColors.Add((await web.Browser.CoreWebView2.ExecuteScriptAsync("getComputedStyle(document.querySelector('.window')).backgroundColor+'|'+getComputedStyle(document.documentElement).getPropertyValue('--accent')")));
                 await Capture(web,"css-theme-"+id+"-en.png");
             }
-            Check(paletteColors.Count==8,"all eight theme palettes have distinct rendered backgrounds");
+            Check(paletteColors.Count==22,"all 22 themes have distinct rendered palettes");
             await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Cancel').click();");
             await Wait(()=>Script(web,"document.documentElement.dataset.theme==='"+initialTheme+"'"));
             Check(Themes.Id(Preferences)==initialTheme && Themes.Id(Store.LoadSettings())==initialTheme,"canceling preview restores and persists the previous theme");

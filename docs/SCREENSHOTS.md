@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## 0.8.6 — 22 temas
+
+Catorce paletas nuevas, claras y oscuras, con [todas las vistas previas y colores](THEMES.md).
+
+![Checkpoint](screenshots/css-theme-cyber-purple-en.png)
+
 ## 0.8.5 — ficha completa del juego
 
 Al pulsar un juego se abren su estado, objetivo, logros, notas y tareas, con acciones para editar y ver logros. Miniatura abre la misma ficha completa. Datos aislados de prueba.

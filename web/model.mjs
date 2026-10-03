@@ -1,6 +1,6 @@
 export const statuses=['Pending','Playing','Paused','Finished','Abandoned'];
 export const goals=['Story','Achievements','Custom'];
-export const themes=['dark','light','midnight','ocean','forest','plum','amber','contrast'];
+export const themes=['dark','light','midnight','ocean','forest','plum','amber','contrast','cyber-purple','electric-blue','neon-lime','black-red','black-orange','synthwave','blue-white','purple-dark','emerald-neutral','black-white','navy-cyan','coral-cream','orange-charcoal','indigo-gray'];
 const text=(v,n)=>typeof v==='string'?v.slice(0,n):'';
 const integer=(v,max)=>Number.isInteger(Number(v))&&Number(v)>=0&&Number(v)<=max?Number(v):0;
 const enumeration=(value,values)=>typeof value==='number'&&values[value]?value:Math.max(0,values.findIndex(x=>x.toLowerCase()===String(value).toLowerCase()));

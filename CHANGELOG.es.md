@@ -2,10 +2,11 @@
 
 # Historial de cambios
 
-## Sin publicar — atribución al creador
+## 0.8.6 — 2026-10-04
 
-- El código actual pasa a Checkpoint Attribution License 1.0: exige un crédito accesible a Nicolasmf05 como creador original y un enlace al proyecto en las redistribuciones y versiones derivadas alojadas públicamente.
-- Archivos de atribución incluidos en futuros paquetes de Windows y en la web. Las publicaciones originales de v0.8.5 y anteriores conservan MIT.
+- Catorce paletas nuevas para un total de 22 temas: Púrpura cibernético, Azul eléctrico, Lima neón, Negro y rojo, Negro y naranja, Onda sintética, Azul y blanco, Púrpura oscuro, Esmeralda y neutro, Negro y blanco, Marino y cian, Coral y crema, Naranja y carbón e Índigo y gris suave.
+- Nombres en español e inglés, vista previa inmediata, persistencia y tratamiento claro/oscuro en Windows y navegador. Tonos de texto derivados para conservar los principales solicitados y su legibilidad.
+- Los paquetes nuevos incluyen Checkpoint Attribution License 1.0 y los documentos de crédito al creador. Las publicaciones originales de v0.8.5 y anteriores conservan MIT.
 
 ## 0.8.5 — 2026-10-04
 

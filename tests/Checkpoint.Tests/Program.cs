@@ -163,7 +163,7 @@ using (var themes = new SqliteStore(Path.Combine(root,"themes")))
     }
 }
 I18n.SetLanguage("en");
-Check(Themes.Ids.Select(Themes.Name).Distinct().Count()==8 && Themes.Name("ocean")=="Ocean" && Themes.Name("contrast")=="High contrast", "theme labels are distinct and localized in English");
+Check(Themes.Ids.Select(Themes.Name).Distinct().Count()==22 && Themes.Name("ocean")=="Ocean" && Themes.Name("contrast")=="High contrast", "theme labels are distinct and localized in English");
 I18n.SetLanguage("es");
 Check(Themes.Name("ocean")=="Océano" && Themes.Name("forest")=="Bosque", "theme labels are localized in Spanish");
 using(var listsStore=new SqliteStore(Path.Combine(root,"recovered-lists")))

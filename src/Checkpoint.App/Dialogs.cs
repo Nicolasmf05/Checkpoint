@@ -236,7 +236,7 @@ internal static partial class Dialogs
         var theme = new ComboBox { ItemsSource = Themes.Ids.Select(Themes.Name).ToArray(), SelectedIndex = Array.IndexOf(Themes.Ids.ToArray(), Themes.Id(prefs)) };
         System.Windows.Automation.AutomationProperties.SetName(theme, I18n.T("Tema")); body.Children.Add(theme);
         body.Children.Add(new TextBlock { Text = I18n.T("Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
-        theme.SelectionChanged += (_, _) => { if (theme.SelectedIndex < 0 || theme.SelectedIndex >= Themes.Ids.Count) return; prefs.Theme = Themes.Ids[theme.SelectedIndex]; prefs.LightTheme = prefs.Theme == "light"; owner.ApplyPreferences(); owner.Refresh(); };
+        theme.SelectionChanged += (_, _) => { if (theme.SelectedIndex < 0 || theme.SelectedIndex >= Themes.Ids.Count) return; prefs.Theme = Themes.Ids[theme.SelectedIndex]; prefs.LightTheme = Themes.IsLight(prefs); owner.ApplyPreferences(); owner.Refresh(); };
         double previousOpacity = prefs.BackgroundOpacity;
         opacity.ValueChanged += (_, _) => { prefs.BackgroundOpacity = opacity.Value; opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles"); owner.ApplyPreferences(); };
         opacityText.Text = (int)(opacity.Value * 100) + I18n.T("% · textos y carátulas permanecen legibles");
@@ -311,7 +311,7 @@ internal static partial class Dialogs
                 prefs.FullWindow = windowMode.SelectedIndex == 0;
                 prefs.MiniatureView = windowMode.SelectedIndex != initialMode ? windowMode.SelectedIndex == 2 : view.SelectedIndex == 3;
                 if (!prefs.MiniatureView && view.SelectedIndex != 3) { prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; }
-                prefs.Theme = Themes.Ids[Math.Clamp(theme.SelectedIndex, 0, Themes.Ids.Count - 1)]; prefs.LightTheme = prefs.Theme == "light"; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
+                prefs.Theme = Themes.Ids[Math.Clamp(theme.SelectedIndex, 0, Themes.Ids.Count - 1)]; prefs.LightTheme = Themes.IsLight(prefs); prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
                 prefs.LightweightMode = lightweight.IsChecked == true; prefs.DetectGames = detectGames.IsChecked == true;

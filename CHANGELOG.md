@@ -2,10 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
-## Unreleased — creator attribution
+## 0.8.6 — 2026-10-04
 
-- Current source now uses Checkpoint Attribution License 1.0, requiring accessible attribution to Nicolasmf05 as the original creator and an original-project link in redistributions and publicly hosted derivatives.
-- Attribution files included in future Windows packages and the web deployment. Original v0.8.5 and earlier releases retain their MIT terms.
+- Fourteen new palettes, bringing the total to 22 themes: Cyber Purple, Electric Blue, Neon Lime, Black + Red, Black + Orange, Synthwave, Blue + White, Purple + Dark, Emerald + Neutral, Black + White + Accent, Navy + Cyan, Coral/Pink + Cream, Orange + Charcoal and Indigo + Soft Gray.
+- Complete Spanish/English theme names, instant previews, persistence and light/dark handling in Windows and the browser. Readable derived text tones retain the requested primary colors.
+- New packages include Checkpoint Attribution License 1.0 and creator-credit documents. Original v0.8.5 and earlier releases retain MIT.
 
 ## 0.8.5 — 2026-10-04
 
