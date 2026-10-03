@@ -134,8 +134,7 @@ public sealed class SocialApi : IDisposable
         "rest/v1/cp_friend_requests?select=id,sender_id,recipient_id,status&status=eq.pending&limit=100",null,true,ct);
     public Task<SocialProfile[]> Find(string code, CancellationToken ct = default)
     {
-        if (!System.Text.RegularExpressions.Regex.IsMatch(code.Trim(), "^cp-[a-fA-F0-9]{12}$")) throw new ArgumentException(I18n.T("El código tiene el formato cp- seguido de 12 caracteres."));
-        return Send<SocialProfile[]>(HttpMethod.Post,"rest/v1/rpc/cp_find_friend",new { p_code = code.Trim().ToLowerInvariant() },true,ct);
+        return Send<SocialProfile[]>(HttpMethod.Post,"rest/v1/rpc/cp_find_friend",new { p_code = FriendCodes.ForService(code) },true,ct);
     }
     public Task<bool> Invite(Guid recipient, CancellationToken ct = default) => Send<bool>(HttpMethod.Post,"rest/v1/cp_friend_requests",
         new { sender_id = Session?.UserId ?? throw new SocialApiException(I18n.T("Entra en Checkpoint.")), recipient_id = recipient },true,ct);

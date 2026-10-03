@@ -56,3 +56,5 @@ No hay un mínimo de RAM/CPU medido en equipos antiguos. No se promete una cifra
 Código, documentación y descargas: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). Guía: [seguridad de Windows](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/WINDOWS-SECURITY.md). [Reputación de SmartScreen según Microsoft](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
 
 **Idioma coherente:** los avisos y sus botones siguen el idioma elegido en Ajustes, incluido Miniatura y las ventanas de edición. Los cuadros propios de Windows siguen el idioma del sistema.
+
+**Código de amigo completo:** Amigos → Cuenta muestra y copia `checkpoint-` seguido de 12 caracteres. Introduce este formato en Checkpoint 0.6.16 o posterior; los códigos anteriores siguen funcionando.

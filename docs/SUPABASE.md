@@ -16,7 +16,7 @@ El servidor de Oracle se ha desactivado: las unidades de Checkpoint están deten
 
 ## Qué crea la migración
 
-- Perfiles vinculados a Supabase Auth, independientes de Steam, con código de amigo `cp-…`.
+- Perfiles vinculados a Supabase Auth, independientes de Steam, con código de amigo `checkpoint-…`.
 - Solicitudes que debe aceptar el destinatario, amistades y bloqueos.
 - Publicaciones de juegos elegidas por su propietario, con estado, objetivo y contadores de progreso. Las notas y los títulos de las tareas se rechazan.
 - Permisos por fila: acceso propio y juegos compartidos de amigos aceptados. Una solicitud pendiente no permite leer juegos.

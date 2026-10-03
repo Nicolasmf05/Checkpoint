@@ -55,6 +55,18 @@ internal static class SocialChecks
         check(!await api.Register("test_user","PASSWORD-FIXTURE","Test"),"unexpected confirmation settings are detected");
         await api.Login("test_user","PASSWORD-FIXTURE");
         check(api.Session!.UserId == user && calls.Last().Token is null,"login does not attach a previous account token");
+        check(FriendCodes.Display("cp-ABCDEF012345") == "checkpoint-abcdef012345", "historical friend codes display the complete Checkpoint name");
+        check(FriendCodes.Display(" CHECKPOINT-ABCDEF012345 ") == "checkpoint-abcdef012345", "complete friend codes normalize case and surrounding spaces");
+        reject(() => FriendCodes.Display("checkpoint-abcdef01234"), "short friend codes are rejected");
+        reject(() => FriendCodes.Display("checkpoint-abcdef0123456"), "long friend codes are rejected");
+        reject(() => FriendCodes.Display("checkpoint-abcdef01234z"), "nonhex friend codes are rejected");
+        reject(() => FriendCodes.Display("other-abcdef012345"), "unrecognized friend prefixes are rejected");
+        await api.Find(" CHECKPOINT-ABCDEF012345 ");
+        using (var lookup = JsonDocument.Parse(calls.Last().Body!))
+            check(lookup.RootElement.GetProperty("p_code").GetString() == "cp-abcdef012345", "complete friend codes resolve existing service identities");
+        await api.Find("cp-abcdef012345");
+        using (var lookup = JsonDocument.Parse(calls.Last().Body!))
+            check(lookup.RootElement.GetProperty("p_code").GetString() == "cp-abcdef012345", "previously copied friend codes still resolve the same identity");
         await api.Publish(game.Id,new() { ExpectedRevision = 0, Payload = payload });
         check(calls.Last().Token == "ACCESS-FIXTURE" && !calls.Last().Body!.Contains("NEVER"),"publication carries owner authentication and an allowlisted body");
         await api.Publish(game.Id,new() { ExpectedRevision = 1, Payload = null });

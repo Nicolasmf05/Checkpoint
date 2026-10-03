@@ -97,6 +97,16 @@ public partial class MainWindow
             await Dispatcher.InvokeAsync(UpdateLayout,DispatcherPriority.ContextIdle);
             check(!FriendsView.Busy,"social action completed: " + content);
         }
+        await ClickSocial("Cuenta");
+        check(Texts(this).Contains("checkpoint-111111111111") && !Texts(this).Any(t => t.StartsWith("cp-",StringComparison.OrdinalIgnoreCase)), "account view shows the complete friend code without the old abbreviation");
+        RenderElement(this,Path.Combine(output,"widget-friends-account.png"));
+        Preferences.Language = "en"; ApplyLanguage(); await ClickSocial("Account");
+        check(Texts(this).Contains("checkpoint-111111111111"), "English account view retains the complete Checkpoint friend code");
+        RenderElement(this,Path.Combine(output,"widget-friends-account-en.png"));
+        await ClickSocial("Friends");
+        var codeInput = Controls<TextBox>(this).Single(c => System.Windows.Automation.AutomationProperties.GetName(c) == "Friend code (checkpoint-…)");
+        check(codeInput.MaxLength == 23, "friend input accepts the complete 23-character code");
+        Preferences.Language = "es"; ApplyLanguage();
         await ClickSocial("Solicitudes");
         check(Texts(this).Contains("Carlos") && Texts(this).Contains("Quiere añadirte como amigo"),"pending Checkpoint requests are rendered");
         await ClickSocial("Aceptar"); check(accepted,"accept button sends the receiver's answer");

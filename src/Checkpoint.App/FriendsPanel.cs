@@ -138,7 +138,7 @@ internal sealed class FriendsPanel : ScrollViewer
             body.Children.Add(Action(I18n.T("Actualizar progreso"),Load)); return;
         }
         body.Children.Add(Text((I18n.IsEnglish ? $"Your friends · {friends.Count}" : $"Tus amigos · {friends.Count}"),18));
-        var code = Input(body,I18n.T("Código de amigo (cp-…)"),15);
+        var code = Input(body,I18n.T("Código de amigo (checkpoint-…)"),FriendCodes.DisplayLength);
         body.Children.Add(Action(I18n.T("Enviar solicitud"),async () => {
             var found = await owner.Social!.Find(code.Text);
             if (found.Length == 0) throw new InvalidOperationException(I18n.T("No se encontró un usuario disponible con ese código."));
@@ -257,8 +257,8 @@ internal sealed class FriendsPanel : ScrollViewer
         body.Children.Add(Text(I18n.T("Tu cuenta de Checkpoint"),18));
         if (profile is not null)
         {
-            body.Children.Add(Text(profile.FriendCode,18));
-            body.Children.Add(Action(I18n.T("Copiar mi código"),() => { Clipboard.SetText(profile.FriendCode); message = I18n.T("Código copiado."); return Task.CompletedTask; }));
+            body.Children.Add(Text(FriendCodes.Display(profile.FriendCode),18));
+            body.Children.Add(Action(I18n.T("Copiar mi código"),() => { Clipboard.SetText(FriendCodes.Display(profile.FriendCode)); message = I18n.T("Código copiado."); return Task.CompletedTask; }));
             var name = Input(body,I18n.T("Tu nombre en Checkpoint"),50); name.Text = profile.DisplayName;
             body.Children.Add(Action(I18n.T("Guardar nombre"),async () => { await owner.Social!.UpdateName(name.Text); await Load(); message = I18n.T("Nombre guardado."); }));
         }

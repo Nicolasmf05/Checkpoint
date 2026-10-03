@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.16 — nombre completo en códigos de amigo
+
+Han pasado 332 comprobaciones: 128 de biblioteca, 15 Node, 14 Edge y 175 WPF. Se verifican presentación completa, mayúsculas/espacios, límites y caracteres del código, búsqueda de la identidad existente con ambos formatos, ventanas de Cuenta en español/inglés y campo de entrada de 23 caracteres. Los códigos del servicio se conservan; los nombres técnicos históricos del esquema permanecen para compatibilidad con clientes publicados. Pruebas HTTP simuladas y ventanas reales con datos aislados; cuentas reales e instalación siguen pendientes.
+
 ## 0.6.15 — idioma coherente
 
 Han pasado 316 comprobaciones: 118 de biblioteca, 15 Node, 14 Edge y 169 WPF. Se comprueban el catálogo literal y los recursos XAML, errores desconocidos del sistema y de Steam, cultura de hilos, avisos y opciones de idioma en ventanas reales para español e inglés. Los cuadros propios de Windows siguen el idioma del sistema. Las pruebas usan datos aislados; cuentas reales, instalación, teclado físico y lectores de pantalla siguen pendientes.

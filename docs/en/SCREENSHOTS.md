@@ -82,3 +82,7 @@ Miniature with text size 18 and adapted rows. This native capture uses Spanish.
 ## Notices in English
 
 ![Notice with English text and button](../screenshots/dialog-notice-en.png)
+
+## Complete friend code
+
+![Account with the complete Checkpoint friend code](../screenshots/widget-friends-account-en.png)

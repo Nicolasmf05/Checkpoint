@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## 0.6.16 — 2026-10-03
+
+- Códigos de amigo mostrados y copiados con el nombre completo `checkpoint-` y sus 12 caracteres originales.
+- Campo de código ampliado a 23 caracteres; etiquetas y avisos sin abreviaturas en español e inglés.
+- Los códigos copiados anteriormente siguen resolviendo la misma cuenta mediante una capa de compatibilidad del servicio. No se modifican cuentas, amistades ni publicaciones.
+- Documentación y capturas actualizadas; pruebas de formato, compatibilidad y ventanas de Cuenta en ambos idiomas.
+
 ## 0.6.15 — 2026-10-03
 
 - Avisos propios con botones en el idioma de Checkpoint, independientes del idioma de Windows.

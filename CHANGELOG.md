@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.16 — 2026-10-03
+
+- Friend codes display and copy the full `checkpoint-` name with their original 12 characters.
+- Friend input accepts 23 characters; labels and notices use the complete name in Spanish and English.
+- Previously copied codes still resolve the same account through a service compatibility boundary. Accounts, friendships and publications are unchanged.
+- Updated documentation and screenshots; format, compatibility and actual Account window tests in both languages.
+
 ## 0.6.15 — 2026-10-03
 
 - App-owned notices use buttons in Checkpoint's language, independently of Windows.

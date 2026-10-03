@@ -56,3 +56,5 @@ There is no measured minimum RAM/CPU on older hardware. No arbitrary minimum is 
 Source, documentation and downloads: [Nicolasmf05/Checkpoint](https://github.com/Nicolasmf05/Checkpoint). See [Windows security](https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/en/WINDOWS-SECURITY.md) and [Microsoft SmartScreen reputation guidance](https://learn.microsoft.com/windows/apps/package-and-deploy/smartscreen-reputation).
 
 **Consistent language:** notices and their buttons follow the language selected in Settings, including Miniature and editing windows. Windows system dialogs follow the operating system language.
+
+**Complete friend code:** Friends → Account displays and copies `checkpoint-` followed by 12 characters. Enter this format in Checkpoint 0.6.16 or later; earlier codes still work.

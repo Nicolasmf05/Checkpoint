@@ -78,3 +78,7 @@ Miniatura con tamaño de texto 18 y filas adaptadas.
 ## Avisos en español
 
 ![Aviso con texto y botón en español](screenshots/dialog-notice-es.png)
+
+## Código de amigo completo
+
+![Cuenta con código de amigo de Checkpoint completo](screenshots/widget-friends-account.png)

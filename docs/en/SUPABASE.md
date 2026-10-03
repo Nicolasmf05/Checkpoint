@@ -14,7 +14,7 @@ Registration is enabled; **Confirm email is disabled**, at the owner's request, 
 
 ## Schema
 
-- Auth-linked profiles independent of Steam; exact `cp-…` friend codes.
+- Auth-linked profiles independent of Steam; exact `checkpoint-…` friend codes.
 - Recipient-approved requests, canonical friendships and blocks.
 - Explicitly selected publications with status, goal and counters. Notes/task labels rejected.
 - Row-level access to own data and accepted friends' shared games; pending requests grant no game access.

@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.16 — complete friend-code name
+
+332 checks passed: 128 core, 15 Node, 14 Edge and 175 WPF. Tests cover complete presentation, case/whitespace normalization, length and character validation, existing-identity lookup with both formats, Spanish/English Account windows and the 23-character input. Stored service codes and historical schema identifiers remain compatible with released clients. HTTP responses are simulated and actual windows use isolated data; real accounts and installation remain pending.
+
 ## 0.6.15 — consistent language
 
 316 checks passed: 118 core, 15 Node, 14 Edge and 169 WPF. Coverage checks literal messages and XAML resources, unknown system and Steam errors, thread culture, notices and language choices in actual Spanish and English windows. Windows system dialogs follow the operating system language. Tests use isolated data; real accounts, installation, physical keyboard and screen readers remain pending.
