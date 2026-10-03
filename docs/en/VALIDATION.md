@@ -1,5 +1,9 @@
 # Validation
 
+## 0.6.14 — restore the normal layout
+
+300 checks passed: 108 core, 15 Node, 14 Edge and 163 native WPF. Six new checks exercise list, compact and grid through real Settings, entering Miniature, another save, SQLite settings reload and background/game exit menus. Persisted flags and restored templates are checked. Existing tests retain F6 cycling, Search, dimensions and text. Installed packages, physical keyboard and real accounts remain pending.
+
 ## 0.6.13 — configurable Miniature text
 
 294 checks passed: 108 core, 15 Node, 14 Edge and 157 native WPF. Five new checks save size 18 through Settings and reload SQLite, verify larger names/states and row height, cancel without changing the saved value, verify the English label and reduce page jumps for large text. Native large-text screenshot included. Real dialogs use isolated data; physical keyboard, screen reader, installed packages and real accounts remain pending.

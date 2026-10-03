@@ -595,6 +595,38 @@ public partial class MainWindow
             MiniatureAction(searchMenu,"Buscar juego").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent)); searchMenu.IsOpen = false;
             await Task.Delay(20); await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             Check(!Preferences.MiniatureView && Search.IsKeyboardFocused && FilterArea.IsVisible, "game search menu keeps focus in the visible search after the popup closes");
+            foreach (int previousView in new[] { 0,1,2 })
+            {
+                RunModal(() => Dialogs.Settings(this), window =>
+                {
+                    Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Vista de la colección").SelectedIndex = previousView;
+                    Click(window,"Guardar");
+                });
+                RunModal(() => Dialogs.Settings(this), window =>
+                {
+                    Controls<ComboBox>(window).Single(c => AutomationProperties.GetName(c) == "Vista de la colección").SelectedIndex = 3;
+                    Click(window,"Guardar");
+                });
+                RunModal(() => Dialogs.Settings(this), window => Click(window,"Guardar"));
+                var remembered = Store.LoadSettings();
+                Check(remembered.MiniatureView && remembered.GridView == (previousView == 2) && remembered.Compact == (previousView == 1),
+                    $"miniature settings retain the previous normal view {previousView} across saves and SQLite reload");
+                await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+                var exitMenu = Shell.ContextMenu;
+                if (previousView == 2)
+                {
+                    var exitRow = VisualChildren(GameList).OfType<Grid>().First(g => g.ContextMenu is not null && g.DataContext is CardView);
+                    exitMenu = exitRow.ContextMenu; exitMenu.PlacementTarget = exitRow;
+                }
+                else exitMenu.PlacementTarget = Shell;
+                exitMenu.IsOpen = true;
+                await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+                MiniatureAction(exitMenu,"Salir de miniatura").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+                await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
+                Check(!Preferences.MiniatureView && !Store.LoadSettings().MiniatureView && Preferences.GridView == (previousView == 2) &&
+                    Preferences.Compact == (previousView == 1) && GameList.ItemTemplate == Resources[previousView == 2 ? "GridRowTemplate" : "GameTemplate"],
+                    $"miniature exit menu restores and saves the previous normal layout {previousView}");
+            }
             File.WriteAllText(Path.Combine(outputDirectory, "smoke.json"), JsonSerializer.Serialize(new { ok = true, checks = checks.Count, assertions = checks }, DataJson.Options));
             Console.WriteLine($"WPF smoke test passed: {checks.Count} checks, {outputDirectory}");
         }

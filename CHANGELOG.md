@@ -2,6 +2,11 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.6.14 — 2026-10-03
+
+- Exit miniature view restores the previous normal layout: list, compact or cover grid. Settings keeps that layout when entering Miniature or saving while it is active.
+- Both background/game exit menus persist the restored choice. F6 keeps its four-view cycle; Search still opens the normal list.
+
 ## 0.6.13 — 2026-10-03
 
 - Settings adds Miniature text size, 12–20 with default 12, saved independently of other views. Names/states and row height grow together.

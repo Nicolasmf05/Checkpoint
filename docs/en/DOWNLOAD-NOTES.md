@@ -41,6 +41,8 @@ Updates preserve the selected game and restore its keyboard focus only if the li
 
 **Settings → Miniature text size** offers values from 12 to 20, default 12. Save applies and stores the choice; Cancel preserves the saved value. Names, states and row height scale together. PageUp/PageDown adapt to the larger rows. Other views retain their text size. Widen Miniature if long names are cut off; their tooltip keeps the full title. No additional installation is needed.
 
+**Right-click → Exit miniature view** returns to the list, compact or cover-grid layout used before entering Miniature. It saves the restored view and uses its independently saved normal size, limited by available screen space. Saving Settings while Miniature is active preserves the remembered layout. **F6** keeps the list → compact → grid → Miniature → list cycle; **Search games / Ctrl+F** opens the normal list with its search field.
+
 ## Optional lightweight mode
 
 Enable **Settings → Lightweight mode (no covers)**. Collection and friend covers are hidden, new image downloads are skipped and the decoded image cache is cleared. Games, goals, progress, saved cover files and publications are preserved; you can turn it off at any time. The choice is saved. An already-started download may finish. Steam, synchronization and pending publication delivery remain enabled.

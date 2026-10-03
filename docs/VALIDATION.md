@@ -2,6 +2,10 @@
 
 # Validación
 
+## 0.6.14 — restaurar la vista normal
+
+Han pasado 300 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 163 WPF. Seis nuevas recorren lista, compacta y cuadrícula con Ajustes reales, entrada en Miniatura, nuevo guardado, recarga de preferencias SQLite y salida mediante menús de fondo/juego. Se verifican flags persistidos y plantillas de interfaz restauradas. Las pruebas existentes mantienen el ciclo F6, Buscar, tamaños y texto. Instalación, teclado físico y cuentas reales siguen pendientes.
+
 ## 0.6.13 — texto configurable en Miniatura
 
 Han pasado 294 comprobaciones: 108 de biblioteca, 15 Node, 14 Edge y 157 WPF. Cinco nuevas prueban guardar tamaño 18 desde Ajustes y recargar SQLite, nombres/estados y altura de fila ampliados, cancelar sin cambiar el valor guardado, etiqueta inglesa y menor salto por página con texto grande. Captura nativa del texto ampliado. Pruebas con diálogos reales y datos aislados; teclado físico, lector de pantalla, instalación y cuentas reales siguen pendientes.

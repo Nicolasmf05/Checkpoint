@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <Version>0.6.13</Version>
+    <Version>0.6.14</Version>
     <Authors>Checkpoint contributors</Authors>
     <Product>Checkpoint</Product>
     <Deterministic>true</Deterministic>

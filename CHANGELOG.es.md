@@ -2,6 +2,11 @@
 
 # Historial de cambios
 
+## 0.6.14 — 2026-10-03
+
+- Salir de miniatura recupera la vista normal anterior: lista, compacta o cuadrícula. Ajustes conserva esa vista al entrar en Miniatura o guardar mientras está activa.
+- Los menús de fondo/juego guardan la vista restaurada. F6 conserva el ciclo de cuatro vistas; Buscar sigue abriendo la lista normal.
+
 ## 0.6.13 — 2026-10-03
 
 - Ajustes incluye Tamaño de texto en Miniatura, de 12 a 20 y predeterminado 12, guardado sin cambiar otras vistas. Nombres/estados y altura de fila crecen juntos.

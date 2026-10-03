@@ -284,7 +284,9 @@ internal static class Dialogs
                 if (!string.IsNullOrWhiteSpace(endpoint.Text)) SteamClient.ValidateServiceUrl(endpoint.Text);
                 if ((startup.IsChecked == true) != prefs.StartWithWindows) SetStartup(startup.IsChecked == true);
                 prefs.BackgroundOpacity = opacity.Value; prefs.AlwaysOnTop = top.IsChecked == true; prefs.PositionLocked = position.IsChecked == true;
-                prefs.MiniatureView = view.SelectedIndex == 3; prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; prefs.LightTheme = light.IsChecked == true; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
+                prefs.MiniatureView = view.SelectedIndex == 3;
+                if (!prefs.MiniatureView) { prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; }
+                prefs.LightTheme = light.IsChecked == true; prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
                 prefs.LightweightMode = lightweight.IsChecked == true;

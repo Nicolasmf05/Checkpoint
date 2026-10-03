@@ -353,7 +353,7 @@ public partial class MainWindow : Window
     private void AddMiniatureWindowActions(System.Windows.Controls.ContextMenu menu)
     {
         var restore = new System.Windows.Controls.MenuItem { Header = I18n.T("Salir de miniatura") };
-        restore.Click += (_, _) => { Preferences.MiniatureView = false; Preferences.GridView = false; Preferences.Compact = false; ApplyPreferences(); Persist(); Refresh(); };
+        restore.Click += (_, _) => { menu.IsOpen = false; Preferences.MiniatureView = false; ApplyPreferences(); Persist(); Refresh(); };
         var settings = new System.Windows.Controls.MenuItem { Header = I18n.T("Ajustes") };
         settings.Click += (_, _) => Dialogs.Settings(this);
         menu.Items.Add(restore); menu.Items.Add(settings);
