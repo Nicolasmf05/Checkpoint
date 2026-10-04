@@ -1,4 +1,3 @@
-/* Paleta predeterminada. Los temas redefinen variables para reutilizar todos los componentes. */
 :root {
   --surface: 32 32 32;
   --text: #ededed;
@@ -11,13 +10,12 @@
   --paused: #b9954c;
   --finished: #a9b9ff;
   --opacity: 0.88;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   color: var(--text);
   font-size: 13px;
   color-scheme: dark;
 }
-/* Temas: colores de superficie, texto, bordes y estados. Los tamaños siguen siendo comunes. */
-:root[data-theme='light'] {
+:root[data-theme="light"] {
   --surface: 240 240 240;
   --text: #202020;
   --muted: #555555;
@@ -31,7 +29,7 @@
   color-scheme: light;
 }
 
-:root[data-theme='midnight'] {
+:root[data-theme="midnight"] {
   --surface: 9 12 24;
   --text: #eef1ff;
   --muted: #afb8d8;
@@ -43,7 +41,7 @@
   --paused: #e5bd79;
   --finished: #b6a5ff;
 }
-:root[data-theme='ocean'] {
+:root[data-theme="ocean"] {
   --surface: 8 30 42;
   --text: #e7f8ff;
   --muted: #9ec8d9;
@@ -55,7 +53,7 @@
   --paused: #edca82;
   --finished: #b4bdff;
 }
-:root[data-theme='forest'] {
+:root[data-theme="forest"] {
   --surface: 14 31 24;
   --text: #edf8e9;
   --muted: #adc9b1;
@@ -67,7 +65,7 @@
   --paused: #e1bd72;
   --finished: #a6cfff;
 }
-:root[data-theme='plum'] {
+:root[data-theme="plum"] {
   --surface: 33 19 40;
   --text: #fbecff;
   --muted: #d2afd8;
@@ -79,7 +77,7 @@
   --paused: #edc58e;
   --finished: #b8c6ff;
 }
-:root[data-theme='amber'] {
+:root[data-theme="amber"] {
   --surface: 36 26 17;
   --text: #fff5e7;
   --muted: #d7bd9b;
@@ -91,7 +89,7 @@
   --paused: #ead898;
   --finished: #b0cdfa;
 }
-:root[data-theme='contrast'] {
+:root[data-theme="contrast"] {
   --surface: 0 0 0;
   --text: #fff;
   --muted: #ededed;
@@ -103,7 +101,7 @@
   --paused: #ffe56a;
   --finished: #b7eaff;
 }
-:root[data-theme='cyber-purple'] {
+:root[data-theme="cyber-purple"] {
   --surface: 9 7 20;
   --text: #f5f3ff;
   --muted: #b5b3c0;
@@ -119,7 +117,7 @@
   --finished: #06d9f7;
   color-scheme: dark;
 }
-:root[data-theme='electric-blue'] {
+:root[data-theme="electric-blue"] {
   --surface: 5 5 12;
   --text: #f8fafc;
   --muted: #b6b8bb;
@@ -135,7 +133,7 @@
   --finished: #22d3ee;
   color-scheme: dark;
 }
-:root[data-theme='neon-lime'] {
+:root[data-theme="neon-lime"] {
   --surface: 6 14 4;
   --text: #f5f7f5;
   --muted: #b4b8b4;
@@ -151,7 +149,7 @@
   --finished: #a3ff12;
   color-scheme: dark;
 }
-:root[data-theme='black-red'] {
+:root[data-theme="black-red"] {
   --surface: 8 8 8;
   --text: #f7f7f7;
   --muted: #b6b6b6;
@@ -167,7 +165,7 @@
   --finished: #ff5a5f;
   color-scheme: dark;
 }
-:root[data-theme='black-orange'] {
+:root[data-theme="black-orange"] {
   --surface: 6 6 11;
   --text: #fafafa;
   --muted: #b8b8b9;
@@ -183,7 +181,7 @@
   --finished: #fbbf24;
   color-scheme: dark;
 }
-:root[data-theme='synthwave'] {
+:root[data-theme="synthwave"] {
   --surface: 11 6 23;
   --text: #f7f2ff;
   --muted: #b7b2c0;
@@ -199,7 +197,7 @@
   --finished: #00e5ff;
   color-scheme: dark;
 }
-:root[data-theme='blue-white'] {
+:root[data-theme="blue-white"] {
   --surface: 248 250 252;
   --text: #111827;
   --muted: #4f5561;
@@ -215,7 +213,7 @@
   --finished: #2563eb;
   color-scheme: light;
 }
-:root[data-theme='purple-dark'] {
+:root[data-theme="purple-dark"] {
   --surface: 17 24 39;
   --text: #f9fafb;
   --muted: #babdc2;
@@ -231,7 +229,7 @@
   --finished: #f9fafb;
   color-scheme: dark;
 }
-:root[data-theme='emerald-neutral'] {
+:root[data-theme="emerald-neutral"] {
   --surface: 248 250 252;
   --text: #1f2937;
   --muted: #5a616c;
@@ -247,7 +245,7 @@
   --finished: #167f63;
   color-scheme: light;
 }
-:root[data-theme='black-white'] {
+:root[data-theme="black-white"] {
   --surface: 9 9 11;
   --text: #ffffff;
   --muted: #bdbdbd;
@@ -263,7 +261,7 @@
   --finished: #06d9f7;
   color-scheme: dark;
 }
-:root[data-theme='navy-cyan'] {
+:root[data-theme="navy-cyan"] {
   --surface: 15 23 42;
   --text: #f8fafc;
   --muted: #b9bdc3;
@@ -279,7 +277,7 @@
   --finished: #f8fafc;
   color-scheme: dark;
 }
-:root[data-theme='coral-cream'] {
+:root[data-theme="coral-cream"] {
   --surface: 255 247 237;
   --text: #292524;
   --muted: #635e5a;
@@ -295,7 +293,7 @@
   --finished: #c13850;
   color-scheme: light;
 }
-:root[data-theme='orange-charcoal'] {
+:root[data-theme="orange-charcoal"] {
   --surface: 24 24 27;
   --text: #fafafa;
   --muted: #bdbdbe;
@@ -311,7 +309,7 @@
   --finished: #fafafa;
   color-scheme: dark;
 }
-:root[data-theme='indigo-gray'] {
+:root[data-theme="indigo-gray"] {
   --surface: 243 244 246;
   --text: #111827;
   --muted: #4e535f;
@@ -327,7 +325,6 @@
   --finished: #4f46e5;
   color-scheme: light;
 }
-/* Base de la interfaz: dimensiones, tipografía y controles de formulario. */
 * {
   box-sizing: border-box;
 }
@@ -390,16 +387,15 @@ textarea {
   min-height: 85px;
   resize: vertical;
 }
-input[type='checkbox'] {
+input[type="checkbox"] {
   accent-color: var(--accent-ink, var(--accent));
   width: 16px;
   min-height: 16px;
 }
-input[type='range'] {
+input[type="range"] {
   padding: 0;
   accent-color: var(--accent-ink, var(--accent));
 }
-/* Contenedor principal y distribución de cabecera, navegación y herramientas. */
 .window {
   height: 100%;
   display: flex;
@@ -483,7 +479,6 @@ h1 {
   font-size: 12px;
   color: var(--text);
 }
-/* Área desplazable; las tarjetas virtualizadas se posicionan dentro de su altura total. */
 .viewport {
   flex: 1;
   min-height: 0;
@@ -644,13 +639,12 @@ progress::-webkit-progress-value {
   touch-action: none;
 }
 .resize:after {
-  content: '╱';
+  content: "╱";
   color: var(--muted);
   position: absolute;
   right: 3px;
   bottom: 0;
 }
-/* Miniatura: oculta controles generales y reserva espacio para las filas de juegos. */
 .window.mini {
   border-radius: 2px;
   padding: 10px;
@@ -698,7 +692,6 @@ progress::-webkit-progress-value {
 .minirow.selected {
   background: var(--panel);
 }
-/* Menú contextual flotante con desplazamiento cuando supera la altura disponible. */
 .menu {
   position: fixed;
   z-index: 10;
@@ -728,7 +721,6 @@ progress::-webkit-progress-value {
   border-top: 1px solid var(--line);
   margin: 5px;
 }
-/* Componentes generados por el esquema de formularios del puente. */
 .dialog-page {
   height: 100%;
   background: var(--input);
@@ -837,7 +829,6 @@ progress::-webkit-progress-value {
   }
 }
 
-/* Selector de modo y espaciado de la ventana completa. */
 .window-mode {
   width: 135px;
   min-width: 0;
@@ -860,7 +851,6 @@ progress::-webkit-progress-value {
   }
 }
 
-/* Etiquetas de teclado y franja de ayuda de atajos. */
 kbd {
   font-family: inherit;
   font-size: 11px;
@@ -988,7 +978,6 @@ textarea::placeholder {
   opacity: 1;
 }
 
-/* Selector de colección y gestión de listas. */
 .collectionbar {
   display: flex;
   align-items: center;
@@ -1034,7 +1023,6 @@ textarea::placeholder {
   height: 10px;
   margin: 8px 0;
 }
-/* Tarjetas y resumen de logros dentro de las páginas de detalle. */
 .achievement-card {
   border-left: 4px solid var(--accent);
   padding: 16px;
@@ -1241,7 +1229,6 @@ textarea::placeholder {
   flex: none;
 }
 
-/* Navegación de páginas y ruta de vuelta a la colección. */
 .page-navigation {
   display: flex;
   align-items: center;
@@ -1289,7 +1276,6 @@ textarea::placeholder {
   font-weight: 700;
   border-width: 2px;
 }
-/* Acciones principales de una ficha con botones cómodos para ratón y pantalla táctil. */
 .game-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1363,7 +1349,7 @@ button.accent:focus-visible {
   min-width: 0;
 }
 .game-playtime::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 20px;
   top: 22px;

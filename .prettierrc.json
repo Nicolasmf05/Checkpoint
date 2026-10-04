@@ -21,6 +21,10 @@
       "options": { "parser": "xml", "xmlWhitespaceSensitivity": "ignore" }
     },
     {
+      "files": "src/Checkpoint.App/Web/app.css",
+      "options": { "singleQuote": false }
+    },
+    {
       "files": "*.webmanifest",
       "options": { "parser": "json" }
     }
