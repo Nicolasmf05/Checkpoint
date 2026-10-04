@@ -517,6 +517,9 @@ public partial class MainWindow
                 updateDialog!,
                 "[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();"
             );
+            await Wait(() =>
+                Script(themeSettings, "!!document.querySelector('select[aria-label=\"Theme\"]')")
+            );
             Check(
                 await Script(
                     themeSettings,
