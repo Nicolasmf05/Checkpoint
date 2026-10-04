@@ -38,7 +38,7 @@ public partial class MainWindow
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
             examples=I18n.T("Añadir ejemplos"), finish=I18n.T("Marcar o desmarcar historia terminada"),
             windowMode=I18n.T("Modo de ventana"), fullWindow=I18n.T("Ventana completa"), smallWindow=I18n.T("Ventana pequeña"), miniature=I18n.T("Miniatura"),
-            collection=I18n.T("Lista de juegos"),manageLists=I18n.T("Gestionar listas"),makePrivate=I18n.T("Mover a Privados"),makeVisible=I18n.T("Hacer visible para amigos"),configureShortcuts=I18n.T("Configurar atajos"), shortcuts=I18n.T("Atajos de teclado"), generalKeys=I18n.T("En la ventana principal"), miniKeys=I18n.T("En miniatura"), orderKeys=I18n.T("Al enfocar el botón de reordenar"),
+            collection=I18n.T("Lista de juegos"),manageLists=I18n.T("Gestionar listas"),listDetails=I18n.T("Ver ficha de la lista"),moveTo=I18n.T("Mover a"),changeList=I18n.T("Cambiar de lista"),addToList=I18n.T("Añadir a otra lista"),removeFromList=I18n.T("Quitar de esta lista"),untrack=I18n.T("Quitar de Mi lista"),selectedGames=I18n.T("Juegos seleccionados:"),selectResults=I18n.T("Seleccionar resultados"),clearSelection=I18n.T("Limpiar selección"),selectionLimit=I18n.T("Hasta 500 juegos a la vez"),makePrivate=I18n.T("Mover a Privados"),makeVisible=I18n.T("Hacer visible para amigos"),configureShortcuts=I18n.T("Configurar atajos"), shortcuts=I18n.T("Atajos de teclado"), generalKeys=I18n.T("En la ventana principal"), miniKeys=I18n.T("En miniatura"), orderKeys=I18n.T("Al enfocar el botón de reordenar"),
             helpHint=I18n.T("Pulsa F1 para ver todos los atajos."), closeHelp=I18n.T("Cerrar ayuda"),
             selectGame=I18n.T("Seleccionar juego"), firstLast=I18n.T("Primer o último juego"), pageGame=I18n.T("Avanzar o retroceder una página"),
             gameMenu=I18n.T("Abrir menú del juego"), reorder=I18n.T("Reordenar juego"),
@@ -48,7 +48,7 @@ public partial class MainWindow
             all=I18n.T("Todos"), statuses=Enum.GetValues<GameStatus>().Select(Labels.Status).ToArray() },
         games=(friendsVisible ? Enumerable.Empty<CardView>() : visibleCards).Select(card => new { id=card.Model.Id, title=card.Model.Title, platform=card.Model.Platform,
             state=(int)card.Model.Status, status=card.Model.StatusText, next=card.Model.NextTask,
-            achievementCaption=AchievementCaption(card.Model), progress=card.ProgressCaption, percent=card.ProgressVisibility == Visibility.Visible ? (int?)card.Percentage : null, favorite=card.Model.Favorite, friendsPrivate=card.Model.FriendsPrivate==true,
+            achievementCaption=AchievementCaption(card.Model), progress=card.ProgressCaption, percent=card.ProgressVisibility == Visibility.Visible ? (int?)card.Percentage : null, favorite=card.Model.Favorite, tracked=card.Model.Tracked, lists=card.Model.Lists, friendsPrivate=card.Model.FriendsPrivate==true,
             cover=Preferences.LightweightMode || Preferences.MiniatureView ? null : CoverOrigin+"game-cover/"+card.Model.Id+"?v="+Uri.EscapeDataString(card.Model.CustomCover ?? "steam") }).ToArray(),
         friendsBusy=FriendsView.Busy, friends=friendsVisible ? friendControls.Capture(FriendsView) : null
     };
@@ -78,6 +78,9 @@ public partial class MainWindow
             case "edit" when game is not null: Dialogs.Edit(this,game); web?.Event(new { kind="focus-game",id=game.Id }); break;
             case "configure-shortcuts": Dialogs.ShortcutSettings(this); break;
             case "manage-lists": Dialogs.ManageLists(this);break;
+            case "list-details": Dialogs.ListDetails(this,Preferences.ActiveList);break;
+            case "list-change": Dialogs.ChooseList(this,ReadGameIds(message),message.GetProperty("source").GetString()??"all",message.GetProperty("mode").GetString()??"move");break;
+            case "batch": ApplyListAction(ReadGameIds(message),message.GetProperty("operation").GetString()??"",message.GetProperty("source").GetString()??"all",message.TryGetProperty("target",out var listTarget)?listTarget.GetString():null);break;
             case "collection": var collection=message.GetProperty("value").GetString()??"all";if(collection=="all"||collection=="private"||Preferences.GameLists.Any(n=>"custom:"+n==collection)){Preferences.ActiveList=collection;allLibrary=false;friendsVisible=false;Search.Clear();StatusFilter.SelectedIndex=0;Persist();Refresh();}break;
             case "privacy" when game is not null: game.FriendsPrivate=message.GetProperty("value").GetBoolean();Persist();Refresh();break;
             case "settings": Dialogs.Settings(this); break;

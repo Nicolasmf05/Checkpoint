@@ -16,3 +16,15 @@ Los nombres y pertenencias son organización local. Los amigos ven todos los jue
 Las retiradas explícitas de versiones anteriores se conservan como privadas. Los demás juegos de Mi lista pasan al nuevo valor visible por defecto. Los cambios de privacidad se guardan localmente incluso sin red, pero una publicación anterior puede seguir visible hasta que el servidor confirme su retirada. Cerrar sesión no retira publicaciones.
 
 Las copias JSON y .checkpoint de Windows conservan privacidad, pertenencias y listas vacías; la web admite JSON. Sesiones y cola social quedan excluidas. Importar omite juegos ya existentes para conservar sus datos actuales. El valor inicial para nuevos juegos es un ajuste local y no se exporta.
+
+## Crear y gestionar juegos
+
+Escribe el nombre en Gestionar listas y pulsa Guardar: se crea y abre la lista. Crear lista sigue disponible para crear varias sin cerrar el gestor. Si seleccionas una lista existente y cambias su nombre, Guardar aplica el cambio.
+
+El menú con clic derecho sobre un juego contiene acciones de ese juego. Ofrece las tres listas creadas más recientemente, Cambiar de lista para cualquier destino y Añadir a otra lista para conservar las pertenencias anteriores. Las opciones de ventana y de la app se consultan desde sus controles o desde el menú del fondo en Miniatura.
+
+En Biblioteca y las listas normales, marca las casillas de los juegos. La barra de selección permite actuar sobre hasta 500 juegos. Seleccionar resultados incluye hasta 500 resultados del filtro actual; cambiar de vista, lista o filtro limpia la selección.
+
+Mover desde una lista personalizada quita solo la pertenencia de origen y añade el destino, conservando otras listas. Mover desde Biblioteca o Mi lista reemplaza las listas actuales. Añadir conserva las demás. Desde Privados se conservan las otras pertenencias y la privacidad. Estos movimientos conservan la privacidad, las notas, tareas y logros. Quitar de una lista personalizada conserva el juego en Biblioteca; Quitar de Mi lista deja de seguirlo y retira su publicación cuando haya conexión. Hacer visible para amigos también añade a Mi lista un juego que antes no se seguía.
+
+Ver ficha de la lista abre el resumen, búsqueda y juegos con selección individual, en páginas de 50. Incluye sus miembros privados para que puedas gestionarlos, aunque no aparezcan en la vista pública de esa lista. Puedes abrir la ficha de cada juego, mover los seleccionados, quitar pertenencias o cambiar privacidad. Marcar privado afecta al juego completo en todas sus listas; no cambia sus pertenencias.

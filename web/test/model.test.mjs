@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {normalize,mergeLibrary,importBackup,payload,friendCode,account,themes,normalizeLists,listName,inList,shouldShare} from '../model.mjs';
+import {normalize,mergeLibrary,importBackup,payload,friendCode,account,themes,normalizeLists,listName,inList,shouldShare,listMembers,applyListAction} from '../model.mjs';
 import {readFile} from 'node:fs/promises';
 test('normalization retains manual fields and bounds remote content',()=>{const g=normalize({title:' Test ',notes:'private',status:'Finished',goal:'Custom',tasks:[{title:'task',done:true}],steamAppId:-1});assert.equal(g.title,'Test');assert.equal(g.status,3);assert.equal(g.goal,2);assert.equal(g.notes,'private');assert.equal(g.steamAppId,null);assert.ok(g.finishedAt);assert.equal(normalize({...g,status:1}).finishedAt,null);});
 test('Steam imports deduplicate and preserve manual state and notes',()=>{const g=normalize({title:'My title',steamAppId:620,notes:'private',status:2,storyPercent:40}),list=[g];assert.equal(mergeLibrary(list,[{appId:620,name:'Portal 2',playtimeMinutes:70},{appId:999,name:'Borrowed',playtimeMinutes:5},{appId:999,name:'Borrowed',playtimeMinutes:10}]),1);assert.equal(list.length,2);assert.equal(g.title,'My title');assert.equal(g.status,2);assert.equal(g.storyPercent,40);assert.equal(g.notes,'private');assert.equal(list[1].tracked,false);});
@@ -14,3 +14,23 @@ test('lists preserve independent memberships and private games never become shar
 test('desktop achievement mappings and local overrides survive web normalization',()=>{const value=normalize({title:'Fixture',retroGameId:42,detectionProcess:'retroarch.exe',detectionWindowTitle:'Mario',retroAchievements:[{id:'1',name:'First',unlocked:true}],manualAchievements:[{id:'manual',name:'Personal'}],removedAchievements:['retro:1'],achievementOverrides:{'manual:manual':true}});assert.equal(value.retroGameId,42);assert.equal(value.detectionWindowTitle,'Mario');assert.equal(value.manualAchievements[0].name,'Personal');assert.deepEqual(value.removedAchievements,['retro:1']);assert.equal(value.achievementOverrides['manual:manual'],true);});
 
 test('cover rejection metadata survives backups without entering friend publications',()=>{const g=normalize({title:'Cover fixture',rejectedIgdbCovers:['fixture','../bad','fixture'],igdbCoverSearchTitle:'Cover fixture',igdbCoverImageId:'accepted'});assert.deepEqual(g.rejectedIgdbCovers,['fixture']);assert.equal(normalize(JSON.parse(JSON.stringify(g))).igdbCoverSearchTitle,'Cover fixture');assert(!JSON.stringify(payload(g)).includes('rejectedIgdbCovers'));});
+
+test('batch list operations preserve private data, memberships and owner visibility',()=>{
+ const a=normalize({title:'One',tracked:false,friendsPrivate:true,lists:['Source','Other'],notes:'Keep notes',storyPercent:37}),b=normalize({title:'Two',lists:['Source'],tasks:[{title:'Keep task'}]}),games=[a,b],catalog=['Source','Other','Target'];
+ applyListAction(games,[a.id,b.id],catalog,'move','custom:Source','Target');
+ assert.deepEqual(a.lists,['Other','Target']);assert.deepEqual(b.lists,['Target']);assert.equal(a.tracked,true);assert.equal(a.friendsPrivate,true);assert.equal(a.notes,'Keep notes');assert.equal(a.storyPercent,37);assert.equal(b.tasks[0].title,'Keep task');
+ assert.equal(listMembers(games,'custom:Target').length,2);assert.equal(inList(a,'custom:Target'),false);
+ applyListAction(games,[a.id],catalog,'add','library','Source');assert.equal(a.lists.length,3);
+ applyListAction(games,[a.id],catalog,'remove','custom:Source');assert.deepEqual(a.lists,['Other','Target']);assert.equal(games.length,2);
+ applyListAction(games,[a.id,b.id],catalog,'public','library');assert.ok(games.every(shouldShare));
+ applyListAction(games,[a.id],catalog,'move','private','Source');assert.deepEqual(a.lists,['Other','Target','Source']);
+ applyListAction(games,[a.id],catalog,'move','library','Source');assert.deepEqual(a.lists,['Source']);
+ applyListAction(games,[a.id],catalog,'remove','all');assert.equal(a.tracked,false);assert.equal(games.length,2);
+});
+test('invalid batch selections and destinations never partially mutate games',()=>{
+ const games=[normalize({title:'One'}),normalize({title:'Two'})],before=JSON.stringify(games);
+ assert.throws(()=>applyListAction(games,[games[0].id,'00000000-0000-4000-8000-000000000000'],['Target'],'private','all'));
+ assert.throws(()=>applyListAction(games,[games[0].id],['Target'],'move','all','Missing'));
+ assert.throws(()=>applyListAction(games,[games[0].id],['Target'],'remove','private'));
+ assert.equal(JSON.stringify(games),before);
+});

@@ -22,21 +22,22 @@ internal static partial class Dialogs
         var notice=new TextBlock{TextWrapping=TextWrapping.Wrap};body.Children.Add(notice);
         void Reload(string? selected=null){selection.ItemsSource=new[]{I18n.T("Nueva lista")}.Concat(owner.Preferences.GameLists).ToList();selection.SelectedIndex=selected is null?0:owner.Preferences.GameLists.IndexOf(selected)+1;}
         selection.SelectionChanged+=(_,_)=>name.Text=selection.SelectedIndex>0?(string)selection.SelectedItem:"";
-        void Change(bool rename)
+        bool Change(bool rename)
         {
             try
             {
                 string? previous=rename&&selection.SelectedIndex>0?(string)selection.SelectedItem:null;
-                if(rename&&previous is null)return;
+                if(rename&&previous is null)return false;
                 string next=GameLists.ValidateName(name.Text,owner.Preferences.GameLists,previous);
                 if(previous is null)owner.Preferences.GameLists.Add(next);
                 else{owner.Preferences.GameLists[owner.Preferences.GameLists.IndexOf(previous)]=next;GameLists.Rename(owner.Games,previous,next);}
-                owner.Preferences.ActiveList="custom:"+next;if(previous is null)owner.Persist();else owner.PersistListChange(previous,next);owner.Refresh();Reload(next);notice.Text=I18n.T("Lista guardada.");
-            }catch(Exception ex){notice.Text=I18n.Error(ex);}
+                owner.Preferences.ActiveList="custom:"+next;if(previous is not null)owner.PersistListChange(previous,next);owner.SelectGameList("custom:"+next);Reload(next);notice.Text=I18n.T("Lista guardada.");return true;
+            }catch(Exception ex){notice.Text=I18n.Error(ex);return false;}
         }
         var actions=new WrapPanel();body.Children.Add(actions);
         actions.Children.Add(Button(I18n.T("Crear lista"),(_,_)=>Change(false)));
         actions.Children.Add(Button(I18n.T("Renombrar lista"),(_,_)=>Change(true)));
+        actions.Children.Add(Button(I18n.T("Ver ficha de la lista"),(_,_)=>{if(selection.SelectedIndex>0)ListDetails(owner,"custom:"+(string)selection.SelectedItem);}));
         actions.Children.Add(Button(I18n.T("Quitar lista"),(_,_)=>
         {
             try{if(selection.SelectedIndex<=0)return;string selected=(string)selection.SelectedItem;
@@ -44,7 +45,7 @@ internal static partial class Dialogs
             owner.Preferences.ActiveList="all";owner.PersistListChange(selected,null);owner.Refresh();Reload();notice.Text=I18n.T("Lista quitada. Tus juegos se conservan.");}catch(Exception ex){notice.Text=I18n.Error(ex);}
         }));
         footer.Children.Add(Button(I18n.T("Cancelar"),(_,_)=>window.Close()));
-        footer.Children.Add(Button(I18n.T("Guardar"),(_,_)=>{try{owner.Preferences.NewGamesPrivate=defaultsPrivate.IsChecked==true;owner.Persist();owner.Refresh();window.Close();}catch(Exception ex){notice.Text=I18n.Error(ex);}},true));
+        footer.Children.Add(Button(I18n.T("Guardar"),(_,_)=>{try{string? previous=selection.SelectedIndex>0?selection.SelectedItem as string:null;if(!string.IsNullOrWhiteSpace(name.Text)&&name.Text.Trim()!=previous&&!Change(previous is not null))return;owner.Preferences.NewGamesPrivate=defaultsPrivate.IsChecked==true;owner.Persist();owner.Refresh();window.Close();}catch(Exception ex){notice.Text=I18n.Error(ex);}},true));
         Reload();window.ShowDialog();
     }
 }

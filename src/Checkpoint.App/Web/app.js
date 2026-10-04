@@ -4,6 +4,8 @@ import { visibleRange, nextIndex } from './ui-model.mjs';
 
 const root = document.querySelector('#app');
 let state, selected, menu, dragId, layout, dialogMode, help, helpFocus, helpLanguage;
+const picked=new Set();
+let selectionContext;
 let requestId = 0;
 const pending = new Map();
 const send = value => { const id=++requestId; window.chrome?.webview?.postMessage({...value,requestId:id}); return id; };
@@ -44,8 +46,16 @@ function showMenu(game, x, y) {
     const key=gestures[command];if(key){item.append(el('kbd','',key));item.setAttribute('aria-keyshortcuts',key==='Esc'?'Escape':key.replace('Ctrl+','Control+'));} item.addEventListener('click', dismissMenu); menu.append(item);
   }
   if (game) {
-    state.labels.statuses.forEach((label, value) => entry(label, 'state', { id: game.id, value }, game.state === value));
-    menu.append(el('hr')); entry(state.labels.edit, 'edit', { id: game.id });if(state.labels.makePrivate)entry(game.friendsPrivate?state.labels.makeVisible:state.labels.makePrivate,'privacy',{id:game.id,value:!game.friendsPrivate}); menu.append(el('hr'));
+    const l=state.labels,ids=picked.has(game.id)&&picked.size>1?[...picked]:[game.id],source=state.tab==='library'?'library':state.collection;
+    if(ids.length===1){entry(l.details,'details',{id:game.id});entry(l.achievements,'achievements',{id:game.id});entry(l.edit,'edit',{id:game.id});menu.append(el('hr'));state.labels.statuses.forEach((label,value)=>entry(label,'state',{id:game.id,value},game.state===value));}
+    else menu.append(el('div','menu-caption',l.selectedGames+' '+ids.length));
+    menu.append(el('hr'));
+    for(const list of [...(state.collections||[])].filter(c=>c.value.startsWith('custom:')).reverse().filter(c=>c.value!==source).slice(0,3))entry(l.moveTo+' '+list.label,'batch',{ids,operation:'move',source,target:list.label});
+    entry(l.changeList,'list-change',{ids,source,mode:'move'});entry(l.addToList,'list-change',{ids,source,mode:'add'});
+    if(source!=='private'&&(ids.length>1||game.tracked))entry(source.startsWith('custom:')?l.removeFromList:l.untrack,'batch',{ids,operation:'remove',source});
+    if(ids.length>1||!game.friendsPrivate)entry(l.makePrivate,'batch',{ids,operation:'private',source});
+    if(ids.length>1||game.friendsPrivate||!game.tracked)entry(l.makeVisible,'batch',{ids,operation:'public',source});
+    document.body.append(menu);menu.style.left=`${Math.max(4,Math.min(x,innerWidth-menu.offsetWidth-4))}px`;menu.style.top=`${Math.max(4,Math.min(y,innerHeight-menu.offsetHeight-4))}px`;menu.querySelector('button')?.focus();return;
   }
   if(state.collections){for(const list of state.collections)entry(list.label,'collection',{value:list.value},list.value===state.collection);entry(state.labels.manageLists,'manage-lists');}
   if (state.mini) entry(state.labels.exitMini, 'exit-mini');
@@ -131,9 +141,10 @@ function frame() {
   const resize = el('div', 'resize'); resize.setAttribute('aria-hidden', 'true'); let point;
   resize.addEventListener('pointerdown', e => { if (state.locked) return; point = [e.screenX,e.screenY]; resize.setPointerCapture(e.pointerId); e.preventDefault(); });
   resize.addEventListener('pointermove', e => { if (!point) return; const x=e.screenX-point[0], y=e.screenY-point[1]; point=[e.screenX,e.screenY]; if (x || y) action('resize',{x,y}); }); resize.addEventListener('pointerup', () => point = undefined); resize.addEventListener('lostpointercapture', () => point = undefined);
-  const collectionbar=el('div','collectionbar'),collections=el('select','collection-selector');collections.addEventListener('change',()=>action('collection',{value:collections.value}));collectionbar.append(collections,button('', 'manage-lists', '', {},'manage-lists'));
+  const collectionbar=el('div','collectionbar'),collections=el('select','collection-selector');collections.addEventListener('change',()=>action('collection',{value:collections.value}));collectionbar.append(collections,button('', 'list-details', '', {},'list-details'),button('', 'manage-lists', '', {},'manage-lists'));
+  const selectionbar=el('div','selectionbar');
   const miniControls=el('div','mini-controls');miniControls.append(button('', 'exit-mini', '', {}, 'mini-exit'));
-  windowNode.append(header,intro,navigation,searchbar,collectionbar,miniControls,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
+  windowNode.append(header,intro,navigation,searchbar,collectionbar,selectionbar,miniControls,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
   windowNode.addEventListener('contextmenu', e => { if (state.mini && !e.target.closest('[data-game]')) { e.preventDefault(); showMenu(null,e.clientX,e.clientY); } });
 }
 function renderMain() {
@@ -148,7 +159,7 @@ function renderMain() {
     if(!host.querySelector('.web-toolbar')){const tools=el('div','web-toolbar');tools.append(button(state.labels.account,'account',state.labels.account,{},'accent web-account'));for(const [name,label] of [['import',state.labels.backupImport],['export',state.labels.backupExport],['web-info',state.labels.browserInfo]])tools.append(button(label,name));const link=el('a','',state.labels.windowsDownload);link.href='https://github.com/Nicolasmf05/Checkpoint/releases';link.target='_blank';link.rel='noopener noreferrer';tools.append(link);host.querySelector('.header').after(tools);}}
   if(state.browser){const account=host.querySelector('.web-account');account.textContent=state.labels.account;account.setAttribute('aria-label',state.labels.account);account.hidden=state.tab==='friends'&&!state.signedIn;}
   host.querySelector('h1').textContent = state.labels[state.tab];
-  host.querySelector('.summary').textContent = state.summary;const collectionbar=host.querySelector('.collectionbar');collectionbar.hidden=!state.collections||state.tab!=='list';if(state.collections){const selector=host.querySelector('.collection-selector');selector.replaceChildren();for(const list of state.collections){const option=el('option','',list.label);option.value=list.value;selector.append(option);}selector.value=state.collection;selector.setAttribute('aria-label',state.labels.collection);const manage=host.querySelector('.manage-lists');manage.textContent=state.labels.manageLists;manage.setAttribute('aria-label',state.labels.manageLists);}
+  host.querySelector('.summary').textContent = state.summary;const collectionbar=host.querySelector('.collectionbar');collectionbar.hidden=!state.collections||state.tab==='friends';if(state.collections){const selector=host.querySelector('.collection-selector');selector.replaceChildren();for(const list of state.collections){const option=el('option','',list.label);option.value=list.value;selector.append(option);}selector.value=state.collection;selector.setAttribute('aria-label',state.labels.collection);const manage=host.querySelector('.manage-lists');manage.textContent=state.labels.manageLists;manage.setAttribute('aria-label',state.labels.manageLists);const sheet=host.querySelector('.list-details');sheet.textContent=state.labels.listDetails;sheet.setAttribute('aria-label',state.labels.listDetails);}
   host.querySelectorAll('[data-label]').forEach(node => { const label = state.labels[node.dataset.label]; const key=gestures[node.dataset.label]; node.title = label+(key?' · '+key:''); node.setAttribute('aria-label', label);if(key)node.setAttribute('aria-keyshortcuts',key==='Esc'?'Escape':key.replace('Ctrl+','Control+')); if (node.classList.contains('add')) node.textContent = '+ '+label; });
   host.querySelectorAll('[data-tab]').forEach(node => { node.textContent = state.labels[node.dataset.tab]; node.classList.toggle('active', state.tab === node.dataset.tab); });
   const search = host.querySelector('#search'); if ((pending.get('search')||0) <= (state.ack||0) && search.value !== state.search) search.value = state.search; search.placeholder = state.labels.search+' · '+gestures.search; search.setAttribute('aria-keyshortcuts',gestures.search.replace('Ctrl+','Control+')); search.setAttribute('aria-label',state.labels.search);
@@ -159,8 +170,20 @@ function renderMain() {
   host.querySelector('.resize').hidden = state.browser || state.locked || state.full; host.querySelector('.dragstrip').hidden = state.browser || !state.mini; host.querySelector('[data-label="pin"]').textContent = state.pinned ? '◆' : '◇';
   host.querySelector('[data-label="view"]').textContent = state.mini ? '☷' : state.grid ? '▦' : state.compact ? '≡' : '▤';
   if (selected && !state.games.some(game => game.id === selected)) selected = undefined;
+  renderSelection();
   if (state.tab === 'friends') preserveTree(() => { const viewport=host.querySelector('.viewport'); const content=el('div','friends-content'); content.append(schema(state.friends)); if (state.friendsBusy) content.querySelectorAll('button,input,select').forEach(node=>node.disabled=true); viewport.replaceChildren(content); });
   else renderGames();
+}
+function renderSelection(){
+ const bar=root.querySelector('.selectionbar');if(!bar)return;bar.hidden=state.mini||state.tab==='friends';bar.replaceChildren();if(bar.hidden)return;
+ const l=state.labels,source=state.tab==='library'?'library':state.collection,ids=[...picked];
+ bar.append(el('span','selection-count',l.selectedGames+' '+ids.length));
+ const selectAll=el('button','',l.selectResults);selectAll.title=l.selectionLimit;selectAll.addEventListener('click',()=>{state.games.slice(0,500).forEach(g=>picked.add(g.id));renderSelection();renderGames();});bar.append(selectAll);
+ const clear=el('button','',l.clearSelection);clear.disabled=!ids.length;clear.addEventListener('click',()=>{picked.clear();renderSelection();renderGames();});if(ids.length)bar.append(clear);
+ const controls=[[l.changeList,'list-change',{ids,source,mode:'move'}],[l.addToList,'list-change',{ids,source,mode:'add'}]];
+ if(source!=='private')controls.push([source.startsWith('custom:')?l.removeFromList:l.untrack,'batch',{ids,source,operation:'remove'}]);
+ controls.push([l.makePrivate,'batch',{ids,source,operation:'private'}],[l.makeVisible,'batch',{ids,source,operation:'public'}]);
+ for(const [label,command,values] of ids.length?controls:[]){const b=button(label,command,label,values);b.disabled=!ids.length;bar.append(b);}if(ids.length)bar.append(el('span','muted',l.selectionLimit));
 }
 function renderGames() {
   if (!state || state.kind !== 'main' || state.tab === 'friends') return;
@@ -175,14 +198,16 @@ function renderGames() {
   for (let index=range.start; index<Math.min(range.end,state.games.length); index++) {
     const game=state.games[index], row=el('article',state.mini ? 'minirow' : `game${state.grid ? ' grid' : state.compact ? ' compact' : ''}`);
     row.dataset.game=game.id;if(state.mini){row.title=state.labels.edit+' · '+gestures.edit;row.setAttribute('aria-keyshortcuts',[gestures.edit,gestures.gameMenu,'Space',gestures.up,gestures.down,gestures.first,gestures.last,gestures.pageUp,gestures.pageDown].join(' '));} row.tabIndex=selected===game.id ? 0 : -1; row.classList.toggle('selected',selected===game.id); row.style.top=`${Math.floor(index/columns)*rowHeight}px`;
+    row.classList.toggle('picked',picked.has(game.id));
     if (!state.mini) { row.style.left=`${(index%columns)*100/columns}%`; row.style.width=`calc(${100/columns}% - ${columns>1 ? 8 : 0}px)`; row.style.height=`${rowHeight-10}px`; }
     else row.style.height=`${rowHeight-3}px`;
     row.title=state.labels.details; row.setAttribute('aria-label',game.title+' · '+state.labels.details);
-    row.addEventListener('click',e=>{if(e.target.closest('button,input,select,a'))return;selected=game.id;action('details',{id:game.id});});
+    row.addEventListener('click',e=>{if(e.target.closest('button,input,select,a,label'))return;selected=game.id;action('details',{id:game.id});});
     row.addEventListener('keydown',e=>{if(e.target===row&&e.key==='Enter'&&(!state.mini||!matches(e,gestures.gameMenu))){e.preventDefault();e.stopPropagation();action('details',{id:game.id});}});
     row.addEventListener('focus',()=>selected=game.id); row.addEventListener('contextmenu',e=>{ e.preventDefault(); selected=game.id; showMenu(game,e.clientX,e.clientY); });
     if (state.mini) { const name=el('div','game-title ellipsis',game.title); name.title=game.title; row.append(name,el('div',`status state-${game.state}`,game.status));  }
     else {
+      const check=el('input','game-selection');check.type='checkbox';check.checked=picked.has(game.id);check.setAttribute('aria-label',state.labels.selectGame+': '+game.title);check.title=state.labels.selectionLimit;check.addEventListener('change',()=>{if(check.checked&&picked.size>=500){check.checked=false;return;}if(check.checked)picked.add(game.id);else picked.delete(game.id);row.classList.toggle('picked',picked.has(game.id));renderSelection();});row.append(check);
       if (!state.lightweight) {
         const missing=()=>{const key=game.id+'|'+game.title+'|'+game.cover;if(missingCoverSignals.has(key))return;missingCoverSignals.add(key);action('cover-missing',{id:game.id});};
         const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>{cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)));missing();});if(!game.cover)queueMicrotask(missing); row.append(cover); }
@@ -231,7 +256,7 @@ window.chrome?.webview?.addEventListener('message',event=>{
   if (event.data.kind==='focus-game') {selected=event.data.id;requestAnimationFrame(()=>root.querySelector(`[data-game="${selected}"]`)?.focus({preventScroll:true}));return;}
   if (event.data.kind==='focus-search') { requestAnimationFrame(()=>{const search=root.querySelector('#search');search?.focus();search?.select();});return; }
   const firstDialog=event.data.kind==='dialog'&&(state?.kind!=='dialog'||state.root?.pageId!==event.data.root?.pageId);
-  state=event.data;if(state.kind==='main')gestures=effectiveShortcuts(state.shortcuts); window.checkpointState=state;
+  state=event.data;if(state.kind==='main'){const context=state.tab+'|'+state.collection+'|'+state.search+'|'+state.filter;if(selectionContext!==context)picked.clear();selectionContext=context;const available=new Set(state.games.map(g=>g.id));for(const id of picked)if(!available.has(id))picked.delete(id);}if(state.kind==='main')gestures=effectiveShortcuts(state.shortcuts); window.checkpointState=state;
   for (const [key,id] of pending) if (id <= (state.ack||0)) pending.delete(key); document.documentElement.lang=state.language; document.documentElement.dataset.theme=state.theme || (state.light?'light':'dark');
   if (state.kind==='dialog') {dialogMode=true;const build=()=>{const page=el('main','dialog-page');page.append(schema(state.root));root.replaceChildren(page);};if(firstDialog)build();else preserveTree(build);if(firstDialog)root.querySelector('input,select,button')?.focus();}
   else renderMain();

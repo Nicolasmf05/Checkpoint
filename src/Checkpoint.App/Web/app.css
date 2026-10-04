@@ -99,3 +99,13 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .achievement-summary { padding:14px; }
 .achievement-summary .heading { font-size:22px; }
 .achievement-link { font-weight:600; }
+
+.selectionbar { display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-bottom:1px solid var(--line);padding:0 0 8px;flex:none; }
+.selectionbar[hidden],.mini .selectionbar { display:none; }
+.selectionbar button { font-size:11px;padding:4px 7px;min-height:28px; }
+.selection-count { font-size:11px;font-weight:600; }
+.game-selection { flex:none;align-self:flex-start; }
+.game.picked { background:var(--panel);box-shadow:inset 3px 0 var(--accent-ink,var(--accent)); }
+.game.grid .game-selection { position:absolute;top:12px;left:12px;z-index:1; }
+.menu-caption { padding:7px;font-weight:600; }
+.collectionbar { flex-wrap:wrap; }.collectionbar button { font-size:11px;padding:6px 8px; }

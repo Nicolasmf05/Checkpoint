@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## 0.8.8 — 2026-10-04
+
+- Guardar crea la lista escrita y la abre, incluso desde Biblioteca; ya no depende del botón Crear lista por separado.
+- Menús de juegos con acciones del juego, las tres listas de destino más recientes y un selector completo.
+- Selección múltiple en Biblioteca y listas normales: mover, añadir otra pertenencia, quitar de una lista y cambiar privacidad. Quitar conserva el juego en Biblioteca, notas y logros.
+- Fichas de listas con recuentos, progreso, juegos privados, búsqueda, páginas de 50 y acciones individuales o por lotes. Controles completos en español e inglés.
+
 ## Web — 2026-10-04
 
 - La dirección principal abre una presentación bilingüe. Abrir Checkpoint entra en la app existente; app.html permite el acceso directo. Volver a la presentación conserva la sesión de la pestaña y los juegos locales. Las PWA instaladas abren directamente la app.

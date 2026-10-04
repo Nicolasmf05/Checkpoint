@@ -66,3 +66,21 @@ export function normalizeLists(names){const map=new Map();for(const n of Array.i
 export function listName(name,existing,previous){name=String(name||'').trim();if(!name||name.length>40||/[\x00-\x1f\x7f]/.test(name))throw new Error('invalid-list');if(['mi lista','my list','privados','private games','biblioteca','library'].includes(name.toLocaleLowerCase())||existing.some(n=>n.toLocaleLowerCase()===name.toLocaleLowerCase()&&n.toLocaleLowerCase()!==previous?.toLocaleLowerCase()))throw new Error('duplicate-list');if(!previous&&existing.length>=30)throw new Error('too-many-lists');return name;}
 export const inList=(g,selection)=>selection==='private'?g.friendsPrivate===true:g.tracked&&g.friendsPrivate!==true&&(selection==='all'||selection.startsWith('custom:')&&g.lists.some(n=>n.toLocaleLowerCase()===selection.slice(7).toLocaleLowerCase()));
 export const shouldShare=g=>g.tracked&&g.friendsPrivate!==true;
+
+export const listMembers=(games,source)=>games.filter(g=>source.startsWith('custom:')?g.lists.some(n=>n.toLocaleLowerCase()===source.slice(7).toLocaleLowerCase()):source==='private'?g.friendsPrivate===true:g.tracked);
+export function applyListAction(games,ids,catalog,operation,source,target){
+ const keys=new Set(ids),chosen=games.filter(g=>keys.has(g.id));
+ if(!keys.size||keys.size>500||chosen.length!==keys.size||![...keys].every(uuid))throw new Error('invalid-selection');
+ if(!['move','add','remove','private','public'].includes(operation))throw new Error('invalid-list-action');
+ const destination=catalog.find(n=>n.toLocaleLowerCase()===String(target||'').toLocaleLowerCase());
+ if(['move','add'].includes(operation)&&!destination)throw new Error('missing-list');
+ if(typeof source!=='string'||!['all','library','private'].includes(source)&&!source.startsWith('custom:')||source.startsWith('custom:')&&!catalog.some(n=>n.toLocaleLowerCase()===source.slice(7).toLocaleLowerCase())||operation==='remove'&&source==='private')throw new Error('invalid-list-action');
+ for(const g of chosen){
+  if(operation==='move')g.lists=source.startsWith('custom:')?g.lists.filter(n=>n.toLocaleLowerCase()!==source.slice(7).toLocaleLowerCase()):source==='private'?[...g.lists]:[];
+  if(operation==='move'||operation==='add'){g.lists=normalizeLists([...g.lists,destination]);g.tracked=true;}
+  else if(operation==='remove'){if(source.startsWith('custom:'))g.lists=g.lists.filter(n=>n.toLocaleLowerCase()!==source.slice(7).toLocaleLowerCase());else g.tracked=false;}
+  else if(operation==='private')g.friendsPrivate=true;
+  else if(operation==='public'){g.friendsPrivate=false;g.tracked=true;}
+ }
+ return chosen.length;
+}

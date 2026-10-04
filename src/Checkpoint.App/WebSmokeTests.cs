@@ -165,7 +165,7 @@ public partial class MainWindow
             Check(await Script(web,"document.activeElement.matches('.minirow')"),"CSS Miniature keyboard navigation focuses an HTML game row");
             var activeGameId=Guid.Parse(JsonSerializer.Deserialize<string>(await web.Browser.CoreWebView2.ExecuteScriptAsync("document.activeElement.dataset.game"))!);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
-            Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===10+window.checkpointState.collections.length"),"Miniature state and window actions render in an HTML context menu");
+            Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===5 && !document.querySelector('.menu').textContent.includes('Settings')"),"Miniature game menu contains only game actions");
             await Run("[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Playing')).click();");
             Check(Store.LoadGames().Single(g=>g.Id==activeGameId).Status==GameStatus.Playing,"HTML state actions persist through the native controller");
             Check(await Script(web,"document.querySelector('.mini-exit').getAttribute('aria-label')==='Exit miniature view' && document.querySelector('.mini-exit').getBoundingClientRect().bottom<=document.querySelector('.viewport').getBoundingClientRect().top"),"Miniature offers a visible English exit button above the game list");
@@ -199,7 +199,7 @@ public partial class MainWindow
             Check(await Script(web,"document.querySelector('.minirow').textContent.includes('<img') && !document.querySelector('.minirow img')"),"game titles render as text rather than executable HTML");
             web.Browser.CoreWebView2.Navigate("https://example.invalid/"); await Task.Delay(200);
             Check(web.Browser.CoreWebView2.Source==WebSurface.Origin+"index.html","navigation to remote content is blocked before loading");
-            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));[...document.querySelectorAll('.menu button')].find(b=>b.textContent==='Exit miniature view').click();");
+            await Run("document.querySelector('.mini-exit').click();");
             Check(!Preferences.MiniatureView && await Script(web,"!window.checkpointState.mini && getComputedStyle(document.querySelector('.header')).display==='flex'"),"HTML exit action restores the normal view and window dimensions");
             Games.RemoveAll(g=>g.Title.StartsWith("CSS scale ",StringComparison.Ordinal) || g.Id==malicious.Id); Persist();
             Preferences.GridView=true; Preferences.Compact=false; Preferences.LightTheme=false; Preferences.Theme="dark"; ApplyPreferences(); Refresh(); await Task.Delay(300);
@@ -232,12 +232,12 @@ public partial class MainWindow
             await Run("const mode=document.querySelector('.window-mode');mode.value=1;mode.dispatchEvent(new Event('change',{bubbles:true}));");
             Check(!IsFullWindow && Math.Abs(Width-smallWidth)<2 && Math.Abs(Height-smallHeight)<2 && await Script(web,"window.checkpointState.opacity===0.61 && document.querySelector('.window-mode').value==='1'"),"small window restores saved dimensions and translucency");
             await Run("const mode=document.querySelector('.window-mode');mode.value=2;mode.dispatchEvent(new Event('change',{bubbles:true}));");
-            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
+            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));document.querySelector('.window').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:8,clientY:8}));");
             await Run("[...document.querySelectorAll('.menu button')].find(button=>button.getAttribute('aria-keyshortcuts')==='F1').click();");
             Check(await Script(web,"!!document.querySelector('.shortcut-help:modal') && !document.querySelector('.menu') && getComputedStyle(document.querySelector('.shortcutbar')).display==='none'"),"Miniature context menu opens the guide without adding controls to its list");
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
             Check(Preferences.MiniatureView && await Script(web,"!document.querySelector('.shortcut-help') && document.activeElement.matches('.minirow')"),"closing Miniature help restores the selected row focus");
-            await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
+            await Run("document.querySelector('.window').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:8,clientY:8}));");
             Check(Preferences.MiniatureView && await Script(web,"[...document.querySelectorAll('.menu button')].some(button=>button.textContent.includes('Full window')) && window.checkpointState.opacity===0.61"),"Miniature keeps translucency and offers all three window modes");
             await Run("[...document.querySelectorAll('.menu button')].find(button=>button.textContent.includes('Full window')).click();");
             Check(IsFullWindow && !Preferences.MiniatureView && Store.LoadSettings().FullWindow,"Miniature context menu restores the opaque full window");
@@ -308,6 +308,31 @@ public partial class MainWindow
             Check(await Script(gameSheet,"document.body.innerText.includes('Game details') && document.body.innerText.includes('Private list fixture')"),"a Miniature row opens the full game sheet by mouse without changing window mode");
             await gameSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
             Preferences.MiniatureView=false;ApplyPreferences();Refresh();
+            await Task.Delay(250);
+            await Run("document.querySelector('[data-label=settings]').click();");
+            var bulkSettings=await Dialog();
+            await bulkSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(250);
+            await Run("document.querySelector('.manage-lists').click();");var saveLists=await Dialog();
+            await saveLists.Browser.CoreWebView2.ExecuteScriptAsync("const name=document.querySelector('input[aria-label=\"List name\"]');name.value='CSS saved list';name.dispatchEvent(new Event('input',{bubbles:true}));");await Task.Delay(250);
+            await saveLists.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
+            Check(Preferences.GameLists.Contains("CSS saved list")&&Store.LoadSettings().GameLists.Contains("CSS saved list")&&Preferences.ActiveList=="custom:CSS saved list","Save creates the typed Windows list and persists its selection");
+            var bulkA=new Game{Title="Bulk first",Tracked=false,Notes="Bulk notes",Lists=["Weekend"]};var bulkB=new Game{Title="Bulk second",FriendsPrivate=true};Games.AddRange(new[]{bulkA,bulkB});Persist();
+            await Run("document.querySelector('[data-tab=library]').click();");
+            await Run("const viewport=document.querySelector('.viewport');viewport.scrollTop=viewport.scrollHeight;viewport.dispatchEvent(new Event('scroll'));");
+            // Backend commands and UI snapshots exercise the same selected-game action used by checkboxes.
+            ApplyListAction(new[]{bulkA.Id,bulkB.Id},"move","library","CSS saved list");await Task.Delay(250);
+            Check(bulkA.Tracked&&bulkA.Lists.SequenceEqual(new[]{"CSS saved list"})&&bulkB.FriendsPrivate==true&&Store.LoadGames().First(g=>g.Id==bulkA.Id).Lists.Contains("CSS saved list"),"Windows batch movement persists and preserves private members and notes");
+            SelectGameList("custom:CSS saved list");await Task.Delay(250);
+            await Run("document.querySelector('.list-details').click();");var listSheet=await Dialog();
+            Check(await Script(listSheet,"document.body.innerText.includes('List details')&&document.body.innerText.includes('Bulk second')&&document.querySelectorAll('input[type=checkbox]').length===2"),"Windows list sheet includes private members with individual selection");
+            await Capture(listSheet,"css-list-details-en.png");
+            await listSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Select this page').click();");await Task.Delay(200);
+            await listSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Make visible to friends').click();");await Task.Delay(250);
+            Check(!bulkA.FriendsPrivate.GetValueOrDefault()&&!bulkB.FriendsPrivate.GetValueOrDefault()&&bulkA.Notes=="Bulk notes","Windows sheet publishes selected games without touching private notes");
+            await listSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            await Run("document.querySelector('.game').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:30,clientY:100}));");
+            Check(await Script(web,"document.querySelector('.menu').textContent.includes('Change list')&&!document.querySelector('.menu').textContent.includes('Settings')&&!document.querySelector('.menu').textContent.includes('Full window')"),"Windows game menu excludes application settings and window controls");
+            await Capture(web,"css-game-menu-en.png");await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

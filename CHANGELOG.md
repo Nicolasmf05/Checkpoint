@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.8 — 2026-10-04
+
+- Save creates a typed list and opens it, including when starting in Library; creation no longer depends on the separate Create list button.
+- Game context menus contain only game actions, with the three newest destination lists and a full list chooser.
+- Multi-selection in Library and normal lists: move, add another membership, remove from a list, and change privacy. Membership removal retains the library game, notes and achievements.
+- Full list sheets with counts, progress, private members, search, pages of 50 and individual or batch actions. All controls are localized in Spanish and English.
+
 ## Web — 2026-10-04
 
 - The main web address opens a bilingual presentation. Open Checkpoint enters the existing app; app.html provides direct access. Returning to the overview retains same-tab sessions and local games. Installed PWAs open the app directly.

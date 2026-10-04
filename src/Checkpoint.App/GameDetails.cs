@@ -6,9 +6,10 @@ using Checkpoint.Core;
 namespace Checkpoint.App;
 internal static partial class Dialogs
 {
-    internal static void GameDetails(MainWindow owner,Game game)
+    internal static void GameDetails(MainWindow owner,Game game,Window? parent=null)
     {
         var window=Modal(owner,I18n.T("Ficha del juego")+" · "+game.Title,620,760);
+        if(parent is not null)window.Owner=parent;
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,game.Title,I18n.T("Ficha del juego"));
         var image=new Image { Height=240,Tag="cover-preview",Visibility=Visibility.Collapsed };
