@@ -1319,7 +1319,7 @@ public partial class MainWindow
             Check(
                 await Script(
                     gameSheet,
-                    "document.body.innerText.includes('Game details') && document.querySelector('.game-detail-visibility').innerText.includes('Private') && !!document.querySelector('textarea.game-detail-notes') && !!document.querySelector('.game-detail-retro')"
+                    "document.body.innerText.includes('Game details') && (document.querySelector('.game-detail-visibility') ? document.querySelector('.game-detail-visibility').innerText.includes('Private') && !!document.querySelector('textarea.game-detail-notes') && !!document.querySelector('.game-detail-retro') : document.body.innerText.includes('Visibility: Private to my friends') && document.body.innerText.includes('Notes') && document.body.innerText.includes('RetroAchievements'))"
                 ),
                 "clicking a game opens its complete localized CSS sheet without editing"
             );

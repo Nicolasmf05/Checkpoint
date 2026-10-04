@@ -1064,13 +1064,17 @@ try {
         .evaluate((n) => n.classList.contains('accent'))),
     'manual game sheet emphasizes achievements without offering an invalid Steam launch',
   );
+  const redesignedSheet = (await page.locator('.game-detail-visibility').count()) > 0;
   check(
     (await page.locator('.game-playtime').getByText('0 h', { exact: true }).isVisible()) &&
-      (await page.getByRole('textbox', { name: 'Notes', exact: true }).inputValue()) === '' &&
-      (await page
-        .locator('.game-detail-visibility')
-        .getByText('Visible', { exact: true })
-        .isVisible()),
+      (redesignedSheet
+        ? (await page.getByRole('textbox', { name: 'Notes', exact: true }).inputValue()) === '' &&
+          (await page
+            .locator('.game-detail-visibility')
+            .getByText('Visible', { exact: true })
+            .isVisible())
+        : (await page.getByText('No notes', { exact: true }).isVisible()) &&
+          (await page.getByText('Visibility: Visible to my friends', { exact: true }).isVisible())),
     'clicking a game title opens its full localized sheet without editing it',
   );
   await page.screenshot({ path: path.join(evidence, 'web-game-details-en.png') });
