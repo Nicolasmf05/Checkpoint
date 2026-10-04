@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.25
+
+- Library’s selection bar now includes Add to My list for multiple selected games. The action appears when any selected game is not tracked yet and preserves privacy, other lists and progress; games already in My list are retained.
+
 ## 0.8.24
 
 - Right-click a Library game to add it directly to My list. The action appears only when the selection includes games that are not tracked yet, works with multiple selected games and preserves privacy, other list memberships and progress.

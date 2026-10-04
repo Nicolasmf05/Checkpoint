@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.25
+
+- La barra de selección de Biblioteca incluye Añadir a Mi lista para varios juegos seleccionados. Aparece cuando alguno todavía no está añadido y conserva la privacidad, las otras listas y el progreso; los juegos que ya estaban en Mi lista se mantienen.
+
 ## 0.8.24
 
 - El menú de clic derecho de Biblioteca permite añadir juegos directamente a Mi lista. La opción aparece cuando la selección incluye juegos que todavía no están en ella, funciona con varios juegos seleccionados y conserva la privacidad, las otras listas y el progreso.

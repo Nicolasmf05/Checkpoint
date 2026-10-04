@@ -1454,6 +1454,37 @@ public partial class MainWindow
             );
             Search.Clear();
             Refresh();
+            ApplyListAction(new[] { bulkA.Id }, "remove", "library");
+            Search.Text = "Bulk";
+            Refresh();
+            await Run(
+                "document.querySelectorAll('.game-selection').forEach(check=>check.click());"
+            );
+            Check(
+                await Script(
+                    web,
+                    "document.querySelector('.selection-count').textContent.includes('2') && [...document.querySelectorAll('.selectionbar button')].some(b=>b.textContent==='Add to My list')"
+                ),
+                "Windows Library selection bar offers direct tracking for a mixed selection"
+            );
+            await Run(
+                "[...document.querySelectorAll('.selectionbar button')].find(b=>b.textContent==='Add to My list').click();"
+            );
+            Check(
+                bulkA.Tracked
+                    && bulkB.Tracked
+                    && bulkA.Lists.SequenceEqual(new[] { "Weekend" })
+                    && bulkA.Notes == "Bulk notes"
+                    && bulkB.FriendsPrivate == true
+                    && Store.LoadGames().Single(g => g.Id == bulkA.Id).Tracked
+                    && await Script(
+                        web,
+                        "![...document.querySelectorAll('.selectionbar button')].some(b=>b.textContent==='Add to My list')"
+                    ),
+                "Windows bulk tracking persists private data and hides the action when all are tracked"
+            );
+            Search.Clear();
+            Refresh();
             await Run(
                 "const viewport=document.querySelector('.viewport');viewport.scrollTop=viewport.scrollHeight;viewport.dispatchEvent(new Event('scroll'));"
             );

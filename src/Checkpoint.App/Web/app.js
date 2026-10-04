@@ -132,6 +132,12 @@ function renderHelp() {
   }
 }
 
+function canTrackSelection(ids, source) {
+  if (source !== 'library' || !ids.length) return false;
+  const chosen = new Set(ids);
+  return state.games.some((game) => chosen.has(game.id) && !game.tracked);
+}
+
 function showMenu(game, x, y) {
   dismissMenu();
   if (!state || state.kind !== 'main') return;
@@ -161,10 +167,7 @@ function showMenu(game, x, y) {
     const l = state.labels,
       ids = picked.has(game.id) && picked.size > 1 ? [...picked] : [game.id],
       source = state.tab === 'library' ? 'library' : state.collection;
-    if (
-      source === 'library' &&
-      ids.some((id) => state.games.some((candidate) => candidate.id === id && !candidate.tracked))
-    )
+    if (canTrackSelection(ids, source))
       entry(l.track, 'batch', { ids, operation: 'track', source });
     if (ids.length === 1) {
       entry(l.details, 'details', { id: game.id });
@@ -756,6 +759,8 @@ function renderSelection() {
     [l.changeList, 'list-change', { ids, source, mode: 'move' }],
     [l.addToList, 'list-change', { ids, source, mode: 'add' }],
   ];
+  if (canTrackSelection(ids, source))
+    controls.unshift([l.track, 'batch', { ids, source, operation: 'track' }]);
   if (source !== 'private')
     controls.push([
       source.startsWith('custom:') ? l.removeFromList : l.untrack,

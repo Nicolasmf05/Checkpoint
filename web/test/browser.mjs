@@ -1275,6 +1275,50 @@ try {
     'direct Library tracking survives reload and preserves privacy memberships and notes',
   );
 
+  await click('Library');
+  await directGame().click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Remove from My list', exact: true }).click();
+  await page.waitForFunction(
+    (title) => window.checkpointState.games.some((g) => g.title === title && !g.tracked),
+    directTitle,
+  );
+  const selectionBefore = await readBulk();
+  for (const title of bulkTitles)
+    await page.getByRole('checkbox', { name: 'Select a game: ' + title, exact: true }).check();
+  await page
+    .locator('.selectionbar')
+    .getByRole('button', { name: 'Add to My list', exact: true })
+    .click();
+  await page.waitForFunction(
+    (titles) =>
+      titles.every((title) =>
+        window.checkpointState.games.some((g) => g.title === title && g.tracked),
+      ),
+    bulkTitles,
+  );
+  check(
+    (await page
+      .locator('.selectionbar')
+      .getByRole('button', { name: 'Add to My list', exact: true })
+      .count()) === 0,
+    'Library selection bar adds a mixed selection and hides the action when all are tracked',
+  );
+  await page.reload();
+  await page.locator('.window').waitFor();
+  const selectionAfter = await readBulk();
+  check(
+    selectionAfter.every((g) => {
+      const previous = selectionBefore.find((p) => p.id === g.id);
+      return (
+        g.tracked &&
+        g.friendsPrivate === previous.friendsPrivate &&
+        JSON.stringify(g.lists) === JSON.stringify(previous.lists) &&
+        g.notes === previous.notes
+      );
+    }),
+    'Library bulk tracking survives reload without changing privacy memberships or notes',
+  );
+
   // Explicit settings review must include more than the periodic 20-game batch.
   libraryEmpty = true;
   await page.evaluate(async () => {
