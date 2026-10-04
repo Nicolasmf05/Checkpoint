@@ -364,7 +364,7 @@ public partial class MainWindow
         achievementReviewErrors;
     private bool achievementReviewVisible,
         achievementReviewStopped;
-    private string achievementReviewError = "";
+    private (string Title, Exception Error)? achievementReviewError;
     internal string AchievementReviewText =>
         !achievementReviewVisible
             ? ""
@@ -381,7 +381,11 @@ public partial class MainWindow
                 + I18n.T("No se pudieron actualizar:")
                 + " "
                 + achievementReviewErrors
-                + (achievementReviewError.Length > 0 ? " · " + achievementReviewError : "");
+                + (
+                    achievementReviewError is { } failure
+                        ? " · " + failure.Title + ": " + I18n.Error(failure.Error)
+                        : ""
+                );
 
     internal void StopAchievementReview()
     {
@@ -406,7 +410,7 @@ public partial class MainWindow
         );
         achievementReviewDone = 0;
         achievementReviewErrors = 0;
-        achievementReviewError = "";
+        achievementReviewError = null;
         achievementReviewTotal = selected.Length;
         achievementReviewVisible = true;
         achievementReviewStopped = false;
@@ -560,7 +564,6 @@ public partial class MainWindow
 
     private void RecordError(Game game, Exception error)
     {
-        if (achievementReviewError.Length == 0)
-            achievementReviewError = game.Title + ": " + I18n.Error(error);
+        achievementReviewError ??= (game.Title, error);
     }
 }

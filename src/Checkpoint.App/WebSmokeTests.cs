@@ -1319,7 +1319,7 @@ public partial class MainWindow
             Check(
                 await Script(
                     gameSheet,
-                    "document.body.innerText.includes('Game details') && document.body.innerText.includes('Visibility: Private to my friends') && document.body.innerText.includes('Notes') && document.body.innerText.includes('RetroAchievements')"
+                    "document.body.innerText.includes('Game details') && document.querySelector('.game-detail-visibility').innerText.includes('Private') && !!document.querySelector('textarea.game-detail-notes') && !!document.querySelector('.game-detail-retro')"
                 ),
                 "clicking a game opens its complete localized CSS sheet without editing"
             );
@@ -1884,11 +1884,21 @@ public partial class MainWindow
                     achievementReviewErrors == 5
                         && AchievementReviewText.Contains("Background")
                         && AchievementReviewText.Contains(
-                            I18n.T("RetroAchievements no responde. Se conserva el progreso anterior.")
+                            I18n.T(
+                                "RetroAchievements no responde. Se conserva el progreso anterior."
+                            )
                         )
                         && Store.LoadGames().All(g => g.RetroAchievements?.Count == 1),
                     "Windows background review displays its failing game and localized cause without erasing saved achievements"
                 );
+                I18n.SetLanguage("es");
+                Check(
+                    AchievementReviewText.Contains(
+                        "RetroAchievements no responde. Se conserva el progreso anterior."
+                    ) && !AchievementReviewText.Contains("RetroAchievements is not responding"),
+                    "Windows background failure is translated again after changing language"
+                );
+                I18n.SetLanguage("en");
                 StopAchievementReview();
             }
             Retro = backgroundRetro;

@@ -1066,8 +1066,11 @@ try {
   );
   check(
     (await page.locator('.game-playtime').getByText('0 h', { exact: true }).isVisible()) &&
-      (await page.getByText('No notes', { exact: true }).isVisible()) &&
-      (await page.getByText('Visibility: Visible to my friends', { exact: true }).isVisible()),
+      (await page.getByRole('textbox', { name: 'Notes', exact: true }).inputValue()) === '' &&
+      (await page
+        .locator('.game-detail-visibility')
+        .getByText('Visible', { exact: true })
+        .isVisible()),
     'clicking a game title opens its full localized sheet without editing it',
   );
   await page.screenshot({ path: path.join(evidence, 'web-game-details-en.png') });
@@ -1484,6 +1487,17 @@ try {
       (await page.locator('.achievement-review').textContent()).includes(privacyMessage),
     'background Steam review displays a failing game and translated cause alongside the error count',
   );
+  await click('Settings');
+  await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('0');
+  await click('Save');
+  check(
+    (await page.locator('.achievement-review').textContent()).includes(steamFailure) &&
+      !(await page.locator('.achievement-review').textContent()).includes(privacyMessage),
+    'stored background failure follows a later language change without mixing languages',
+  );
+  await click('Ajustes');
+  await page.getByRole('combobox', { name: 'Idioma', exact: true }).selectOption('1');
+  await click('Guardar');
   const afterFailure = await page.evaluate(async () => {
     const { BrowserStore } = await import('./store.mjs'),
       store = await new BrowserStore().open();

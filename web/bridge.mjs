@@ -784,7 +784,7 @@ function reviewStatus() {
     T('No se pudieron actualizar:') +
     ' ' +
     r.errors +
-    (r.firstError ? ' · ' + r.firstError : '')
+    (r.firstError ? ' · ' + r.firstError.title + ': ' + errorText(r.firstError.error) : '')
   );
 }
 function startAchievementReview() {
@@ -796,7 +796,7 @@ function startAchievementReview() {
       done: 0,
       total: ids.length,
       errors: 0,
-      firstError: '',
+      firstError: null,
       running: true,
       stopped: false,
       controller: new AbortController(),
@@ -845,7 +845,7 @@ function startAchievementReview() {
           } catch (error) {
             if (signal.aborted) throw error;
             r.errors++;
-            r.firstError ||= target.title + ': ' + errorText(error);
+            r.firstError ||= { title: target.title, error };
           }
           r.done++;
           emit();
