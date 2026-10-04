@@ -1,5 +1,12 @@
 export const statuses=['Pending','Playing','Paused','Finished','Abandoned'];
-export const goals=['Story','Achievements','Custom'];
+import {reviewItems} from './review.mjs';
+export const goals=['Story','Achievements','Custom','None'];
+export function goalVisible(game){
+ if(game.goal===3||game.goal===0&&game.status===3)return false;
+ if(game.goal!==1)return true;
+ if(game.steamAppId&&game.achievements===null||game.retroGameId&&game.retroAchievements===null)return true;
+ const items=reviewItems(game);return !items.length||!items.every(a=>a.unlocked);
+}
 export const themes=['dark','light','midnight','ocean','forest','plum','amber','contrast','cyber-purple','electric-blue','neon-lime','black-red','black-orange','synthwave','blue-white','purple-dark','emerald-neutral','black-white','navy-cyan','coral-cream','orange-charcoal','indigo-gray'];
 const text=(v,n)=>typeof v==='string'?v.slice(0,n):'';
 const integer=(v,max)=>Number.isInteger(Number(v))&&Number(v)>=0&&Number(v)<=max?Number(v):0;
@@ -50,7 +57,7 @@ export function importBackup(games,backup) {
     game.sortOrder=games.length;games.push(game);ids.add(game.id);if(game.steamAppId)apps.add(game.steamAppId);added++;}return added;
 }
 export function payload(game) {
-  return {title:game.title,platform:game.platform,status:statuses[game.status].toLowerCase(),goalKind:goals[game.goal].toLowerCase(),goalText:game.goal===2?game.customGoal:null,
+  return {title:game.title,platform:game.platform,status:statuses[game.status].toLowerCase(),goalKind:goalVisible(game)?goals[game.goal].toLowerCase():null,goalText:game.goal===2?game.customGoal:null,
     storyPercent:game.storyPercent,tasksDone:game.tasks.length?game.tasks.filter(t=>t.done).length:null,tasksTotal:game.tasks.length||null,
     achievementsUnlocked:game.achievements?.length?game.achievements.filter(a=>a.unlocked).length:null,achievementsTotal:game.achievements?.length||null,
     steamAppId:game.steamAppId,coverPath:null,finishedAt:game.finishedAt};

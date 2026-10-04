@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.21
+
+- Opción Sin objetivo. Los objetivos de historia y logros cumplidos desaparecen de tarjetas y fichas sin borrar la elección guardada; al reabrir el progreso vuelven a mostrarse. Los logros vacíos o sin sincronizar no cuentan como completados.
+
 ## 0.8.20
 
 - Filtros de estado visibles en Biblioteca y colecciones, también en las fichas de listas. Se combinan con la búsqueda por nombre; cambiar los filtros limpia la selección para evitar acciones sobre juegos ocultos.

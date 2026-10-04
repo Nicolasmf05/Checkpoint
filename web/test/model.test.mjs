@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {normalize,mergeLibrary,importBackup,payload,friendCode,account,themes,normalizeLists,listName,inList,shouldShare,listMembers,applyListAction} from '../model.mjs';
+import {normalize,goalVisible,mergeLibrary,importBackup,payload,friendCode,account,themes,normalizeLists,listName,inList,shouldShare,listMembers,applyListAction} from '../model.mjs';
 import {readFile} from 'node:fs/promises';
 test('normalization retains manual fields and bounds remote content',()=>{const g=normalize({title:' Test ',notes:'private',status:'Finished',goal:'Custom',tasks:[{title:'task',done:true}],steamAppId:-1});assert.equal(g.title,'Test');assert.equal(g.status,3);assert.equal(g.goal,2);assert.equal(g.notes,'private');assert.equal(g.steamAppId,null);assert.ok(g.finishedAt);assert.equal(normalize({...g,status:1}).finishedAt,null);});
 test('Steam imports deduplicate and preserve manual state and notes',()=>{const g=normalize({title:'My title',steamAppId:620,notes:'private',status:2,storyPercent:40}),list=[g];assert.equal(mergeLibrary(list,[{appId:620,name:'Portal 2',playtimeMinutes:70},{appId:999,name:'Borrowed',playtimeMinutes:5},{appId:999,name:'Borrowed',playtimeMinutes:10}]),1);assert.equal(list.length,2);assert.equal(g.title,'My title');assert.equal(g.status,2);assert.equal(g.storyPercent,40);assert.equal(g.notes,'private');assert.equal(list[1].tracked,false);});
@@ -34,3 +34,6 @@ test('invalid batch selections and destinations never partially mutate games',()
  assert.throws(()=>applyListAction(games,[games[0].id],['Target'],'remove','private'));
  assert.equal(JSON.stringify(games),before);
 });
+
+test('optional goals survive imports and publication without changing old values',()=>{const g=normalize({title:'Optional',goal:'None'});assert.equal(g.goal,3);assert.equal(payload(g).goalKind,null);const copy=normalize({...g,goal:'None'});assert.equal(copy.goal,3);assert.equal(normalize({title:'Legacy',goal:'Custom'}).goal,2);});
+test('completed goals hide and restore without deleting saved choices',()=>{const g=normalize({title:'Story',goal:'Story',status:'Finished'});assert.equal(goalVisible(g),false);assert.equal(payload(g).goalKind,null);g.status=1;assert.equal(goalVisible(g),true);g.goal=1;assert.equal(goalVisible(g),true);g.achievements=[{id:'a',unlocked:true},{id:'b',unlocked:false}];assert.equal(goalVisible(g),true);g.achievementOverrides={'steam:b':true};assert.equal(goalVisible(g),false);g.achievementOverrides['steam:a']=false;assert.equal(goalVisible(g),true);g.steamAppId=620;g.achievements=null;g.manualAchievements=[{id:'m',unlocked:true}];assert.equal(goalVisible(g),true);});

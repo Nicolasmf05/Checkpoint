@@ -633,5 +633,6 @@
   "Requiere Steam instalado en este equipo.": "Requires Steam installed on this computer.",
   "Al guardar, compartes la referencia de IGDB como carátula por defecto para este juego. No se sube la imagen ni tus datos personales.": "Saving shares the IGDB reference as the default cover for this game. The image and your personal data are not uploaded.",
   "Resultados": "Results",
-  "Ningún juego coincide con los filtros.": "No games match the filters."
+  "Ningún juego coincide con los filtros.": "No games match the filters.",
+  "Sin objetivo": "No goal"
 }

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Checkpoint.Core;
 
 public enum GameStatus { Pending, Playing, Paused, Finished, Abandoned }
-public enum GameGoal { Story, Achievements, Custom }
+public enum GameGoal { Story, Achievements, Custom, None }
 
 public sealed class ChecklistItem
 {
@@ -63,7 +63,17 @@ public sealed class Game
         ? (int)Math.Round(UnlockedCount * 100d / Achievements.Count) : null;
     [JsonIgnore] public bool AllAchievements => Achievements is { Count: > 0 } && Achievements.All(a => a.Unlocked);
     [JsonIgnore] public string StatusText => Labels.Status(Status);
-    [JsonIgnore] public string GoalText => Goal switch
+    [JsonIgnore] public bool GoalVisible => Goal != GameGoal.None && !(Goal == GameGoal.Story && Status == GameStatus.Finished) && !(Goal == GameGoal.Achievements && CompletedAchievementGoal);
+    [JsonIgnore] private bool CompletedAchievementGoal
+    {
+        get
+        {
+            if ((SteamAppId.HasValue && Achievements is null) || (RetroGameId.HasValue && RetroAchievements is null)) return false;
+            var items = AchievementTracking.Items(this).ToArray();
+            return items.Length > 0 && items.All(a => a.Completed);
+        }
+    }
+    [JsonIgnore] public string GoalText => !GoalVisible ? "" : Goal switch
     {
         GameGoal.Story => I18n.T("Terminar la historia"),
         GameGoal.Achievements => I18n.T("Conseguir todos los logros"),
@@ -81,7 +91,7 @@ public static class Labels
     };
     public static string Goal(GameGoal goal) => goal switch
     {
-        GameGoal.Story => I18n.T("Historia"), GameGoal.Achievements => I18n.T("Todos los logros"), _ => I18n.T("Personalizado")
+        GameGoal.Story => I18n.T("Historia"), GameGoal.Achievements => I18n.T("Todos los logros"), GameGoal.None => I18n.T("Sin objetivo"), _ => I18n.T("Personalizado")
     };
 }
 

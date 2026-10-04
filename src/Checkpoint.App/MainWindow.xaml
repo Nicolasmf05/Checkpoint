@@ -11,7 +11,7 @@
             <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding Meta}" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
             <TextBlock Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" FontWeight="SemiBold" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding Model.NextTask}" Foreground="{DynamicResource TextBrush}" FontSize="11" Margin="0,5,0,0" TextTrimming="CharacterEllipsis" Visibility="{Binding DetailVisibility}"/>
+            <TextBlock Text="{Binding Model.NextTask}" Foreground="{DynamicResource TextBrush}" FontSize="11" Margin="0,5,0,0" TextTrimming="CharacterEllipsis" Visibility="{Binding NextTaskVisibility}"/>
             <Grid Margin="0,7,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding ProgressCaption}" FontSize="10" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis"/><TextBlock Grid.Column="1" Text="{Binding PercentText}" FontSize="10" Foreground="{DynamicResource AccentBrush}" Margin="6,0,0,0"/></Grid>
             <ProgressBar Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,5,0,0" Visibility="{Binding ProgressVisibility}"/>
           </StackPanel>
@@ -33,7 +33,7 @@
             <TextBlock Text="{Binding Model.Title}" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding Model.Title}"/>
             <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource MutedBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
             <TextBlock Text="{Binding Model.StatusText}" Foreground="{Binding StatusBrush}" FontSize="10" FontWeight="SemiBold" Margin="0,5,0,0"/>
-            <TextBlock Text="{Binding Model.NextTask}" Foreground="{DynamicResource TextBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,5,0,0"/>
+            <TextBlock Text="{Binding Model.NextTask}" Foreground="{DynamicResource TextBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,5,0,0" Visibility="{Binding GridNextTaskVisibility}"/>
             <TextBlock Text="{Binding GridProgressCaption}" Foreground="{DynamicResource MutedBrush}" FontSize="10" TextTrimming="CharacterEllipsis" Margin="0,6,0,0"/>
             <ProgressBar Value="{Binding Percentage, Mode=OneWay}" Maximum="100" Margin="0,5,0,0"/>
           </StackPanel>

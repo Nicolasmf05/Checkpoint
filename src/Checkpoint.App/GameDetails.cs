@@ -33,7 +33,7 @@ internal static partial class Dialogs
         void Line(string text)=>body.Children.Add(new TextBlock { Text=text,TextWrapping=TextWrapping.Wrap });
         void Section(string title)=>body.Children.Add(new TextBlock { Text=I18n.T(title),FontSize=22,FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap });
         Line(game.Platform+" · "+game.StatusText);
-        Line(I18n.T("Objetivo")+": "+game.GoalText);
+        if(game.GoalVisible)Line(I18n.T("Objetivo")+": "+game.GoalText);
         if(game.StoryPercent is {} percent){Line(I18n.T("Historia")+": "+percent+"%");body.Children.Add(new ProgressBar { Minimum=0,Maximum=100,Value=percent,Height=10 });}
         var achievements=AchievementTracking.Items(game).ToArray();
         Section("Logros");Line(achievements.Count(a=>a.Completed)+" / "+achievements.Length+I18n.T(" completados en Checkpoint"));

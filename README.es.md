@@ -41,12 +41,12 @@ App real en el navegador, con el tema Claro y una pequeña colección de ejemplo
 
 ## Descargar y utilizar
 
-La versión actual es **0.8.20**. En la carpeta `dist` se generan:
+La versión actual es **0.8.21**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.20), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.21), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.8.20-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.8.20-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.8.21-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.8.21-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -106,7 +106,7 @@ Miniatura muestra automáticamente **Biblioteca** cuando Mi lista no contiene ju
 - Mi lista y biblioteca, búsqueda y filtro por estado. Lista y filas de cuadrícula virtualizadas para colecciones grandes.
 - Carátulas descargadas al usar juegos de Steam, caché local y selección de imágenes propias.
 - Estados pendiente, jugando, pausado, historia terminada y abandonado; favoritos y orden por arrastre o teclado.
-- Objetivo de historia, todos los logros o personalizado; notas y tareas con casillas.
+- Objetivo de historia, todos los logros, personalizado o **Sin objetivo**; notas y tareas con casillas. Los objetivos de historia y logros cumplidos se ocultan sin borrar la elección; reaparecen al reabrir el progreso. Los logros vacíos o sin sincronizar no cuentan como completados.
 - Importación de Steam y consulta de logros a través del servicio incluido; logros secretos ocultos por defecto.
 - Actualización manual y cada 15, 30, 60 o 120 minutos. Cada ciclo consulta como máximo 20 juegos de Mi lista, empezando por los menos actualizados.
 - Bandeja del sistema, inicio con Windows opcional y bloqueo de posición/tamaño.
@@ -221,7 +221,7 @@ El proyecto incluye `.gitignore`, licencia Checkpoint Attribution License 1.0, d
 
 Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
 
-También se entrega `dist/Checkpoint-source-0.8.20.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
+También se entrega `dist/Checkpoint-source-0.8.21.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
 
 ## Próximas versiones
 

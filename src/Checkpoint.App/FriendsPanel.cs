@@ -167,7 +167,7 @@ internal sealed class FriendsPanel : ScrollViewer
         var grid = new Grid(); grid.ColumnDefinitions.Add(new() { Width = GridLength.Auto }); grid.ColumnDefinitions.Add(new());
         grid.Children.Add(cover); details.Margin = new Thickness(owner.Preferences.LightweightMode ? 0 : 12,0,0,0); Grid.SetColumn(details,1); grid.Children.Add(details); card.Children.Add(grid);
         int current = generation; if (!owner.Preferences.LightweightMode) _ = LoadCover(image,publication,current);
-        details.Children.Add(Text(game.GoalKind == "custom" ? game.GoalText ?? I18n.T("Objetivo personal") : game.GoalKind == "story" ? I18n.T("Objetivo: terminar la historia") : I18n.T("Objetivo: todos los logros"),11,true));
+        if(game.GoalKind is not null)details.Children.Add(Text(game.GoalKind == "custom" ? game.GoalText ?? I18n.T("Objetivo personal") : game.GoalKind == "story" ? I18n.T("Objetivo: terminar la historia") : I18n.T("Objetivo: todos los logros"),11,true));
         if (game.ProgressText.Length > 0) details.Children.Add(Text(game.ProgressText,12));
         details.Children.Add(Text(I18n.T("Publicado ") + publication.UpdatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm"),10,true));
     }

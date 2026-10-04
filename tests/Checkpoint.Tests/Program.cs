@@ -120,6 +120,18 @@ Check(game.Title == "Test game" && game.Status == GameStatus.Paused && game.Note
 Check(game.PlaytimeMinutes == 900 && library[1].PlaytimeMinutes == 55 && !library[1].Tracked, "imports only update Steam fields and do not flood widget");
 Check(game.NextTask == "Last chapter", "next pending task"); game.Tasks[0].Done = true;
 Check(game.NextTask == game.GoalText, "completed tasks fall back to goal");
+var noGoal = new Game {Title="No goal",Goal=GameGoal.None,CustomGoal="Kept",Status=GameStatus.Playing};
+Check(noGoal.GoalText=="" && noGoal.NextTask=="" && SharedGamePayload.From(noGoal).GoalKind is null,"no goal hides the objective and publishes a nullable kind");
+GameRules.Validate(noGoal);
+Check(JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(noGoal))!.Goal==GameGoal.None,"no goal survives backup serialization without shifting legacy enum values");
+var objective = new Game {Title="Goal",Goal=GameGoal.Story,Status=GameStatus.Finished};
+Check(!objective.GoalVisible && objective.GoalText=="" && objective.Goal==GameGoal.Story,"completed story hides the goal without deleting its selection");objective.Status=GameStatus.Playing;
+Check(objective.GoalVisible,"reopening the story restores its goal");objective.Goal=GameGoal.Achievements;
+Check(objective.GoalVisible,"unknown or empty achievements never imply a completed goal");objective.Achievements=[new(){Id="first",Unlocked=true},new(){Id="second"}];
+Check(objective.GoalVisible,"pending achievement keeps the goal visible");objective.AchievementOverrides["steam:second"]=true;
+Check(!objective.GoalVisible,"personal achievement completion hides the fulfilled achievement goal");objective.AchievementOverrides["steam:first"]=false;
+Check(objective.GoalVisible,"reopening an achievement restores its goal");objective.Tasks=[new(){Title="Pending task"}];objective.Goal=GameGoal.None;
+Check(objective.NextTask=="Pending task","no goal preserves independently pending tasks");
 Reject(() => GameRules.Validate(new Game { Title = "" }), "empty title rejected");
 Reject(() => GameRules.Validate(new Game { Title = "x", SteamAppId = -1 }), "invalid Steam ID rejected");
 Reject(() => GameRules.Validate(new Game { Title = "x", Goal = (GameGoal)999 }), "unknown enum rejected");

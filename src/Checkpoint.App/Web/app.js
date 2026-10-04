@@ -215,7 +215,7 @@ function renderGames() {
       if (!state.lightweight) {
         const missing=()=>{const key=game.id+'|'+game.title+'|'+game.cover;if(missingCoverSignals.has(key))return;missingCoverSignals.add(key);action('cover-missing',{id:game.id});};
         const cover=el(game.cover?'img':'div',game.cover?'cover':'cover cover-fallback',game.cover?null:game.title.slice(0,1)); if(game.cover)cover.src=game.cover; cover.alt=''; cover.loading='lazy'; cover.addEventListener('error',()=>{cover.replaceWith(el('div','cover cover-fallback',game.title.slice(0,1)));missing();});if(!game.cover)queueMicrotask(missing); row.append(cover); }
-      const details=el('div','details'); details.append(el('div','game-title ellipsis',game.title),el('div','platform ellipsis',game.platform),el('div',`status state-${game.state}`,game.status),el('div','next ellipsis',game.next),el('div','progress ellipsis',game.progress+(game.percent==null?'':` · ${game.percent}%`)));
+      const details=el('div','details'); details.append(el('div','game-title ellipsis',game.title),el('div','platform ellipsis',game.platform),el('div',`status state-${game.state}`,game.status),...(game.next?[el('div','next ellipsis',game.next)]:[]),el('div','progress ellipsis',game.progress+(game.percent==null?'':` · ${game.percent}%`)));
       if (game.percent != null) { const progress=el('progress'); progress.max=100; progress.value=game.percent; progress.setAttribute('aria-label',game.progress); details.append(progress); }
       details.append(button('🏆 '+(game.achievementCaption||state.labels.achievements),'achievements',state.labels.achievements,{id:game.id},'achievement-link'));
       row.append(details);

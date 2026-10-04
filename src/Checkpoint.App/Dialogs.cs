@@ -75,7 +75,7 @@ internal static partial class Dialogs
         body.Children.Add(new TextBlock { Text = I18n.T("Steam se detecta por su carpeta de instalación. Para emuladores, indica el ejecutable y un texto del título específico del juego."), TextWrapping = TextWrapping.Wrap });
         var platform = Input(body, I18n.T("Plataforma"), game.Platform); platform.MaxLength = 60;
         Label(body, I18n.T("Estado")); var state = new ComboBox { ItemsSource = Enum.GetValues<GameStatus>().Select(Labels.Status).ToList(), SelectedIndex = (int)game.Status }; body.Children.Add(state);
-        Label(body, I18n.T("Objetivo")); var goal = new ComboBox { ItemsSource = Enum.GetValues<GameGoal>().Select(Labels.Goal).ToList(), SelectedIndex = (int)game.Goal }; body.Children.Add(goal);
+        Label(body, I18n.T("Objetivo")); var goal = new ComboBox { ItemsSource = Enum.GetValues<GameGoal>().Select(Labels.Goal).ToList(), SelectedIndex = (int)game.Goal }; System.Windows.Automation.AutomationProperties.SetName(goal,I18n.T("Objetivo")); body.Children.Add(goal);
         var customGoal = Input(body, I18n.T("Objetivo personalizado"), game.CustomGoal); customGoal.MaxLength = 500;
         var storyPercent = Input(body, I18n.T("Historia completada (0–100 %, opcional y manual)"), game.StoryPercent?.ToString() ?? "");
         storyPercent.MaxLength = 3;

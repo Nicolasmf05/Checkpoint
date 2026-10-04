@@ -35,12 +35,12 @@ public sealed record SocialPublication(
     [property: JsonPropertyName("updated_at")] DateTimeOffset UpdatedAt);
 
 // Explicit allowlist. Never serialize Game itself for a publication.
-public sealed record SharedGamePayload(string Title, string Platform, string Status, string GoalKind,
+public sealed record SharedGamePayload(string Title, string Platform, string Status, string? GoalKind,
     string? GoalText, int? StoryPercent, int? TasksDone, int? TasksTotal,
     int? AchievementsUnlocked, int? AchievementsTotal, int? SteamAppId, string? CoverPath, DateTimeOffset? FinishedAt)
 {
     public static SharedGamePayload From(Game game) => new(
-        game.Title, game.Platform, game.Status.ToString().ToLowerInvariant(), game.Goal.ToString().ToLowerInvariant(),
+        game.Title, game.Platform, game.Status.ToString().ToLowerInvariant(), game.GoalVisible ? game.Goal.ToString().ToLowerInvariant() : null,
         game.Goal == GameGoal.Custom ? game.CustomGoal : null, game.StoryPercent,
         game.Tasks.Count > 0 ? game.Tasks.Count(t => t.Done) : null, game.Tasks.Count > 0 ? game.Tasks.Count : null,
         game.Achievements is { Count: > 0 } ? game.UnlockedCount : null,

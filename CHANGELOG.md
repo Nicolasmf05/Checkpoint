@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.21
+
+- Optional No goal setting; completed story and achievement objectives disappear from cards and details without deleting their saved selection. Reopening progress restores them. Unknown or empty achievements do not count as completion.
+
 ## 0.8.20
 
 - Visible status filters in the library and collections, also available in list details. Combine them with title search; changing list filters clears selections to keep batch actions safe.

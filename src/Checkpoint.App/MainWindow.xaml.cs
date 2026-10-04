@@ -672,6 +672,8 @@ public partial class MainWindow : Window
         public double CoverWidth { get; }
         public double CoverHeight { get; }
         public Visibility DetailVisibility { get; }
+        public Visibility NextTaskVisibility => Model.NextTask.Length>0 && DetailVisibility==Visibility.Visible ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility GridNextTaskVisibility => Model.NextTask.Length>0 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility CoverVisibility { get; }
         public System.Windows.Media.Brush CoverBackground { get; }
         public System.Windows.Media.Brush StatusBrush { get; }

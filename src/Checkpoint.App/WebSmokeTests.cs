@@ -285,6 +285,7 @@ public partial class MainWindow
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'N',ctrlKey:true,shiftKey:true,bubbles:true}));");
             var shortcutEditor=await Dialog();
             Check(await Script(shortcutEditor,"!!document.querySelector('input[aria-label=\"Game title\"]')"),"custom desktop shortcut opens the game editor");
+            Check(await Script(shortcutEditor,"[...document.querySelector('select[aria-label=\"Goal\"]').options].some(o=>o.text==='No goal'&&o.value==='3')"),"Windows goal editor offers a localized No goal without shifting existing choices");
             await ScopedScript(shortcutEditor,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);
             await Run("document.querySelector('.manage-lists').click();");
             var listsDialog=await Dialog();
