@@ -8,7 +8,7 @@ Widget translúcido para organizar los juegos que quieres pasarte en Windows.
 
 > **AVISO IMPORTANTE — SMARTSCREEN:** los EXE/MSI de GitHub no tienen firma ni certificado de editor. La ausencia de firma y de reputación puede provocar «Windows protegió su PC». **No tengo certificado porque supone un coste; no lo compraré hasta que los ingresos de Checkpoint cubran al menos lo que cueste. Hasta entonces, estas descargas seguirán sin certificado.** Firmar tampoco garantiza que el aviso desaparezca inmediatamente. [Lee el aviso y los requisitos](docs/DOWNLOAD-NOTES.md).
 
-![Checkpoint: interfaz CSS](docs/screenshots/css-widget-es.png)
+![Colección de juegos de Checkpoint](docs/screenshots/readme-library-es.png)
 
 
 Ajustes → Actualizaciones comprueba nuevas versiones al abrir y permite descargar e instalar un MSI verificado, con copia previa y conservación de datos. [Detalles y edición portable](docs/UPDATES.md).
@@ -33,11 +33,11 @@ Si un juego de tu lista no tiene una carátula de Steam disponible, Checkpoint p
 
 ## Capturas
 
-Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. Juegos y progresos son ejemplos; la carátula verde es una imagen local de prueba. Consulta la [galería actual y capturas históricas](docs/SCREENSHOTS.md).
+App real en el navegador, con el tema Claro y una pequeña colección de ejemplo. Los estados y el tiempo jugado son ilustrativos; las carátulas proceden de Steam. No se muestran cuentas personales ni etiquetas de pruebas. [Galería completa](docs/SCREENSHOTS.md).
 
-| Editor | Miniatura |
+| Cuadrícula de carátulas | Ficha del juego |
 | --- | --- |
-| ![Editor en español](docs/screenshots/css-editor-es.png) | ![Nombre y estado](docs/screenshots/css-miniature-es.png) |
+| ![Cuadrícula de carátulas](docs/screenshots/readme-grid-es.png) | ![Ficha del juego](docs/screenshots/readme-details-es.png) |
 
 ## Descargar y utilizar
 

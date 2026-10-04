@@ -4,6 +4,12 @@
 
 Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
 
+## README gallery
+
+The README uses fresh captures of the real browser application with the Light theme, official Steam covers and three example games. Progress and playtime are illustrative. These captures do not show a signed-in account. Older automated captures below remain as historical validation evidence.
+
+![Example collection](../screenshots/readme-library-en.png)
+
 ## 0.8.6 — 22 themes
 
 Fourteen new palettes, light and dark, with [all previews and colors](THEMES.md).

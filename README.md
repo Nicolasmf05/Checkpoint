@@ -8,7 +8,7 @@ A translucent Windows desktop widget for the games you want to finish, with cove
 
 > **IMPORTANT — SMARTSCREEN:** GitHub EXE/MSI downloads have no digital signature or publisher certificate. Their unsigned status and lack of reputation can trigger “Windows protected your PC”. **I have no certificate because it costs money; I will not buy one until Checkpoint income covers at least its cost. Until then, these downloads will remain without a certificate.** Signing does not guarantee that warnings immediately disappear. [Read the notice and requirements](docs/en/DOWNLOAD-NOTES.md).
 
-![Checkpoint CSS interface](docs/screenshots/css-widget-en.png)
+![Checkpoint game collection](docs/screenshots/readme-library-en.png)
 
 
 Settings → Updates checks new releases on launch and downloads/installs a verified MSI with a pre-update backup and preserved data. [Details and portable behavior](docs/en/UPDATES.md).
@@ -33,11 +33,11 @@ When a listed game has no working Steam cover, Checkpoint proposes the closest I
 
 ## Screenshots
 
-Current captures come from the actual local HTML/CSS interface in WebView2, using isolated test data. Game titles and progress are examples; the green cover is a local fixture. [Current gallery and archived screenshots](docs/en/SCREENSHOTS.md).
+Actual browser app, shown with the Light theme and a small example collection. Game states and playtime are illustrative; covers come from Steam. No personal accounts or test labels appear. [Full gallery](docs/en/SCREENSHOTS.md).
 
-| Friends login | Miniature |
+| Cover grid | Game details |
 | --- | --- |
-| ![Username and password](docs/screenshots/css-friends-login-en.png) | ![Names and states](docs/screenshots/css-miniature-en.png) |
+| ![Cover grid](docs/screenshots/readme-grid-en.png) | ![Game details](docs/screenshots/readme-details-en.png) |
 
 ## Download and run
 

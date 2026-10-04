@@ -4,6 +4,12 @@
 
 Las capturas actuales proceden de WebView2 real. Juegos y progresos son ejemplos; no representan un registro con cuentas reales.
 
+## Galería del README
+
+El README usa nuevas capturas de la app real en el navegador, con el tema Claro, carátulas oficiales de Steam y tres juegos de ejemplo. El progreso y el tiempo jugado son ilustrativos. No muestran una cuenta con sesión iniciada. Las capturas automatizadas anteriores se conservan abajo como evidencia histórica de validación.
+
+![Colección de ejemplo](screenshots/readme-library-es.png)
+
 ## 0.8.6 — 22 temas
 
 Catorce paletas nuevas, claras y oscuras, con [todas las vistas previas y colores](THEMES.md).
