@@ -71,3 +71,9 @@ La detección funciona solo en Windows mientras Checkpoint esté abierto. Steam 
 ## Creador y licencia
 
 Checkpoint creado originalmente por **Nicolasmf05** — https://github.com/Nicolasmf05/Checkpoint. Las nuevas distribuciones desde la revisión que cambia la licencia usan Checkpoint Attribution License 1.0; conserva su archivo LICENSE y el crédito al redistribuirlas. Los paquetes originales de v0.8.5 y anteriores conservan su licencia MIT.
+
+## Desinstalar
+
+MSI: cierra Checkpoint y usa Inicio → Checkpoint → Desinstalar Checkpoint, o el acceso de desinstalación de la carpeta instalada. El nombre depende del idioma de Windows (español o inglés) y abre la confirmación de Windows Installer. También sirve Configuración de Windows → Aplicaciones → Checkpoint → Desinstalar. Se eliminan la app y sus accesos instalados; la biblioteca y los ajustes en `%LOCALAPPDATA%\Checkpoint` se conservan.
+
+Portátil: desactiva Iniciar con Windows si estaba activado, cierra Checkpoint y elimina la carpeta extraída. El ZIP portátil no instala accesos MSI.

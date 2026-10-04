@@ -50,4 +50,5 @@ $msi = Join-Path $checkpointRoot "dist\Checkpoint-$version-$Runtime.msi"
 & $wix build "$checkpointRoot\installer\Package.wxs" $harvest -arch $architecture -d "AppVersion=$version" -o $msi
 if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación del MSI.' }
 Get-FileHash -LiteralPath $msi -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLowerInvariant())  $(Split-Path $msi -Leaf)" } | Set-Content -LiteralPath "$msi.sha256" -Encoding ascii
+& "$PSScriptRoot\Verify-Uninstaller.ps1" -MsiPath $msi
 Write-Output "Instalador: $msi"

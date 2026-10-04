@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.12 — Uninstall shortcuts
+
+The MSI adds Windows Installer uninstall shortcuts to the Start menu and installed folder. Spanish Windows receives Spanish shortcut names; other Windows languages receive English names. The normal uninstall confirmation remains visible, and user library/settings are preserved. Portable removal is documented separately.
+
 ## 0.8.11 — Exit on close by default
 
 The X button now exits Windows Checkpoint completely for new settings. Hiding in the tray remains optional in Settings; existing saved choices are preserved. README screenshots now show simple example collections with real Steam covers.

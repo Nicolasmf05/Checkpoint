@@ -142,3 +142,7 @@ Responsive web update: 48 browser checks cover six viewport sizes from 320 to 14
 ## 0.8.10: text-only storage
 
 Eleven live Supabase SQL checks passed in a rolled-back transaction: privileged, service-role and authenticated Storage uploads denied; embedded images and new avatars rejected; text publications and legacy-path retries accepted. Existing files were not deleted. Native friend checks now verify that Storage covers are never requested. Earlier upload checks describe historical releases.
+
+## 0.8.12: uninstall shortcuts
+
+The MSI is inspected without installing or uninstalling the user’s application. `scripts/Verify-Uninstaller.ps1`, invoked by the MSI build, verifies four shortcuts (two languages, two locations), product identity, normal Windows Installer confirmation, mutually exclusive locale conditions and separation of installation/library paths. Real install/uninstall on a clean machine remains pending.

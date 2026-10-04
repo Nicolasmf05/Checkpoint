@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.12 — Accesos para desinstalar
+
+El MSI añade accesos al desinstalador de Windows en Inicio y en la carpeta instalada. El nombre aparece en español para Windows en español y en inglés para los demás idiomas. Se mantiene la confirmación de desinstalación y se conservan biblioteca y ajustes. Se documenta aparte la eliminación del portátil.
+
 ## 0.8.11 — Cierre completo por defecto
 
 La X cierra Checkpoint para Windows completamente cuando se usan ajustes nuevos. Ocultar en la bandeja sigue siendo opcional en Ajustes; se conservan las preferencias guardadas. Las capturas del README muestran colecciones sencillas de ejemplo con carátulas reales de Steam.

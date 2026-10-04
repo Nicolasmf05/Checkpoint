@@ -13,8 +13,18 @@
         <RemoveFolder Id="RemoveMenu" On="uninstall" />
         <RegistryValue Root="HKCU" Key="Software\Checkpoint" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
       </Component>
+      <Component Id="UninstallSpanish" Guid="A5CE563E-C743-4D8B-893E-D9C7E8E01B2E" Condition="UserLanguageID = 1034 OR UserLanguageID = 2058 OR UserLanguageID = 3082 OR UserLanguageID = 4106 OR UserLanguageID = 5130 OR UserLanguageID = 6154 OR UserLanguageID = 7178 OR UserLanguageID = 8202 OR UserLanguageID = 9226 OR UserLanguageID = 10250 OR UserLanguageID = 11274 OR UserLanguageID = 12298 OR UserLanguageID = 13322 OR UserLanguageID = 14346 OR UserLanguageID = 15370 OR UserLanguageID = 16394 OR UserLanguageID = 17418 OR UserLanguageID = 18442 OR UserLanguageID = 19466 OR UserLanguageID = 20490 OR UserLanguageID = 21514 OR UserLanguageID = 22538 OR UserLanguageID = 23562">
+        <Shortcut Id="UninstallMenuSpanish" Name="Desinstalar Checkpoint" Description="Quita Checkpoint y conserva tu biblioteca." Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" Icon="AppIcon" />
+        <Shortcut Id="UninstallFolderSpanish" Directory="INSTALLFOLDER" Name="Desinstalar Checkpoint" Description="Quita Checkpoint y conserva tu biblioteca." Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Checkpoint\Installer" Name="UninstallSpanish" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+      <Component Id="UninstallEnglish" Guid="EBB6A714-DA0E-42DE-BD36-2D0491815E35" Condition="NOT (UserLanguageID = 1034 OR UserLanguageID = 2058 OR UserLanguageID = 3082 OR UserLanguageID = 4106 OR UserLanguageID = 5130 OR UserLanguageID = 6154 OR UserLanguageID = 7178 OR UserLanguageID = 8202 OR UserLanguageID = 9226 OR UserLanguageID = 10250 OR UserLanguageID = 11274 OR UserLanguageID = 12298 OR UserLanguageID = 13322 OR UserLanguageID = 14346 OR UserLanguageID = 15370 OR UserLanguageID = 16394 OR UserLanguageID = 17418 OR UserLanguageID = 18442 OR UserLanguageID = 19466 OR UserLanguageID = 20490 OR UserLanguageID = 21514 OR UserLanguageID = 22538 OR UserLanguageID = 23562)">
+        <Shortcut Id="UninstallMenuEnglish" Name="Uninstall Checkpoint" Description="Remove Checkpoint and keep your library." Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" Icon="AppIcon" />
+        <Shortcut Id="UninstallFolderEnglish" Directory="INSTALLFOLDER" Name="Uninstall Checkpoint" Description="Remove Checkpoint and keep your library." Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Checkpoint\Installer" Name="UninstallEnglish" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
     </Directory></StandardDirectory>
     <StandardDirectory Id="StartupFolder"><Component Id="StartupCleanup" Guid="18B4D1D6-E1B9-4340-9810-B60AA68E45B0"><RemoveFile Id="RemoveStartupShortcut" Name="Checkpoint.lnk" Property="CHECKPOINT_STARTUP_CLEANUP" On="uninstall" /><RegistryValue Root="HKCU" Key="Software\Checkpoint" Name="StartupCleanup" Type="integer" Value="1" KeyPath="yes" /></Component></StandardDirectory>
-    <Feature Id="Application" Title="Checkpoint" Level="1"><ComponentGroupRef Id="AppFiles" /><ComponentRef Id="Shortcuts" /><ComponentRef Id="StartupCleanup" /></Feature>
+    <Feature Id="Application" Title="Checkpoint" Level="1"><ComponentGroupRef Id="AppFiles" /><ComponentRef Id="Shortcuts" /><ComponentRef Id="StartupCleanup" /><ComponentRef Id="UninstallSpanish" /><ComponentRef Id="UninstallEnglish" /></Feature>
   </Package>
 </Wix>

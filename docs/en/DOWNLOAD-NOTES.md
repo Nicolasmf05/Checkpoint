@@ -71,3 +71,9 @@ Detection works only in Windows while Checkpoint is open. Steam uses its existin
 ## Creator and license
 
 Checkpoint originally created by **Nicolasmf05** — https://github.com/Nicolasmf05/Checkpoint. New distributions from the license-change revision use Checkpoint Attribution License 1.0; retain the accompanying LICENSE and creator credit when redistributing. Original v0.8.5 and earlier packages retain their included MIT license.
+
+## Uninstall
+
+MSI: close Checkpoint, then use Start → Checkpoint → Uninstall Checkpoint, or the uninstall shortcut inside the installed folder. The shortcut follows the Windows language (Spanish or English) and opens the Windows Installer confirmation. Windows Settings → Apps → Checkpoint → Uninstall also works. The app and installed shortcuts are removed; library and settings in `%LOCALAPPDATA%\Checkpoint` remain.
+
+Portable: disable Start with Windows if enabled, close Checkpoint and remove its extracted folder. The portable ZIP does not install MSI shortcuts.

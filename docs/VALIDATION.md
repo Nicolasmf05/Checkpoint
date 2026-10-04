@@ -148,3 +148,7 @@ Adaptación web: 48 comprobaciones de navegador incluyen seis tamaños entre 320
 ## 0.8.10: almacenamiento solo de texto
 
 En Supabase real pasaron 11 comprobaciones SQL con reversión: bloqueo de Storage con permisos privilegiados, service_role y usuario; rechazo de imágenes incrustadas y avatares nuevos; publicación de texto y reintentos compatibles con referencias antiguas. No se eliminaron archivos existentes. La prueba nativa de amigos ahora confirma que no se solicitan carátulas de Storage. Las pruebas antiguas de subida describen versiones anteriores.
+
+## 0.8.12: desinstalador
+
+El MSI se inspecciona sin instalar ni desinstalar la app del usuario. `scripts/Verify-Uninstaller.ps1`, ejecutado por la compilación del MSI, verifica los cuatro accesos (dos idiomas, dos ubicaciones), la identidad del producto, la confirmación normal de Windows Installer, condiciones de idioma excluyentes y separación entre instalación y biblioteca. La instalación/desinstalación real en un equipo limpio sigue pendiente.
