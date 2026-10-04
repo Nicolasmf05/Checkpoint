@@ -1884,7 +1884,7 @@ public partial class MainWindow
                     achievementReviewErrors == 5
                         && AchievementReviewText.Contains("Background")
                         && AchievementReviewText.Contains(
-                            I18n.T("Sin conexión. Puedes seguir usando tu biblioteca local.")
+                            I18n.T("RetroAchievements no responde. Se conserva el progreso anterior.")
                         )
                         && Store.LoadGames().All(g => g.RetroAchievements?.Count == 1),
                     "Windows background review displays its failing game and localized cause without erasing saved achievements"
