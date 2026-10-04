@@ -4,6 +4,12 @@
 
 ## 0.8.23
 
+- Biblioteca conserva todos los juegos; Mi lista queda como una selección aparte. Volver a Amigos abre su menú inicial.
+- Los grupos de logros permiten seguir un juego conjuntamente con amigos de Checkpoint. Los logros manuales publicados incluyen descripción y estado, identificados como propios de Checkpoint; pueden eliminarse sin borrar los logros de los proveedores.
+- Miniatura en Windows mantiene siempre la opacidad mínima y la superposición, recuperando las preferencias normales al salir. Se puede salir directamente de ventana completa y cambiar a Miniatura restaura una ventana pequeña.
+- Las fichas de juegos usan una única barra de desplazamiento exterior, muestran las horas en una tarjeta con reloj y permiten seleccionar ejecutables desde el administrador de archivos. Los créditos reconocen a Yus.
+- Se reduce el trabajo de renderizado y carátulas cuando la ventana está oculta o en Miniatura. La colección permite priorizar juegos mediante su orden.
+- El formato del código y las versiones fijadas de las herramientas facilitan la colaboración y conservan los cambios de CSS del colaborador.
 - Los logros de amigos tienen un bloque propio por juego, con contadores grandes de completados, pendientes y barra de progreso. Se indica cuando no hay datos publicados; historia y tareas quedan en segundo plano. No se comparten nuevos datos privados.
 
 ## 0.8.22

@@ -908,24 +908,24 @@ public partial class MainWindow
             bool priorPin = Preferences.AlwaysOnTop,
                 priorLock = Preferences.PositionLocked;
             Check(
-                MiniatureAction(Shell.ContextMenu, "Mantener siempre visible").IsChecked == priorPin
+                MiniatureAction(Shell.ContextMenu, "Mantener siempre visible").IsChecked
+                    && !MiniatureAction(Shell.ContextMenu, "Mantener siempre visible").IsEnabled
+                    && Topmost
+                    && Math.Abs(EffectiveOpacity - .35) < .001
                     && MiniatureAction(Shell.ContextMenu, "Bloquear posición y tamaño").IsChecked
                         == priorLock,
-                "miniature quick window actions reflect saved settings"
+                "miniature forces minimum opacity and topmost while retaining saved position lock"
             );
             var quickPin = MiniatureAction(Shell.ContextMenu, "Mantener siempre visible");
-            quickPin.IsChecked = !priorPin;
+            quickPin.IsChecked = false;
             quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Check(
-                Preferences.AlwaysOnTop == !priorPin
-                    && Topmost == !priorPin
-                    && Store.LoadSettings().AlwaysOnTop == !priorPin
+                Preferences.AlwaysOnTop == priorPin
+                    && Topmost
+                    && Store.LoadSettings().AlwaysOnTop == priorPin
                     && Preferences.MiniatureView,
-                "miniature pin action applies and persists without leaving the view"
+                "miniature pin action preserves the normal window preference"
             );
-            quickPin = MiniatureAction(Shell.ContextMenu, "Mantener siempre visible");
-            quickPin.IsChecked = priorPin;
-            quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             var quickLock = MiniatureAction(Shell.ContextMenu, "Bloquear posición y tamaño");
             quickLock.IsChecked = true;
             quickLock.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
@@ -1281,22 +1281,21 @@ public partial class MainWindow
             await Dispatcher.InvokeAsync(UpdateLayout, DispatcherPriority.ContextIdle);
             quickPin = MiniatureAction(miniatureMenu, "Mantener siempre visible");
             Check(
-                quickPin.IsChecked == Preferences.AlwaysOnTop
+                quickPin.IsChecked
+                    && !quickPin.IsEnabled
                     && MiniatureAction(miniatureMenu, "Bloquear posición y tamaño").IsChecked
                         == Preferences.PositionLocked,
-                "miniature game menu reflects quick window settings"
+                "miniature game menu reflects forced topmost and saved position lock"
             );
-            quickPin.IsChecked = !priorPin;
+            quickPin.IsChecked = false;
             quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             Check(
-                Topmost == !priorPin
-                    && Store.LoadSettings().AlwaysOnTop == !priorPin
-                    && MiniatureAction(Shell.ContextMenu, "Mantener siempre visible").IsChecked
-                        == !priorPin,
-                "miniature game menu pin action persists and updates the background menu"
+                Topmost
+                    && Preferences.AlwaysOnTop == priorPin
+                    && Store.LoadSettings().AlwaysOnTop == priorPin
+                    && MiniatureAction(Shell.ContextMenu, "Mantener siempre visible").IsChecked,
+                "miniature game menu pin action preserves normal settings and forced topmost"
             );
-            quickPin.IsChecked = priorPin;
-            quickPin.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
             var finishState = miniatureMenu
                 .Items.OfType<MenuItem>()
                 .Single(i => i.Tag is GameStatus s && s == GameStatus.Finished);
@@ -1451,6 +1450,8 @@ public partial class MainWindow
             );
             Check(
                 !Preferences.MiniatureView
+                    && Topmost == priorPin
+                    && Math.Abs(EffectiveOpacity - Preferences.BackgroundOpacity) < .001
                     && Width
                         == Math.Max(MinWidth, Math.Min(normalWidth, workArea.Width / dpi.DpiScaleX))
                     && Height

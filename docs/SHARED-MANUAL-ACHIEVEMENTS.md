@@ -12,4 +12,4 @@ The publication field `manualAchievementsJson` contains a bounded JSON string wi
 
 ## Client rollout
 
-Both the person sharing and the friend viewing need an updated client. After the sharing client updates, its normal publication process sends the manual achievement data. Previous publications cannot recover manual details that were never sent to Supabase. The client changes are currently local and have not been published in a release or on GitHub Pages.
+Both the person sharing and the friend viewing need Checkpoint 0.8.23 or later. After the sharing client updates, its normal publication process sends the manual achievement data. Previous publications cannot recover manual details that were never sent to Supabase.

@@ -4,6 +4,12 @@
 
 ## 0.8.23
 
+- Library retains every game; My list remains a separate selection. Returning to Friends opens its main menu.
+- Shared achievement groups let Checkpoint friends track a game together. Published manual achievements include descriptions and completion, with a clear Checkpoint label; manual achievements can be deleted separately from provider achievements.
+- Windows Miniature always uses minimum opacity and stays on top, restoring normal preferences when leaving. Full window can be exited directly and switching to Miniature restores a small window.
+- Game sheets use one outer scrollbar, show playtime in a clock card and provide a file picker for game executables. Credits recognize Yus.
+- Rendering and cover work are reduced when the window is hidden or in Miniature. Collection ordering supports prioritizing games.
+- Source formatting and fixed formatter versions make collaboration consistent while retaining the collaborator’s CSS changes.
 - Friends’ achievements have a dedicated panel per game with larger completed counts, pending counts and a progress bar. Missing published data is explicit; story and tasks remain secondary. No additional private data is shared.
 
 ## 0.8.22

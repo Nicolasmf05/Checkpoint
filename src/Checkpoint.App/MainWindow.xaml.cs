@@ -970,6 +970,8 @@ public partial class MainWindow : Window
         };
         pin.Click += (_, _) =>
         {
+            if (Preferences.MiniatureView)
+                return;
             Preferences.AlwaysOnTop = pin.IsChecked;
             ApplyPreferences();
             Persist();
@@ -1230,6 +1232,8 @@ public partial class MainWindow : Window
 
     private void PinClick(object sender, RoutedEventArgs e)
     {
+        if (Preferences.MiniatureView)
+            return;
         Preferences.AlwaysOnTop = !Preferences.AlwaysOnTop;
         ApplyPreferences();
         Store.SaveSettings(Preferences);

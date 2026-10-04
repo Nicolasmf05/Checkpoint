@@ -1056,11 +1056,13 @@ public partial class MainWindow
             );
             Check(
                 Preferences.MiniatureView
+                    && Topmost
+                    && Math.Abs(Preferences.BackgroundOpacity - .61) < .001
                     && await Script(
                         web,
-                        "[...document.querySelectorAll('.menu button')].some(button=>button.textContent.includes('Full window')) && window.checkpointState.opacity===0.61"
+                        "[...document.querySelectorAll('.menu button')].some(button=>button.textContent.includes('Full window')) && window.checkpointState.opacity===0.35 && window.checkpointState.pinned"
                     ),
-                "Miniature keeps translucency and offers all three window modes"
+                "Miniature forces minimum opacity and topmost without overwriting normal opacity"
             );
             await Run(
                 "[...document.querySelectorAll('.menu button')].find(button=>button.textContent.includes('Full window')).click();"
@@ -1089,7 +1091,11 @@ public partial class MainWindow
             );
             await Task.Delay(350);
             Check(
-                !IsFullWindow && !Preferences.MiniatureView && !Store.LoadSettings().FullWindow,
+                !IsFullWindow
+                    && !Preferences.MiniatureView
+                    && !Store.LoadSettings().FullWindow
+                    && Topmost == Preferences.AlwaysOnTop
+                    && Math.Abs(EffectiveOpacity - .61) < .001,
                 "CSS settings save the small window mode"
             );
             _ = Dispatcher.BeginInvoke(new Action(() => Dialogs.ShortcutSettings(this)));

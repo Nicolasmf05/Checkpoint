@@ -6,4 +6,4 @@ La lista es un seguimiento compartido dentro de Checkpoint. Marcar un objetivo n
 
 La base de datos conserva únicamente el nombre del grupo, el título del juego, el identificador de Steam opcional y el texto de los objetivos con su estado. No almacena carátulas ni notas privadas. Los datos se limitan a 200 objetivos por grupo, nombres de objetivo de hasta 250 caracteres y descripciones de hasta 2000 caracteres y un máximo de 150 kB de texto de logros por grupo. Row Level Security restringe grupos a sus integrantes y las invitaciones a sus destinatarios o integrantes.
 
-Las migraciones `supabase/migrations/202610040006_checkpoint_groups.sql` y `supabase/migrations/202610040007_checkpoint_group_text_limit.sql` están aplicadas al proyecto Supabase de Checkpoint. Los cambios de la app son locales; para usar grupos, publica una versión nueva y los integrantes del grupo deben actualizarla.
+Las migraciones `supabase/migrations/202610040006_checkpoint_groups.sql` y `supabase/migrations/202610040007_checkpoint_group_text_limit.sql` están aplicadas al proyecto Supabase de Checkpoint. Para usar grupos, todos los integrantes deben tener Checkpoint 0.8.23 o posterior.
