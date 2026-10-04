@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.22
+
+- Las listas vacías no permiten abrir su ficha desde la colección ni desde Gestionar listas. Al quitar o mover el último juego se cierra la ficha; añadir un juego vuelve a habilitarla. La búsqueda y los filtros no afectan a esta regla.
+
 ## 0.8.21
 
 - Opción Sin objetivo. Los objetivos de historia y logros cumplidos desaparecen de tarjetas y fichas sin borrar la elección guardada; al reabrir el progreso vuelven a mostrarse. Los logros vacíos o sin sincronizar no cuentan como completados.

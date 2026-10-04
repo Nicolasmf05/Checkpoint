@@ -295,6 +295,7 @@ public partial class MainWindow
             await Capture(listsDialog,"css-lists-en.png");
             await ScopedScript(listsDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(250);
             Check(await Script(web,"document.querySelector('.collection-selector').value==='custom:Weekend' && !window.checkpointState.games.length"),"an empty custom list is independently selectable");
+            Check(await Script(web,"document.querySelector('.list-details').disabled"),"Windows empty list disables its sheet button");
             await Run("document.querySelector('[data-label=add]').click();");
             var privateEditor=await Dialog();
             await ScopedScript(privateEditor,"const n=document.querySelector('input[aria-label=\"Game title\"]');n.value='Private list fixture';n.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('input[aria-label=\"Private to my friends\"]').click();[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(400);

@@ -24,6 +24,7 @@ internal static partial class Dialogs
     internal static void ListDetails(MainWindow owner,string source)
     {
         if(source is not ("all" or "private")&&!owner.Preferences.GameLists.Contains(source.StartsWith("custom:")?source[7..]:"",StringComparer.OrdinalIgnoreCase))return;
+        if(!GameLists.Members(owner.Games,source).Any())return;
         string title=source=="all"?I18n.T("Mi lista"):source=="private"?I18n.T("Privados"):source[7..];
         var window=Modal(owner,I18n.T("Ficha de la lista")+" · "+title,720,790);
         var body=Panel();Layout(window,body,out var footer);Heading(body,title,I18n.T("Ficha de la lista"));
@@ -39,7 +40,7 @@ internal static partial class Dialogs
         Game[] Matches()=>GameLists.Members(owner.Games,source).Where(g=>(status.SelectedIndex==0||g.Status==(GameStatus)(status.SelectedIndex-1))&&g.Title.Contains(search.Text,StringComparison.OrdinalIgnoreCase)).OrderBy(g=>g.Title,StringComparer.OrdinalIgnoreCase).ToArray();
         void Reload()
         {
-            var members=GameLists.Members(owner.Games,source).ToArray();selected.RemoveWhere(id=>!members.Any(g=>g.Id==id));var matches=Matches();page=Math.Clamp(page,0,Math.Max(0,(matches.Length+49)/50-1));rows.Children.Clear();results.Text=I18n.T("Resultados")+": "+matches.Length+" / "+members.Length;
+            var members=GameLists.Members(owner.Games,source).ToArray();if(members.Length==0){window.Close();return;}selected.RemoveWhere(id=>!members.Any(g=>g.Id==id));var matches=Matches();page=Math.Clamp(page,0,Math.Max(0,(matches.Length+49)/50-1));rows.Children.Clear();results.Text=I18n.T("Resultados")+": "+matches.Length+" / "+members.Length;
             summary.Text=I18n.T("Juegos")+": "+members.Length+" · "+I18n.T("Historia terminada")+": "+members.Count(g=>g.Status==GameStatus.Finished)+" · "+I18n.T("Jugando")+": "+members.Count(g=>g.Status==GameStatus.Playing)+" · "+I18n.T("Privados")+": "+members.Count(g=>g.FriendsPrivate==true);
             foreach(var game in matches.Skip(page*50).Take(50))
             {

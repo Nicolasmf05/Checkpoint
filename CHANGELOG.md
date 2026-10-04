@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.22
+
+- Empty lists cannot open their details from collections or list management. Moving or removing the last member closes the sheet; adding a member enables it again. Search and status filters do not affect this rule.
+
 ## 0.8.21
 
 - Optional No goal setting; completed story and achievement objectives disappear from cards and details without deleting their saved selection. Reopening progress restores them. Unknown or empty achievements do not count as completion.

@@ -20,8 +20,9 @@ internal static partial class Dialogs
         var defaultsPrivate=Check(body,I18n.T("Crear juegos nuevos como privados"),owner.Preferences.NewGamesPrivate);
         body.Children.Add(new TextBlock{Text=I18n.T("Quitar una lista conserva sus juegos, su privacidad y el resto de listas."),TextWrapping=TextWrapping.Wrap});
         var notice=new TextBlock{TextWrapping=TextWrapping.Wrap};body.Children.Add(notice);
+        Button? sheet=null;void UpdateSheet(){if(sheet is not null)sheet.IsEnabled=selection.SelectedIndex>0&&GameLists.Members(owner.Games,"custom:"+(string)selection.SelectedItem).Any();}
         void Reload(string? selected=null){selection.ItemsSource=new[]{I18n.T("Nueva lista")}.Concat(owner.Preferences.GameLists).ToList();selection.SelectedIndex=selected is null?0:owner.Preferences.GameLists.IndexOf(selected)+1;}
-        selection.SelectionChanged+=(_,_)=>name.Text=selection.SelectedIndex>0?(string)selection.SelectedItem:"";
+        selection.SelectionChanged+=(_,_)=>{name.Text=selection.SelectedIndex>0?(string)selection.SelectedItem:"";UpdateSheet();};
         bool Change(bool rename)
         {
             try
@@ -37,7 +38,7 @@ internal static partial class Dialogs
         var actions=new WrapPanel();body.Children.Add(actions);
         actions.Children.Add(Button(I18n.T("Crear lista"),(_,_)=>Change(false)));
         actions.Children.Add(Button(I18n.T("Renombrar lista"),(_,_)=>Change(true)));
-        actions.Children.Add(Button(I18n.T("Ver ficha de la lista"),(_,_)=>{if(selection.SelectedIndex>0)ListDetails(owner,"custom:"+(string)selection.SelectedItem);}));
+        sheet=Button(I18n.T("Ver ficha de la lista"),(_,_)=>{if(selection.SelectedIndex>0)ListDetails(owner,"custom:"+(string)selection.SelectedItem);UpdateSheet();});actions.Children.Add(sheet);
         actions.Children.Add(Button(I18n.T("Quitar lista"),(_,_)=>
         {
             try{if(selection.SelectedIndex<=0)return;string selected=(string)selection.SelectedItem;

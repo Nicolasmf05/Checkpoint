@@ -23,7 +23,7 @@ public partial class MainWindow
     }
     private object WebSnapshot() => new
     {
-        kind="main", collection=Preferences.ActiveList, collections=new[]{new {value="all",label=I18n.T("Mi lista")},new{value="private",label=I18n.T("Privados")}}.Concat(Preferences.GameLists.Select(n=>new{value="custom:"+n,label=n})).ToArray(), shortcuts=Shortcuts.Effective(Preferences.Shortcuts), language=I18n.Language, light=Themes.IsLight(Preferences), theme=Themes.Id(Preferences),
+        kind="main", canOpenList=GameLists.Members(Games,Preferences.ActiveList).Any(), collection=Preferences.ActiveList, collections=new[]{new {value="all",label=I18n.T("Mi lista")},new{value="private",label=I18n.T("Privados")}}.Concat(Preferences.GameLists.Select(n=>new{value="custom:"+n,label=n})).ToArray(), shortcuts=Shortcuts.Effective(Preferences.Shortcuts), language=I18n.Language, light=Themes.IsLight(Preferences), theme=Themes.Id(Preferences),
         opacity=EffectiveOpacity, full=IsFullWindow, mini=Preferences.MiniatureView, miniLibrary=MiniatureUsesLibrary, compact=Preferences.Compact,
         grid=Preferences.GridView, textSize=Preferences.MiniatureTextSize, locked=Preferences.PositionLocked,
         pinned=Preferences.AlwaysOnTop, globalHotkey=hotkeyRegistered, lightweight=Preferences.LightweightMode, busy=syncing,
