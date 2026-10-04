@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
@@ -372,6 +375,36 @@ public partial class MainWindow
             Check(reviewSecond.CustomCover is null&&reviewSecond.RejectedIgdbCovers.Contains("fixture_first"),"Windows Next game skips the cover and finishes the review");
             await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
             await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);Preferences.LightweightMode=false;Covers.SetEnabled(true);Games.Clear();Games.AddRange(reviewSavedGames);Persist();Refresh();
+            var backgroundGames=Games.ToArray();var backgroundRetro=Retro;int backgroundCalls=0,backgroundActive=0,backgroundPeak=0;
+            Directory.CreateDirectory(Path.Combine(output,"background-review"));
+            using(var backgroundClient=new RetroClient(Path.Combine(output,"background-review"),new ReviewSmokeHandler(async(request,token)=>
+            {
+                backgroundCalls++;backgroundActive++;backgroundPeak=Math.Max(backgroundPeak,backgroundActive);
+                try{await Task.Delay(1800,token);string id=request.RequestUri!.Query.Split('&').First(v=>v.Contains("g=")).Split('=')[1];
+                    return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent("{\"ID\":"+id+",\"Achievements\":{\"1\":{\"Title\":\"Reviewed achievement\",\"Description\":\"Details\"}}}")};}
+                finally{backgroundActive--;}
+            })))
+            {
+                backgroundClient.Save("fixture_review","FIXTURE_REVIEW_KEY",false);Retro=backgroundClient;Games.Clear();
+                Games.AddRange(Enumerable.Range(1,5).Select(id=>new Game{Title="Background "+id,RetroGameId=id,Tracked=false,FriendsPrivate=true,Notes="Keep review notes",ManualAchievements=[new(){Id="local",Name="Local goal"}]}));Persist();Refresh();
+                await Run("document.querySelector('[data-label=settings]').click();");var backgroundSettings=await ReviewWindow(I18n.T("Ajustes · Checkpoint"));
+                await backgroundSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Review all achievements').click();");var backgroundSheet=await ReviewWindow(I18n.T("Repasar todos los logros"));
+                await backgroundSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Update all achievements').click();");
+                await Wait(()=>Script(web,"window.checkpointState.achievementReview?.running && !document.querySelector('.achievement-review').hidden"));
+                Check(IsEnabled&&!Application.Current.Windows.OfType<Window>().Any(w=>w.Tag==backgroundSettings||w.Tag==backgroundSheet),"Windows achievement review releases both modal windows and continues in the background");
+                await Run("[...document.querySelectorAll('.navigation button')].find(b=>b.textContent==='Library').click();");
+                Check(await Script(web,"window.checkpointState.tab==='library' && window.checkpointState.games.length===5 && window.checkpointState.achievementReview.running"),"Windows Library remains usable during delayed achievement requests");
+                Games[0]=JsonSerializer.Deserialize<Game>(JsonSerializer.Serialize(Games[0],DataJson.Options),DataJson.Options)!;Persist();
+                await Wait(()=>Task.FromResult(achievementReviewDone>0));
+                await Run("document.querySelector('.achievement-review button').click();");await Wait(()=>Task.FromResult(!AchievementSyncBusy));
+                int stoppedCalls=backgroundCalls;await Task.Delay(900);
+                Check(backgroundCalls==stoppedCalls&&achievementReviewDone<5&&backgroundPeak<=3&&backgroundPeak>1,"Windows Stop review drains active requests and prevents queued calls with bounded concurrency");
+                Check(Store.LoadGames().Any(g=>g.RetroAchievements?.Count==1)&&Store.LoadGames().All(g=>g.Notes=="Keep review notes"&&g.FriendsPrivate==true&&!g.Tracked&&g.ManualAchievements.Count==1),"stopping the background review preserves completed results and local private fields");
+                StartAchievementReview();await Wait(()=>Task.FromResult(!AchievementSyncBusy));
+                Check(achievementReviewDone==5&&achievementReviewErrors==0&&Store.LoadGames().All(g=>g.RetroAchievements?.Count==1),"Windows background review can restart and persist the entire library");
+                StopAchievementReview();
+            }
+            Retro=backgroundRetro;Games.Clear();Games.AddRange(backgroundGames);Persist();Refresh();
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }
@@ -379,4 +412,9 @@ public partial class MainWindow
         { Console.Error.WriteLine(error); Environment.ExitCode=1; File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new {ok=false,checks=checks.Count,error=error.ToString()},DataJson.Options)); }
         finally { Exit(); }
     }
+    private sealed class ReviewSmokeHandler(Func<HttpRequestMessage,CancellationToken,Task<HttpResponseMessage>> respond):HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken cancellationToken)=>respond(request,cancellationToken);
+    }
+
 }

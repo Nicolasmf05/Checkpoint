@@ -4,11 +4,11 @@ export class BrowserApi {
   constructor(config,fetchImpl=(...args)=>fetch(...args)){this.config=config;this.fetch=fetchImpl;this.social=this.restore('checkpoint-social');this.steam=this.restore('checkpoint-steam');}
   restore(key){try{return JSON.parse(sessionStorage.getItem(key));}catch{return null;}}
   save(key,value){try{if(value)sessionStorage.setItem(key,JSON.stringify(value));else sessionStorage.removeItem(key);}catch{}}
-  async request(path,body,{steam=false,auth=false,method=body===undefined?'GET':'POST'}={}) {
+  async request(path,body,{steam=false,auth=false,method=body===undefined?'GET':'POST',signal}={}) {
     if(auth&&!steam)await this.refresh();
     const headers={'content-type':'application/json'};if(!steam)headers.apikey=this.config.publishableKey;
     if(auth)headers.authorization='Bearer '+(steam?this.steam?.token:this.social?.access_token);
-    const response=await this.fetch(this.config.url+(steam?'/functions/v1/checkpoint-steam/':'/')+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),credentials:'omit',referrerPolicy:'no-referrer',signal:AbortSignal.timeout(35000)});
+    const response=await this.fetch(this.config.url+(steam?'/functions/v1/checkpoint-steam/':'/')+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),credentials:'omit',referrerPolicy:'no-referrer',signal:signal?AbortSignal.any([signal,AbortSignal.timeout(35000)]):AbortSignal.timeout(35000)});
     const text=await response.text();let data;try{data=text?JSON.parse(text):null;}catch{throw new RemoteError('remote');}
     if(!response.ok)throw new RemoteError(data?.code||data?.error_code||(response.status===401?'unauthorized':response.status===403?'forbidden':response.status===429?'rate':'remote'));
     return data;
@@ -36,7 +36,7 @@ export class BrowserApi {
     const reader=response.body.getReader(),parts=[];let length=0;try{for(;;){const {done,value}=await reader.read();if(done)break;length+=value.length;if(length>2000000)throw new RemoteError('igdb-unavailable');parts.push(value);}}finally{await reader.cancel();}
     return new Blob(parts,{type:response.headers.get('content-type')});
   }
-  steamRequest(path,body,auth=true){return this.request(path,body,{steam:true,auth});}
+  steamRequest(path,body,auth=true,signal){return this.request(path,body,{steam:true,auth,signal});}
   async unlink(){try{if(this.steam)await this.steamRequest('v1/auth/logout',{});}finally{this.steam=null;this.save('checkpoint-steam',null);}}
 }
 

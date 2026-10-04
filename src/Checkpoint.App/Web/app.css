@@ -112,3 +112,8 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 
 .mini-source { margin-right:auto;align-self:center;color:var(--muted);font-size:11px; }
 .mini-empty { text-align:center;font-size:11px;padding:4px; } .mini-empty p { margin:0 0 6px; } .mini-empty button { font-size:11px;min-height:28px;padding:4px 8px; }
+
+.achievement-review { display:flex;align-items:center;gap:8px;border:1px solid var(--line);padding:6px 8px;font-size:11px;flex:none; }
+.achievement-review[hidden],.mini .achievement-review { display:none; }
+.achievement-review span { flex:1;min-width:0;overflow-wrap:anywhere; }
+.achievement-review button { font-size:11px;padding:4px 8px;min-height:28px;flex:none; }

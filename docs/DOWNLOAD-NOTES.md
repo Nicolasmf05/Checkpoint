@@ -81,3 +81,7 @@ Portátil: desactiva Iniciar con Windows si estaba activado, cierra Checkpoint y
 ## Listas vacías en Miniatura
 
 Cuando Mi lista no contiene juegos visibles, Miniatura usa automáticamente Biblioteca y muestra **Biblioteca** como origen. Los juegos importados se ven aunque todavía no estén añadidos a Mi lista. Esto no selecciona, publica ni cambia la privacidad de ningún juego. Las listas personalizadas vacías muestran un aviso traducido y un botón Biblioteca que sale de Miniatura y abre la biblioteca normal.
+
+## Repaso de logros en segundo plano
+
+Ajustes → Repasar todos los logros → Actualizar todos los logros vuelve a la colección y continúa en segundo plano. El indicador incluye Detener repaso; los resultados recibidos quedan guardados. Se ejecutan hasta tres consultas simultáneas, con inicio espaciado para respetar los límites de Steam. Windows actualiza solo el juego cambiado en SQLite. Puedes consultar y editar juegos durante el repaso. Cerrar la app de Windows o recargar/cerrar el navegador detiene el trabajo pendiente. La web repasa Steam; Windows también los juegos de RetroAchievements vinculados.

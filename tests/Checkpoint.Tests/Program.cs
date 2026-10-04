@@ -7,6 +7,37 @@ Directory.CreateDirectory(root);
 int passed = 0;
 void Check(bool condition, string name) { if (!condition) throw new Exception("FAILED: " + name); passed++; Console.WriteLine("PASS " + name); }
 void Reject(Action action, string name) { try { action(); } catch { passed++; Console.WriteLine("PASS " + name); return; } throw new Exception("FAILED: " + name); }
+var reviewRelease=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+int reviewActive=0,reviewPeak=0,reviewCompleted=0;
+var reviewTask=AchievementReviewQueue.Run(Enumerable.Range(0,9).ToArray(),async(_,token)=>
+{
+    int active=Interlocked.Increment(ref reviewActive);int old;
+    do{old=reviewPeak;if(old>=active)break;}while(Interlocked.CompareExchange(ref reviewPeak,active,old)!=old);
+    await reviewRelease.Task.WaitAsync(token);Interlocked.Decrement(ref reviewActive);Interlocked.Increment(ref reviewCompleted);
+},CancellationToken.None,spacingMilliseconds:0);
+await Task.Delay(30);
+Check(reviewPeak==3&&reviewCompleted==0,"achievement review uses three bounded concurrent operations without blocking its caller");
+reviewRelease.SetResult();await reviewTask;
+Check(reviewCompleted==9&&reviewActive==0,"achievement review finishes the entire queue before returning");
+using(var stopReview=new CancellationTokenSource())
+{
+    int started=0;
+    var stopped=AchievementReviewQueue.Run(Enumerable.Range(0,20).ToArray(),async(_,token)=>{Interlocked.Increment(ref started);await Task.Delay(5000,token);},stopReview.Token,spacingMilliseconds:0);
+    await Task.Delay(30);stopReview.Cancel();
+    try{await stopped;throw new Exception("Review should cancel");}catch(OperationCanceledException){}
+    Check(started==3,"stopping achievement review cancels active requests and prevents queued requests");
+}
+using(var reviewStore=new SqliteStore(Path.Combine(root,"review-incremental")))
+{
+    var first=new Game{Title="Review first",FriendsPrivate=true,Notes="Keep local notes",AchievementOverrides=new(){["steam:one"]=false}};
+    var second=new Game{Title="Review second"};var settings=new Settings{Language="en"};reviewStore.Save([first,second],settings);
+    first.Achievements=[new(){Id="one",Name="Remote achievement",Unlocked=true}];
+    Check(reviewStore.SaveExistingGame(first)&&reviewStore.LoadGames().Count==2&&reviewStore.LoadSettings().Language=="en","incremental achievement save preserves other games and settings");
+    var restored=reviewStore.LoadGames().Single(g=>g.Id==first.Id);
+    Check(restored.Notes==first.Notes&&restored.FriendsPrivate==true&&restored.AchievementOverrides["steam:one"]==false,"incremental achievement save preserves private notes and manual completion");
+    reviewStore.Save([second],settings);
+    Check(!reviewStore.SaveExistingGame(first)&&reviewStore.LoadGames().Count==1,"late achievement results cannot recreate deleted games");
+}
 var batchOne=new Game{Title="Batch one",Tracked=false,FriendsPrivate=true,Lists=["Source","Other"],Notes="Keep notes",StoryPercent=37};
 var batchTwo=new Game{Title="Batch two",Lists=["Source"],Tasks=[new ChecklistItem{Title="Keep task"}]};
 var batchGames=new List<Game>{batchOne,batchTwo};string[] batchCatalog=["Source","Other","Target"];

@@ -81,3 +81,7 @@ Portable: disable Start with Windows if enabled, close Checkpoint and remove its
 ## Empty Miniature lists
 
 When the default My list has no visible games, Miniature uses Library automatically and labels its source **Library**. Imported games therefore remain visible even before you add them to My list. This does not track, publish or change the privacy of any game. Empty custom lists stay empty with a localized explanation and a Library button that exits Miniature into the normal Library view.
+
+## Background achievement review
+
+Settings → Review all achievements → Update all achievements returns to the collection and continues in the background. The progress indicator has Stop review; completed results remain saved. Up to three queries run at once, with starts paced to respect Steam limits. Windows updates only the changed game in SQLite. You can browse and edit your games during the review. Closing the Windows app or reloading/closing the browser stops the remaining work. The browser reviews Steam; Windows also reviews linked RetroAchievements games.

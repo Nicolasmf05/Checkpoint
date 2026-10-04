@@ -16,17 +16,14 @@ internal static partial class Dialogs
         var ids=owner.Games.OrderBy(g=>g.Title,StringComparer.OrdinalIgnoreCase).Select(g=>g.Id).ToArray();int index=0;
         var position=new TextBlock();var title=new TextBlock{FontSize=22,TextWrapping=TextWrapping.Wrap};var summary=new TextBlock{TextWrapping=TextWrapping.Wrap};var message=new TextBlock{TextWrapping=TextWrapping.Wrap};
         body.Children.Add(position);body.Children.Add(title);body.Children.Add(summary);body.Children.Add(message);
-        using var cancellation=new CancellationTokenSource();bool busy=false;
         Game? Current()=>index<ids.Length?owner.Games.FirstOrDefault(g=>g.Id==ids[index]):null;
         Button view=null!,update=null!,previous=null!,next=null!;
         view=Button(I18n.T("Ver logros"),(_,_)=>{if(Current() is {} game)Achievements(owner,game,false,window);Reload();});body.Children.Add(view);
-        update=Button(I18n.T("Actualizar todos los logros"),async(_,_)=>
+        body.Children.Add(new TextBlock{Text=I18n.T("La actualización continúa en segundo plano. Puedes usar Checkpoint y detenerla desde el indicador de progreso."),TextWrapping=TextWrapping.Wrap});
+        update=Button(I18n.T("Actualizar todos los logros"),(_,_)=>
         {
-            if(busy||owner.AchievementSyncBusy)return;busy=true;Reload();
-            try {var result=await owner.ReviewAchievementSync((done,total)=>{if(window.IsVisible)message.Text=I18n.T("Juegos revisados:")+" "+done+" / "+total;},cancellation.Token);
-                if(window.IsVisible)message.Text=I18n.T("Juegos revisados:")+" "+result.Updated+" · "+I18n.T("No se pudieron actualizar:")+" "+result.Errors;}
-            catch(OperationCanceledException){}
-            finally{busy=false;if(window.IsVisible)Reload();}
+            if(owner.AchievementSyncBusy)return;
+            owner.StartAchievementReview();window.Close();parent.Close();
         });body.Children.Add(update);
         previous=Button(I18n.T("Anterior"),(_,_)=>{index--;Reload();});next=Button(I18n.T("Siguiente juego"),(_,_)=>{index++;Reload();});
         footer.Children.Add(previous);footer.Children.Add(next);footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));
@@ -35,10 +32,11 @@ internal static partial class Dialogs
             index=Math.Clamp(index,0,Math.Max(0,ids.Length-1));var game=Current();var items=game is null?[]:AchievementTracking.Items(game).ToArray();
             position.Text=I18n.T("Juego")+" "+(ids.Length==0?0:index+1)+" / "+ids.Length;title.Text=game?.Title??I18n.T("Sin juegos en Biblioteca");
             summary.Text=I18n.T("Logros")+": "+items.Count(a=>a.Completed)+" / "+items.Length+" · "+I18n.T("Pendientes")+": "+items.Count(a=>!a.Completed)+(game is not null&&(game.SteamAppId.HasValue&&game.Achievements is null||game.RetroGameId.HasValue&&game.RetroAchievements is null)?" · "+I18n.T("Sin sincronizar"):"");
-            view.IsEnabled=game is not null&&!busy;previous.IsEnabled=index>0&&!busy;next.IsEnabled=index+1<ids.Length&&!busy;
-            update.IsEnabled=!busy&&!owner.AchievementSyncBusy&&owner.Games.Any(owner.CanReviewAchievements);
+            view.IsEnabled=game is not null;previous.IsEnabled=index>0;next.IsEnabled=index+1<ids.Length;
+            message.Text=owner.AchievementReviewText;
+            update.IsEnabled=!owner.AchievementSyncBusy&&owner.Games.Any(owner.CanReviewAchievements);
         }
-        window.Closed+=(_,_)=>cancellation.Cancel();Reload();window.ShowDialog();
+        Reload();window.ShowDialog();
     }
 
     internal static void ReviewCovers(MainWindow owner, Window parent)
@@ -101,32 +99,65 @@ public partial class MainWindow
 {
     internal bool AchievementSyncBusy=>syncing;
     internal bool CanReviewAchievements(Game game)=>(game.SteamAppId.HasValue&&Steam.Session is not null)||(game.RetroGameId.HasValue&&Retro.Session is not null);
-    internal async Task<(int Updated,int Errors)> ReviewAchievementSync(Action<int,int> progress,CancellationToken cancellation)
+    private CancellationTokenSource? achievementReviewCancellation;
+    private int achievementReviewDone,achievementReviewTotal,achievementReviewErrors;
+    private bool achievementReviewVisible,achievementReviewStopped;
+    internal string AchievementReviewText => !achievementReviewVisible ? "" :
+        I18n.T(achievementReviewCancellation is not null ? "Actualizando logros en segundo plano:" : achievementReviewStopped ? "Repaso de logros detenido:" : "Repaso de logros terminado:")
+        + " " + achievementReviewDone + " / " + achievementReviewTotal + " · " + I18n.T("No se pudieron actualizar:") + " " + achievementReviewErrors;
+    internal void StopAchievementReview()
     {
-        if(syncing)return(0,0);syncing=true;Refresh();int updated=0,errors=0;
-        using var linked=CancellationTokenSource.CreateLinkedTokenSource(cancellation,shutdown.Token);
-        var games=Games.Where(CanReviewAchievements).ToArray();var steamSession=Steam.Session;var retroSession=Retro.Session;
+        if(achievementReviewCancellation is not null)achievementReviewCancellation.Cancel();
+        else{achievementReviewVisible=false;Refresh();}
+    }
+    internal void StartAchievementReview()
+    {
+        if(syncing)return;
+        var selected=Games.Where(CanReviewAchievements).ToArray();if(selected.Length==0)return;
+        achievementReviewCancellation=CancellationTokenSource.CreateLinkedTokenSource(shutdown.Token);
+        achievementReviewDone=0;achievementReviewErrors=0;achievementReviewTotal=selected.Length;
+        achievementReviewVisible=true;achievementReviewStopped=false;
+        _=RunAchievementReview(selected,achievementReviewCancellation);
+    }
+    private async Task RunAchievementReview(Game[] selected,CancellationTokenSource cancellation)
+    {
+        syncing=true;Refresh();var steamSession=Steam.Session;var retroSession=Retro.Session;
         try
         {
-            foreach(var game in games)
+            await AchievementReviewQueue.Run(selected,async(game,token)=>
             {
-                linked.Token.ThrowIfCancellationRequested();bool failed=false;
-                if(game.SteamAppId is int appId&&steamSession is not null&&Steam.Session==steamSession)
+                bool failed=false;
+                if(steamSession is not null&&Steam.Session!=steamSession||retroSession is not null&&Retro.Session!=retroSession){cancellation.Cancel();token.ThrowIfCancellationRequested();}
+                var current=Games.FirstOrDefault(g=>g.Id==game.Id);
+                if(current is null){achievementReviewDone++;Refresh();return;}
+                var steamId=current.SteamAppId;var retroId=current.RetroGameId;
+                if(steamId is int appId&&steamSession is not null&&Steam.Session==steamSession)
                 {
-                    try{var result=await Steam.Achievements(Preferences.ServiceUrl,appId,linked.Token);linked.Token.ThrowIfCancellationRequested();if(Steam.Session==steamSession&&Games.Contains(game)){game.Achievements=result.Achievements.ToList();game.SyncedAt=DateTimeOffset.UtcNow;}}
-                    catch(OperationCanceledException) when(!linked.IsCancellationRequested){failed=true;}
+                    try{var result=await Steam.Achievements(Preferences.ServiceUrl,appId,token);token.ThrowIfCancellationRequested();
+                        var target=Games.FirstOrDefault(g=>g.Id==game.Id);
+                        if(Steam.Session==steamSession&&target is not null&&target.SteamAppId==steamId){target.Achievements=result.Achievements.ToList();target.SyncedAt=DateTimeOffset.UtcNow;Store.SaveExistingGame(target);}}
+                    catch(OperationCanceledException) when(!token.IsCancellationRequested){failed=true;}
                     catch(Exception error) when(error is not OutOfMemoryException and not OperationCanceledException){failed=true;}
                 }
-                if(game.RetroGameId is int retroId&&retroSession is not null&&Retro.Session==retroSession)
+                if(retroId is int id&&retroSession is not null&&Retro.Session==retroSession)
                 {
-                    try{var result=await Retro.Achievements(retroId,linked.Token);linked.Token.ThrowIfCancellationRequested();GameRules.Validate(new Game{Title=game.Title,RetroAchievements=result});if(Retro.Session==retroSession&&Games.Contains(game))game.RetroAchievements=result;}
-                    catch(OperationCanceledException) when(!linked.IsCancellationRequested){failed=true;}
+                    try{var result=await Retro.Achievements(id,token);token.ThrowIfCancellationRequested();GameRules.Validate(new Game{Title=game.Title,RetroAchievements=result});
+                        var target=Games.FirstOrDefault(g=>g.Id==game.Id);
+                        if(Retro.Session==retroSession&&target is not null&&target.RetroGameId==retroId){target.RetroAchievements=result;Store.SaveExistingGame(target);}}
+                    catch(OperationCanceledException) when(!token.IsCancellationRequested){failed=true;}
                     catch(Exception error) when(error is not OutOfMemoryException and not OperationCanceledException){failed=true;}
                 }
-                Persist();if(failed)errors++;else updated++;progress(updated+errors,games.Length);
-            }
-            return(updated,errors);
+                if(failed)achievementReviewErrors++;achievementReviewDone++;
+                if(achievementReviewDone%10==0)SchedulePublications();
+                Refresh();
+            },cancellation.Token);
         }
-        finally{syncing=false;if(!shutdown.IsCancellationRequested)Refresh();}
+        catch(OperationCanceledException){achievementReviewStopped=true;}
+        catch(Exception error) when(error is not OutOfMemoryException){achievementReviewStopped=true;if(!shutdown.IsCancellationRequested)Notice(I18n.Error(error));}
+        finally
+        {
+            achievementReviewCancellation=null;cancellation.Dispose();syncing=false;
+            if(!shutdown.IsCancellationRequested){SchedulePublications();Refresh();}
+        }
     }
 }

@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.14
+
+- Achievement review runs in the background in Windows and the browser, with progress and Stop review. Up to three requests overlap, with paced starts to respect Steam limits. Windows persists only the updated game; completed results and local edits survive stopping the job.
+
 ## 0.8.13 — Imported games in Miniature
 
 Miniature falls back to Library when the default My list is empty, so fresh Steam imports remain visible. A source label identifies the fallback without changing tracking or friend privacy. Empty custom lists show a localized message and a Library action instead of a blank viewport.

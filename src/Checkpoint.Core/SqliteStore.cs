@@ -45,6 +45,18 @@ public sealed class SqliteStore : IDisposable
 
     public void Save(IEnumerable<Game> games, Settings settings) => SaveState(games, settings);
 
+    // Update only an existing game; late remote results must not recreate deleted entries.
+    public bool SaveExistingGame(Game game)
+    {
+        GameRules.Validate(game);
+        using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE games SET payload=$payload WHERE id=$id";
+        command.Parameters.AddWithValue("$id",game.Id.ToString());
+        command.Parameters.AddWithValue("$payload",JsonSerializer.Serialize(game,DataJson.Options));
+        return command.ExecuteNonQuery() == 1;
+    }
+
+
     public void SaveListChange(IEnumerable<Game> games, Settings settings, string previous, string? next) => SaveState(games,settings,listChange:(previous,next));
 
     private void SaveState(IEnumerable<Game> games, Settings settings, DeletedGame? deleted = null, Guid? restored = null, (string Previous,string? Next)? listChange = null)

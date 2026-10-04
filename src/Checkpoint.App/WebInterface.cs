@@ -29,6 +29,7 @@ public partial class MainWindow
         pinned=Preferences.AlwaysOnTop, globalHotkey=hotkeyRegistered, lightweight=Preferences.LightweightMode, busy=syncing,
         tab=friendsVisible ? "friends" : allLibrary ? "library" : "list", search=Search.Text, filter=StatusFilter.SelectedIndex,
         summary=Summary.Text, notice=NoticeText.Text, connection=ConnectionText.Text,
+        achievementReview=achievementReviewVisible ? new {text=AchievementReviewText,cancelText=I18n.T(achievementReviewCancellation is not null ? "Detener repaso" : "Cerrar"),running=achievementReviewCancellation is not null} : null,
         emptyTitle=EmptyTitle.Text, emptyText=EmptyText.Text, miniEmpty=I18n.T("Esta lista no tiene juegos."), examples=Games.Count == 0, undo=DeletedGames.Count > 0,
         labels=new { title=I18n.T("Mi lista"),
             friendsTitle=I18n.T("Amigos"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
@@ -98,6 +99,7 @@ public partial class MainWindow
             case "examples": AddExamples(); Persist(); Refresh(); break;
             case "pin": Preferences.AlwaysOnTop=!Preferences.AlwaysOnTop; ApplyPreferences(); Persist(); break;
             case "lock": Preferences.PositionLocked=!Preferences.PositionLocked; ApplyPreferences(); Persist(); break;
+            case "stop-achievement-review": StopAchievementReview(); break;
             case "mini-library": Preferences.MiniatureView=false; ApplyPreferences(); LibraryClick(this,new RoutedEventArgs()); Persist(); break;
             case "exit-mini": Preferences.MiniatureView=false; ApplyPreferences(); Persist(); Refresh(); break;
             case "hide": Hide(); break;

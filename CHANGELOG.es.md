@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.14
+
+- El repaso de logros continúa en segundo plano en Windows y en el navegador, con progreso y Detener repaso. Hasta tres consultas simultáneas con inicio espaciado para respetar los límites de Steam. Windows guarda solo el juego actualizado; detener conserva los resultados recibidos y cambios locales.
+
 ## 0.8.13 — Juegos importados en Miniatura
 
 Miniatura muestra Biblioteca cuando Mi lista está vacía, para que los juegos recién importados de Steam sigan visibles. Una etiqueta identifica el origen sin cambiar selección ni privacidad. Las listas personalizadas vacías muestran un aviso traducido y una acción Biblioteca en vez de un panel en blanco.

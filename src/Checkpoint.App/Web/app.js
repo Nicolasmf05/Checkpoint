@@ -143,8 +143,9 @@ function frame() {
   resize.addEventListener('pointermove', e => { if (!point) return; const x=e.screenX-point[0], y=e.screenY-point[1]; point=[e.screenX,e.screenY]; if (x || y) action('resize',{x,y}); }); resize.addEventListener('pointerup', () => point = undefined); resize.addEventListener('lostpointercapture', () => point = undefined);
   const collectionbar=el('div','collectionbar'),collections=el('select','collection-selector');collections.addEventListener('change',()=>action('collection',{value:collections.value}));collectionbar.append(collections,button('', 'list-details', '', {},'list-details'),button('', 'manage-lists', '', {},'manage-lists'));
   const selectionbar=el('div','selectionbar');
+  const achievementReview=el('div','achievement-review');achievementReview.setAttribute('role','status');achievementReview.append(el('span'),button('', 'stop-achievement-review'));
   const miniControls=el('div','mini-controls');miniControls.append(el('span','mini-source'),button('', 'exit-mini', '', {}, 'mini-exit'));
-  windowNode.append(header,intro,navigation,searchbar,collectionbar,selectionbar,miniControls,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
+  windowNode.append(header,intro,navigation,searchbar,collectionbar,selectionbar,miniControls,achievementReview,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
   windowNode.addEventListener('contextmenu', e => { if (state.mini && !e.target.closest('[data-game]')) { e.preventDefault(); showMenu(null,e.clientX,e.clientY); } });
 }
 function renderMain() {
@@ -166,6 +167,7 @@ function renderMain() {
   const search = host.querySelector('#search'); if ((pending.get('search')||0) <= (state.ack||0) && search.value !== state.search) search.value = state.search; search.placeholder = state.labels.search+' · '+gestures.search; search.setAttribute('aria-keyshortcuts',gestures.search.replace('Ctrl+','Control+')); search.setAttribute('aria-label',state.labels.search);
   const filter = host.querySelector('.searchbar select'); filter.replaceChildren(); [state.labels.all,...state.labels.statuses].forEach((text,index) => { const option=el('option','',text); option.value=index; filter.append(option); }); filter.value = state.filter;
   const hints=host.querySelector('.shortcut-hints');hints.replaceChildren();for(const [keys,label] of [[gestures.add,state.labels.add],[gestures.search,state.labels.search],[gestures.view,state.labels.view]]){const hint=el('span');hint.append(el('kbd','',keys),el('span','',label));hints.append(hint);}const helpButton=host.querySelector('.shortcut-button');helpButton.replaceChildren(el('span','',state.labels.shortcuts),el('kbd','',gestures.shortcuts));helpButton.title=state.labels.shortcuts+' · '+gestures.shortcuts;helpButton.setAttribute('aria-keyshortcuts',gestures.shortcuts);renderHelp();
+  const review=host.querySelector('.achievement-review');review.hidden=!state.achievementReview;review.querySelector('span').textContent=state.achievementReview?.text||'';review.querySelector('button').textContent=state.achievementReview?.cancelText||'';
   host.querySelector('.connection').textContent = state.connection; host.querySelector('.notice').textContent = state.notice;
   host.querySelector('[data-label="undo"]').hidden = !state.undo; host.querySelector('[data-label="sync"]').disabled = state.busy;
   host.querySelector('.resize').hidden = state.browser || state.locked || state.full; host.querySelector('.dragstrip').hidden = state.browser || !state.mini; host.querySelector('[data-label="pin"]').textContent = state.pinned ? '◆' : '◇';

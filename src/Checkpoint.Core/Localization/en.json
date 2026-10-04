@@ -614,5 +614,10 @@
   "No quedan juegos sin carátula por revisar.": "No more games with missing covers to review.",
   "En la web se actualiza Steam. RetroAchievements se sincroniza desde la app de Windows.": "The web version updates Steam. RetroAchievements syncs through the Windows app.",
   "Pendientes": "Remaining",
-  "Esta lista no tiene juegos.": "This list has no games."
+  "Esta lista no tiene juegos.": "This list has no games.",
+  "La actualización continúa en segundo plano. Puedes usar Checkpoint y detenerla desde el indicador de progreso.": "Updating continues in the background. You can use Checkpoint and stop it from the progress indicator.",
+  "Actualizando logros en segundo plano:": "Updating achievements in the background:",
+  "Repaso de logros detenido:": "Achievement review stopped:",
+  "Repaso de logros terminado:": "Achievement review finished:",
+  "Detener repaso": "Stop review"
 }
