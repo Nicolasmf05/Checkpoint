@@ -69,7 +69,7 @@ public partial class MainWindow
         var page=inlinePages[^1];
         var root=page.Controls.Capture(page.Root);if(root is Dictionary<string,object?> node)node["pageId"]=page.Id;
         return new {kind="dialog",inline=true,language=I18n.Language,theme=Themes.Id(Preferences),light=Themes.IsLight(Preferences),title=page.Controller.Title,
-            navigation=new {back=I18n.T("Volver"),home=I18n.T("Volver a la colección"),close=I18n.T("Cerrar Checkpoint"),trail=inlinePages.Select(p=>p.Controller.Title).ToArray()},
+            navigation=new {back=I18n.T("Volver"),home=I18n.T("Volver a la colección"),close=I18n.T("Cerrar Checkpoint"),minimize=I18n.T("Minimizar"),trail=inlinePages.Select(p=>p.Controller.Title).ToArray()},
             achievementReview=achievementReviewVisible?new{text=AchievementReviewText,cancelText=I18n.T(achievementReviewCancellation is not null?"Detener repaso":"Ocultar progreso"),running=achievementReviewCancellation is not null}:null,
             root=root};
     }
@@ -78,6 +78,7 @@ public partial class MainWindow
         if(!HasInlinePage)return false;
         string? action=message.TryGetProperty("action",out var a)?a.GetString():null;
         if(action=="close-app")Close();
+        else if(action=="minimize")MinimizeWidget();
         else if(action=="drag"){if(!Preferences.PositionLocked)DragMove();}
         else if(action is "cancel-dialog" or "navigation-back")inlinePages[^1].Controller.Close();
         else if(action=="navigation-home")CloseInlinePages();

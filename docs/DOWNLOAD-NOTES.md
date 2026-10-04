@@ -89,3 +89,8 @@ Ajustes → Repasar todos los logros → Actualizar todos los logros vuelve a la
 ## Navegación en una sola ventana
 
 Checkpoint utiliza la misma ventana o pestaña para ajustes, fichas de juegos/listas, logros, repasos y avisos. Volver retrocede un nivel; Volver a la colección regresa a tu colección actual. Abrir una pantalla relacionada conserva el formulario anterior. Salir de un formulario sin guardar cancela sus cambios pendientes; utiliza Guardar para conservarlos. Miniatura se amplía temporalmente para leer las fichas y recupera su tamaño al volver. Los selectores de archivos y la autorización de Steam siguen siendo interfaces del sistema/externas.
+
+
+## Minimizar en Windows
+
+El botón − minimiza en la barra de tareas por defecto. Ajustes → Ocultar en la bandeja al minimizar permite ocultarlo en su lugar. Recupéralo con doble clic en el icono de la bandeja o con tu atajo global configurado. Ocultar en la bandeja al cerrar es independiente; la X sigue cerrando completamente por defecto. Escape y las acciones explícitas de mostrar u ocultar conservan su función. En el navegador se utilizan los controles de minimizar del propio navegador.

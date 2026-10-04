@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.16
+
+- Minimize keeps Checkpoint on the Windows taskbar by default. Settings offers an independent option to hide in the tray when minimizing; closing to the tray remains a separate choice. The global show/hide shortcut restores a minimized window.
+
 ## 0.8.15
 
 - Checkpoint screens share one window/browser surface, including settings, game/list sheets, achievements, notices and review tools. Back and Back to collection show a clear screen path. Nested forms preserve their parent; Miniature temporarily expands for full sheets and restores its dimensions. Background review controls remain visible on pages.

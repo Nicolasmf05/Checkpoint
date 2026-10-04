@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.16
+
+- Minimizar deja Checkpoint en la barra de tareas de Windows por defecto. Ajustes ofrece una opción independiente para ocultar en la bandeja al minimizar; ocultar al cerrar sigue siendo otra elección. El atajo global recupera una ventana minimizada.
+
 ## 0.8.15
 
 - Las pantallas de Checkpoint comparten una sola ventana/superficie: ajustes, fichas de juegos/listas, logros, avisos y repasos. Volver y Volver a la colección muestran una ruta clara. Los formularios conservan su pantalla anterior; Miniatura se amplía temporalmente para las fichas y recupera su tamaño. El progreso del repaso sigue visible en las páginas.

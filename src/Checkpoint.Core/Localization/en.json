@@ -624,5 +624,8 @@
   "Volver a la colección": "Back to collection",
   "Cerrar Checkpoint": "Close Checkpoint",
   "Ocultar progreso": "Hide progress",
-  "Ajusta Checkpoint para que encaje contigo.": "Customize Checkpoint to suit you."
+  "Ajusta Checkpoint para que encaje contigo.": "Customize Checkpoint to suit you.",
+  "Minimizar": "Minimize",
+  "Ocultar en la bandeja al minimizar": "Hide in the system tray when minimized",
+  "Desactivado: minimizar deja Checkpoint en la barra de tareas. Activado: lo oculta en la bandeja; haz doble clic en su icono para volver.": "Off: minimizing keeps Checkpoint on the taskbar. On: it hides in the system tray; double-click its icon to return."
 }

@@ -34,5 +34,6 @@
   "Loc_UndoTooltip": "Recuperar el último juego eliminado · Ctrl+Z",
   "Loc_ViewTooltip": "Cambiar vista · F6",
   "Loc_Sync": "Sincronizar Steam",
-  "Loc_Example": "Ver ejemplo"
+  "Loc_Example": "Ver ejemplo",
+  "Loc_Minimize": "Minimizar"
 }

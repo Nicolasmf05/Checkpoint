@@ -33,7 +33,7 @@ public partial class MainWindow
         emptyTitle=EmptyTitle.Text, emptyText=EmptyText.Text, miniEmpty=I18n.T("Esta lista no tiene juegos."), examples=Games.Count == 0, undo=DeletedGames.Count > 0,
         labels=new { title=I18n.T("Mi lista"),
             friendsTitle=I18n.T("Amigos"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
-            add=I18n.T("Añadir juego"), settings=I18n.T("Ajustes"), hide=I18n.T("Ocultar widget"), close=I18n.T("Cerrar"),
+            add=I18n.T("Añadir juego"), settings=I18n.T("Ajustes"), hide=I18n.T("Ocultar widget"), minimize=I18n.T("Minimizar"), close=I18n.T("Cerrar"),
             pin=I18n.T("Mantener siempre visible"), search=I18n.T("Buscar juego"), sync=I18n.T("Actualizar"),
             details=I18n.T("Ver ficha completa"), achievements=I18n.T("Ver logros"), steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
@@ -103,6 +103,7 @@ public partial class MainWindow
             case "stop-achievement-review": StopAchievementReview(); break;
             case "mini-library": Preferences.MiniatureView=false; ApplyPreferences(); LibraryClick(this,new RoutedEventArgs()); Persist(); break;
             case "exit-mini": Preferences.MiniatureView=false; ApplyPreferences(); Persist(); Refresh(); break;
+            case "minimize": MinimizeWidget(); break;
             case "hide": Hide(); break;
             case "close": Close(); break;
             case "drag": if (!IsFullWindow && !Preferences.PositionLocked && System.Windows.Input.Mouse.LeftButton == System.Windows.Input.MouseButtonState.Pressed) DragMove(); break;

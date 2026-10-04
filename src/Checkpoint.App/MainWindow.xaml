@@ -78,7 +78,7 @@
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
           <Button x:Name="PinButton" Content="◇" Click="PinClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_ccd9c24d49b0}" AutomationProperties.Name="{DynamicResource Loc_ccd9c24d49b0}"/>
           <Button Content="⚙" Click="SettingsClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_4f2debbbf4fa}" AutomationProperties.Name="{DynamicResource Loc_4f2debbbf4fa}"/>
-          <Button Content="−" Click="HideClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_f882ac34dce0}" AutomationProperties.Name="{DynamicResource Loc_1cea6be7bd3a}"/>
+          <Button Content="−" Click="MinimizeClick" Width="29" Height="29" Padding="0" Margin="0,0,5,0" ToolTip="{DynamicResource Loc_Minimize}" AutomationProperties.Name="{DynamicResource Loc_Minimize}"/>
           <Button Content="×" Click="CloseClick" Width="29" Height="29" Padding="0" ToolTip="{DynamicResource Loc_aeccae342e4b}" AutomationProperties.Name="{DynamicResource Loc_aeccae342e4b}"/>
         </StackPanel>
       </Grid>

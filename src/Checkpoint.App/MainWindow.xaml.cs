@@ -79,6 +79,7 @@ public partial class MainWindow : Window
         }
         LoadLanguageResources(Preferences.Language);
         InitializeComponent();
+        StateChanged += (_, _) => { if (WindowState == WindowState.Minimized && Preferences.MinimizeToTray) Hide(); };
         InitializeSocial();
         boundsTimer.Tick += (_, _) => { boundsTimer.Stop(); CaptureBounds(); Store.SaveSettings(Preferences); };
         PreviewMouseMove += DragHandleMove;
@@ -255,7 +256,7 @@ public partial class MainWindow : Window
     }
     private void CaptureBounds()
     {
-        if (fullWindowApplied||inlineMiniatureBounds is not null) return;
+        if (WindowState == WindowState.Minimized || fullWindowApplied||inlineMiniatureBounds is not null) return;
         if (miniatureApplied == true) { Preferences.MiniatureWidth = Width; Preferences.MiniatureHeight = Height; }
         else { Preferences.Width = Width; Preferences.Height = Height; }
         Preferences.Left = Left; Preferences.Top = Top;
@@ -554,7 +555,8 @@ public partial class MainWindow : Window
     }
     private static T? FindVisual<T>(DependencyObject parent) where T : DependencyObject => VisualChildren(parent).OfType<T>().FirstOrDefault();
     private void PinClick(object sender, RoutedEventArgs e) { Preferences.AlwaysOnTop = !Preferences.AlwaysOnTop; ApplyPreferences(); Store.SaveSettings(Preferences); }
-    private void HideClick(object sender, RoutedEventArgs e) => Hide();
+    internal void MinimizeWidget() => WindowState = WindowState.Minimized;
+    private void MinimizeClick(object sender, RoutedEventArgs e) => MinimizeWidget();
     private void CloseClick(object sender, RoutedEventArgs e) => Close();
     private void DragTitle(object sender, MouseButtonEventArgs e) { if (!Preferences.PositionLocked && e.LeftButton == MouseButtonState.Pressed) { DragMove(); CaptureBounds(); Store.SaveSettings(Preferences); } }
     private void ResizeDrag(object sender, DragDeltaEventArgs e) { if (Preferences.PositionLocked) return; Width = Math.Max(MinWidth, Width + e.HorizontalChange); Height = Math.Max(MinHeight, Height + e.VerticalChange); boundsTimer.Stop(); boundsTimer.Start(); }
@@ -578,7 +580,7 @@ public partial class MainWindow : Window
         Persist(); Notice(I18n.T("Juegos de ejemplo añadidos. El progreso de Steam aún no se ha consultado."));
     }
     internal void ShowWidget() { Show(); WindowState = WindowState.Normal; if (ready) { if (IsFullWindow) FillWorkArea(); else ClampToScreen(); } Activate(); }
-    private void ToggleVisible() { if (IsVisible) Hide(); else ShowWidget(); }
+    private void ToggleVisible() { if (IsVisible && WindowState != WindowState.Minimized) Hide(); else ShowWidget(); }
     internal void Exit() { exiting = true; Close(); }
     protected override void OnClosing(CancelEventArgs e)
     {

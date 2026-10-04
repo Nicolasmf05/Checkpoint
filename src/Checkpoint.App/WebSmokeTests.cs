@@ -420,6 +420,26 @@ public partial class MainWindow
                 StopAchievementReview();
             }
             Retro=backgroundRetro;Games.Clear();Games.AddRange(backgroundGames);Persist();Refresh();
+            Check(!Preferences.MinimizeToTray,"new and existing libraries minimize to the taskbar by default");
+            await Run("document.querySelector('[data-label=minimize]').click();");
+            await Wait(()=>Task.FromResult(IsVisible&&ShowInTaskbar&&WindowState==WindowState.Minimized));
+            Check(IsVisible&&ShowInTaskbar,"CSS minimize keeps the window available on the taskbar");
+            ShowWidget();await Wait(()=>Task.FromResult(WindowState==WindowState.Normal&&IsVisible));
+            await Run("document.querySelector('[data-label=settings]').click();");var minimizeSettings=await Dialog();
+            await ScopedScript(minimizeSettings,"document.querySelector('input[aria-label=\"Hide in the system tray when minimized\"]').click();document.querySelector('[aria-label=\"Minimize\"]').click();");
+            await Wait(()=>Task.FromResult(IsVisible&&WindowState==WindowState.Minimized));
+            ShowWidget();await Wait(()=>Script(minimizeSettings,"document.querySelector('input[aria-label=\"Hide in the system tray when minimized\"]').checked"));
+            Check(HasInlinePage,"minimizing an internal page keeps its unsaved form when restored");
+            var previousCloseToTray=Preferences.CloseToTray;
+            await ScopedScript(minimizeSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");
+            await Wait(()=>Task.FromResult(!HasInlinePage&&Preferences.MinimizeToTray));
+            Check(Store.LoadSettings().MinimizeToTray&&Preferences.CloseToTray==previousCloseToTray,"minimize-to-tray saves independently of close-to-tray");
+            WindowState=WindowState.Minimized;
+            await Wait(()=>Task.FromResult(!IsVisible));
+            Check(!IsVisible,"optional tray behavior applies to Windows system minimize too");
+            ToggleVisible();await Wait(()=>Task.FromResult(IsVisible&&WindowState==WindowState.Normal));
+            Check(IsVisible,"show/hide shortcut restores a minimized or tray-hidden app");
+            Preferences.MinimizeToTray=false;Persist();
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

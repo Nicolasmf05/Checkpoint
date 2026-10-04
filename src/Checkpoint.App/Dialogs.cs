@@ -254,6 +254,8 @@ internal static partial class Dialogs
         body.Children.Add(new TextBlock { Text = I18n.T("Amplía Miniatura si los nombres se recortan. El texto de las otras vistas no cambia."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         var lightweight = Check(body, I18n.T("Modo ligero (sin carátulas)"), prefs.LightweightMode);
         body.Children.Add(new TextBlock { Text = I18n.T("Oculta las carátulas de tu lista y de amigos, evita nuevas descargas de imágenes y libera su caché. Conserva los juegos, objetivos y progreso."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
+        var minimizeTray = Check(body, I18n.T("Ocultar en la bandeja al minimizar"), prefs.MinimizeToTray);
+        body.Children.Add(new TextBlock { Text = I18n.T("Desactivado: minimizar deja Checkpoint en la barra de tareas. Activado: lo oculta en la bandeja; haz doble clic en su icono para volver."), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         var tray = Check(body, I18n.T("Ocultar en la bandeja al cerrar"), prefs.CloseToTray); var startup = Check(body, I18n.T("Iniciar con Windows"), prefs.StartWithWindows);
         Label(body, I18n.T("Atajos")); body.Children.Add(new TextBlock { Text = I18n.T("Ctrl+Alt+C · mostrar / ocultar\nCtrl+N · añadir juego     Ctrl+F · buscar\nF6 · cambiar vista     Escape · ocultar\nAlt+↑ / Alt+↓ · reordenar desde el asa ⠿\nCtrl+Z · recuperar el último juego eliminado"), FontSize = 12, LineHeight = 20 });
         var detectGames = Check(body, I18n.T("Detectar juegos y abrir sus logros automáticamente"), prefs.DetectGames);
@@ -312,7 +314,7 @@ internal static partial class Dialogs
                 prefs.FullWindow = windowMode.SelectedIndex == 0;
                 prefs.MiniatureView = windowMode.SelectedIndex != initialMode ? windowMode.SelectedIndex == 2 : view.SelectedIndex == 3;
                 if (!prefs.MiniatureView && view.SelectedIndex != 3) { prefs.Compact = view.SelectedIndex == 1; prefs.GridView = view.SelectedIndex == 2; }
-                prefs.Theme = Themes.Ids[Math.Clamp(theme.SelectedIndex, 0, Themes.Ids.Count - 1)]; prefs.LightTheme = Themes.IsLight(prefs); prefs.CloseToTray = tray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
+                prefs.Theme = Themes.Ids[Math.Clamp(theme.SelectedIndex, 0, Themes.Ids.Count - 1)]; prefs.LightTheme = Themes.IsLight(prefs); prefs.CloseToTray = tray.IsChecked == true; prefs.MinimizeToTray = minimizeTray.IsChecked == true; prefs.StartWithWindows = startup.IsChecked == true;
                 prefs.ServiceUrl = endpoint.Text.Trim(); prefs.SyncMinutes = new[] { 15, 30, 60, 120 }[interval.SelectedIndex];
                 prefs.Language = language.SelectedIndex == 1 ? "en" : "es";
                 prefs.LightweightMode = lightweight.IsChecked == true; prefs.DetectGames = detectGames.IsChecked == true;

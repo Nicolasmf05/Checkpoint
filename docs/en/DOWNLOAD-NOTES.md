@@ -89,3 +89,8 @@ Settings → Review all achievements → Update all achievements returns to the 
 ## Navigation in one window
 
 Checkpoint uses the same window or browser tab for settings, game/list sheets, achievements, reviews and notices. Back returns one level; Back to collection returns to your current collection. Opening a related page preserves the parent form. Leaving an unsaved form cancels its pending changes; use Save to keep them. Miniature expands temporarily to make full sheets readable and restores its size on return. Native file pickers and Steam authorization remain system/external interfaces.
+
+
+## Minimizing on Windows
+
+The − button minimizes to the taskbar by default. Settings → Hide in the system tray when minimized enables hiding instead. Restore it by double-clicking the tray icon or using your configured global shortcut. Hide in the system tray when closed is independent; the X still exits completely by default. Escape and the explicit show/hide actions keep their configured purpose. Browser windows use the browser’s own minimize controls.
