@@ -333,6 +333,33 @@ public partial class MainWindow
             await Run("document.querySelector('.game').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:30,clientY:100}));");
             Check(await Script(web,"document.querySelector('.menu').textContent.includes('Change list')&&!document.querySelector('.menu').textContent.includes('Settings')&&!document.querySelector('.menu').textContent.includes('Full window')"),"Windows game menu excludes application settings and window controls");
             await Capture(web,"css-game-menu-en.png");await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
+            var reviewSavedGames=Games.ToList();Games.Clear();
+            var reviewFirst=new Game{Title="AA cover review",Tracked=false,FriendsPrivate=true,Notes="Review notes",ManualAchievements=[new Achievement{Id="local",Name="Local review goal",Unlocked=true}]};
+            var reviewSecond=new Game{Title="ZZ cover review",Tracked=false};Games.AddRange(new[]{reviewFirst,reviewSecond});Persist();Refresh();
+            await Run("document.querySelector('[data-label=settings]').click();");var reviewSettings=await Dialog();
+            Check(await Script(reviewSettings,"document.body.innerText.includes('Review all achievements')&&document.body.innerText.includes('Find missing covers')"),"Windows settings expose both complete library review actions");
+            async Task<WebSurface> ReviewWindow(string title)
+            {
+                WebSurface? found=null;await Wait(async()=>{found=Application.Current.Windows.Cast<Window>().Where(w=>w.Title==title).Select(w=>w.Tag).OfType<WebSurface>().FirstOrDefault();return found?.Browser.CoreWebView2 is not null&&await Script(found,"window.checkpointState?.kind==='dialog'");});return found!;
+            }
+            await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Review all achievements').click();");
+            var reviewSheet=await ReviewWindow(I18n.T("Repasar todos los logros"));
+            Check(await Script(reviewSheet,"document.body.innerText.includes('Game 1 / 2')&&document.body.innerText.includes('Achievements: 1 / 1')"),"Windows achievement review includes private untracked games and manual goals");await Capture(reviewSheet,"css-achievement-review-en.png");
+            await reviewSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Next game').click();");await Task.Delay(300);
+            Check(await Script(reviewSheet,"document.body.innerText.includes('ZZ cover review')&&document.body.innerText.includes('Game 2 / 2')"),"Windows achievement review advances through the entire library");
+            await reviewSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            Preferences.LightweightMode=true;Covers.SetEnabled(false);
+            await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Find missing covers').click();");
+            var coversSheet=await ReviewWindow(I18n.T("Buscar carátulas que faltan"));await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Closest cover fixture')&&!!document.querySelector('img.cover-preview')"));
+            Check(await Script(coversSheet,"document.body.innerText.includes('AA cover review')&&document.body.innerText.includes('Accept')&&document.body.innerText.includes('Next cover')&&document.body.innerText.includes('Next game')"),"Windows covers review works in lightweight mode and offers the three review choices");await Capture(coversSheet,"css-cover-review-en.png");
+            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Next cover').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Second cover fixture')"));
+            Check(Store.LoadGames().First(g=>g.Id==reviewFirst.Id).RejectedIgdbCovers.Contains("fixture_first"),"Windows Next cover saves a rejection before another IGDB search");
+            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Accept').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('ZZ cover review')&&document.body.innerText.includes('Closest cover fixture')"));
+            Check(reviewFirst.IgdbCoverImageId=="fixture_second"&&reviewFirst.CustomCover is not null&&Store.LoadGames().First(g=>g.Id==reviewFirst.Id).Notes=="Review notes","Windows Accept immediately saves a cover without changing notes or privacy");
+            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Next game').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Review complete')"));
+            Check(reviewSecond.CustomCover is null&&reviewSecond.RejectedIgdbCovers.Contains("fixture_first"),"Windows Next game skips the cover and finishes the review");
+            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);Preferences.LightweightMode=false;Covers.SetEnabled(true);Games.Clear();Games.AddRange(reviewSavedGames);Persist();Refresh();
             File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new { ok=true, checks=checks.Count, names=checks },DataJson.Options));
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }

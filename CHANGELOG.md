@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.9
+
+- Settings now review achievements across the entire Library, including untracked and private games, with sequential navigation and an explicit update of every linked game. Local achievement changes are preserved.
+- A missing-cover wizard checks Steam first and searches IGDB one game at a time: Accept, Next cover or Next game. Accepting saves immediately; dismissed images are excluded from later suggestions.
+- Both reviews work in Windows and the web. Windows updates Steam and RetroAchievements; the web updates Steam and displays imported RetroAchievements and manual goals.
+
 ## 0.8.8 — 2026-10-04
 
 - Save creates a typed list and opens it, including when starting in Library; creation no longer depends on the separate Create list button.

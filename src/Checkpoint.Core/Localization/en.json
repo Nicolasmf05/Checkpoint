@@ -597,5 +597,21 @@
   "Seleccionar esta página": "Select this page",
   "Crea una lista antes de mover juegos.": "Create a list before moving games.",
   "La ficha incluye los juegos privados de esta lista. Quitar no elimina el juego de Biblioteca.": "This sheet includes private games in this list. Removing a game does not delete it from Library.",
-  "Mover desde una lista quita solo esa pertenencia. Desde Biblioteca o Mi lista reemplaza las listas actuales. Añadir conserva las demás. La privacidad no cambia.": "Moving from a list removes only that membership. From Library or My list it replaces current lists. Adding keeps other memberships. Privacy stays unchanged."
+  "Mover desde una lista quita solo esa pertenencia. Desde Biblioteca o Mi lista reemplaza las listas actuales. Añadir conserva las demás. La privacidad no cambia.": "Moving from a list removes only that membership. From Library or My list it replaces current lists. Adding keeps other memberships. Privacy stays unchanged.",
+  "Repasar todos los logros": "Review all achievements",
+  "Buscar carátulas que faltan": "Find missing covers",
+  "Actualizar todos los logros": "Update all achievements",
+  "Incluye toda la Biblioteca, también los juegos privados y los que no están en Mi lista. Los cambios manuales se conservan.": "Includes the entire Library, including private games and games outside My list. Manual changes are preserved.",
+  "Se comprueba Steam antes de buscar en IGDB. Siguiente carátula descarta la propuesta; Siguiente juego continúa sin añadirla. Las decisiones se guardan al instante.": "Steam is checked before searching IGDB. Next cover dismisses the suggestion; Next game continues without adding it. Decisions are saved immediately.",
+  "Juego": "Game",
+  "Sin juegos en Biblioteca": "No games in Library",
+  "Juegos revisados:": "Games reviewed:",
+  "No se pudieron actualizar:": "Could not update:",
+  "Siguiente juego": "Next game",
+  "Siguiente carátula": "Next cover",
+  "Buscando carátula…": "Searching for a cover…",
+  "Revisión terminada": "Review complete",
+  "No quedan juegos sin carátula por revisar.": "No more games with missing covers to review.",
+  "En la web se actualiza Steam. RetroAchievements se sincroniza desde la app de Windows.": "The web version updates Steam. RetroAchievements syncs through the Windows app.",
+  "Pendientes": "Remaining"
 }

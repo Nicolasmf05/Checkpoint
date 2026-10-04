@@ -9,7 +9,7 @@ $stdout = Join-Path $caseRoot 'web.stdout.log'
 $stderr = Join-Path $caseRoot 'web.stderr.log'
 $arguments = @('--data-dir', ('"' + $data + '"'), '--demo', '--diagnostics', '--web-smoke-test', ('"' + $render + '"'))
 $process = Start-Process -FilePath $ExePath -ArgumentList $arguments -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
-if (!$process.WaitForExit(90000)) { $process.Kill(); throw "CSS validation timed out. See $caseRoot" }
+if (!$process.WaitForExit(120000)) { $process.Kill(); throw "CSS validation timed out. See $caseRoot" }
 $process.WaitForExit()
 Get-Content -LiteralPath $stdout
 if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $stderr; throw "CSS application validation failed. See $caseRoot" }

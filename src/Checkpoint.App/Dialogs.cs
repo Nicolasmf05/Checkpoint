@@ -259,6 +259,8 @@ internal static partial class Dialogs
         Label(body, I18n.T("Atajos")); body.Children.Add(new TextBlock { Text = I18n.T("Ctrl+Alt+C · mostrar / ocultar\nCtrl+N · añadir juego     Ctrl+F · buscar\nF6 · cambiar vista     Escape · ocultar\nAlt+↑ / Alt+↓ · reordenar desde el asa ⠿\nCtrl+Z · recuperar el último juego eliminado"), FontSize = 12, LineHeight = 20 });
         var detectGames = Check(body, I18n.T("Detectar juegos y abrir sus logros automáticamente"), prefs.DetectGames);
         body.Children.Add(Button(I18n.T("Configurar RetroAchievements"), (_, _) => RetroSettings(owner, window)));
+        body.Children.Add(Button(I18n.T("Repasar todos los logros"), (_, _) => ReviewAchievements(owner, window)));
+        body.Children.Add(Button(I18n.T("Buscar carátulas que faltan"), (_, _) => ReviewCovers(owner, window)));
         Label(body, "Steam"); var steamSummary = new TextBlock { Text = owner.Steam.Session is null ? I18n.T("Cuenta sin vincular. El inicio de sesión se realiza en Steam.") : I18n.T("Cuenta vinculada: ") + owner.Steam.Session.SteamId, TextWrapping = TextWrapping.Wrap, FontSize = 12 }; body.Children.Add(steamSummary);
         var steamActions = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 10, 0, 0) }; body.Children.Add(steamActions);
         var advanced = new StackPanel(); var endpoint = Input(advanced, I18n.T("Dirección del servicio"), prefs.ServiceUrl);

@@ -2,6 +2,7 @@ import {defaults,shortcutLabels,effectiveShortcuts,validateShortcuts} from './sh
 import {normalize,mergeLibrary,importBackup,payload,friendCode,statuses,goals,themes,uuid,normalizeLists,listName,inList,shouldShare,listMembers,applyListAction} from './model.mjs';
 import {BrowserStore} from './store.mjs';
 import {BrowserApi} from './api.mjs';
+import {reviewItems} from './review.mjs';
 
 const [english,config]=await Promise.all(['en.json','config.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw new Error('configuration');return r.json();})));
 const store=await new BrowserStore().open();
@@ -63,6 +64,60 @@ async function findCover(g,title,parent,automatic=false,builder){
  }catch(error){if(!automatic&&dialog===parent)fail(error);}
  finally{coverBusy=false;if(builder)builder.busy=false;emit();}
 }
+function reviewAchievements(parent){
+ const ids=data.games.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(g=>g.id),b=build('review-achievements',{});let index=0,stopped=false,message='';
+ const current=()=>game(ids[index]);
+ const page={cancel:()=>{stopped=true;dialog=parent;emit();},render:()=>{
+  const g=current(),items=g?reviewItems(g):[],done=items.filter(a=>a.unlocked).length;
+  return b.page(T('Repasar todos los logros'),T('Incluye toda la Biblioteca, también los juegos privados y los que no están en Mi lista. Los cambios manuales se conservan.'),[
+   text(T('Juego')+' '+(ids.length?index+1:0)+' / '+ids.length),text(g?.title||T('Sin juegos en Biblioteca'),true),text(T('Logros')+': '+done+' / '+items.length+' · '+T('Pendientes')+': '+(items.length-done)),text(message),
+   {...b.button(T('Ver logros'),()=>achievements(g.id,page),'view'),enabled:!!g&&!b.busy},
+   text(T('En la web se actualiza Steam. RetroAchievements se sincroniza desde la app de Windows.')),
+   {...b.button(T('Actualizar todos los logros'),async()=>{
+    if(steamBusy||b.busy||!api.steam)return;b.busy=true;steamBusy=true;emit();let errors=0,processed=0;const session=api.steam;
+    try{const selected=data.games.filter(g=>g.steamAppId).map(g=>g.id);
+     for(const id of selected){if(stopped||api.steam!==session)break;const target=game(id);if(!target)continue;
+      try{const result=await api.steamRequest(`v1/games/${target.steamAppId}/achievements?lang=${data.settings.language}`);if(stopped||api.steam!==session)break;
+       if(game(id)===target){target.achievements=normalize({...target,achievements:result.achievements}).achievements;target.syncedAt=new Date().toISOString();await persist();}
+      }catch{errors++;}processed++;message=T('Juegos revisados:')+' '+processed+' / '+selected.length;if(dialog===page)emit();
+     }message=T('Juegos revisados:')+' '+processed+' · '+T('No se pudieron actualizar:')+' '+errors;
+    }finally{b.busy=false;steamBusy=false;emit();}
+   },'sync-all'),enabled:!!api.steam&&!steamBusy&&!b.busy&&data.games.some(g=>g.steamAppId)}
+  ],[{...b.button(T('Anterior'),()=>{index--;},'previous'),enabled:index>0&&!b.busy},{...b.button(T('Siguiente juego'),()=>{index++;},'next'),enabled:index+1<ids.length&&!b.busy},{...b.button(T('Cerrar'),page.cancel,'close'),enabled:true}]);
+ }};dialog=page;emit();
+}
+async function reviewHasCover(g){
+ const load=src=>new Promise(resolve=>{const image=new Image();let ended=false;const finish=value=>{if(ended)return;ended=true;clearTimeout(timer);image.onload=image.onerror=null;resolve(value);};const timer=setTimeout(()=>finish(false),10000);image.onload=()=>finish(image.naturalWidth>0);image.onerror=()=>finish(false);image.src=src;});
+ if(g.customCover&&await load(g.customCover))return true;
+ if(!g.steamAppId)return false;
+ return load(`https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`);
+}
+function reviewCovers(parent){
+ const ids=data.games.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(g=>g.id),b=build('review-covers',{});let index=-1,candidate=null,png=null,stopped=false,message='';
+ const current=()=>game(ids[index]);
+ const save=async accept=>{const g=current();if(!g)return;g.igdbCoverSearchTitle=g.title;if(candidate){if(accept){g.customCover=png;g.igdbCoverImageId=candidate.imageId;}else if(!g.rejectedIgdbCovers.includes(candidate.imageId))g.rejectedIgdbCovers.push(candidate.imageId);}await persist();};
+ const load=async advance=>{
+  if(b.busy||stopped)return;b.busy=true;candidate=null;png=null;delete page.error;message=T('Buscando carátula…');emit();
+  try{
+   if(advance){while(++index<ids.length){const g=current();if(!g)continue;emit();const found=await reviewHasCover(g);if(stopped)return;if(!found)break;}}
+   if(stopped)return;const g=current();if(!g){message=T('No quedan juegos sin carátula por revisar.');return;}
+   if(g.rejectedIgdbCovers.length>=200)throw new Error('igdb-exhausted');const result=await api.coverSearch(g.title,g.rejectedIgdbCovers,true);if(stopped)return;
+   const found=result?.candidate;if(!found){message=T('No hay otra carátula de IGDB disponible para este nombre.');return;}
+   if(!Number.isSafeInteger(found.id)||found.id<1||typeof found.name!=='string'||!found.name||found.name.length>250||!(/^[A-Za-z0-9_-]{1,80}$/).test(found.imageId)||g.rejectedIgdbCovers.includes(found.imageId))throw new Error('igdb-unavailable');
+   const blob=await api.coverImage(found.imageId);if(stopped)return;const bitmap=await createImageBitmap(blob);
+   try{if(bitmap.width*bitmap.height>16000000)throw new Error('igdb-unavailable');const scale=Math.min(1,160/bitmap.width,240/bitmap.height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);png=canvas.toDataURL('image/png');}finally{bitmap.close();}
+   if(stopped)return;candidate=found;message=T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.');
+  }catch(error){if(!stopped&&dialog===page)fail(error);}
+  finally{b.busy=false;if(!stopped&&dialog===page)emit();}
+ };
+ const decide=async(accept,advance)=>{if(b.busy||stopped)return;b.busy=true;emit();try{await save(accept);}finally{b.busy=false;}if(!stopped)await load(advance);};
+ const page={cancel:()=>{stopped=true;dialog=parent;emit();},render:()=>{
+  const g=current();return b.page(T('Buscar carátulas que faltan'),T('Se comprueba Steam antes de buscar en IGDB. Siguiente carátula descarta la propuesta; Siguiente juego continúa sin añadirla. Las decisiones se guardan al instante.'),[
+   text(T('Juego')+' '+Math.max(0,Math.min(index+1,ids.length))+' / '+ids.length),text(g?.title||T('Revisión terminada'),true),...(png?[{type:'image',src:png,style:'cover-preview',children:[]}]:[]),...(candidate?[text(candidate.name+(Number.isInteger(candidate.year)?' · '+candidate.year:''),true)]:[]),text(message),
+   {type:'row',children:[{...b.button(T('Aceptar'),()=>decide(true,true),'accept'),enabled:!!candidate&&!b.busy},{...b.button(T('Siguiente carátula'),()=>decide(false,false),'another'),enabled:!!g&&!b.busy},{...b.button(T('Siguiente juego'),()=>decide(false,true),'next'),enabled:!!g&&!b.busy}]}
+  ],[{...b.button(T('Cerrar'),page.cancel,'close'),enabled:true}]);
+ }};dialog=page;emit();load(true);
+}
 function closeDialog(){dialog=null;emit();}
 function info(){const b=build('info',{});dialog={render:()=>b.page(T('Checkpoint en tu navegador'),T('La biblioteca privada se guarda en este navegador. Exporta copias: borrar los datos del sitio elimina la biblioteca local.'),[text(T('Steam y amigos requieren conexión. La sesión se conserva en esta pestaña; al cerrarla puede ser necesario volver a entrar.')),text(T('La interfaz se adapta al tamaño de tu navegador. Usa Mi lista o Biblioteca; la bandeja y los atajos globales están en la app de Windows.')),text(T('Los archivos JSON de la app de Windows se pueden importar. La biblioteca privada no se sincroniza automáticamente entre dispositivos.'))],[b.button(T('Cerrar'),closeDialog,'close')])};emit();}
 function editor(original){const draft=original?structuredClone(original):normalize({title:T('Nuevo juego'),sortOrder:data.games.length,friendsPrivate:data.settings.newGamesPrivate===true||data.settings.activeList==='private',lists:data.settings.activeList.startsWith('custom:')?[data.settings.activeList.slice(7)]:[]});const fields={title:original?.title||'',platform:draft.platform,steamAppId:draft.steamAppId||'',status:draft.status,goal:draft.goal,customGoal:draft.customGoal,storyPercent:draft.storyPercent??'',notes:draft.notes,friendsPrivate:draft.friendsPrivate===true,tracked:draft.tracked,favorite:draft.favorite,tasks:draft.tasks.map(t=>`[${t.done?'x':' '}] ${t.title}`).join('\n')};for(const name of data.settings.gameLists)fields['list.'+name]=draft.lists.some(n=>n.toLocaleLowerCase()===name.toLocaleLowerCase());const b=build('editor',fields);
@@ -82,16 +137,16 @@ function gameDetails(id,parent){if(!game(id))return;const b=build('game-details'
  return b.page(g.title,T('Ficha del juego'),items,[b.button(T('Cerrar'),()=>{dialog=parent||null;emit();},'close'),b.button(T('Editar juego'),()=>editor(g),'edit'),b.button(T('Ver logros'),()=>achievements(id,dialog),'achievements')]);}};emit();}
 function confirmDelete(id){const g=game(id);if(!g)return;const b=build('delete',{});dialog={render:()=>b.page(T('Eliminar juego'),g.title,[text(T('Podrás recuperar este juego desde Deshacer. Su publicación se retirará cuando haya conexión.'))],[b.button(T('Cancelar'),()=>editor(g),'cancel'),b.button(T('Eliminar'),async()=>{data.deleted.push(structuredClone(g));data.deleted=data.deleted.slice(-20);data.games=data.games.filter(x=>x.id!==id);if(shares[id]?.selected){shares[id].selected=false;shares[id].desired=null;await saveShares();}await persist();closeDialog();},'delete')])};emit();}
 function achievements(id,parent){if(!game(id))return;const fields={spoilers:false,pending:true},expanded=new Set(),b=build('achievements',fields);
- dialog={render:()=>{const g=game(id),all=g?.achievements||[],done=all.filter(a=>a.unlocked).length;
+ dialog={cancel:()=>{dialog=parent||null;emit();},render:()=>{const g=game(id),all=g?reviewItems(g):[],done=all.filter(a=>a.unlocked).length;
  const items=[{type:'card',style:'achievement-summary',children:[text(`${done} / ${all.length} ${T('logros completados')}`,true),{type:'progress',value:all.length?done*100/all.length:0,max:100,name:T('Logros'),children:[]},text(all.length?`${all.length-done}${T(' logros pendientes')}`:T('Logros sin sincronizar'))]},...b.field('spoilers',T('Mostrar logros ocultos'),'check'),...b.field('pending',T('Solo pendientes'),'check')];
- for(const a of all.filter(a=>!fields.pending||!a.unlocked).sort((a,b)=>Number(a.unlocked)-Number(b.unlocked))){const hidden=a.hidden&&!a.unlocked&&!fields.spoilers;
- const children=[text((a.unlocked?'✓ ':'○ ')+(hidden?T('Logro oculto'):a.name),true),text('Steam',false,true)];
+ for(const a of all.filter(a=>!fields.pending||!a.unlocked).sort((a,b)=>Number(a.unlocked)-Number(b.unlocked))){const hidden=a.hidden&&!a.sourceUnlocked&&!fields.spoilers;
+ const children=[text((a.unlocked?'✓ ':'○ ')+(hidden?T('Logro oculto'):a.name),true),text(a.provider==='manual'?T('Manual'):a.provider==='retro'?'RetroAchievements':'Steam',false,true)];
  if(hidden)children.push(text(T('Activa la opción superior para revelar este logro.')));
  else {const toggle=b.button(T(expanded.has(a.id)?'Ocultar descripción':'Ver descripción'),()=>{if(!expanded.delete(a.id))expanded.add(a.id);},'description.'+a.id);toggle.name=toggle.text+' · '+a.name;children.push(toggle);if(expanded.has(a.id))children.push({...text(a.description||T('Este logro no tiene descripción.')),style:'achievement-description'});}
  items.push({type:'card',style:'achievement-card',children});}
  return b.page(T('Logros'),g?.title||'',items,[b.button(T('Cerrar'),()=>{if(parent){dialog=parent;emit();}else closeDialog();},'close'),{...b.button(T('Actualizar'),async()=>{await sync(id);emit();},'sync'),enabled:!!api.steam&&!steamBusy&&!!g?.steamAppId}]);}};emit();}
 function settings(){const previous=structuredClone(data.settings),fields={language:data.settings.language==='en'?1:0,theme:themes.indexOf(data.settings.theme),layout:data.settings.layout,opacity:data.settings.opacity,interval:[15,30,60,120].indexOf(data.settings.syncMinutes),lightweight:data.settings.lightweight};const b=build('settings',fields);b.onChange=(key,value)=>{if(key==='theme')data.settings.theme=themes[Number(value)]||'dark';if(key==='opacity')data.settings.opacity=Number(value);};
- dialog={cancel:async()=>{data.settings=previous;await persist();closeDialog();},render:()=>{const items=[...b.field('language',T('Idioma'),'select',[T('Español'),T('Inglés')]),...b.field('theme',T('Tema'),'select',themeLabels()),text(T('Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.'),false,true),...b.field('layout',T('Vista de la colección'),'select',[T('Lista'),T('Compacta'),T('Cuadrícula de carátulas')]),...b.field('opacity',T('Opacidad del fondo'),'slider'),...b.field('lightweight',T('Modo ligero (sin carátulas)'),'check'),...b.field('interval',T('Sincronizar biblioteca y logros al abrir y cada…'),'select',[15,30,60,120].map(n=>`${n} ${T('minutos')}`)),text(api.steam?T('Steam vinculado.'):T('Cuenta sin vincular. El inicio de sesión se realiza en Steam.')),b.button(api.steam?T('Desvincular Steam'):T('Vincular Steam'),async()=>{data.settings=previous;await persist();if(api.steam)await api.unlink();else connectSteam();closeDialog();},'steam'),b.button(T('Gestionar listas'),async()=>{data.settings=previous;await persist();closeDialog();manageLists();},'lists'),b.button(T('Configurar atajos'),async()=>{data.settings=previous;await persist();shortcutSettings();},'shortcuts'),b.button(T('Sobre la versión web'),async()=>{data.settings=previous;await persist();info();},'info')];const slider=items.find(x=>x.type==='slider');Object.assign(slider,{min:.35,max:1,step:.05});return b.page(T('Ajustes'),T('Ajusta Checkpoint para que encaje contigo.'),items,[b.button(T('Cancelar'),async()=>{data.settings=previous;await persist();closeDialog();},'cancel'),b.button(T('Guardar'),async()=>{data.settings={...data.settings,language:Number(fields.language)===1?'en':'es',theme:themes[fields.theme]||'dark',layout:Number(fields.layout),opacity:Number(fields.opacity),syncMinutes:[15,30,60,120][fields.interval]||30,lightweight:fields.lightweight===true};await persist();restartTimer();closeDialog();},'save')]);}};emit();}
+ dialog={cancel:async()=>{data.settings=previous;await persist();closeDialog();},render:()=>{const items=[...b.field('language',T('Idioma'),'select',[T('Español'),T('Inglés')]),...b.field('theme',T('Tema'),'select',themeLabels()),text(T('Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.'),false,true),...b.field('layout',T('Vista de la colección'),'select',[T('Lista'),T('Compacta'),T('Cuadrícula de carátulas')]),...b.field('opacity',T('Opacidad del fondo'),'slider'),...b.field('lightweight',T('Modo ligero (sin carátulas)'),'check'),...b.field('interval',T('Sincronizar biblioteca y logros al abrir y cada…'),'select',[15,30,60,120].map(n=>`${n} ${T('minutos')}`)),text(api.steam?T('Steam vinculado.'):T('Cuenta sin vincular. El inicio de sesión se realiza en Steam.')),b.button(api.steam?T('Desvincular Steam'):T('Vincular Steam'),async()=>{data.settings=previous;await persist();if(api.steam)await api.unlink();else connectSteam();closeDialog();},'steam'),b.button(T('Repasar todos los logros'),()=>reviewAchievements(dialog),'review-achievements'),b.button(T('Buscar carátulas que faltan'),()=>reviewCovers(dialog),'review-covers'),b.button(T('Gestionar listas'),async()=>{data.settings=previous;await persist();closeDialog();manageLists();},'lists'),b.button(T('Configurar atajos'),async()=>{data.settings=previous;await persist();shortcutSettings();},'shortcuts'),b.button(T('Sobre la versión web'),async()=>{data.settings=previous;await persist();info();},'info')];const slider=items.find(x=>x.type==='slider');Object.assign(slider,{min:.35,max:1,step:.05});return b.page(T('Ajustes'),T('Ajusta Checkpoint para que encaje contigo.'),items,[b.button(T('Cancelar'),async()=>{data.settings=previous;await persist();closeDialog();},'cancel'),b.button(T('Guardar'),async()=>{data.settings={...data.settings,language:Number(fields.language)===1?'en':'es',theme:themes[fields.theme]||'dark',layout:Number(fields.layout),opacity:Number(fields.opacity),syncMinutes:[15,30,60,120][fields.interval]||30,lightweight:fields.lightweight===true};await persist();restartTimer();closeDialog();},'save')]);}};emit();}
 function chooseList(ids,source,mode='move',parent=dialog){
  const selected=[...new Set(ids||[])];if(!selected.length||selected.some(id=>!game(id)))throw new Error('invalid-selection');
  const fields={target:0},b=build('list-change',fields);

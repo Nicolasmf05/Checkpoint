@@ -13,6 +13,8 @@ Widget translúcido para organizar los juegos que quieres pasarte en Windows.
 
 Ajustes → Actualizaciones comprueba nuevas versiones al abrir y permite descargar e instalar un MSI verificado, con copia previa y conservación de datos. [Detalles y edición portable](docs/UPDATES.md).
 
+Ajustes también incluye **Repasar todos los logros** y **Buscar carátulas que faltan**. [Repasar logros y buscar carátulas que faltan](docs/LIBRARY-REVIEW.md).
+
 ## Detección de juegos y logros personales
 
 La edición Windows abre los logros pendientes al detectar un juego de tu biblioteca. Incluye Steam, RetroAchievements y objetivos manuales que puedes añadir, quitar y marcar completados. RetroAchievements necesita tu usuario y clave web personal en Ajustes, además del ID del juego y asociación del emulador. [Configuración, privacidad y límites](docs/ACHIEVEMENTS.md).
@@ -39,12 +41,12 @@ Capturas de la interfaz HTML/CSS real en WebView2 con datos de prueba aislados. 
 
 ## Descargar y utilizar
 
-La versión actual es **0.8.8**. En la carpeta `dist` se generan:
+La versión actual es **0.8.9**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.8), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.9), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.8.8-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.8.8-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.8.9-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.8.9-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -209,7 +211,7 @@ El proyecto incluye `.gitignore`, licencia Checkpoint Attribution License 1.0, d
 
 Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
 
-También se entrega `dist/Checkpoint-source-0.7.1.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
+También se entrega `dist/Checkpoint-source-0.8.9.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
 
 ## Próximas versiones
 

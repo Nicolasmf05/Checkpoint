@@ -7,9 +7,10 @@ using Checkpoint.Core;
 namespace Checkpoint.App;
 internal static partial class Dialogs
 {
-    internal static Window Achievements(MainWindow owner, Game initial, bool automatic = false)
+    internal static Window Achievements(MainWindow owner, Game initial, bool automatic = false, Window? parent = null)
     {
         var window = Modal(owner, I18n.T("Logros · ") + initial.Title, 620, 720);
+        if(parent is not null)window.Owner=parent;
         if(automatic) { window.Owner=null; window.ShowInTaskbar=true; window.ShowActivated=false; window.WindowStartupLocation=WindowStartupLocation.CenterScreen; }
         var body=Panel(); Layout(window,body,out var footer);
         Heading(body,I18n.T("Logros de ")+initial.Title,I18n.T("Los cambios manuales solo afectan a Checkpoint. No desbloquean logros en Steam ni RetroAchievements."));

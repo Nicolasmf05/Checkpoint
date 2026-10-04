@@ -104,9 +104,9 @@ public sealed class CoverCache : IDisposable
         if (!BackupFiles.IsCustomCoverName(name)) throw new ArgumentException(I18n.T("Nombre de carátula no válido."));
         File.Delete(Path.Combine(folder, name));
     }
-    public async Task<BitmapImage?> Get(Game game)
+    public async Task<BitmapImage?> Get(Game game, bool review = false)
     {
-        if (!enabled) return null;
+        if (!enabled && !review) return null;
         var custom = game.CustomCover;
         if (BackupFiles.IsCustomCoverName(custom))
         {
@@ -114,11 +114,11 @@ public sealed class CoverCache : IDisposable
         }
         if (game.SteamAppId is not int appId) return null;
         if (retryAfter.TryGetValue(appId, out var retry) && retry > DateTimeOffset.UtcNow) return null;
-        var work = inFlight.GetOrAdd(appId, id => new Lazy<Task<BitmapImage?>>(() => Download(id)));
+        var work = inFlight.GetOrAdd(appId, id => new Lazy<Task<BitmapImage?>>(() => Download(id, review)));
         try { return await work.Value; }
         finally { inFlight.TryRemove(appId, out _); }
     }
-    private async Task<BitmapImage?> Download(int appId)
+    private async Task<BitmapImage?> Download(int appId, bool review)
     {
         var path = Path.Combine(folder, appId + ".jpg");
         try
@@ -130,7 +130,7 @@ public sealed class CoverCache : IDisposable
                 if (File.Exists(path)) return ReadCached(path);
                 foreach (var asset in new[] { "library_600x900.jpg", "header.jpg" })
                 {
-                    if (!enabled) return null;
+                    if (!enabled && !review) return null;
                     using var response = await http.GetAsync($"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appId}/{asset}");
                     if (!response.IsSuccessStatusCode) continue;
                     var bytes = await response.Content.ReadAsByteArrayAsync(); if (bytes.Length > 8_000_000) continue;

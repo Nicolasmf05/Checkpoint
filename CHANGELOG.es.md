@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.9
+
+- Ajustes permite repasar los logros de toda la Biblioteca, incluidos juegos privados y fuera de Mi lista, avanzar juego por juego y actualizar todos los vinculados. Se conservan los cambios manuales.
+- El asistente de carátulas comprueba Steam y busca en IGDB juego por juego: Aceptar, Siguiente carátula o Siguiente juego. Guarda al aceptar y recuerda las imágenes descartadas.
+- Ambos recorridos están en Windows y en la web. Windows actualiza Steam y RetroAchievements; la web actualiza Steam y muestra los logros de RetroAchievements importados y los objetivos manuales.
+
 ## 0.8.8 — 2026-10-04
 
 - Guardar crea la lista escrita y la abre, incluso desde Biblioteca; ya no depende del botón Crear lista por separado.
