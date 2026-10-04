@@ -1,38 +1,75 @@
+-- Migra las publicaciones a progreso sin imágenes y retira los recursos de Storage anteriores.
 -- Checkpoint stores only bounded JSON/text metadata in Supabase.
 -- Does not delete existing files, accounts, progress or image references.
 -- Remove actual files with the Storage API after backing them up and approval.
-begin;
+BEGIN;
 
 -- Restrictive rules also deny uploads if another permissive policy is added later.
-drop policy if exists cp_asset_insert on storage.objects;
-drop policy if exists cp_asset_update on storage.objects;
-create policy cp_text_only_insert on storage.objects as restrictive
-    for insert to anon, authenticated with check (false);
-create policy cp_text_only_update on storage.objects as restrictive
-    for update to anon, authenticated using (false) with check (false);
+DROP POLICY if EXISTS cp_asset_insert ON storage.objects;
+
+DROP POLICY if EXISTS cp_asset_update ON storage.objects;
+
+CREATE POLICY cp_text_only_insert ON storage.objects AS restrictive FOR insert TO anon,
+authenticated
+WITH
+  CHECK (FALSE);
+
+CREATE POLICY cp_text_only_update ON storage.objects AS restrictive
+FOR UPDATE
+  TO anon,
+  authenticated USING (FALSE)
+WITH
+  CHECK (FALSE);
 
 -- Storage service credentials bypass RLS, but not this upload guard.
-create function checkpoint_private.reject_file_storage()
-returns trigger language plpgsql set search_path = '' as $$
+CREATE FUNCTION checkpoint_private.reject_file_storage () returns trigger language plpgsql
+SET
+  search_path = '' AS $$
 begin
     raise exception 'Checkpoint stores text only; file uploads are disabled' using errcode = '42501';
 end;
 $$;
-revoke all on function checkpoint_private.reject_file_storage() from public, anon, authenticated;
-create trigger cp_text_only_storage_guard before insert or update on storage.objects
-    for each row execute function checkpoint_private.reject_file_storage();
+
+REVOKE ALL ON function checkpoint_private.reject_file_storage ()
+FROM
+  public,
+  anon,
+  authenticated;
+
+CREATE TRIGGER cp_text_only_storage_guard
+BEFORE INSERT OR UPDATE ON storage.objects FOR EACH ROW
+EXECUTE FUNCTION checkpoint_private.reject_file_storage ();
 
 -- Legacy rows can still be read. Any new/updated publication is text-only.
-alter table public.cp_game_publications add constraint cp_text_only_publication
-    check (cover_path is null and (operation_payload is null or
-        (operation_payload->>'coverPath' is null and operation_payload::text !~* 'data:[^" ]*;base64,'))) not valid;
-alter table public.cp_profiles add constraint cp_text_only_profile
-    check (avatar_path is null) not valid;
-alter table checkpoint_steam.entries add constraint cp_text_only_state
-    check (octet_length(value::text) <= 2097152 and value::text !~* 'data:[^" ]*;base64,') not valid;
+ALTER TABLE public.cp_game_publications
+ADD CONSTRAINT cp_text_only_publication CHECK (
+  cover_path IS NULL
+  AND (
+    operation_payload IS NULL
+    OR (
+      operation_payload ->> 'coverPath' IS NULL
+      AND operation_payload::text !~* 'data:[^" ]*;base64,'
+    )
+  )
+) NOT valid;
 
-create or replace function public.cp_publish_game(p_game_id uuid, p_expected_revision bigint, p_operation_id uuid, p_game jsonb)
-returns bigint language plpgsql security definer set search_path = '' as $$
+ALTER TABLE public.cp_profiles
+ADD CONSTRAINT cp_text_only_profile CHECK (avatar_path IS NULL) NOT valid;
+
+ALTER TABLE checkpoint_steam.entries
+ADD CONSTRAINT cp_text_only_state CHECK (
+  octet_length(value::text) <= 2097152
+  AND value::text !~* 'data:[^" ]*;base64,'
+) NOT valid;
+
+CREATE OR REPLACE FUNCTION public.cp_publish_game (
+  p_game_id uuid,
+  p_expected_revision bigint,
+  p_operation_id uuid,
+  p_game jsonb
+) returns bigint language plpgsql security definer
+SET
+  search_path = '' AS $$
 declare actor uuid := auth.uid(); current_row public.cp_game_publications; result_revision bigint;
 begin
     if actor is null then raise exception 'Inicia sesión' using errcode = '42501'; end if;
@@ -87,4 +124,4 @@ begin
 end;
 $$;
 
-commit;
+COMMIT;

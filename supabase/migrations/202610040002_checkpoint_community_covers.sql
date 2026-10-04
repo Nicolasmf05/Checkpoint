@@ -1,16 +1,31 @@
+-- Catálogo comunitario de referencias IGDB confirmadas.
+-- Las confirmaciones conservan la primera propuesta y se ejecutan desde el servicio.
 -- Only text metadata, no images, URLs, user identity or public direct writes.
-begin;
-create table if not exists checkpoint_steam.community_covers (
-  id text primary key check(id ~ '^[a-f0-9]{64}$'),
-  title text not null check(length(title) between 1 and 140),
-  platform text not null check(length(platform) between 1 and 80),
-  candidate jsonb not null check(pg_column_size(candidate)<=2048),
-  created_at timestamptz not null default now()
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS checkpoint_steam.community_covers (
+  id text PRIMARY KEY CHECK (id ~ '^[a-f0-9]{64}$'),
+  title text NOT NULL CHECK (length(title) BETWEEN 1 AND 140),
+  platform text NOT NULL CHECK (length(platform) BETWEEN 1 AND 80),
+  candidate jsonb NOT NULL CHECK (pg_column_size(candidate) <= 2048),
+  created_at timestamptz NOT NULL DEFAULT now()
 );
-alter table checkpoint_steam.community_covers enable row level security;
-revoke all on checkpoint_steam.community_covers from public,anon,authenticated;
-create or replace function public.cp_community_cover(p_action text,p_id text,p_value jsonb default '{}'::jsonb)
-returns jsonb language plpgsql security definer set search_path='' as $$
+
+ALTER TABLE checkpoint_steam.community_covers enable ROW level security;
+
+REVOKE ALL ON checkpoint_steam.community_covers
+FROM
+  public,
+  anon,
+  authenticated;
+
+CREATE OR REPLACE FUNCTION public.cp_community_cover (
+  p_action text,
+  p_id text,
+  p_value jsonb DEFAULT '{}'::jsonb
+) returns jsonb language plpgsql security definer
+SET
+  search_path = '' AS $$
 declare result jsonb;
 begin
   if p_id !~ '^[a-f0-9]{64}$' then raise exception 'Invalid cover identity'; end if;
@@ -33,6 +48,14 @@ begin
   end if;
   raise exception 'Unsupported community cover action';
 end $$;
-revoke all on function public.cp_community_cover(text,text,jsonb) from public,anon,authenticated;
-grant execute on function public.cp_community_cover(text,text,jsonb) to service_role;
-commit;
+
+REVOKE ALL ON function public.cp_community_cover (text, text, jsonb)
+FROM
+  public,
+  anon,
+  authenticated;
+
+GRANT
+EXECUTE ON function public.cp_community_cover (text, text, jsonb) TO service_role;
+
+COMMIT;

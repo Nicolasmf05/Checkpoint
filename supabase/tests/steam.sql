@@ -1,6 +1,8 @@
+-- Pruebas de RPC del estado Steam: expiración, caché, límites y reutilización de nonces.
 -- Run as postgres in SQL Editor, after the Steam migration. No persistent fixtures.
-begin;
-do $$
+BEGIN;
+
+DO $$
 declare result jsonb; i integer;
 begin
   assert not has_schema_privilege('anon','checkpoint_steam','usage');
@@ -34,5 +36,9 @@ begin
   assert public.cp_steam_state('get','session','expired') is null;
   raise notice 'Steam database assertions passed (20 including rate-limit iterations)';
 end $$;
-select 'Steam assertions passed' as result, 20 as checks;
-rollback;
+
+SELECT
+  'Steam assertions passed' AS result,
+  20 AS checks;
+
+ROLLBACK;

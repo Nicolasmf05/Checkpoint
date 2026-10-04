@@ -1,39 +1,279 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';
-import {normalize,goalVisible,mergeLibrary,importBackup,payload,friendCode,account,themes,normalizeLists,listName,inList,shouldShare,listMembers,applyListAction} from '../model.mjs';
-import {readFile} from 'node:fs/promises';
-test('normalization retains manual fields and bounds remote content',()=>{const g=normalize({title:' Test ',notes:'private',status:'Finished',goal:'Custom',tasks:[{title:'task',done:true}],steamAppId:-1});assert.equal(g.title,'Test');assert.equal(g.status,3);assert.equal(g.goal,2);assert.equal(g.notes,'private');assert.equal(g.steamAppId,null);assert.ok(g.finishedAt);assert.equal(normalize({...g,status:1}).finishedAt,null);});
-test('Steam imports deduplicate and preserve manual state and notes',()=>{const g=normalize({title:'My title',steamAppId:620,notes:'private',status:2,storyPercent:40}),list=[g];assert.equal(mergeLibrary(list,[{appId:620,name:'Portal 2',playtimeMinutes:70},{appId:999,name:'Borrowed',playtimeMinutes:5},{appId:999,name:'Borrowed',playtimeMinutes:10}]),1);assert.equal(list.length,2);assert.equal(g.title,'My title');assert.equal(g.status,2);assert.equal(g.storyPercent,40);assert.equal(g.notes,'private');assert.equal(list[1].tracked,false);});
-test('invalid backup imports are atomic and valid imports skip existing games',()=>{const list=[normalize({title:'Kept',steamAppId:620})];assert.throws(()=>importBackup(list,{games:[{title:'Valid'},{title:''}]}));assert.equal(list.length,1);assert.equal(importBackup(list,{games:[{title:'Duplicate',steamAppId:620},{title:'New'}]}),1);assert.equal(list[0].title,'Kept');});
-test('publication payload never contains private notes or task titles',()=>{const g=normalize({title:'Public',notes:'secret',tasks:[{title:'private task',done:true}],customCover:'data:image/png;base64,AAAA'});const p=payload(g);assert.equal(p.tasksDone,1);assert.equal(p.coverPath,null);assert.ok(!JSON.stringify(p).includes('secret'));assert.ok(!JSON.stringify(p).includes('private task'));assert.ok(!('notes'in p));});
-test('friend codes always display full Checkpoint and usernames are normalized',()=>{assert.equal(friendCode('CHECKPOINT-123456abcdef'),'checkpoint-123456abcdef');assert.equal(friendCode('cp-123456abcdef'),'checkpoint-123456abcdef');assert.equal(friendCode('checkpoint-123456abcdef',true),'cp-123456abcdef');assert.throws(()=>friendCode('garbage'));assert.equal(account(' Test_User '),'test_user@accounts.checkpoint.invalid');assert.throws(()=>account('bad name'));assert.equal(themes.length,22);});
-test('untrusted cover paths and invalid identifiers never become image URLs',()=>{const g=normalize({title:'x',customCover:'javascript:alert(1)',steamAppId:Infinity,id:'not-a-uuid'});assert.equal(g.customCover,null);assert.equal(g.steamAppId,null);assert.match(g.id,/^[a-f\d-]{36}$/);});
-test('every literal browser message has an English translation',async()=>{const en={...JSON.parse(await readFile('src/Checkpoint.Core/Localization/en.json','utf8')),...JSON.parse(await readFile('web/en.json','utf8'))};const source=await readFile('web/bridge.mjs','utf8');for(const match of source.matchAll(/T\('([^']+)'\)/g))assert.ok(en[match[1]],'Missing: '+match[1]);const errors=source.slice(source.indexOf('const keys='),source.indexOf('notice=T(keys'));for(const match of errors.matchAll(/:'([^']+)'/g))assert.ok(en[match[1]],'Missing error: '+match[1]);});
+// Pruebas de normalización, importación, objetivos, privacidad y operaciones de listas del modelo web.
 
-test('lists preserve independent memberships and private games never become shareable',()=>{const g=normalize({title:'Fixture',friendsPrivate:false,lists:['Backlog','Other','backlog']});assert.equal(g.lists.length,2);assert.ok(shouldShare(g)&&inList(g,'all')&&inList(g,'custom:Backlog'));g.friendsPrivate=true;assert.ok(!shouldShare(g)&&!inList(g,'all')&&!inList(g,'custom:Backlog')&&inList(g,'private'));g.friendsPrivate=false;g.tracked=false;assert.ok(!shouldShare(g));assert.throws(()=>listName('BACKLOG',['Backlog']));assert.throws(()=>listName('Privados',[]));assert.throws(()=>listName('',[]));assert.throws(()=>normalize({title:'Bad privacy',friendsPrivate:'true'}));assert.deepEqual(normalizeLists(['  New  ','new','Other']),['New','Other']);});
-
-test('desktop achievement mappings and local overrides survive web normalization',()=>{const value=normalize({title:'Fixture',retroGameId:42,detectionProcess:'retroarch.exe',detectionWindowTitle:'Mario',retroAchievements:[{id:'1',name:'First',unlocked:true}],manualAchievements:[{id:'manual',name:'Personal'}],removedAchievements:['retro:1'],achievementOverrides:{'manual:manual':true}});assert.equal(value.retroGameId,42);assert.equal(value.detectionWindowTitle,'Mario');assert.equal(value.manualAchievements[0].name,'Personal');assert.deepEqual(value.removedAchievements,['retro:1']);assert.equal(value.achievementOverrides['manual:manual'],true);});
-
-test('cover rejection metadata survives backups without entering friend publications',()=>{const g=normalize({title:'Cover fixture',rejectedIgdbCovers:['fixture','../bad','fixture'],igdbCoverSearchTitle:'Cover fixture',igdbCoverImageId:'accepted'});assert.deepEqual(g.rejectedIgdbCovers,['fixture']);assert.equal(normalize(JSON.parse(JSON.stringify(g))).igdbCoverSearchTitle,'Cover fixture');assert(!JSON.stringify(payload(g)).includes('rejectedIgdbCovers'));});
-
-test('batch list operations preserve private data, memberships and owner visibility',()=>{
- const a=normalize({title:'One',tracked:false,friendsPrivate:true,lists:['Source','Other'],notes:'Keep notes',storyPercent:37}),b=normalize({title:'Two',lists:['Source'],tasks:[{title:'Keep task'}]}),games=[a,b],catalog=['Source','Other','Target'];
- applyListAction(games,[a.id,b.id],catalog,'move','custom:Source','Target');
- assert.deepEqual(a.lists,['Other','Target']);assert.deepEqual(b.lists,['Target']);assert.equal(a.tracked,true);assert.equal(a.friendsPrivate,true);assert.equal(a.notes,'Keep notes');assert.equal(a.storyPercent,37);assert.equal(b.tasks[0].title,'Keep task');
- assert.equal(listMembers(games,'custom:Target').length,2);assert.equal(inList(a,'custom:Target'),false);
- applyListAction(games,[a.id],catalog,'add','library','Source');assert.equal(a.lists.length,3);
- applyListAction(games,[a.id],catalog,'remove','custom:Source');assert.deepEqual(a.lists,['Other','Target']);assert.equal(games.length,2);
- applyListAction(games,[a.id,b.id],catalog,'public','library');assert.ok(games.every(shouldShare));
- applyListAction(games,[a.id],catalog,'move','private','Source');assert.deepEqual(a.lists,['Other','Target','Source']);
- applyListAction(games,[a.id],catalog,'move','library','Source');assert.deepEqual(a.lists,['Source']);
- applyListAction(games,[a.id],catalog,'remove','all');assert.equal(a.tracked,false);assert.equal(games.length,2);
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  normalize,
+  goalVisible,
+  mergeLibrary,
+  importBackup,
+  payload,
+  friendCode,
+  account,
+  themes,
+  normalizeLists,
+  listName,
+  inList,
+  shouldShare,
+  listMembers,
+  applyListAction,
+} from '../model.mjs';
+import { readFile } from 'node:fs/promises';
+test('normalization retains manual fields and bounds remote content', () => {
+  const g = normalize({
+    title: ' Test ',
+    notes: 'private',
+    status: 'Finished',
+    goal: 'Custom',
+    tasks: [{ title: 'task', done: true }],
+    steamAppId: -1,
+  });
+  assert.equal(g.title, 'Test');
+  assert.equal(g.status, 3);
+  assert.equal(g.goal, 2);
+  assert.equal(g.notes, 'private');
+  assert.equal(g.steamAppId, null);
+  assert.ok(g.finishedAt);
+  assert.equal(normalize({ ...g, status: 1 }).finishedAt, null);
 });
-test('invalid batch selections and destinations never partially mutate games',()=>{
- const games=[normalize({title:'One'}),normalize({title:'Two'})],before=JSON.stringify(games);
- assert.throws(()=>applyListAction(games,[games[0].id,'00000000-0000-4000-8000-000000000000'],['Target'],'private','all'));
- assert.throws(()=>applyListAction(games,[games[0].id],['Target'],'move','all','Missing'));
- assert.throws(()=>applyListAction(games,[games[0].id],['Target'],'remove','private'));
- assert.equal(JSON.stringify(games),before);
+test('Steam imports deduplicate and preserve manual state and notes', () => {
+  const g = normalize({
+      title: 'My title',
+      steamAppId: 620,
+      notes: 'private',
+      status: 2,
+      storyPercent: 40,
+    }),
+    list = [g];
+  assert.equal(
+    mergeLibrary(list, [
+      { appId: 620, name: 'Portal 2', playtimeMinutes: 70 },
+      { appId: 999, name: 'Borrowed', playtimeMinutes: 5 },
+      { appId: 999, name: 'Borrowed', playtimeMinutes: 10 },
+    ]),
+    1,
+  );
+  assert.equal(list.length, 2);
+  assert.equal(g.title, 'My title');
+  assert.equal(g.status, 2);
+  assert.equal(g.storyPercent, 40);
+  assert.equal(g.notes, 'private');
+  assert.equal(list[1].tracked, false);
+});
+test('invalid backup imports are atomic and valid imports skip existing games', () => {
+  const list = [normalize({ title: 'Kept', steamAppId: 620 })];
+  assert.throws(() => importBackup(list, { games: [{ title: 'Valid' }, { title: '' }] }));
+  assert.equal(list.length, 1);
+  assert.equal(
+    importBackup(list, { games: [{ title: 'Duplicate', steamAppId: 620 }, { title: 'New' }] }),
+    1,
+  );
+  assert.equal(list[0].title, 'Kept');
+});
+test('publication payload never contains private notes or task titles', () => {
+  const g = normalize({
+    title: 'Public',
+    notes: 'secret',
+    tasks: [{ title: 'private task', done: true }],
+    customCover: 'data:image/png;base64,AAAA',
+  });
+  const p = payload(g);
+  assert.equal(p.tasksDone, 1);
+  assert.equal(p.coverPath, null);
+  assert.ok(!JSON.stringify(p).includes('secret'));
+  assert.ok(!JSON.stringify(p).includes('private task'));
+  assert.ok(!('notes' in p));
+});
+test('friend codes always display full Checkpoint and usernames are normalized', () => {
+  assert.equal(friendCode('CHECKPOINT-123456abcdef'), 'checkpoint-123456abcdef');
+  assert.equal(friendCode('cp-123456abcdef'), 'checkpoint-123456abcdef');
+  assert.equal(friendCode('checkpoint-123456abcdef', true), 'cp-123456abcdef');
+  assert.throws(() => friendCode('garbage'));
+  assert.equal(account(' Test_User '), 'test_user@accounts.checkpoint.invalid');
+  assert.throws(() => account('bad name'));
+  assert.equal(themes.length, 22);
+});
+test('untrusted cover paths and invalid identifiers never become image URLs', () => {
+  const g = normalize({
+    title: 'x',
+    customCover: 'javascript:alert(1)',
+    steamAppId: Infinity,
+    id: 'not-a-uuid',
+  });
+  assert.equal(g.customCover, null);
+  assert.equal(g.steamAppId, null);
+  assert.match(g.id, /^[a-f\d-]{36}$/);
+});
+test('every literal browser message has an English translation', async () => {
+  const en = {
+    ...JSON.parse(await readFile('src/Checkpoint.Core/Localization/en.json', 'utf8')),
+    ...JSON.parse(await readFile('web/en.json', 'utf8')),
+  };
+  const source = await readFile('web/bridge.mjs', 'utf8');
+  for (const match of source.matchAll(/T\('([^']+)'\)/g))
+    assert.ok(en[match[1]], 'Missing: ' + match[1]);
+  const errors = source.slice(source.indexOf('const keys='), source.indexOf('notice=T(keys'));
+  for (const match of errors.matchAll(/:'([^']+)'/g))
+    assert.ok(en[match[1]], 'Missing error: ' + match[1]);
 });
 
-test('optional goals survive imports and publication without changing old values',()=>{const g=normalize({title:'Optional',goal:'None'});assert.equal(g.goal,3);assert.equal(payload(g).goalKind,null);const copy=normalize({...g,goal:'None'});assert.equal(copy.goal,3);assert.equal(normalize({title:'Legacy',goal:'Custom'}).goal,2);});
-test('completed goals hide and restore without deleting saved choices',()=>{const g=normalize({title:'Story',goal:'Story',status:'Finished'});assert.equal(goalVisible(g),false);assert.equal(payload(g).goalKind,null);g.status=1;assert.equal(goalVisible(g),true);g.goal=1;assert.equal(goalVisible(g),true);g.achievements=[{id:'a',unlocked:true},{id:'b',unlocked:false}];assert.equal(goalVisible(g),true);g.achievementOverrides={'steam:b':true};assert.equal(goalVisible(g),false);g.achievementOverrides['steam:a']=false;assert.equal(goalVisible(g),true);g.steamAppId=620;g.achievements=null;g.manualAchievements=[{id:'m',unlocked:true}];assert.equal(goalVisible(g),true);});
+test('lists preserve independent memberships and private games never become shareable', () => {
+  const g = normalize({
+    title: 'Fixture',
+    friendsPrivate: false,
+    lists: ['Backlog', 'Other', 'backlog'],
+  });
+  assert.equal(g.lists.length, 2);
+  assert.ok(shouldShare(g) && inList(g, 'all') && inList(g, 'custom:Backlog'));
+  g.friendsPrivate = true;
+  assert.ok(
+    !shouldShare(g) && !inList(g, 'all') && !inList(g, 'custom:Backlog') && inList(g, 'private'),
+  );
+  g.friendsPrivate = false;
+  g.tracked = false;
+  assert.ok(!shouldShare(g));
+  assert.throws(() => listName('BACKLOG', ['Backlog']));
+  assert.throws(() => listName('Privados', []));
+  assert.throws(() => listName('', []));
+  assert.throws(() => normalize({ title: 'Bad privacy', friendsPrivate: 'true' }));
+  assert.deepEqual(normalizeLists(['  New  ', 'new', 'Other']), ['New', 'Other']);
+});
+
+test('desktop achievement mappings and local overrides survive web normalization', () => {
+  const value = normalize({
+    title: 'Fixture',
+    retroGameId: 42,
+    detectionProcess: 'retroarch.exe',
+    detectionWindowTitle: 'Mario',
+    retroAchievements: [{ id: '1', name: 'First', unlocked: true }],
+    manualAchievements: [{ id: 'manual', name: 'Personal' }],
+    removedAchievements: ['retro:1'],
+    achievementOverrides: { 'manual:manual': true },
+  });
+  assert.equal(value.retroGameId, 42);
+  assert.equal(value.detectionWindowTitle, 'Mario');
+  assert.equal(value.manualAchievements[0].name, 'Personal');
+  assert.deepEqual(value.removedAchievements, ['retro:1']);
+  assert.equal(value.achievementOverrides['manual:manual'], true);
+});
+
+test('cover rejection metadata survives backups without entering friend publications', () => {
+  const g = normalize({
+    title: 'Cover fixture',
+    rejectedIgdbCovers: ['fixture', '../bad', 'fixture'],
+    igdbCoverSearchTitle: 'Cover fixture',
+    igdbCoverImageId: 'accepted',
+  });
+  assert.deepEqual(g.rejectedIgdbCovers, ['fixture']);
+  assert.equal(normalize(JSON.parse(JSON.stringify(g))).igdbCoverSearchTitle, 'Cover fixture');
+  assert(!JSON.stringify(payload(g)).includes('rejectedIgdbCovers'));
+});
+
+test('batch list operations preserve private data, memberships and owner visibility', () => {
+  const a = normalize({
+      title: 'One',
+      tracked: false,
+      friendsPrivate: true,
+      lists: ['Source', 'Other'],
+      notes: 'Keep notes',
+      storyPercent: 37,
+    }),
+    b = normalize({ title: 'Two', lists: ['Source'], tasks: [{ title: 'Keep task' }] }),
+    games = [a, b],
+    catalog = ['Source', 'Other', 'Target'];
+  applyListAction(games, [a.id, b.id], catalog, 'move', 'custom:Source', 'Target');
+  assert.deepEqual(a.lists, ['Other', 'Target']);
+  assert.deepEqual(b.lists, ['Target']);
+  assert.equal(a.tracked, true);
+  assert.equal(a.friendsPrivate, true);
+  assert.equal(a.notes, 'Keep notes');
+  assert.equal(a.storyPercent, 37);
+  assert.equal(b.tasks[0].title, 'Keep task');
+  assert.equal(listMembers(games, 'custom:Target').length, 2);
+  assert.equal(inList(a, 'custom:Target'), false);
+  applyListAction(games, [a.id], catalog, 'add', 'library', 'Source');
+  assert.equal(a.lists.length, 3);
+  applyListAction(games, [a.id], catalog, 'remove', 'custom:Source');
+  assert.deepEqual(a.lists, ['Other', 'Target']);
+  assert.equal(games.length, 2);
+  applyListAction(games, [a.id, b.id], catalog, 'public', 'library');
+  assert.ok(games.every(shouldShare));
+  applyListAction(games, [a.id], catalog, 'move', 'private', 'Source');
+  assert.deepEqual(a.lists, ['Other', 'Target', 'Source']);
+  applyListAction(games, [a.id], catalog, 'move', 'library', 'Source');
+  assert.deepEqual(a.lists, ['Source']);
+  applyListAction(games, [a.id], catalog, 'remove', 'all');
+  assert.equal(a.tracked, false);
+  assert.equal(games.length, 2);
+});
+test('invalid batch selections and destinations never partially mutate games', () => {
+  const games = [normalize({ title: 'One' }), normalize({ title: 'Two' })],
+    before = JSON.stringify(games);
+  assert.throws(() =>
+    applyListAction(
+      games,
+      [games[0].id, '00000000-0000-4000-8000-000000000000'],
+      ['Target'],
+      'private',
+      'all',
+    ),
+  );
+  assert.throws(() => applyListAction(games, [games[0].id], ['Target'], 'move', 'all', 'Missing'));
+  assert.throws(() => applyListAction(games, [games[0].id], ['Target'], 'remove', 'private'));
+  assert.equal(JSON.stringify(games), before);
+});
+
+test('optional goals survive imports and publication without changing old values', () => {
+  const g = normalize({ title: 'Optional', goal: 'None' });
+  assert.equal(g.goal, 3);
+  assert.equal(payload(g).goalKind, null);
+  const copy = normalize({ ...g, goal: 'None' });
+  assert.equal(copy.goal, 3);
+  assert.equal(normalize({ title: 'Legacy', goal: 'Custom' }).goal, 2);
+});
+test('completed goals hide and restore without deleting saved choices', () => {
+  const g = normalize({ title: 'Story', goal: 'Story', status: 'Finished' });
+  assert.equal(goalVisible(g), false);
+  assert.equal(payload(g).goalKind, null);
+  g.status = 1;
+  assert.equal(goalVisible(g), true);
+  g.goal = 1;
+  assert.equal(goalVisible(g), true);
+  g.achievements = [
+    { id: 'a', unlocked: true },
+    { id: 'b', unlocked: false },
+  ];
+  assert.equal(goalVisible(g), true);
+  g.achievementOverrides = { 'steam:b': true };
+  assert.equal(goalVisible(g), false);
+  g.achievementOverrides['steam:a'] = false;
+  assert.equal(goalVisible(g), true);
+  g.steamAppId = 620;
+  g.achievements = null;
+  g.manualAchievements = [{ id: 'm', unlocked: true }];
+  assert.equal(goalVisible(g), true);
+});
+
+test('friends receive manual achievements with effective completion but no private fields', () => {
+  const g = normalize({
+    title: 'Shared manual',
+    manualAchievements: [
+      {
+        id: 'm',
+        name: 'Personal challenge',
+        description: 'Finish without damage',
+        unlocked: false,
+      },
+      { id: 'hidden', name: 'Removed', description: '', unlocked: true },
+    ],
+    removedAchievements: ['manual:hidden'],
+    achievementOverrides: { 'manual:m': true },
+    notes: 'Private note',
+  });
+  const p = payload(g);
+  assert.deepEqual(JSON.parse(p.manualAchievementsJson), [
+    { name: 'Personal challenge', description: 'Finish without damage', completed: true },
+  ]);
+  assert(!JSON.stringify(p).includes('Private note'));
+  assert(!JSON.stringify(p).includes('Removed'));
+});

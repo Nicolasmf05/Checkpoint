@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.23
+
+- Friends’ achievements have a dedicated panel per game with larger completed counts, pending counts and a progress bar. Missing published data is explicit; story and tasks remain secondary. No additional private data is shared.
+
 ## 0.8.22
 
 - Empty lists cannot open their details from collections or list management. Moving or removing the last member closes the sheet; adding a member enables it again. Search and status filters do not affect this rule.

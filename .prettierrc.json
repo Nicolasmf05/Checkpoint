@@ -1,0 +1,28 @@
+{
+  "printWidth": 100,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "htmlWhitespaceSensitivity": "strict",
+  "plugins": ["@prettier/plugin-xml", "prettier-plugin-sh", "prettier-plugin-toml"],
+  "overrides": [
+    {
+      "files": [
+        "*.xaml",
+        "*.wxs",
+        "*.csproj",
+        "*.props",
+        "*.slnx",
+        "*.manifest",
+        "*.svg",
+        "NuGet.config"
+      ],
+      "options": { "parser": "xml", "xmlWhitespaceSensitivity": "ignore" }
+    },
+    {
+      "files": "*.webmanifest",
+      "options": { "parser": "json" }
+    }
+  ]
+}

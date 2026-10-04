@@ -1,6 +1,8 @@
+-- Comprueba acceso al catálogo comunitario y confirmaciones mediante el rol del servicio.
 -- Run in the SQL Editor after the community-cover migration. All test writes are rolled back.
-begin;
-do $$
+BEGIN;
+
+DO $$
 declare k text:=repeat('f',64); a jsonb:='{"title":"Checkpoint cover test","platform":"PC","candidate":{"id":1,"name":"Checkpoint cover test","imageId":"test_first","year":2020,"score":1}}'; b jsonb;
 begin
   assert not has_schema_privilege('anon','checkpoint_steam','usage');
@@ -24,5 +26,8 @@ begin
     if sqlerrm='Invalid image reference was accepted' then raise; end if;
   end;
 end $$;
-select '14 checks passed: text only, private permissions and stable first choice; test data is rolled back' as result;
-rollback;
+
+SELECT
+  '14 checks passed: text only, private permissions and stable first choice; test data is rolled back' AS result;
+
+ROLLBACK;

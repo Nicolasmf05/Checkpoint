@@ -1,3 +1,5 @@
+# CI de Windows: compila, prueba y prepara paquetes y evidencias de la distribución.
+
 name: Build and verify
 on:
   push:

@@ -1,11 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-         xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
-         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-         IgnorableNamespaces="uap uap10 rescap">
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Identidad, recursos, capacidades y punto de entrada del paquete MSIX. -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap10 rescap"
+>
   <!-- Preview identity. Build-MSIX replaces these values with Partner Center identity. -->
-  <Identity Name="Checkpoint.PackagingPreview" Publisher="CN=Checkpoint Packaging Preview" Version="1.6.1.0" ProcessorArchitecture="x64" />
+  <Identity
+    Name="Checkpoint.PackagingPreview"
+    Publisher="CN=Checkpoint Packaging Preview"
+    Version="1.6.1.0"
+    ProcessorArchitecture="x64"
+  />
   <Properties>
     <DisplayName>Checkpoint</DisplayName>
     <PublisherDisplayName>Checkpoint Packaging Preview</PublisherDisplayName>
@@ -14,12 +22,26 @@
   </Properties>
   <Resources><Resource Language="en-US" /><Resource Language="es-ES" /></Resources>
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+    <TargetDeviceFamily
+      Name="Windows.Desktop"
+      MinVersion="10.0.22000.0"
+      MaxVersionTested="10.0.26100.0"
+    />
   </Dependencies>
   <Applications>
-    <Application Id="Checkpoint" Executable="Checkpoint\Checkpoint.exe" uap10:RuntimeBehavior="packagedClassicApp" uap10:TrustLevel="mediumIL">
-      <uap:VisualElements DisplayName="Checkpoint" Description="A desktop widget for your game backlog."
-                          Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="#111827" />
+    <Application
+      Id="Checkpoint"
+      Executable="Checkpoint\Checkpoint.exe"
+      uap10:RuntimeBehavior="packagedClassicApp"
+      uap10:TrustLevel="mediumIL"
+    >
+      <uap:VisualElements
+        DisplayName="Checkpoint"
+        Description="A desktop widget for your game backlog."
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
+        BackgroundColor="#111827"
+      />
     </Application>
   </Applications>
   <Capabilities><rescap:Capability Name="runFullTrust" /></Capabilities>

@@ -1,21 +1,45 @@
+-- Estado privado del servicio Steam para flujos, sesiones, caché, límites y nonces.
+-- El acceso se reserva a las operaciones del servicio mediante RPC.
 -- Steam state is private and accessed exclusively by the Edge Function.
-begin;
-create schema if not exists checkpoint_steam;
-revoke all on schema checkpoint_steam from public, anon, authenticated;
-create table if not exists checkpoint_steam.entries (
-  kind text not null check (kind in ('flow','session','nonce','cache','limit')),
-  id text not null,
-  value jsonb not null,
-  expires timestamptz not null,
-  primary key(kind,id)
-);
-alter table checkpoint_steam.entries enable row level security;
-revoke all on checkpoint_steam.entries from public, anon, authenticated;
-create index if not exists cp_steam_expiry on checkpoint_steam.entries(expires);
+BEGIN;
 
-create or replace function public.cp_steam_state(p_action text, p_kind text, p_id text,
-  p_value jsonb default '{}'::jsonb, p_ttl integer default 600)
-returns jsonb language plpgsql security definer set search_path = '' as $$
+CREATE SCHEMA if NOT EXISTS checkpoint_steam;
+
+REVOKE ALL ON schema checkpoint_steam
+FROM
+  public,
+  anon,
+  authenticated;
+
+CREATE TABLE IF NOT EXISTS checkpoint_steam.entries (
+  kind text NOT NULL CHECK (
+    kind IN ('flow', 'session', 'nonce', 'cache', 'limit')
+  ),
+  id text NOT NULL,
+  value jsonb NOT NULL,
+  expires timestamptz NOT NULL,
+  PRIMARY KEY (kind, id)
+);
+
+ALTER TABLE checkpoint_steam.entries enable ROW level security;
+
+REVOKE ALL ON checkpoint_steam.entries
+FROM
+  public,
+  anon,
+  authenticated;
+
+CREATE INDEX if NOT EXISTS cp_steam_expiry ON checkpoint_steam.entries (expires);
+
+CREATE OR REPLACE FUNCTION public.cp_steam_state (
+  p_action text,
+  p_kind text,
+  p_id text,
+  p_value jsonb DEFAULT '{}'::jsonb,
+  p_ttl integer DEFAULT 600
+) returns jsonb language plpgsql security definer
+SET
+  search_path = '' AS $$
 declare v jsonb; n integer; expiry timestamptz; inserted integer;
 begin
   if p_kind not in ('flow','session','nonce','cache','limit') or length(p_id) > 200
@@ -67,6 +91,14 @@ begin
   end if;
   raise exception 'Unsupported Steam state action';
 end $$;
-revoke all on function public.cp_steam_state(text,text,text,jsonb,integer) from public,anon,authenticated;
-grant execute on function public.cp_steam_state(text,text,text,jsonb,integer) to service_role;
-commit;
+
+REVOKE ALL ON function public.cp_steam_state (text, text, text, jsonb, integer)
+FROM
+  public,
+  anon,
+  authenticated;
+
+GRANT
+EXECUTE ON function public.cp_steam_state (text, text, text, jsonb, integer) TO service_role;
+
+COMMIT;

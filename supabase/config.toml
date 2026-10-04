@@ -1,9 +1,11 @@
+# Configuración del entorno Supabase y de la validación JWT para cada función Edge.
+
 [functions.checkpoint-steam]
 # Steam OpenID callbacks and custom Steam bearer sessions are validated inside the function.
 verify_jwt = false
-entrypoint = "./functions/checkpoint-steam/index.ts"
+entrypoint = './functions/checkpoint-steam/index.ts'
 
 [functions.checkpoint-covers]
 # Public metadata/image lookup with bounded requests and server-side rate limits.
 verify_jwt = false
-entrypoint = "./functions/checkpoint-covers/index.ts"
+entrypoint = './functions/checkpoint-covers/index.ts'

@@ -1,6 +1,9 @@
+# Extrae y valida la distribución portable en un directorio de diagnóstico propio.
+# Ejecuta pruebas nativas y CSS sobre los archivos que recibirá el usuario.
+
 param(
     [Parameter(Mandatory)][string]$ZipPath,
-    [ValidateSet('win-x64','win-arm64')][string]$Runtime = 'win-x64'
+    [ValidateSet('win-x64', 'win-arm64')][string]$Runtime = 'win-x64'
 )
 $ErrorActionPreference = 'Stop'
 $checkpointRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -16,13 +19,19 @@ if ($topLevel.Count -ne 1 -or !$topLevel[0].PSIsContainer -or $topLevel[0].Name 
     throw 'El portable debe contener una única carpeta Checkpoint en la raíz.'
 }
 $exe = Join-Path $extracted 'Checkpoint.exe'
-foreach ($relative in @('Checkpoint.exe','Checkpoint.dll','service-config.json','supabase-config.json','LICENSE','ATTRIBUTION.md','ATTRIBUTION.es.md','THIRD-PARTY-NOTICES.md','licenses\DOTNET-LICENSE.txt','licenses\WEBVIEW2-LICENSE.txt','Web\index.html','Web\app.css','Web\app.js','Web\ui-model.mjs','READ-ME-FIRST.md','LEEME-PRIMERO.md')) {
-    if (!(Test-Path -LiteralPath (Join-Path $extracted $relative))) { throw "El paquete no incluye $relative." }
+foreach ($relative in @('Checkpoint.exe', 'Checkpoint.dll', 'service-config.json', 'supabase-config.json', 'LICENSE', 'ATTRIBUTION.md', 'ATTRIBUTION.es.md', 'THIRD-PARTY-NOTICES.md', 'licenses\DOTNET-LICENSE.txt', 'licenses\WEBVIEW2-LICENSE.txt', 'Web\index.html', 'Web\app.css', 'Web\app.js', 'Web\ui-model.mjs', 'READ-ME-FIRST.md', 'LEEME-PRIMERO.md')) {
+    if (!(Test-Path -LiteralPath (Join-Path $extracted $relative))) {
+        throw "El paquete no incluye $relative."
+    }
 }
-$unexpectedLanguages = @(Get-ChildItem -LiteralPath $extracted -Directory | Where-Object { $_.Name -in @('cs','de','fr','it','ja','ko','pl','pt-BR','ru','tr','zh-Hans','zh-Hant') })
-if ($unexpectedLanguages.Count) { throw 'The package contains unused framework language resources.' }
+$unexpectedLanguages = @(Get-ChildItem -LiteralPath $extracted -Directory | Where-Object { $_.Name -in @('cs', 'de', 'fr', 'it', 'ja', 'ko', 'pl', 'pt-BR', 'ru', 'tr', 'zh-Hans', 'zh-Hant') })
+if ($unexpectedLanguages.Count) {
+    throw 'The package contains unused framework language resources.'
+}
 $fileVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($exe).ProductVersion.Split('+')[0]
-if (!$fileVersion.StartsWith($version + '.') -and $fileVersion -ne $version) { throw "Versión inesperada en el paquete: $fileVersion" }
+if (!$fileVersion.StartsWith($version + '.') -and $fileVersion -ne $version) {
+    throw "Versión inesperada en el paquete: $fileVersion"
+}
 if ($Runtime -eq 'win-arm64' -and [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString() -ne 'Arm64') {
     Write-Output 'Estructura ARM64 comprobada. Ejecuta Verify-Package.ps1 en Windows ARM64 para validar la app nativa.'
     return
@@ -36,11 +45,17 @@ if (!$process.WaitForExit(60000)) {
 }
 $process.WaitForExit()
 Get-Content -LiteralPath $stdout
-if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $stderr; throw "Falló la app del paquete con código $($process.ExitCode). Consulta $caseRoot." }
+if ($process.ExitCode -ne 0) {
+    Get-Content -LiteralPath $stderr; throw "Falló la app del paquete con código $($process.ExitCode). Consulta $caseRoot."
+}
 $reportPath = Join-Path $render 'smoke.json'
-if (!(Test-Path -LiteralPath $reportPath)) { throw 'La app no produjo el informe de comprobación.' }
+if (!(Test-Path -LiteralPath $reportPath)) {
+    throw 'La app no produjo el informe de comprobación.'
+}
 $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json
-if (!$report.ok -or $report.checks -lt 175) { throw 'La comprobación nativa del paquete quedó incompleta.' }
+if (!$report.ok -or $report.checks -lt 175) {
+    throw 'La comprobación nativa del paquete quedó incompleta.'
+}
 Write-Output "Paquete validado: $($report.checks) comprobaciones. Imágenes e informe: $render"
 
 & "$PSScriptRoot\Verify-WebInterface.ps1" -ExePath $exe

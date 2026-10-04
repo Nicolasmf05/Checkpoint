@@ -1,11 +1,17 @@
-param([ValidateSet('win-x64','win-arm64')][string]$Runtime = 'win-x64')
+# Genera el MSI por usuario a partir de la distribución portable y produce su SHA-256.
+
+param([ValidateSet('win-x64', 'win-arm64')][string]$Runtime = 'win-x64')
 $ErrorActionPreference = 'Stop'
 $checkpointRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $version = & "$PSScriptRoot\Get-Version.ps1"
 $publish = Join-Path $checkpointRoot "dist\$version\$Runtime\Checkpoint"
 $wix = Join-Path $checkpointRoot '.tools\wix\wix.exe'
-if (!(Test-Path -LiteralPath $wix)) { throw 'Instala WiX 5.0.2 con dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGet.config.' }
-if (!(Test-Path -LiteralPath (Join-Path $publish 'Checkpoint.exe'))) { throw 'Genera primero el paquete con scripts/Build.ps1.' }
+if (!(Test-Path -LiteralPath $wix)) {
+    throw 'Instala WiX 5.0.2 con dotnet tool install wix --version 5.0.2 --tool-path .tools/wix --configfile NuGet.config.'
+}
+if (!(Test-Path -LiteralPath (Join-Path $publish 'Checkpoint.exe'))) {
+    throw 'Genera primero el paquete con scripts/Build.ps1.'
+}
 New-Item -ItemType Directory -Path (Join-Path $checkpointRoot 'artifacts\installer') -Force | Out-Null
 $document = [System.Xml.XmlDocument]::new()
 $ns = 'http://wixtoolset.org/schemas/v4/wxs'
@@ -16,10 +22,12 @@ $group = $document.CreateElement('ComponentGroup', $ns); $group.SetAttribute('Id
 $knownDirectories = @{ '' = @{ Id = 'INSTALLFOLDER'; Element = $directories } }
 function Get-StableId([string]$text) {
     $bytes = [System.Security.Cryptography.SHA256]::HashData([System.Text.Encoding]::UTF8.GetBytes($text.ToLowerInvariant()))
-    return [Convert]::ToHexString($bytes).Substring(0,24)
+    return [Convert]::ToHexString($bytes).Substring(0, 24)
 }
 function Get-Directory([string]$relative) {
-    if ($knownDirectories.ContainsKey($relative)) { return $knownDirectories[$relative].Id }
+    if ($knownDirectories.ContainsKey($relative)) {
+        return $knownDirectories[$relative].Id
+    }
     $parentPath = [System.IO.Path]::GetDirectoryName($relative)
     $parentId = Get-Directory $parentPath
     $element = $document.CreateElement('Directory', $ns)
@@ -45,10 +53,17 @@ foreach ($file in (Get-ChildItem -LiteralPath $publish -Recurse -File | Sort-Obj
     [void]$group.AppendChild($component)
 }
 $harvest = Join-Path $checkpointRoot 'artifacts\installer\Files.wxs'; $document.Save($harvest)
-$architecture = if ($Runtime -eq 'win-arm64') { 'arm64' } else { 'x64' }
+$architecture = if ($Runtime -eq 'win-arm64') {
+    'arm64'
+}
+else {
+    'x64'
+}
 $msi = Join-Path $checkpointRoot "dist\Checkpoint-$version-$Runtime.msi"
 & $wix build "$checkpointRoot\installer\Package.wxs" $harvest -arch $architecture -d "AppVersion=$version" -o $msi
-if ($LASTEXITCODE -ne 0) { throw 'Falló la compilación del MSI.' }
+if ($LASTEXITCODE -ne 0) {
+    throw 'Falló la compilación del MSI.'
+}
 Get-FileHash -LiteralPath $msi -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLowerInvariant())  $(Split-Path $msi -Leaf)" } | Set-Content -LiteralPath "$msi.sha256" -Encoding ascii
 & "$PSScriptRoot\Verify-Uninstaller.ps1" -MsiPath $msi
 Write-Output "Instalador: $msi"

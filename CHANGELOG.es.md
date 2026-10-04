@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.23
+
+- Los logros de amigos tienen un bloque propio por juego, con contadores grandes de completados, pendientes y barra de progreso. Se indica cuando no hay datos publicados; historia y tareas quedan en segundo plano. No se comparten nuevos datos privados.
+
 ## 0.8.22
 
 - Las listas vacías no permiten abrir su ficha desde la colección ni desde Gestionar listas. Al quitar o mover el último juego se cierra la ficha; añadir un juego vuelve a habilitarla. La búsqueda y los filtros no afectan a esta regla.

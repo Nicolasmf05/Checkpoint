@@ -1,8 +1,18 @@
+# Valida la versión web y publica los archivos preparados en GitHub Pages tras superar las pruebas.
+
 name: Checkpoint Web
 on:
   push:
     branches: [main]
-    paths: ['web/**', 'src/Checkpoint.App/Web/**', 'src/Checkpoint.Core/Localization/en.json', 'scripts/build-web.mjs', 'supabase/project.json', '.github/workflows/pages.yml']
+    paths:
+      [
+        'web/**',
+        'src/Checkpoint.App/Web/**',
+        'src/Checkpoint.Core/Localization/en.json',
+        'scripts/build-web.mjs',
+        'supabase/project.json',
+        '.github/workflows/pages.yml',
+      ]
   workflow_dispatch:
 permissions:
   contents: read

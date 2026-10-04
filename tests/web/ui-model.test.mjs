@@ -1,3 +1,5 @@
+// Comprueba límites de virtualización y desplazamiento de selección por teclado.
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { visibleRange, nextIndex } from '../../src/Checkpoint.App/Web/ui-model.mjs';

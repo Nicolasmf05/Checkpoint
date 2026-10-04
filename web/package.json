@@ -1,1 +1,8 @@
-{"name":"checkpoint-web-validation","private":true,"version":"0.1.0","devDependencies":{"playwright":"1.62.1"}}
+{
+  "name": "checkpoint-web-validation",
+  "private": true,
+  "version": "0.1.0",
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

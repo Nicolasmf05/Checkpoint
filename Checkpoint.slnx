@@ -1,3 +1,4 @@
+<!-- Solución que agrupa la aplicación, el núcleo y sus pruebas. -->
 <Solution>
   <Project Path="src/Checkpoint.Core/Checkpoint.Core.csproj" />
   <Project Path="src/Checkpoint.App/Checkpoint.App.csproj" />

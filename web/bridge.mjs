@@ -1,282 +1,3273 @@
-import {defaults,shortcutLabels,effectiveShortcuts,validateShortcuts} from './shortcuts.mjs';
-import {normalize,mergeLibrary,importBackup,payload,friendCode,statuses,goals,goalVisible,themes,uuid,normalizeLists,listName,inList,shouldShare,listMembers,applyListAction} from './model.mjs';
-import {BrowserStore} from './store.mjs';
-import {BrowserApi} from './api.mjs';
-import {reviewItems,runAchievementReview} from './review.mjs';
+// Controlador de la versión web que implementa el protocolo usado por la interfaz compartida.
+// Coordina IndexedDB, páginas, sincronización, publicaciones y formularios.
 
-const [english,config]=await Promise.all(['en.json','config.json'].map(path=>fetch(path).then(r=>{if(!r.ok)throw new Error('configuration');return r.json();})));
-const store=await new BrowserStore().open();
-const entryLanguage=location.hash==='#en'?'en':'es';
-let data=await store.get('library')||{revision:0,games:[],deleted:[],settings:{language:entryLanguage,theme:'dark',layout:0,opacity:.88,syncMinutes:30,lightweight:false}};
-data.games=(data.games||[]).map(normalize);data.deleted=(data.deleted||[]).slice(-20);data.settings={language:'es',theme:'dark',layout:0,opacity:.88,syncMinutes:30,lightweight:false,...data.settings};
-data.settings.gameLists=normalizeLists([...(data.settings.gameLists||[]),...data.games.flatMap(g=>g.lists)]);data.settings.activeList=data.settings.activeList||'all';if(!['all','private'].includes(data.settings.activeList)&&!data.settings.gameLists.some(n=>'custom:'+n===data.settings.activeList))data.settings.activeList='all';
-delete data.settings.mode;delete data.settings.miniSize;
-if(!themes.includes(data.settings.theme))data.settings.theme='dark';
-const api=new BrowserApi(config),listeners=[],controls=new Map();
+import { defaults, shortcutLabels, effectiveShortcuts, validateShortcuts } from './shortcuts.mjs';
+import {
+  normalize,
+  mergeLibrary,
+  importBackup,
+  payload,
+  friendCode,
+  statuses,
+  goals,
+  goalVisible,
+  themes,
+  uuid,
+  normalizeLists,
+  listName,
+  inList,
+  shouldShare,
+  listMembers,
+  applyListAction,
+} from './model.mjs';
+import { BrowserStore } from './store.mjs';
+import { BrowserApi } from './api.mjs';
+import { reviewItems, runAchievementReview } from './review.mjs';
+
+const [english, config] = await Promise.all(
+  ['en.json', 'config.json'].map((path) =>
+    fetch(path).then((r) => {
+      if (!r.ok) throw new Error('configuration');
+      return r.json();
+    }),
+  ),
+);
+const store = await new BrowserStore().open();
+const entryLanguage = location.hash === '#en' ? 'en' : 'es';
+let data = (await store.get('library')) || {
+  revision: 0,
+  games: [],
+  deleted: [],
+  settings: {
+    language: entryLanguage,
+    theme: 'dark',
+    layout: 0,
+    opacity: 0.88,
+    syncMinutes: 30,
+    lightweight: false,
+  },
+};
+data.games = (data.games || []).map(normalize);
+data.deleted = (data.deleted || []).slice(-20);
+data.settings = {
+  language: 'es',
+  theme: 'dark',
+  layout: 0,
+  opacity: 0.88,
+  syncMinutes: 30,
+  lightweight: false,
+  ...data.settings,
+};
+data.settings.gameLists = normalizeLists([
+  ...(data.settings.gameLists || []),
+  ...data.games.flatMap((g) => g.lists),
+]);
+data.settings.activeList = data.settings.activeList || 'all';
+if (
+  !['all', 'private'].includes(data.settings.activeList) &&
+  !data.settings.gameLists.some((n) => 'custom:' + n === data.settings.activeList)
+)
+  data.settings.activeList = 'all';
+delete data.settings.mode;
+delete data.settings.miniSize;
+if (!themes.includes(data.settings.theme)) data.settings.theme = 'dark';
+const api = new BrowserApi(config),
+  listeners = [],
+  controls = new Map();
 let achievementReview;
-let ack=0,tab='list',search='',filter=0,notice='',steamBusy=false,friendsBusy=false,authBusy=false,profiles=[],friendships=[],requests=[],publications=[],ownPublications=[],selectedFriend,friendPage='friends',friendFields={},authMode='login',shares={},shareUser,publishing=false,persistQueue=Promise.resolve(),storageConflict=false,loginGeneration=0;
-const navigation={
- value:null,parents:[],
- get current(){return this.value;},
- set current(next){
-  if(next===this.value)return;
-  if(!next){this.value=null;this.parents=[];return;}
-  const index=this.parents.indexOf(next);
-  if(index>=0)this.parents=this.parents.slice(0,index);
-  else if(this.value)this.parents.push(this.value);
-  this.value=next;
- },
- pop(){this.value=this.parents.pop()||null;},
- async back(){if(this.value?.cancel)await this.value.cancel();else this.pop();emit();},
- async home(){for(let i=0;this.value&&i<30;i++){const before=this.value;await this.back();if(this.value===before)this.pop();}emit();}
+let ack = 0,
+  tab = 'list',
+  search = '',
+  filter = 0,
+  notice = '',
+  steamBusy = false,
+  friendsBusy = false,
+  authBusy = false,
+  profiles = [],
+  friendships = [],
+  requests = [],
+  groups = [],
+  groupInvites = [],
+  groupMembers = [],
+  publications = [],
+  ownPublications = [],
+  selectedFriend,
+  friendPage = 'friends',
+  friendFields = {},
+  authMode = 'login',
+  shares = {},
+  shareUser,
+  publishing = false,
+  persistQueue = Promise.resolve(),
+  storageConflict = false,
+  loginGeneration = 0;
+const navigation = {
+  value: null,
+  parents: [],
+  get current() {
+    return this.value;
+  },
+  set current(next) {
+    if (next === this.value) return;
+    if (!next) {
+      this.value = null;
+      this.parents = [];
+      return;
+    }
+    const index = this.parents.indexOf(next);
+    if (index >= 0) this.parents = this.parents.slice(0, index);
+    else if (this.value) this.parents.push(this.value);
+    this.value = next;
+  },
+  pop() {
+    this.value = this.parents.pop() || null;
+  },
+  async back() {
+    if (this.value?.cancel) await this.value.cancel();
+    else this.pop();
+    emit();
+  },
+  async home() {
+    for (let i = 0; this.value && i < 30; i++) {
+      const before = this.value;
+      await this.back();
+      if (this.value === before) this.pop();
+    }
+    emit();
+  },
 };
-const T=key=>data.settings.language==='en'?(english[key]||key):key;
-const statusLabels=()=>['Pendiente','Jugando','Pausado','Historia terminada','Abandonado'].map(T);
-const goalLabels=()=>['Historia','Todos los logros','Personalizado','Sin objetivo'].map(T);
-const goalText=g=>goalVisible(g)?(g.goal===2?(g.customGoal||T('Objetivo personal')):goalLabels()[g.goal]):'';
-const themeLabels=()=>['Oscuro','Claro','Medianoche','Océano','Bosque','Ciruela','Ámbar','Alto contraste','Púrpura cibernético','Azul eléctrico','Lima neón','Negro y rojo','Negro y naranja','Onda sintética','Azul y blanco','Púrpura oscuro','Esmeralda y neutro','Negro y blanco','Marino y cian','Coral y crema','Naranja y carbón','Índigo y gris suave'].map(T);
-const game=id=>data.games.find(g=>g.id===id);
-const send=value=>listeners.forEach(listener=>listener({data:value}));
-const fail=error=>{
-  const code=error?.code||error?.message;
-  const keys={'igdb-not-configured':'El responsable de esta edición debe configurar IGDB en Supabase.','igdb-unavailable':'IGDB no está disponible. Inténtalo más tarde.','igdb-exhausted':'Has rechazado 200 carátulas para este juego. No se harán más búsquedas.','invalid-selection':'Selecciona entre 1 y 500 juegos existentes.','invalid-list-action':'Acción de lista no válida.','missing-list':'La lista de destino ya no existe.','invalid-list':'El nombre de la lista debe tener entre 1 y 40 caracteres.','duplicate-list':'Ya existe una lista con ese nombre.','too-many-lists':'Puedes crear hasta 30 listas.','invalid-steam':'El ID de Steam debe ser un número positivo.','invalid-story':'La historia completada debe estar entre 0 y 100, o dejarse vacía.','duplicate-steam':'Ese juego de Steam ya está en la biblioteca.','invalid-shortcut':'Combinación no válida. Usa Ctrl, Alt o Shift y una tecla; las letras requieren Ctrl o Alt.','duplicate-shortcut':'Hay atajos repetidos o reservados. Espacio y Escape se conservan para navegar y cerrar.','invalid-user':'El usuario debe tener de 3 a 24 letras, números o guiones bajos, sin espacios.','invalid-code':'El código tiene el formato checkpoint- seguido de 12 caracteres.','invalid-game':'Escribe el nombre del juego.','invalid-backup':'La copia no es válida. No se han importado juegos.','local-conflict':'Otra pestaña ha cambiado la biblioteca. Exporta tus cambios y recarga antes de continuar.',storage:'No se pudo guardar. Exporta una copia antes de cerrar esta página.',
-    invalid_credentials:'El usuario o la contraseña no son correctos.',user_already_exists:'Ese nombre de usuario ya está en uso.',email_exists:'Ese nombre de usuario ya está en uso.',weak_password:'Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres.',unauthorized:'La sesión no es válida. Vuelve a entrar en Checkpoint.',forbidden:'No tienes permiso para consultar o cambiar estos datos.',rate:'Demasiadas consultas. Espera antes de volver a intentarlo.','40001':'El progreso cambió en otro equipo. Revisa el conflicto antes de publicar.','not-found':'No se encontró un usuario disponible con ese código.'};
-  notice=T(keys[code]||'No se pudo completar la operación. Los datos locales se conservan.');if(navigation.current)navigation.current.error=notice;emit();
+const T = (key) => (data.settings.language === 'en' ? english[key] || key : key);
+const statusLabels = () =>
+  ['Pendiente', 'Jugando', 'Pausado', 'Historia terminada', 'Abandonado'].map(T);
+const goalLabels = () => ['Historia', 'Todos los logros', 'Personalizado', 'Sin objetivo'].map(T);
+const goalText = (g) =>
+  goalVisible(g)
+    ? g.goal === 2
+      ? g.customGoal || T('Objetivo personal')
+      : goalLabels()[g.goal]
+    : '';
+const themeLabels = () =>
+  [
+    'Oscuro',
+    'Claro',
+    'Medianoche',
+    'Océano',
+    'Bosque',
+    'Ciruela',
+    'Ámbar',
+    'Alto contraste',
+    'Púrpura cibernético',
+    'Azul eléctrico',
+    'Lima neón',
+    'Negro y rojo',
+    'Negro y naranja',
+    'Onda sintética',
+    'Azul y blanco',
+    'Púrpura oscuro',
+    'Esmeralda y neutro',
+    'Negro y blanco',
+    'Marino y cian',
+    'Coral y crema',
+    'Naranja y carbón',
+    'Índigo y gris suave',
+  ].map(T);
+const game = (id) => data.games.find((g) => g.id === id);
+const send = (value) => listeners.forEach((listener) => listener({ data: value }));
+const fail = (error) => {
+  const code = error?.code || error?.message;
+  const keys = {
+    'igdb-not-configured': 'El responsable de esta edición debe configurar IGDB en Supabase.',
+    'igdb-unavailable': 'IGDB no está disponible. Inténtalo más tarde.',
+    'igdb-exhausted': 'Has rechazado 200 carátulas para este juego. No se harán más búsquedas.',
+    'invalid-selection': 'Selecciona entre 1 y 500 juegos existentes.',
+    'invalid-list-action': 'Acción de lista no válida.',
+    'missing-list': 'La lista de destino ya no existe.',
+    'invalid-list': 'El nombre de la lista debe tener entre 1 y 40 caracteres.',
+    'duplicate-list': 'Ya existe una lista con ese nombre.',
+    'too-many-lists': 'Puedes crear hasta 30 listas.',
+    'invalid-steam': 'El ID de Steam debe ser un número positivo.',
+    'invalid-story': 'La historia completada debe estar entre 0 y 100, o dejarse vacía.',
+    'duplicate-steam': 'Ese juego de Steam ya está en la biblioteca.',
+    'invalid-shortcut':
+      'Combinación no válida. Usa Ctrl, Alt o Shift y una tecla; las letras requieren Ctrl o Alt.',
+    'duplicate-shortcut':
+      'Hay atajos repetidos o reservados. Espacio y Escape se conservan para navegar y cerrar.',
+    'invalid-user':
+      'El usuario debe tener de 3 a 24 letras, números o guiones bajos, sin espacios.',
+    'invalid-code': 'El código tiene el formato checkpoint- seguido de 12 caracteres.',
+    'invalid-game': 'Escribe el nombre del juego.',
+    'invalid-backup': 'La copia no es válida. No se han importado juegos.',
+    'local-conflict':
+      'Otra pestaña ha cambiado la biblioteca. Exporta tus cambios y recarga antes de continuar.',
+    storage: 'No se pudo guardar. Exporta una copia antes de cerrar esta página.',
+    invalid_credentials: 'El usuario o la contraseña no son correctos.',
+    user_already_exists: 'Ese nombre de usuario ya está en uso.',
+    email_exists: 'Ese nombre de usuario ya está en uso.',
+    weak_password: 'Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres.',
+    unauthorized: 'La sesión no es válida. Vuelve a entrar en Checkpoint.',
+    forbidden: 'No tienes permiso para consultar o cambiar estos datos.',
+    rate: 'Demasiadas consultas. Espera antes de volver a intentarlo.',
+    40001: 'El progreso cambió en otro equipo. Revisa el conflicto antes de publicar.',
+    'not-found': 'No se encontró un usuario disponible con ese código.',
+  };
+  notice = T(keys[code] || 'No se pudo completar la operación. Los datos locales se conservan.');
+  if (navigation.current) navigation.current.error = notice;
+  emit();
 };
-function persist(){data.settings.gameLists=normalizeLists([...(data.settings.gameLists||[]),...data.games.flatMap(g=>g.lists)]);planSharing();const snapshot=structuredClone({games:data.games,deleted:data.deleted,settings:data.settings});persistQueue=persistQueue.catch(()=>{}).then(async()=>{if(storageConflict)throw new Error('local-conflict');try{data.revision=await store.save(snapshot,data.revision);}catch(error){if(error.message==='local-conflict')storageConflict=true;throw error;}});persistQueue.catch(fail);persistQueue.then(shareCovers,()=>{});scheduleSharing();return persistQueue;}
-async function commit(){await persist();emit();}
-function progress(g){if(g.goal===0&&g.storyPercent!=null)return {text:T('Historia · avance manual'),percent:g.storyPercent};if(g.goal===2&&g.tasks.length)return {text:`${g.tasks.filter(t=>t.done).length} / ${g.tasks.length} ${T('tareas')}`,percent:Math.round(g.tasks.filter(t=>t.done).length*100/g.tasks.length)};if(!g.achievements)return {text:T('Logros sin sincronizar'),percent:null};return {text:g.achievements.length?`${g.achievements.filter(a=>a.unlocked).length} / ${g.achievements.length} ${T('logros')}`:T('Sin logros de Steam'),percent:g.achievements.length?Math.round(g.achievements.filter(a=>a.unlocked).length*100/g.achievements.length):null};}
-const cover=g=>g.customCover||(g.steamAppId?`https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`:null);
-function snapshot(){const p=data.settings;const sorted=data.games.filter(g=>(tab==='library'||inList(g,p.activeList))&&(filter===0||g.status===filter-1)&&g.title.toLocaleLowerCase().includes(search.toLocaleLowerCase())).sort((a,b)=>Number(b.favorite)-Number(a.favorite)||a.sortOrder-b.sortOrder||a.title.localeCompare(b.title));
- return {kind:'main',canOpenList:listMembers(data.games,p.activeList).length>0,browser:true,signedIn:!!api.social,collection:p.activeList,collections:[{value:'all',label:T('Mi lista')},{value:'private',label:T('Privados')},...p.gameLists.map(name=>({value:'custom:'+name,label:name}))],shortcuts:effectiveShortcuts(p.shortcuts),language:p.language,theme:p.theme,light:['light','blue-white','emerald-neutral','coral-cream','indigo-gray'].includes(p.theme),opacity:p.opacity,mini:false,full:false,compact:p.layout===1,grid:p.layout===2,textSize:12,locked:true,pinned:false,globalHotkey:false,lightweight:p.lightweight,busy:steamBusy,tab,search,filter,ack,
-  summary:`${data.games.filter(g=>g.tracked).length} ${T('en tu lista')} · ${data.games.filter(g=>g.status===3).length} ${T('historias terminadas')}`,
-  connection:api.steam?T('● Steam vinculado'):api.social?T('● Checkpoint conectado'):T('● Biblioteca en este navegador'),notice,achievementReview:achievementReview?{text:reviewStatus(),cancelText:T(achievementReview.running?'Detener repaso':'Ocultar progreso'),running:achievementReview.running}:null,
-  emptyTitle:T('Sin juegos en esta lista'),emptyText:T('Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano.'),examples:data.games.length===0,undo:data.deleted.length>0,
-  labels:{account:T(api.social?'Mi cuenta':'Iniciar sesión'),title:T('Mi lista'),friendsTitle:T('Amigos'),list:T('Mi lista'),library:T('Biblioteca'),friends:T('Amigos'),add:T('Añadir juego'),settings:T('Ajustes'),hide:T('Cerrar menús o ayuda'),minimize:T('Minimizar'),close:T('Cerrar'),pin:T('Mantener siempre visible'),search:T('Buscar juego'),filterStatus:T('Filtrar por estado'),sync:T('Actualizar'),details:T('Ver ficha completa'),achievements:T('Ver logros'),steam:T('Conectar Steam'),edit:T('Editar juego'),exitMini:T('Salir de miniatura'),locked:T('Bloquear posición y tamaño'),view:T('Cambiar vista'),undo:T('Recuperar último juego eliminado'),examples:T('Añadir ejemplos'),finish:T('Marcar o desmarcar historia terminada'),windowMode:T('Modo de ventana'),fullWindow:T('Ventana completa'),smallWindow:T('Ventana pequeña'),miniature:T('Miniatura'),collection:T('Lista de juegos'),manageLists:T('Gestionar listas'),listDetails:T('Ver ficha de la lista'),moveTo:T('Mover a'),changeList:T('Cambiar de lista'),addToList:T('Añadir a otra lista'),removeFromList:T('Quitar de esta lista'),untrack:T('Quitar de Mi lista'),selectedGames:T('Juegos seleccionados:'),selectResults:T('Seleccionar resultados'),clearSelection:T('Limpiar selección'),selectionLimit:T('Hasta 500 juegos a la vez'),makePrivate:T('Mover a Privados'),makeVisible:T('Hacer visible para amigos'),configureShortcuts:T('Configurar atajos'),shortcuts:T('Atajos de teclado'),generalKeys:T('En la ventana principal'),miniKeys:T('En miniatura'),orderKeys:T('Al enfocar el botón de reordenar'),helpHint:T('Pulsa F1 para ver todos los atajos.'),closeHelp:T('Cerrar ayuda'),selectGame:T('Seleccionar juego'),firstLast:T('Primer o último juego'),pageGame:T('Avanzar o retroceder una página'),gameMenu:T('Abrir menú del juego'),reorder:T('Reordenar juego'),undoContext:T('Fuera de los campos de texto'),hideContext:'',globalKeys:T('Mostrar / ocultar desde cualquier aplicación'),globalUnavailable:T('Este atajo solo está disponible en la aplicación de Windows.'),homeEnd:T('Inicio / Fin'),pageKeys:T('RePág / AvPág'),enterSpace:T('Intro / Espacio'),all:T('Todos'),statuses:statusLabels(),backupImport:T('Importar copia'),backupExport:T('Exportar copia'),browserInfo:T('Sobre la versión web'),windowsDownload:T('Descargar para Windows')},
-  games:sorted.map(g=>({id:g.id,title:g.title,platform:g.platform+(g.playtimeMinutes?` · ${(g.playtimeMinutes/60).toFixed(1)} h`:''),state:g.status,status:statusLabels()[g.status],next:g.tasks.find(t=>!t.done)?.title||goalText(g),achievementCaption:g.achievements?.length?`${T("Logros")} · ${g.achievements.filter(a=>a.unlocked).length} / ${g.achievements.length}`:T("Ver logros"),progress:progress(g).text,percent:progress(g).percent,favorite:g.favorite,tracked:g.tracked,lists:g.lists,friendsPrivate:g.friendsPrivate===true,cover:p.lightweight?null:cover(g)})),friendsBusy,friends:tab==='friends'?friendsSchema():null};}
-function emit(){
- while(navigation.current?.listSource&&!listMembers(data.games,navigation.current.listSource).length)navigation.pop();
- const p=data.settings,home=document.querySelector('[data-presentation]');if(home){home.textContent=T('Presentación');home.href='./#'+p.language;}
- if(navigation.current){const page=navigation.current,root=page.render();page.title=root.title||'';
-  send({kind:'dialog',inline:true,browser:true,language:p.language,theme:p.theme,light:['light','blue-white','emerald-neutral','coral-cream','indigo-gray'].includes(p.theme),ack,title:page.title,
-   navigation:{back:T('Volver'),home:T('Volver a la colección'),trail:[...navigation.parents,page].map(item=>item.title||'')},
-   achievementReview:achievementReview?{text:reviewStatus(),cancelText:T(achievementReview.running?'Detener repaso':'Ocultar progreso'),running:achievementReview.running}:null,root});
- }else send(snapshot());
+// Serializa las escrituras con una instantánea por cambio; un conflicto de revisión detiene nuevos guardados.
+function persist() {
+  data.settings.gameLists = normalizeLists([
+    ...(data.settings.gameLists || []),
+    ...data.games.flatMap((g) => g.lists),
+  ]);
+  planSharing();
+  const snapshot = structuredClone({
+    games: data.games,
+    deleted: data.deleted,
+    settings: data.settings,
+  });
+  persistQueue = persistQueue
+    .catch(() => {})
+    .then(async () => {
+      if (storageConflict) throw new Error('local-conflict');
+      try {
+        data.revision = await store.save(snapshot, data.revision);
+      } catch (error) {
+        if (error.message === 'local-conflict') storageConflict = true;
+        throw error;
+      }
+    });
+  persistQueue.catch(fail);
+  persistQueue.then(shareCovers, () => {});
+  scheduleSharing();
+  return persistQueue;
 }
-const text=(value,heading=false,muted=false)=>({type:'text',text:value,heading,muted,children:[]});
-function build(prefix,fields){const b={fields,n:0};
- b.button=(label,run,tag)=>{const id=prefix+'.'+(tag||++b.n);controls.set(id,run);return {id,type:'button',text:label,enabled:!b.busy,accent:['save','accept','apply','import','signin','signup'].includes(tag),children:[]};};
- b.field=(key,label,type='input',options)=>{const id=prefix+'.field.'+key;controls.set(id,async value=>{fields[key]=value;if(b.onChange)await b.onChange(key,value);});const node={id,type,name:label,text:label,max:type==='textarea'?20000:250,enabled:!b.busy,value:type==='password'?undefined:fields[key],checked:fields[key]===true,empty:!fields[key],options,children:[]};return type==='check'?[node]:[text(label,false,true),node];};
- b.page=(heading,description,items,actions)=>({pageId:prefix,title:heading,type:'dock',children:[{type:'scroll',children:[{type:'stack',children:[text(heading,true),text(description,false,true),...(navigation.current?.error?[text(navigation.current.error,false,true)]:[]),...items]}]},{type:'row',children:actions}]});return b;}
-const contributedCovers=new Set();let contributingCovers=false;
-const coverContributionKey=g=>JSON.stringify([g.title,g.platform,g.steamAppId,g.igdbCoverImageId]);
-async function shareCovers(){
- if(contributingCovers||storageConflict||!navigator.onLine)return;contributingCovers=true;
- try{for(;;){const g=data.games.find(g=>g.customCover&&/^[A-Za-z0-9_-]{1,80}$/.test(g.igdbCoverImageId)&&g.igdbCoverSearchTitle===g.title&&!contributedCovers.has(coverContributionKey(g)));if(!g)break;contributedCovers.add(coverContributionKey(g));
-   try{await api.coverConfirm(structuredClone(g));}catch{}await new Promise(resolve=>setTimeout(resolve,5000));
- }}finally{contributingCovers=false;}
+async function commit() {
+  await persist();
+  emit();
 }
-setTimeout(shareCovers,2000);
-const coverQueue=new Set(),coverAttempts=new Set();let coverBusy=false,coverProposalCount=0;
-function missingCover(id){const g=game(id);if(g&&!g.customCover&&coverQueue.size<100&&!coverAttempts.has(g.id+'|'+g.title))coverQueue.add(id);}
-setInterval(async()=>{if(coverBusy||navigation.current||document.hidden||document.querySelector('.menu,.shortcut-help:modal')||tab==='friends'||data.settings.lightweight)return;const id=coverQueue.values().next().value;if(!id)return;coverQueue.delete(id);const g=game(id);if(!g||g.customCover)return;coverAttempts.add(g.id+'|'+g.title);await findCover(g,g.title,null,true);},3000);
-async function findCover(g,title,parent,automatic=false,builder){
- if(coverBusy)return;coverBusy=true;if(builder)builder.busy=true;emit();
- const remember=async()=>{const current=game(g.id);if(automatic){await persist();}else if(current){current.rejectedIgdbCovers=[...g.rejectedIgdbCovers];current.igdbCoverSearchTitle=g.igdbCoverSearchTitle;await persist();}};
- try{
-  if(!title||title.length>140)throw new Error('invalid-game');if(g.rejectedIgdbCovers.length>=200)throw new Error('igdb-exhausted');
-  let result,shared=false;
-  if(automatic){try{result=await api.coverShared(g);shared=!!result?.candidate;}catch{}if(!shared){if(!g.tracked||g.igdbCoverSearchTitle===g.title||coverProposalCount>=10)return;coverProposalCount++;}}
-  if(!shared)result=await api.coverSearch(title,g.rejectedIgdbCovers,!automatic);if((navigation.current||null)!==parent)return;
-  const candidate=result?.candidate;if(candidate==null){g.igdbCoverSearchTitle=title;await remember();if(!automatic)notice=T('No hay otra carátula de IGDB disponible para este nombre.');return;}
-  if(!Number.isSafeInteger(candidate.id)||candidate.id<1||typeof candidate.name!=='string'||candidate.name.length>250||!candidate.name||!(/^[A-Za-z0-9_-]{1,80}$/).test(candidate.imageId)||g.rejectedIgdbCovers.includes(candidate.imageId))throw new Error('igdb-unavailable');
-  const blob=await api.coverImage(candidate.imageId),bitmap=await createImageBitmap(blob);let png;
-  try{if(bitmap.width*bitmap.height>16000000)throw new Error('igdb-unavailable');const scale=Math.min(1,160/bitmap.width,240/bitmap.height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);png=canvas.toDataURL('image/png');}finally{bitmap.close();}
-  if((navigation.current||null)!==parent||automatic&&(!game(g.id)||g.customCover||g.title!==title||data.settings.lightweight))return;
-  g.igdbCoverSearchTitle=title;
-  if(shared){g.customCover=png;g.igdbCoverImageId=candidate.imageId;contributedCovers.add(coverContributionKey(g));await remember();return;}
-  const choice=build('cover-choice',{});let deciding=false;
-  const decide=async accept=>{if(deciding)return;deciding=true;choice.busy=true;emit();try{if(accept){g.customCover=png;g.igdbCoverImageId=candidate.imageId;}else if(!g.rejectedIgdbCovers.includes(candidate.imageId))g.rejectedIgdbCovers.push(candidate.imageId);await remember();navigation.current=parent||undefined;emit();}catch(error){choice.busy=false;deciding=false;fail(error);}};
-  navigation.current={cancel:()=>decide(false),render:()=>choice.page(T('Carátula de IGDB'),title,[{type:'image',src:png,style:'cover-preview',children:[]},text(candidate.name+(Number.isInteger(candidate.year)?' · '+candidate.year:''),true),text(T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.')),text(T('Si la rechazas no volveremos a ofrecerla. Puedes buscar otra desde el editor del juego.')),text(T('Al guardar, compartes la referencia de IGDB como carátula por defecto para este juego. No se sube la imagen ni tus datos personales.'))],[choice.button(T('No usar esta carátula'),()=>decide(false),'reject'),choice.button(T('Usar esta carátula'),()=>decide(true),'accept')])};
- }catch(error){if(!automatic&&navigation.current===parent)fail(error);}
- finally{coverBusy=false;if(builder)builder.busy=false;emit();}
+function progress(g) {
+  if (g.goal === 0 && g.storyPercent != null)
+    return { text: T('Historia · avance manual'), percent: g.storyPercent };
+  if (g.goal === 2 && g.tasks.length)
+    return {
+      text: `${g.tasks.filter((t) => t.done).length} / ${g.tasks.length} ${T('tareas')}`,
+      percent: Math.round((g.tasks.filter((t) => t.done).length * 100) / g.tasks.length),
+    };
+  if (!g.achievements) return { text: T('Logros sin sincronizar'), percent: null };
+  return {
+    text: g.achievements.length
+      ? `${g.achievements.filter((a) => a.unlocked).length} / ${g.achievements.length} ${T('logros')}`
+      : T('Sin logros de Steam'),
+    percent: g.achievements.length
+      ? Math.round((g.achievements.filter((a) => a.unlocked).length * 100) / g.achievements.length)
+      : null,
+  };
 }
-function reviewStatus(){
- const r=achievementReview;if(!r)return '';
- return T(r.running?'Actualizando logros en segundo plano:':r.stopped?'Repaso de logros detenido:':'Repaso de logros terminado:')+' '+r.done+' / '+r.total+' · '+T('No se pudieron actualizar:')+' '+r.errors;
+const cover = (g) =>
+  g.customCover ||
+  (g.steamAppId
+    ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`
+    : null);
+const sectionFilters = { list: { search: '', filter: 0 }, library: { search: '', filter: 0 } };
+function switchTab(next) {
+  if (next === tab) return;
+  if (sectionFilters[tab]) sectionFilters[tab] = { search, filter };
+  tab = next;
+  if (next === 'friends') {
+    friendPage = 'friends';
+    selectedFriend = null;
+    publications = [];
+  }
+  if (sectionFilters[next]) ({ search, filter } = sectionFilters[next]);
 }
-function startAchievementReview(){
- if(steamBusy||!api.steam)return;
- const ids=data.games.filter(g=>g.steamAppId).map(g=>g.id);if(!ids.length)return;
- const session=api.steam,r={done:0,total:ids.length,errors:0,running:true,stopped:false,controller:new AbortController()};
- achievementReview=r;steamBusy=true;navigation.current=null;emit();
- void (async()=>{
-  try{
-   await runAchievementReview(ids,async(id,signal)=>{
-    if(api.steam!==session){r.controller.abort();signal.throwIfAborted();}
-    const target=game(id);if(!target){r.done++;emit();return;}const appId=target.steamAppId;
-    try{
-     const result=await api.steamRequest(`v1/games/${appId}/achievements?lang=${data.settings.language}`,undefined,true,signal);
-     signal.throwIfAborted();if(api.steam!==session){r.controller.abort();signal.throwIfAborted();}
-     const current=game(id);if(current&&current.steamAppId===appId){current.achievements=normalize({...current,achievements:result.achievements}).achievements;current.syncedAt=new Date().toISOString();await persist();}
-    }catch(error){if(signal.aborted)throw error;r.errors++;}
-    r.done++;emit();
-   },r.controller.signal);
-  }catch(error){r.stopped=true;if(!r.controller.signal.aborted)fail(error);}
-  finally{r.running=false;steamBusy=false;emit();}
- })();
+// Traduce el estado del navegador al mismo contrato que recibe la interfaz desde la aplicación nativa.
+function snapshot() {
+  const p = data.settings;
+  const sorted = data.games
+    .filter(
+      (g) =>
+        (tab === 'library' || inList(g, p.activeList)) &&
+        (filter === 0 || g.status === filter - 1) &&
+        g.title.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
+    )
+    .sort(
+      (a, b) =>
+        Number(b.favorite) - Number(a.favorite) ||
+        a.sortOrder - b.sortOrder ||
+        a.title.localeCompare(b.title),
+    );
+  return {
+    kind: 'main',
+    canOpenList: tab === 'list' && listMembers(data.games, p.activeList).length > 0,
+    browser: true,
+    signedIn: !!api.social,
+    collection: tab === 'library' ? 'library' : p.activeList,
+    listDestinations: p.gameLists.map((name) => ({ value: 'custom:' + name, label: name })),
+    collections:
+      tab === 'library'
+        ? null
+        : [
+            { value: 'all', label: T('Mi lista') },
+            { value: 'private', label: T('Privados') },
+            ...p.gameLists.map((name) => ({ value: 'custom:' + name, label: name })),
+          ],
+    shortcuts: effectiveShortcuts(p.shortcuts),
+    language: p.language,
+    theme: p.theme,
+    light: ['light', 'blue-white', 'emerald-neutral', 'coral-cream', 'indigo-gray'].includes(
+      p.theme,
+    ),
+    opacity: p.opacity,
+    mini: false,
+    full: false,
+    compact: p.layout === 1,
+    grid: p.layout === 2,
+    textSize: 12,
+    locked: true,
+    pinned: false,
+    globalHotkey: false,
+    lightweight: p.lightweight,
+    busy: steamBusy,
+    tab,
+    search,
+    filter,
+    ack,
+    summary: `${data.games.filter((g) => tab === 'library' || inList(g, p.activeList)).length} ${T(tab === 'library' ? 'en Biblioteca' : 'en tu lista')} · ${data.games.filter((g) => (tab === 'library' || inList(g, p.activeList)) && g.status === 3).length} ${T('historias terminadas')}`,
+    connection: api.steam
+      ? T('● Steam vinculado')
+      : api.social
+        ? T('● Checkpoint conectado')
+        : T('● Biblioteca en este navegador'),
+    notice,
+    achievementReview: achievementReview
+      ? {
+          text: reviewStatus(),
+          cancelText: T(achievementReview.running ? 'Detener repaso' : 'Ocultar progreso'),
+          running: achievementReview.running,
+        }
+      : null,
+    emptyTitle: T(tab === 'library' ? 'Sin juegos en Biblioteca' : 'Sin juegos en esta lista'),
+    emptyText: T(
+      'Añade un juego o importa tu biblioteca de Steam. Elige después cuáles quieres tener a mano.',
+    ),
+    examples: data.games.length === 0,
+    undo: data.deleted.length > 0,
+    labels: {
+      account: T(api.social ? 'Mi cuenta' : 'Iniciar sesión'),
+      title: T('Mi lista'),
+      friendsTitle: T('Amigos'),
+      list: T('Mi lista'),
+      library: T('Biblioteca'),
+      friends: T('Amigos'),
+      credits: T('Créditos'),
+      add: T('Añadir juego'),
+      settings: T('Ajustes'),
+      hide: T('Cerrar menús o ayuda'),
+      minimize: T('Minimizar'),
+      close: T('Cerrar'),
+      pin: T('Mantener siempre visible'),
+      search: T('Buscar juego'),
+      filterStatus: T('Filtrar por estado'),
+      sync: T('Actualizar'),
+      details: T('Ver ficha completa'),
+      achievements: T('Ver logros'),
+      steam: T('Conectar Steam'),
+      edit: T('Editar juego'),
+      exitMini: T('Salir de miniatura'),
+      locked: T('Bloquear posición y tamaño'),
+      view: T('Cambiar vista'),
+      undo: T('Recuperar último juego eliminado'),
+      examples: T('Añadir ejemplos'),
+      finish: T('Marcar o desmarcar historia terminada'),
+      windowMode: T('Modo de ventana'),
+      fullWindow: T('Ventana completa'),
+      smallWindow: T('Ventana pequeña'),
+      miniature: T('Miniatura'),
+      collection: T('Lista de juegos'),
+      manageLists: T('Gestionar listas'),
+      listDetails: T('Ver ficha de la lista'),
+      moveTo: T('Mover a'),
+      changeList: T('Cambiar de lista'),
+      addToList: T('Añadir a otra lista'),
+      removeFromList: T('Quitar de esta lista'),
+      untrack: T('Quitar de Mi lista'),
+      selectedGames: T('Juegos seleccionados:'),
+      selectResults: T('Seleccionar resultados'),
+      clearSelection: T('Limpiar selección'),
+      selectionLimit: T('Hasta 500 juegos a la vez'),
+      makePrivate: T('Mover a Privados'),
+      makeVisible: T('Hacer visible para amigos'),
+      configureShortcuts: T('Configurar atajos'),
+      shortcuts: T('Atajos de teclado'),
+      generalKeys: T('En la ventana principal'),
+      miniKeys: T('En miniatura'),
+      orderKeys: T('Al enfocar el botón de reordenar'),
+      helpHint: T('Pulsa F1 para ver todos los atajos.'),
+      closeHelp: T('Cerrar ayuda'),
+      selectGame: T('Seleccionar juego'),
+      firstLast: T('Primer o último juego'),
+      pageGame: T('Avanzar o retroceder una página'),
+      gameMenu: T('Abrir menú del juego'),
+      reorder: T('Reordenar juego'),
+      undoContext: T('Fuera de los campos de texto'),
+      hideContext: '',
+      globalKeys: T('Mostrar / ocultar desde cualquier aplicación'),
+      globalUnavailable: T('Este atajo solo está disponible en la aplicación de Windows.'),
+      homeEnd: T('Inicio / Fin'),
+      pageKeys: T('RePág / AvPág'),
+      enterSpace: T('Intro / Espacio'),
+      all: T('Todos'),
+      statuses: statusLabels(),
+      backupImport: T('Importar copia'),
+      backupExport: T('Exportar copia'),
+      browserInfo: T('Sobre la versión web'),
+      windowsDownload: T('Descargar para Windows'),
+    },
+    games: sorted.map((g) => ({
+      id: g.id,
+      title: g.title,
+      platform:
+        g.platform + (g.playtimeMinutes ? ` · ${(g.playtimeMinutes / 60).toFixed(1)} h` : ''),
+      state: g.status,
+      status: statusLabels()[g.status],
+      next: g.tasks.find((t) => !t.done)?.title || goalText(g),
+      achievementCaption: g.achievements?.length
+        ? `${T('Logros')} · ${g.achievements.filter((a) => a.unlocked).length} / ${g.achievements.length}`
+        : T('Ver logros'),
+      progress: progress(g).text,
+      percent: progress(g).percent,
+      favorite: g.favorite,
+      tracked: g.tracked,
+      lists: g.lists,
+      friendsPrivate: g.friendsPrivate === true,
+      cover: p.lightweight ? null : cover(g),
+    })),
+    friendsBusy,
+    friends: tab === 'friends' ? friendsSchema() : null,
+  };
 }
-function reviewAchievements(parent){
- const ids=data.games.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(g=>g.id),b=build('review-achievements',{});let index=0;
- const current=()=>game(ids[index]);
- const page={cancel:()=>{navigation.current=parent;emit();},render:()=>{
-  const g=current(),items=g?reviewItems(g):[],done=items.filter(a=>a.unlocked).length;
-  return b.page(T('Repasar todos los logros'),T('Incluye toda la Biblioteca, también los juegos privados y los que no están en Mi lista. Los cambios manuales se conservan.'),[
-   text(T('Juego')+' '+(ids.length?index+1:0)+' / '+ids.length),text(g?.title||T('Sin juegos en Biblioteca'),true),text(T('Logros')+': '+done+' / '+items.length+' · '+T('Pendientes')+': '+(items.length-done)),text(reviewStatus()),
-   {...b.button(T('Ver logros'),()=>achievements(g.id,page),'view'),enabled:!!g},
-   text(T('En la web se actualiza Steam. RetroAchievements se sincroniza desde la app de Windows.')),
-   text(T('La actualización continúa en segundo plano. Puedes usar Checkpoint y detenerla desde el indicador de progreso.')),
-   {...b.button(T('Actualizar todos los logros'),startAchievementReview,'sync-all'),enabled:!!api.steam&&!steamBusy&&data.games.some(g=>g.steamAppId)},
-   ...(achievementReview?.running?[b.button(T('Detener repaso'),()=>achievementReview.controller.abort(),'stop')]:[])
-  ],[{...b.button(T('Anterior'),()=>{index--;},'previous'),enabled:index>0},{...b.button(T('Siguiente juego'),()=>{index++;},'next'),enabled:index+1<ids.length},{...b.button(T('Cerrar'),page.cancel,'close'),enabled:true}]);
- }};navigation.current=page;emit();
+// Publica la página activa o la colección y retira fichas de listas que ya no tienen miembros.
+function emit() {
+  while (
+    navigation.current?.listSource &&
+    !listMembers(data.games, navigation.current.listSource).length
+  )
+    navigation.pop();
+  const p = data.settings,
+    home = document.querySelector('[data-presentation]');
+  if (home) {
+    home.textContent = T('Presentación');
+    home.href = './#' + p.language;
+  }
+  if (navigation.current) {
+    const page = navigation.current,
+      root = page.render();
+    page.title = root.title || '';
+    send({
+      kind: 'dialog',
+      inline: true,
+      browser: true,
+      language: p.language,
+      theme: p.theme,
+      light: ['light', 'blue-white', 'emerald-neutral', 'coral-cream', 'indigo-gray'].includes(
+        p.theme,
+      ),
+      ack,
+      title: page.title,
+      navigation: {
+        back: T('Volver'),
+        home: T('Volver a la colección'),
+        trail: [...navigation.parents, page].map((item) => item.title || ''),
+      },
+      achievementReview: achievementReview
+        ? {
+            text: reviewStatus(),
+            cancelText: T(achievementReview.running ? 'Detener repaso' : 'Ocultar progreso'),
+            running: achievementReview.running,
+          }
+        : null,
+      root,
+    });
+  } else send(snapshot());
 }
-async function reviewHasCover(g){
- const load=src=>new Promise(resolve=>{const image=new Image();let ended=false;const finish=value=>{if(ended)return;ended=true;clearTimeout(timer);image.onload=image.onerror=null;resolve(value);};const timer=setTimeout(()=>finish(false),10000);image.onload=()=>finish(image.naturalWidth>0);image.onerror=()=>finish(false);image.src=src;});
- if(g.customCover&&await load(g.customCover))return true;
- if(!g.steamAppId)return false;
- return load(`https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`);
+const text = (value, heading = false, muted = false) => ({
+  type: 'text',
+  text: value,
+  heading,
+  muted,
+  children: [],
+});
+// Registra controles por identificador y construye su esquema sin incluir valores de contraseñas.
+function build(prefix, fields) {
+  const b = { fields, n: 0 };
+  b.button = (label, run, tag) => {
+    const id = prefix + '.' + (tag || ++b.n);
+    controls.set(id, run);
+    return {
+      id,
+      type: 'button',
+      text: label,
+      enabled: !b.busy,
+      accent: ['save', 'accept', 'apply', 'import', 'signin', 'signup'].includes(tag),
+      children: [],
+    };
+  };
+  b.field = (key, label, type = 'input', options) => {
+    const id = prefix + '.field.' + key;
+    controls.set(id, async (value) => {
+      fields[key] = value;
+      if (b.onChange) await b.onChange(key, value);
+    });
+    const node = {
+      id,
+      type,
+      name: label,
+      text: label,
+      max: type === 'textarea' ? 20000 : 250,
+      enabled: !b.busy,
+      value: type === 'password' ? undefined : fields[key],
+      checked: fields[key] === true,
+      empty: !fields[key],
+      options,
+      children: [],
+    };
+    return type === 'check' ? [node] : [text(label, false, true), node];
+  };
+  b.page = (heading, description, items, actions) => ({
+    pageId: prefix,
+    title: heading,
+    type: 'dock',
+    children: [
+      {
+        type: 'scroll',
+        children: [
+          {
+            type: 'stack',
+            children: [
+              text(heading, true),
+              text(description, false, true),
+              ...(navigation.current?.error ? [text(navigation.current.error, false, true)] : []),
+              ...items,
+            ],
+          },
+        ],
+      },
+      { type: 'row', children: actions },
+    ],
+  });
+  return b;
 }
-function reviewCovers(parent){
- const ids=data.games.slice().sort((a,b)=>a.title.localeCompare(b.title)).map(g=>g.id),b=build('review-covers',{});let index=-1,candidate=null,png=null,stopped=false,message='';
- const current=()=>game(ids[index]);
- const save=async accept=>{const g=current();if(!g)return;g.igdbCoverSearchTitle=g.title;if(candidate){if(accept){g.customCover=png;g.igdbCoverImageId=candidate.imageId;}else if(!g.rejectedIgdbCovers.includes(candidate.imageId))g.rejectedIgdbCovers.push(candidate.imageId);}await persist();};
- const load=async advance=>{
-  if(b.busy||stopped)return;b.busy=true;candidate=null;png=null;delete page.error;message=T('Buscando carátula…');emit();
-  try{
-   if(advance){while(++index<ids.length){const g=current();if(!g)continue;emit();const found=await reviewHasCover(g);if(stopped)return;if(!found)break;}}
-   if(stopped)return;const g=current();if(!g){message=T('No quedan juegos sin carátula por revisar.');return;}
-   if(g.rejectedIgdbCovers.length>=200)throw new Error('igdb-exhausted');const result=await api.coverSearch(g.title,g.rejectedIgdbCovers,true);if(stopped)return;
-   const found=result?.candidate;if(!found){message=T('No hay otra carátula de IGDB disponible para este nombre.');return;}
-   if(!Number.isSafeInteger(found.id)||found.id<1||typeof found.name!=='string'||!found.name||found.name.length>250||!(/^[A-Za-z0-9_-]{1,80}$/).test(found.imageId)||g.rejectedIgdbCovers.includes(found.imageId))throw new Error('igdb-unavailable');
-   const blob=await api.coverImage(found.imageId);if(stopped)return;const bitmap=await createImageBitmap(blob);
-   try{if(bitmap.width*bitmap.height>16000000)throw new Error('igdb-unavailable');const scale=Math.min(1,160/bitmap.width,240/bitmap.height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);png=canvas.toDataURL('image/png');}finally{bitmap.close();}
-   if(stopped)return;candidate=found;message=T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.');
-  }catch(error){if(!stopped&&navigation.current===page)fail(error);}
-  finally{b.busy=false;if(!stopped&&navigation.current===page)emit();}
- };
- const decide=async(accept,advance)=>{if(b.busy||stopped)return;b.busy=true;emit();try{await save(accept);}finally{b.busy=false;}if(!stopped)await load(advance);};
- const page={cancel:()=>{stopped=true;navigation.current=parent;emit();},render:()=>{
-  const g=current();return b.page(T('Buscar carátulas que faltan'),T('Se comprueba Steam antes de buscar en IGDB. Siguiente carátula descarta la propuesta; Siguiente juego continúa sin añadirla. Las decisiones se guardan al instante.'),[
-   text(T('Juego')+' '+Math.max(0,Math.min(index+1,ids.length))+' / '+ids.length),text(g?.title||T('Revisión terminada'),true),...(png?[{type:'image',src:png,style:'cover-preview',children:[]}]:[]),...(candidate?[text(candidate.name+(Number.isInteger(candidate.year)?' · '+candidate.year:''),true)]:[]),text(message),
-   {type:'row',children:[{...b.button(T('Aceptar'),()=>decide(true,true),'accept'),enabled:!!candidate&&!b.busy},{...b.button(T('Siguiente carátula'),()=>decide(false,false),'another'),enabled:!!g&&!b.busy},{...b.button(T('Siguiente juego'),()=>decide(false,true),'next'),enabled:!!g&&!b.busy}]}
-  ],[{...b.button(T('Cerrar'),page.cancel,'close'),enabled:true}]);
- }};navigation.current=page;emit();load(true);
+const contributedCovers = new Set();
+let contributingCovers = false;
+const coverContributionKey = (g) =>
+  JSON.stringify([g.title, g.platform, g.steamAppId, g.igdbCoverImageId]);
+// Solo contribuye referencias de juegos guardados; cada elección se intenta una vez por sesión.
+async function shareCovers() {
+  if (contributingCovers || storageConflict || !navigator.onLine) return;
+  contributingCovers = true;
+  try {
+    for (;;) {
+      const g = data.games.find(
+        (g) =>
+          g.customCover &&
+          /^[A-Za-z0-9_-]{1,80}$/.test(g.igdbCoverImageId) &&
+          g.igdbCoverSearchTitle === g.title &&
+          !contributedCovers.has(coverContributionKey(g)),
+      );
+      if (!g) break;
+      contributedCovers.add(coverContributionKey(g));
+      try {
+        await api.coverConfirm(structuredClone(g));
+      } catch {}
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+  } finally {
+    contributingCovers = false;
+  }
 }
-function closeDialog(){navigation.pop();emit();}
-function info(){const b=build('info',{});navigation.current={render:()=>b.page(T('Checkpoint en tu navegador'),T('La biblioteca privada se guarda en este navegador. Exporta copias: borrar los datos del sitio elimina la biblioteca local.'),[text(T('Steam y amigos requieren conexión. La sesión se conserva en esta pestaña; al cerrarla puede ser necesario volver a entrar.')),text(T('La interfaz se adapta al tamaño de tu navegador. Usa Mi lista o Biblioteca; la bandeja y los atajos globales están en la app de Windows.')),text(T('Los archivos JSON de la app de Windows se pueden importar. La biblioteca privada no se sincroniza automáticamente entre dispositivos.'))],[b.button(T('Cerrar'),closeDialog,'close')])};emit();}
-function editor(original){const draft=original?structuredClone(original):normalize({title:T('Nuevo juego'),sortOrder:data.games.length,friendsPrivate:data.settings.newGamesPrivate===true||data.settings.activeList==='private',lists:data.settings.activeList.startsWith('custom:')?[data.settings.activeList.slice(7)]:[]});const fields={title:original?.title||'',platform:draft.platform,steamAppId:draft.steamAppId||'',status:draft.status,goal:draft.goal,customGoal:draft.customGoal,storyPercent:draft.storyPercent??'',notes:draft.notes,friendsPrivate:draft.friendsPrivate===true,tracked:draft.tracked,favorite:draft.favorite,tasks:draft.tasks.map(t=>`[${t.done?'x':' '}] ${t.title}`).join('\n')};for(const name of data.settings.gameLists)fields['list.'+name]=draft.lists.some(n=>n.toLocaleLowerCase()===name.toLocaleLowerCase());const b=build('editor',fields);
- b.onChange=async(key,value)=>{if(key==='cover'&&value){if(value.size>2097152||!['image/png','image/jpeg','image/webp'].includes(value.type))throw new Error('cover');const bitmap=await createImageBitmap(value);try{if(bitmap.width*bitmap.height>16000000)throw new Error('cover');const scale=Math.min(1,160/bitmap.width,240/bitmap.height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);draft.customCover=canvas.toDataURL('image/png');draft.igdbCoverImageId='';}finally{bitmap.close();}}};
- navigation.current={gameId:original?.id,render:()=>{const items=[...b.field('title',T('Nombre del juego')),...b.field('platform',T('Plataforma')),...b.field('steamAppId',T('ID de aplicación de Steam (opcional)')),...b.field('status',T('Estado'),'select',statusLabels()),...b.field('goal',T('Objetivo'),'select',goalLabels()),...b.field('customGoal',T('Objetivo personal')),...b.field('storyPercent',T('Avance de historia (0–100, opcional)')),...b.field('tracked',T('Mostrar en Mi lista'),'check'),...b.field('friendsPrivate',T('Privado para mis amigos'),'check'),text(T('Los juegos de tus listas son visibles para tus amigos salvo que los marques privados. Notas y nombres de tareas siguen siendo privados.')),text(T('Sin conexión, los cambios de visibilidad se aplican a tus amigos cuando vuelva la conexión.')),...data.settings.gameLists.flatMap(name=>b.field('list.'+name,T('Lista: ')+name,'check')),...b.field('favorite',T('Favorito'),'check'),...b.field('tasks',T('Tareas: una por línea. Usa [x] para las terminadas.'),'textarea'),...b.field('notes',T('Notas privadas'),'textarea'),...b.field('cover',T('Carátula local (PNG, JPEG o WebP, hasta 2 MiB)'),'file')];items.at(-1).accept='image/png,image/jpeg,image/webp';if(draft.customCover)items.push({type:'image',src:draft.customCover,children:[]});
- items.push(b.button(T('Buscar otra carátula en IGDB'),()=>findCover(draft,String(fields.title).trim(),navigation.current,false,b),'igdb'));
- const actions=[b.button(T('Cancelar'),closeDialog,'cancel'),b.button(T('Guardar'),async()=>{if(fields.steamAppId && (!/^\d+$/.test(String(fields.steamAppId).trim())||Number(fields.steamAppId)<1||Number(fields.steamAppId)>2147483647))throw new Error('invalid-steam');if(fields.storyPercent!==''&&(!/^\d+$/.test(String(fields.storyPercent))||Number(fields.storyPercent)>100))throw new Error('invalid-story');const candidate=normalize({...draft,...fields,lists:data.settings.gameLists.filter(name=>fields['list.'+name]),steamAppId:fields.steamAppId||null,storyPercent:fields.storyPercent===''?null:Number(fields.storyPercent),status:Number(fields.status),goal:Number(fields.goal),tasks:String(fields.tasks).split('\n').map(line=>{const match=line.match(/^\s*\[([xX ])\]\s*(.*)$/);return {title:match?match[2]:line.trim(),done:!!match&&match[1].toLowerCase()==='x'};})});if(!candidate.title)throw new Error('invalid-game');if(candidate.steamAppId&&data.games.some(g=>g.id!==candidate.id&&g.steamAppId===candidate.steamAppId))throw new Error('duplicate-steam');if(original){const current=game(original.id);if(!current)throw new Error('invalid-game');candidate.achievements=current.achievements;candidate.manualAchievements=current.manualAchievements;candidate.removedAchievements=current.removedAchievements;candidate.achievementOverrides=current.achievementOverrides;candidate.retroAchievements=current.retroAchievements;candidate.playtimeMinutes=current.playtimeMinutes;candidate.syncedAt=current.syncedAt;data.games[data.games.indexOf(current)]=candidate;}else data.games.push(candidate);await persist();closeDialog();},'save')];if(original){actions.unshift(b.button(T('Logros'),()=>achievements(original.id,navigation.current),'achievements'),b.button(T('Eliminar'),()=>confirmDelete(original.id),'delete'));}return b.page(original?T('Editar juego'):T('Añadir juego'),T('La historia se marca manualmente. Los logros de Steam no la completan.'),items,actions);}};emit();}
-function gameDetails(id,parent){if(!game(id))return;const b=build('game-details',{});
- navigation.current={render:()=>{const g=game(id);if(!g)return b.page(T('Ficha del juego'),T('Juego no disponible'),[],[b.button(T('Cerrar'),closeDialog,'close')]);const p=progress(g),all=g.achievements||[];
- const actions=[];
- if(Number.isInteger(g.steamAppId)&&g.steamAppId>0&&g.steamAppId<=2147483647)actions.push({...b.button(T('Jugar'),()=>{const link=document.createElement('a');link.href='steam://rungameid/'+g.steamAppId;link.click();},'play'),accent:true,tip:T('Requiere Steam instalado en este equipo.')});
- actions.push({...b.button(T('Ver logros'),()=>achievements(id,navigation.current),'achievements'),accent:actions.length===0},b.button(T('Editar juego'),()=>editor(g),'edit'));
- const items=[{type:'row',style:'game-actions',children:actions}];if(!data.settings.lightweight&&cover(g))items.push({type:'image',src:cover(g),style:'cover-preview',children:[]});
- items.push(text(g.platform+' · '+statusLabels()[g.status],true),...(goalVisible(g)?[text(T('Objetivo')+': '+goalText(g))]:[]),text(p.text+(p.percent==null?'':' · '+p.percent+'%')));
- if(p.percent!=null)items.push({type:'progress',value:p.percent,max:100,name:T('Progreso'),children:[]});
- items.push({type:'card',style:'achievement-summary',children:[text(T('Logros'),true),text('Steam: '+(g.achievements===null?T('Sin sincronizar'):all.filter(a=>a.unlocked).length+' / '+all.length)),text('RetroAchievements: '+(g.retroAchievements===null?T('Sin sincronizar'):g.retroAchievements.filter(a=>a.unlocked).length+' / '+g.retroAchievements.length)),text(T('Objetivos manuales')+': '+g.manualAchievements.length)]});
- items.push(text(T('Tiempo jugado')+': '+(g.playtimeMinutes/60).toLocaleString(data.settings.language,{maximumFractionDigits:1})+' h'),text(T('Visibilidad')+': '+T(g.friendsPrivate?'Privado para mis amigos':'Visible para mis amigos')),text(T('Listas')+': '+(g.lists.join(', ')||T('Sin listas adicionales'))),text(T('Tareas'),true));
- items.push(...(g.tasks.length?g.tasks.map(t=>text((t.done?'✓ ':'○ ')+t.title)):[text(T('Sin tareas'))]));items.push(text(T('Notas'),true),text(g.notes||T('Sin notas')));
- const date=value=>value?new Date(value).toLocaleString(data.settings.language):T('Sin sincronizar');items.push(text(T('Añadido')+': '+date(g.addedAt)),text(T('Última sincronización')+': '+date(g.syncedAt)));if(g.finishedAt)items.push(text(T('Historia terminada')+': '+date(g.finishedAt)));if(g.steamAppId)items.push(text('Steam ID: '+g.steamAppId));if(g.retroGameId)items.push(text('RetroAchievements ID: '+g.retroGameId));
- return b.page(g.title,T('Ficha del juego'),items,[b.button(T('Cerrar'),()=>{navigation.current=parent||null;emit();},'close')]);}};emit();}
-function confirmDelete(id){const g=game(id);if(!g)return;const b=build('delete',{});navigation.current={render:()=>b.page(T('Eliminar juego'),g.title,[text(T('Podrás recuperar este juego desde Deshacer. Su publicación se retirará cuando haya conexión.'))],[b.button(T('Cancelar'),closeDialog,'cancel'),b.button(T('Eliminar'),async()=>{data.deleted.push(structuredClone(g));data.deleted=data.deleted.slice(-20);data.games=data.games.filter(x=>x.id!==id);if(shares[id]?.selected){shares[id].selected=false;shares[id].desired=null;await saveShares();}await persist();await navigation.home();},'delete')])};emit();}
-function achievements(id,parent){if(!game(id))return;const fields={spoilers:false,pending:true},expanded=new Set(),b=build('achievements',fields);
- navigation.current={cancel:()=>{navigation.current=parent||null;emit();},render:()=>{const g=game(id),all=g?reviewItems(g):[],done=all.filter(a=>a.unlocked).length;
- const items=[{type:'card',style:'achievement-summary',children:[text(`${done} / ${all.length} ${T('logros completados')}`,true),{type:'progress',value:all.length?done*100/all.length:0,max:100,name:T('Logros'),children:[]},text(all.length?`${all.length-done}${T(' logros pendientes')}`:T('Logros sin sincronizar'))]},...b.field('spoilers',T('Mostrar logros ocultos'),'check'),...b.field('pending',T('Solo pendientes'),'check')];
- for(const a of all.filter(a=>!fields.pending||!a.unlocked).sort((a,b)=>Number(a.unlocked)-Number(b.unlocked))){const hidden=a.hidden&&!a.sourceUnlocked&&!fields.spoilers;
- const children=[text((a.unlocked?'✓ ':'○ ')+(hidden?T('Logro oculto'):a.name),true),text(a.provider==='manual'?T('Manual'):a.provider==='retro'?'RetroAchievements':'Steam',false,true)];
- if(hidden)children.push(text(T('Activa la opción superior para revelar este logro.')));
- else {const toggle=b.button(T(expanded.has(a.id)?'Ocultar descripción':'Ver descripción'),()=>{if(!expanded.delete(a.id))expanded.add(a.id);},'description.'+a.id);toggle.name=toggle.text+' · '+a.name;children.push(toggle);if(expanded.has(a.id))children.push({...text(String(a.description||'').trim()?a.description:T(a.provider==='steam'&&a.hidden?'Steam no ha enviado la descripción de este logro oculto. Prueba a actualizar los logros; si sigue vacía, no está disponible en la API de Steam.':'Este logro no tiene descripción.')),style:'achievement-description'});}
- items.push({type:'card',style:'achievement-card',children});}
- return b.page(T('Logros'),g?.title||'',items,[b.button(T('Cerrar'),()=>{if(parent){navigation.current=parent;emit();}else closeDialog();},'close'),{...b.button(T('Actualizar'),async()=>{await sync(id);emit();},'sync'),enabled:!!api.steam&&!steamBusy&&!!g?.steamAppId}]);}};emit();}
-function settings(){const previous=structuredClone(data.settings),fields={language:data.settings.language==='en'?1:0,theme:themes.indexOf(data.settings.theme),layout:data.settings.layout,opacity:data.settings.opacity,interval:[15,30,60,120].indexOf(data.settings.syncMinutes),lightweight:data.settings.lightweight};const b=build('settings',fields);b.onChange=(key,value)=>{if(key==='theme')data.settings.theme=themes[Number(value)]||'dark';if(key==='opacity')data.settings.opacity=Number(value);};
- const cancel=async()=>{data.settings.theme=previous.theme;data.settings.opacity=previous.opacity;await persist();closeDialog();};
- navigation.current={cancel,render:()=>{const items=[...b.field('language',T('Idioma'),'select',[T('Español'),T('Inglés')]),...b.field('theme',T('Tema'),'select',themeLabels()),text(T('Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.'),false,true),...b.field('layout',T('Vista de la colección'),'select',[T('Lista'),T('Compacta'),T('Cuadrícula de carátulas')]),...b.field('opacity',T('Opacidad del fondo'),'slider'),...b.field('lightweight',T('Modo ligero (sin carátulas)'),'check'),...b.field('interval',T('Sincronizar biblioteca y logros al abrir y cada…'),'select',[15,30,60,120].map(n=>`${n} ${T('minutos')}`)),text(api.steam?T('Steam vinculado.'):T('Cuenta sin vincular. El inicio de sesión se realiza en Steam.')),b.button(api.steam?T('Desvincular Steam'):T('Vincular Steam'),async()=>{await cancel();if(api.steam){await api.unlink();emit();}else connectSteam();},'steam'),b.button(T('Repasar todos los logros'),()=>reviewAchievements(navigation.current),'review-achievements'),b.button(T('Buscar carátulas que faltan'),()=>reviewCovers(navigation.current),'review-covers'),b.button(T('Gestionar listas'),()=>manageLists(navigation.current),'lists'),b.button(T('Configurar atajos'),()=>shortcutSettings(),'shortcuts'),b.button(T('Sobre la versión web'),()=>info(),'info')];const slider=items.find(x=>x.type==='slider');Object.assign(slider,{min:.35,max:1,step:.05});return b.page(T('Ajustes'),T('Ajusta Checkpoint para que encaje contigo.'),items,[b.button(T('Cancelar'),cancel,'cancel'),b.button(T('Guardar'),async()=>{data.settings={...data.settings,language:Number(fields.language)===1?'en':'es',theme:themes[fields.theme]||'dark',layout:Number(fields.layout),opacity:Number(fields.opacity),syncMinutes:[15,30,60,120][fields.interval]||30,lightweight:fields.lightweight===true};await persist();restartTimer();closeDialog();},'save')]);}};emit();}
-function chooseList(ids,source,mode='move',parent=navigation.current){
- const selected=[...new Set(ids||[])];if(!selected.length||selected.some(id=>!game(id)))throw new Error('invalid-selection');
- const fields={target:0},b=build('list-change',fields);
- navigation.current={cancel:()=>{navigation.current=parent;emit();},render:()=>b.page(T(mode==='add'?'Añadir a otra lista':'Cambiar de lista'),T('Mover desde una lista quita solo esa pertenencia. Desde Biblioteca o Mi lista reemplaza las listas actuales. Añadir conserva las demás. La privacidad no cambia.'),[text(T('Juegos seleccionados:')+' '+selected.length),...b.field('target',T('Lista de destino'),'select',data.settings.gameLists),...(!data.settings.gameLists.length?[text(T('Crea una lista antes de mover juegos.'))]:[])],[b.button(T('Crear lista'),()=>manageLists(navigation.current),'create'),b.button(T('Cancelar'),()=>{navigation.current=parent;emit();},'cancel'),b.button(T(mode==='add'?'Añadir a otra lista':'Mover juegos'),async()=>{const target=data.settings.gameLists[Number(fields.target)];applyListAction(data.games,selected,data.settings.gameLists,mode,source,target);await persist();navigation.current=parent;emit();},'apply')])};emit();
+setTimeout(shareCovers, 2000);
+const coverQueue = new Set(),
+  coverAttempts = new Set();
+let coverBusy = false,
+  coverProposalCount = 0;
+function missingCover(id) {
+  const g = game(id);
+  if (g && !g.customCover && coverQueue.size < 100 && !coverAttempts.has(g.id + '|' + g.title))
+    coverQueue.add(id);
 }
-function listSheet(source){
- if(!['all','private'].includes(source)&&!data.settings.gameLists.some(n=>'custom:'+n===source))throw new Error('missing-list');
- if(!listMembers(data.games,source).length)return;
- const fields={search:'',status:0},picked=new Set(),b=build('list-sheet',fields);let page=0;
- b.onChange=(key,value)=>{if(key==='search'||key==='status'){page=0;picked.clear();}else if(key.startsWith('game.')){const id=key.slice(5);if(value){if(picked.size>=500)throw new Error('invalid-selection');picked.add(id);}else picked.delete(id);}};
- const batch=async operation=>{applyListAction(data.games,[...picked],data.settings.gameLists,operation,source);await persist();picked.clear();emit();};
- navigation.current={listSource:source,render:()=>{
- const members=listMembers(data.games,source),matches=members.filter(g=>(Number(fields.status)===0||g.status===Number(fields.status)-1)&&g.title.toLocaleLowerCase().includes(String(fields.search).toLocaleLowerCase())).sort((a,b)=>a.title.localeCompare(b.title));
- for(const id of picked)if(!members.some(g=>g.id===id))picked.delete(id);
- page=Math.max(0,Math.min(page,Math.max(0,Math.ceil(matches.length/50)-1)));
- const title=source==='all'?T('Mi lista'):source==='private'?T('Privados'):source.slice(7);
- const items=[text(T('Juegos')+': '+members.length),text(T('Historia terminada')+': '+members.filter(g=>g.status===3).length+' · '+T('Jugando')+': '+members.filter(g=>g.status===1).length+' · '+T('Privados')+': '+members.filter(g=>g.friendsPrivate===true).length),text(T('Juegos seleccionados:')+' '+picked.size),text(T('La ficha incluye los juegos privados de esta lista. Quitar no elimina el juego de Biblioteca.')),...b.field('search',T('Buscar juego')),...b.field('status',T('Filtrar por estado'),'select',[T('Todos'),...statusLabels()]),text(T('Resultados')+': '+matches.length+' / '+members.length)];
- for(const g of matches.slice(page*50,page*50+50)){fields['game.'+g.id]=picked.has(g.id);items.push({type:'card',children:[...b.field('game.'+g.id,T('Seleccionar juego')+': '+g.title,'check'),text(g.platform+' · '+statusLabels()[g.status]+' · '+T(g.friendsPrivate?'Privado para mis amigos':'Visible para mis amigos')),text(T('Listas')+': '+(g.lists.join(', ')||T('Sin listas adicionales'))),text(progress(g).text+(progress(g).percent==null?'':' · '+progress(g).percent+'%')),b.button(T('Ver ficha completa'),()=>gameDetails(g.id,navigation.current),'details.'+g.id)]});}
- if(!matches.length)items.push(text(T(members.length?'Ningún juego coincide con los filtros.':'Sin juegos en esta lista')));
- items.push(text(T('Página')+' '+(page+1)+' / '+Math.max(1,Math.ceil(matches.length/50))),{type:'row',children:[b.button(T('Anterior'),()=>{page=Math.max(0,page-1);},'previous'),b.button(T('Siguiente'),()=>{page=Math.max(0,Math.min(Math.ceil(matches.length/50)-1,page+1));},'next'),b.button(T('Seleccionar esta página'),()=>{matches.slice(page*50,page*50+50).forEach(g=>{if(picked.size<500)picked.add(g.id);});},'select-page'),b.button(T('Limpiar selección'),()=>picked.clear(),'clear')]});
- const actions=[b.button(T('Cerrar'),closeDialog,'close'),b.button(T('Cambiar de lista'),()=>chooseList([...picked],source,'move',navigation.current),'move'),b.button(T('Añadir a otra lista'),()=>chooseList([...picked],source,'add',navigation.current),'add')];
- if(source!=='private')actions.push(b.button(T('Quitar de esta lista'),()=>batch('remove'),'remove'));
- actions.push(b.button(T('Mover a Privados'),()=>batch('private'),'private'),b.button(T('Hacer visible para amigos'),()=>batch('public'),'public'));
- for(const node of actions.slice(1))node.enabled=picked.size>0;
- return b.page(title,T('Ficha de la lista'),items,actions);
- }};emit();
+setInterval(async () => {
+  if (
+    coverBusy ||
+    navigation.current ||
+    document.hidden ||
+    document.querySelector('.menu,.shortcut-help:modal') ||
+    tab === 'friends' ||
+    data.settings.lightweight
+  )
+    return;
+  const id = coverQueue.values().next().value;
+  if (!id) return;
+  coverQueue.delete(id);
+  const g = game(id);
+  if (!g || g.customCover) return;
+  coverAttempts.add(g.id + '|' + g.title);
+  await findCover(g, g.title, null, true);
+}, 3000);
+// Conserva rechazos y exige confirmación antes de sustituir una carátula.
+async function findCover(g, title, parent, automatic = false, builder) {
+  if (coverBusy) return;
+  coverBusy = true;
+  if (builder) builder.busy = true;
+  emit();
+  const remember = async () => {
+    const current = game(g.id);
+    if (automatic) {
+      await persist();
+    } else if (current) {
+      current.rejectedIgdbCovers = [...g.rejectedIgdbCovers];
+      current.igdbCoverSearchTitle = g.igdbCoverSearchTitle;
+      await persist();
+    }
+  };
+  try {
+    if (!title || title.length > 140) throw new Error('invalid-game');
+    if (g.rejectedIgdbCovers.length >= 200) throw new Error('igdb-exhausted');
+    let result,
+      shared = false;
+    if (automatic) {
+      try {
+        result = await api.coverShared(g);
+        shared = !!result?.candidate;
+      } catch {}
+      if (!shared) {
+        if (!g.tracked || g.igdbCoverSearchTitle === g.title || coverProposalCount >= 10) return;
+        coverProposalCount++;
+      }
+    }
+    if (!shared) result = await api.coverSearch(title, g.rejectedIgdbCovers, !automatic);
+    if ((navigation.current || null) !== parent) return;
+    const candidate = result?.candidate;
+    if (candidate == null) {
+      g.igdbCoverSearchTitle = title;
+      await remember();
+      if (!automatic) notice = T('No hay otra carátula de IGDB disponible para este nombre.');
+      return;
+    }
+    if (
+      !Number.isSafeInteger(candidate.id) ||
+      candidate.id < 1 ||
+      typeof candidate.name !== 'string' ||
+      candidate.name.length > 250 ||
+      !candidate.name ||
+      !/^[A-Za-z0-9_-]{1,80}$/.test(candidate.imageId) ||
+      g.rejectedIgdbCovers.includes(candidate.imageId)
+    )
+      throw new Error('igdb-unavailable');
+    const blob = await api.coverImage(candidate.imageId),
+      bitmap = await createImageBitmap(blob);
+    let png;
+    try {
+      if (bitmap.width * bitmap.height > 16000000) throw new Error('igdb-unavailable');
+      const scale = Math.min(1, 160 / bitmap.width, 240 / bitmap.height),
+        canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      png = canvas.toDataURL('image/png');
+    } finally {
+      bitmap.close();
+    }
+    if (
+      (navigation.current || null) !== parent ||
+      (automatic &&
+        (!game(g.id) || g.customCover || g.title !== title || data.settings.lightweight))
+    )
+      return;
+    g.igdbCoverSearchTitle = title;
+    if (shared) {
+      g.customCover = png;
+      g.igdbCoverImageId = candidate.imageId;
+      contributedCovers.add(coverContributionKey(g));
+      await remember();
+      return;
+    }
+    const choice = build('cover-choice', {});
+    let deciding = false;
+    const decide = async (accept) => {
+      if (deciding) return;
+      deciding = true;
+      choice.busy = true;
+      emit();
+      try {
+        if (accept) {
+          g.customCover = png;
+          g.igdbCoverImageId = candidate.imageId;
+        } else if (!g.rejectedIgdbCovers.includes(candidate.imageId))
+          g.rejectedIgdbCovers.push(candidate.imageId);
+        await remember();
+        navigation.current = parent || undefined;
+        emit();
+      } catch (error) {
+        choice.busy = false;
+        deciding = false;
+        fail(error);
+      }
+    };
+    navigation.current = {
+      cancel: () => decide(false),
+      render: () =>
+        choice.page(
+          T('Carátula de IGDB'),
+          title,
+          [
+            { type: 'image', src: png, style: 'cover-preview', children: [] },
+            text(
+              candidate.name + (Number.isInteger(candidate.year) ? ' · ' + candidate.year : ''),
+              true,
+            ),
+            text(
+              T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.'),
+            ),
+            text(
+              T(
+                'Si la rechazas no volveremos a ofrecerla. Puedes buscar otra desde el editor del juego.',
+              ),
+            ),
+            text(
+              T(
+                'Al guardar, compartes la referencia de IGDB como carátula por defecto para este juego. No se sube la imagen ni tus datos personales.',
+              ),
+            ),
+          ],
+          [
+            choice.button(T('No usar esta carátula'), () => decide(false), 'reject'),
+            choice.button(T('Usar esta carátula'), () => decide(true), 'accept'),
+          ],
+        ),
+    };
+  } catch (error) {
+    if (!automatic && navigation.current === parent) fail(error);
+  } finally {
+    coverBusy = false;
+    if (builder) builder.busy = false;
+    emit();
+  }
 }
-function manageLists(parent){const fields={selected:0,name:'',newGamesPrivate:data.settings.newGamesPrivate===true},b=build('lists',fields);b.onChange=(key,value)=>{if(key==='selected')fields.name=data.settings.gameLists[Number(value)-1]||'';};const change=async(rename)=>{if(b.busy)return;const old=rename?data.settings.gameLists[Number(fields.selected)-1]:null;if(rename&&!old)return;const next=listName(fields.name,data.settings.gameLists,old);b.busy=true;emit();try{if(old){data.settings.gameLists=data.settings.gameLists.map(n=>n.toLocaleLowerCase()===old.toLocaleLowerCase()?next:n);for(const g of [...data.games,...data.deleted])g.lists=normalizeLists(g.lists.map(n=>n.toLocaleLowerCase()===old.toLocaleLowerCase()?next:n));}else data.settings.gameLists.push(next);data.settings.activeList='custom:'+next;tab='list';search='';filter=0;await persist();fields.selected=data.settings.gameLists.indexOf(next)+1;fields.name=next;}finally{b.busy=false;emit();}};navigation.current={render:()=>b.page(T('Gestionar listas'),T('Un juego puede estar en varias listas sin duplicarse. Los privados se consultan en Privados.'),[...b.field('selected',T('Lista de juegos'),'select',[T('Nueva lista'),...data.settings.gameLists]),...b.field('name',T('Nombre de la lista')),...b.field('newGamesPrivate',T('Crear juegos nuevos como privados'),'check'),text(T('Quitar una lista conserva sus juegos, su privacidad y el resto de listas.')),b.button(T('Crear lista'),()=>change(false),'create'),b.button(T('Renombrar lista'),()=>change(true),'rename'),{...b.button(T('Ver ficha de la lista'),()=>{const name=data.settings.gameLists[Number(fields.selected)-1];if(name)listSheet('custom:'+name);},'sheet'),enabled:!b.busy&&Number(fields.selected)>0&&listMembers(data.games,'custom:'+data.settings.gameLists[Number(fields.selected)-1]).length>0},b.button(T('Quitar lista'),()=>{const name=data.settings.gameLists[Number(fields.selected)-1];if(!name)return;const parent=navigation.current,c=build('remove-list',{});navigation.current={render:()=>c.page(T('Quitar lista'),name,[text(T('Quitar una lista conserva sus juegos, su privacidad y el resto de listas.'))],[c.button(T('Cancelar'),()=>{navigation.current=parent;emit();},'cancel'),c.button(T('Quitar lista'),async()=>{data.settings.gameLists=data.settings.gameLists.filter(n=>n!==name);for(const g of [...data.games,...data.deleted])g.lists=g.lists.filter(n=>n.toLocaleLowerCase()!==name.toLocaleLowerCase());data.settings.activeList='all';await persist();fields.selected=0;fields.name='';navigation.current=parent;emit();},'remove')])};emit();},'remove')],[b.button(T('Cancelar'),()=>{navigation.current=parent||null;emit();},'cancel'),b.button(T('Guardar'),async()=>{const old=data.settings.gameLists[Number(fields.selected)-1];if(String(fields.name||'').trim()&&(!old||String(fields.name).trim()!==old))await change(!!old);data.settings.newGamesPrivate=fields.newGamesPrivate===true;await persist();navigation.current=parent||null;emit();},'save')])};emit();}
-function shortcutSettings(){const fields=effectiveShortcuts(data.settings.shortcuts),b=build('shortcuts',fields);navigation.current={render:()=>{const items=[text(T('Pulsa una combinación en cada campo. Tab cambia de campo; Escape cancela. No se permiten atajos repetidos.')),text(T('Los atajos del navegador pueden tener prioridad. El atajo global solo funciona en Windows.'))];for(const key of Object.keys(defaults).filter(k=>k!=='global')){const nodes=b.field(key,T(shortcutLabels[key]));nodes.find(n=>n.type==='input').shortcut=true;items.push(...nodes);}return b.page(T('Configurar atajos'),T('Los cambios se aplican al guardar.'),items,[b.button(T('Restablecer predeterminados'),()=>{Object.assign(fields,defaults);emit();},'reset'),b.button(T('Cancelar'),closeDialog,'cancel'),b.button(T('Guardar'),async()=>{data.settings.shortcuts=validateShortcuts(fields);await persist();closeDialog();},'save')]);}};emit();}
-async function sync(single){if(steamBusy||!api.steam)return;steamBusy=true;emit();try{if(!single){const library=await api.steamRequest('v1/library');mergeLibrary(data.games,library.games||[]);if(!data.games.some(g=>g.tracked))tab='library';await persist();}
- const selected=single?[game(single)].filter(Boolean):data.games.filter(g=>g.tracked&&g.steamAppId).sort((a,b)=>(a.syncedAt||'').localeCompare(b.syncedAt||'')).slice(0,20);let errors=0;
- for(const current of selected){try{const result=await api.steamRequest(`v1/games/${current.steamAppId}/achievements?lang=${data.settings.language}`);const target=game(current.id);if(target){target.achievements=normalize({...target,achievements:result.achievements}).achievements;target.syncedAt=new Date().toISOString();await persist();}}catch{errors++;}}
- notice=T(errors?'Algunos logros no se pudieron actualizar. Se conserva el progreso anterior.':'Biblioteca y progreso de Steam actualizados.');}catch(error){fail(error);}finally{steamBusy=false;emit();}}
-async function connectSteam(){const popup=window.open('about:blank','checkpoint-steam-login');const generation=++loginGeneration;steamBusy=true;emit();try{const flow=await api.steamRequest('v1/auth/start',{},false),url=new URL(flow.authorizeUrl);if(url.origin!=='https://steamcommunity.com'||url.pathname!=='/openid/login')throw new Error('remote');if(popup)popup.location.href=url.href;
- const b=build('steam',{});navigation.current={cancel:()=>{loginGeneration++;steamBusy=false;closeDialog();},render:()=>b.page(T('Vincular Steam'),T('Termina el acceso en Steam y vuelve a esta página.'),[b.button(T('Abrir Steam'),()=>window.open(url.href,'_blank','noopener,noreferrer'),'open')],[b.button(T('Cancelar'),()=>{loginGeneration++;steamBusy=false;closeDialog();},'cancel')])};emit();
- const expires=Date.now()+600000;while(generation===loginGeneration&&Date.now()<expires){await new Promise(r=>setTimeout(r,2000));const result=await api.steamRequest('v1/auth/poll',{flowId:flow.flowId,pollSecret:flow.pollSecret},false);if(generation!==loginGeneration)return;if(result.status==='complete'){if(!/^[A-Za-z\d_-]{43}$/.test(result.token)||!/^7656119\d{10}$/.test(result.steamId))throw new Error('auth');api.steam={token:result.token,steamId:result.steamId};api.save('checkpoint-steam',api.steam);closeDialog();popup?.close();break;}}if(!api.steam&&generation===loginGeneration)throw new Error('remote');}catch(error){popup?.close();fail(error);}finally{if(generation===loginGeneration){steamBusy=false;emit();if(api.steam)await sync();}}}
-async function loadFriends(){if(friendsBusy||!api.social)return;friendsBusy=true;emit();try{const user=api.social.user.id;const results=await Promise.all([api.profiles(),api.friendships(),api.requests(),api.publications(user)]);if(api.social?.user.id!==user)return;[profiles,friendships,requests,ownPublications]=results;if(selectedFriend)publications=(await api.publications(selectedFriend)).filter(p=>p.is_shared&&p.operation_payload);await attachShares();}catch(error){profiles=[];friendships=[];requests=[];publications=[];ownPublications=[];fail(error);}finally{friendsBusy=false;emit();}}
-async function attachShares(){const user=api.social?.user.id;if(user===shareUser)return;shareUser=user;shares=user?(await store.get('shares.'+user)||{}):{};if(user){let changed=false;for(const g of data.games)if(g.friendsPrivate===null){g.friendsPrivate=shares[g.id]?.selected===false;changed=true;}if(changed)await persist();}}
-const saveShares=()=>shareUser?store.put('shares.'+shareUser,shares):Promise.resolve();
-const samePayload=(a,b)=>JSON.stringify(a,Object.keys(a||{}).sort())===JSON.stringify(b,Object.keys(b||{}).sort());
-function planSharing(){if(!shareUser||api.social?.user.id!==shareUser)return;for(const g of data.games){const desired=shouldShare(g)?payload(g):null;let entry=shares[g.id];if(!entry&&desired){const remote=ownPublications.find(p=>p.game_id===g.id);entry=shares[g.id]={revision:remote?.revision||0,published:remote?.operation_payload||null,pending:null,conflict:false};}if(entry){entry.selected=desired!==null;entry.desired=desired;}}for(const [id,entry] of Object.entries(shares))if(!game(id)){entry.selected=false;entry.desired=null;}}
+function reviewStatus() {
+  const r = achievementReview;
+  if (!r) return '';
+  return (
+    T(
+      r.running
+        ? 'Actualizando logros en segundo plano:'
+        : r.stopped
+          ? 'Repaso de logros detenido:'
+          : 'Repaso de logros terminado:',
+    ) +
+    ' ' +
+    r.done +
+    ' / ' +
+    r.total +
+    ' · ' +
+    T('No se pudieron actualizar:') +
+    ' ' +
+    r.errors
+  );
+}
+function startAchievementReview() {
+  if (steamBusy || !api.steam) return;
+  const ids = data.games.filter((g) => g.steamAppId).map((g) => g.id);
+  if (!ids.length) return;
+  const session = api.steam,
+    r = {
+      done: 0,
+      total: ids.length,
+      errors: 0,
+      running: true,
+      stopped: false,
+      controller: new AbortController(),
+    };
+  achievementReview = r;
+  steamBusy = true;
+  navigation.current = null;
+  emit();
+  void (async () => {
+    try {
+      await runAchievementReview(
+        ids,
+        async (id, signal) => {
+          if (api.steam !== session) {
+            r.controller.abort();
+            signal.throwIfAborted();
+          }
+          const target = game(id);
+          if (!target) {
+            r.done++;
+            emit();
+            return;
+          }
+          const appId = target.steamAppId;
+          try {
+            const result = await api.steamRequest(
+              `v1/games/${appId}/achievements?lang=${data.settings.language}`,
+              undefined,
+              true,
+              signal,
+            );
+            signal.throwIfAborted();
+            if (api.steam !== session) {
+              r.controller.abort();
+              signal.throwIfAborted();
+            }
+            const current = game(id);
+            if (current && current.steamAppId === appId) {
+              current.achievements = normalize({
+                ...current,
+                achievements: result.achievements,
+              }).achievements;
+              current.syncedAt = new Date().toISOString();
+              await persist();
+            }
+          } catch (error) {
+            if (signal.aborted) throw error;
+            r.errors++;
+          }
+          r.done++;
+          emit();
+        },
+        r.controller.signal,
+      );
+    } catch (error) {
+      r.stopped = true;
+      if (!r.controller.signal.aborted) fail(error);
+    } finally {
+      r.running = false;
+      steamBusy = false;
+      emit();
+    }
+  })();
+}
+function reviewAchievements(parent) {
+  const ids = data.games
+      .slice()
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((g) => g.id),
+    b = build('review-achievements', {});
+  let index = 0;
+  const current = () => game(ids[index]);
+  const page = {
+    cancel: () => {
+      navigation.current = parent;
+      emit();
+    },
+    render: () => {
+      const g = current(),
+        items = g ? reviewItems(g) : [],
+        done = items.filter((a) => a.unlocked).length;
+      return b.page(
+        T('Repasar todos los logros'),
+        T(
+          'Incluye toda la Biblioteca, también los juegos privados y los que no están en Mi lista. Los cambios manuales se conservan.',
+        ),
+        [
+          text(T('Juego') + ' ' + (ids.length ? index + 1 : 0) + ' / ' + ids.length),
+          text(g?.title || T('Sin juegos en Biblioteca'), true),
+          text(
+            T('Logros') +
+              ': ' +
+              done +
+              ' / ' +
+              items.length +
+              ' · ' +
+              T('Pendientes') +
+              ': ' +
+              (items.length - done),
+          ),
+          text(reviewStatus()),
+          { ...b.button(T('Ver logros'), () => achievements(g.id, page), 'view'), enabled: !!g },
+          text(
+            T(
+              'En la web se actualiza Steam. RetroAchievements se sincroniza desde la app de Windows.',
+            ),
+          ),
+          text(
+            T(
+              'La actualización continúa en segundo plano. Puedes usar Checkpoint y detenerla desde el indicador de progreso.',
+            ),
+          ),
+          {
+            ...b.button(T('Actualizar todos los logros'), startAchievementReview, 'sync-all'),
+            enabled: !!api.steam && !steamBusy && data.games.some((g) => g.steamAppId),
+          },
+          ...(achievementReview?.running
+            ? [b.button(T('Detener repaso'), () => achievementReview.controller.abort(), 'stop')]
+            : []),
+        ],
+        [
+          {
+            ...b.button(
+              T('Anterior'),
+              () => {
+                index--;
+              },
+              'previous',
+            ),
+            enabled: index > 0,
+          },
+          {
+            ...b.button(
+              T('Siguiente juego'),
+              () => {
+                index++;
+              },
+              'next',
+            ),
+            enabled: index + 1 < ids.length,
+          },
+          { ...b.button(T('Cerrar'), page.cancel, 'close'), enabled: true },
+        ],
+      );
+    },
+  };
+  navigation.current = page;
+  emit();
+}
+async function reviewHasCover(g) {
+  const load = (src) =>
+    new Promise((resolve) => {
+      const image = new Image();
+      let ended = false;
+      const finish = (value) => {
+        if (ended) return;
+        ended = true;
+        clearTimeout(timer);
+        image.onload = image.onerror = null;
+        resolve(value);
+      };
+      const timer = setTimeout(() => finish(false), 10000);
+      image.onload = () => finish(image.naturalWidth > 0);
+      image.onerror = () => finish(false);
+      image.src = src;
+    });
+  if (g.customCover && (await load(g.customCover))) return true;
+  if (!g.steamAppId) return false;
+  return load(
+    `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`,
+  );
+}
+function reviewCovers(parent) {
+  const ids = data.games
+      .slice()
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map((g) => g.id),
+    b = build('review-covers', {});
+  let index = -1,
+    candidate = null,
+    png = null,
+    stopped = false,
+    message = '';
+  const current = () => game(ids[index]);
+  const save = async (accept) => {
+    const g = current();
+    if (!g) return;
+    g.igdbCoverSearchTitle = g.title;
+    if (candidate) {
+      if (accept) {
+        g.customCover = png;
+        g.igdbCoverImageId = candidate.imageId;
+      } else if (!g.rejectedIgdbCovers.includes(candidate.imageId))
+        g.rejectedIgdbCovers.push(candidate.imageId);
+    }
+    await persist();
+  };
+  const load = async (advance) => {
+    if (b.busy || stopped) return;
+    b.busy = true;
+    candidate = null;
+    png = null;
+    delete page.error;
+    message = T('Buscando carátula…');
+    emit();
+    try {
+      if (advance) {
+        while (++index < ids.length) {
+          const g = current();
+          if (!g) continue;
+          emit();
+          const found = await reviewHasCover(g);
+          if (stopped) return;
+          if (!found) break;
+        }
+      }
+      if (stopped) return;
+      const g = current();
+      if (!g) {
+        message = T('No quedan juegos sin carátula por revisar.');
+        return;
+      }
+      if (g.rejectedIgdbCovers.length >= 200) throw new Error('igdb-exhausted');
+      const result = await api.coverSearch(g.title, g.rejectedIgdbCovers, true);
+      if (stopped) return;
+      const found = result?.candidate;
+      if (!found) {
+        message = T('No hay otra carátula de IGDB disponible para este nombre.');
+        return;
+      }
+      if (
+        !Number.isSafeInteger(found.id) ||
+        found.id < 1 ||
+        typeof found.name !== 'string' ||
+        !found.name ||
+        found.name.length > 250 ||
+        !/^[A-Za-z0-9_-]{1,80}$/.test(found.imageId) ||
+        g.rejectedIgdbCovers.includes(found.imageId)
+      )
+        throw new Error('igdb-unavailable');
+      const blob = await api.coverImage(found.imageId);
+      if (stopped) return;
+      const bitmap = await createImageBitmap(blob);
+      try {
+        if (bitmap.width * bitmap.height > 16000000) throw new Error('igdb-unavailable');
+        const scale = Math.min(1, 160 / bitmap.width, 240 / bitmap.height),
+          canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        png = canvas.toDataURL('image/png');
+      } finally {
+        bitmap.close();
+      }
+      if (stopped) return;
+      candidate = found;
+      message = T(
+        'Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.',
+      );
+    } catch (error) {
+      if (!stopped && navigation.current === page) fail(error);
+    } finally {
+      b.busy = false;
+      if (!stopped && navigation.current === page) emit();
+    }
+  };
+  const decide = async (accept, advance) => {
+    if (b.busy || stopped) return;
+    b.busy = true;
+    emit();
+    try {
+      await save(accept);
+    } finally {
+      b.busy = false;
+    }
+    if (!stopped) await load(advance);
+  };
+  const page = {
+    cancel: () => {
+      stopped = true;
+      navigation.current = parent;
+      emit();
+    },
+    render: () => {
+      const g = current();
+      return b.page(
+        T('Buscar carátulas que faltan'),
+        T(
+          'Se comprueba Steam antes de buscar en IGDB. Siguiente carátula descarta la propuesta; Siguiente juego continúa sin añadirla. Las decisiones se guardan al instante.',
+        ),
+        [
+          text(
+            T('Juego') + ' ' + Math.max(0, Math.min(index + 1, ids.length)) + ' / ' + ids.length,
+          ),
+          text(g?.title || T('Revisión terminada'), true),
+          ...(png ? [{ type: 'image', src: png, style: 'cover-preview', children: [] }] : []),
+          ...(candidate
+            ? [
+                text(
+                  candidate.name + (Number.isInteger(candidate.year) ? ' · ' + candidate.year : ''),
+                  true,
+                ),
+              ]
+            : []),
+          text(message),
+          {
+            type: 'row',
+            children: [
+              {
+                ...b.button(T('Aceptar'), () => decide(true, true), 'accept'),
+                enabled: !!candidate && !b.busy,
+              },
+              {
+                ...b.button(T('Siguiente carátula'), () => decide(false, false), 'another'),
+                enabled: !!g && !b.busy,
+              },
+              {
+                ...b.button(T('Siguiente juego'), () => decide(false, true), 'next'),
+                enabled: !!g && !b.busy,
+              },
+            ],
+          },
+        ],
+        [{ ...b.button(T('Cerrar'), page.cancel, 'close'), enabled: true }],
+      );
+    },
+  };
+  navigation.current = page;
+  emit();
+  load(true);
+}
+function closeDialog() {
+  navigation.pop();
+  emit();
+}
+function credits() {
+  const b = build('credits', {});
+  navigation.current = {
+    render: () =>
+      b.page(
+        T('Créditos'),
+        '',
+        [text('Yus', true), text(T('El mejor beta tester'))],
+        [b.button(T('Cerrar'), closeDialog, 'close')],
+      ),
+  };
+  emit();
+}
+function info() {
+  const b = build('info', {});
+  navigation.current = {
+    render: () =>
+      b.page(
+        T('Checkpoint en tu navegador'),
+        T(
+          'La biblioteca privada se guarda en este navegador. Exporta copias: borrar los datos del sitio elimina la biblioteca local.',
+        ),
+        [
+          text(
+            T(
+              'Steam y amigos requieren conexión. La sesión se conserva en esta pestaña; al cerrarla puede ser necesario volver a entrar.',
+            ),
+          ),
+          text(
+            T(
+              'La interfaz se adapta al tamaño de tu navegador. Usa Mi lista o Biblioteca; la bandeja y los atajos globales están en la app de Windows.',
+            ),
+          ),
+          text(
+            T(
+              'Los archivos JSON de la app de Windows se pueden importar. La biblioteca privada no se sincroniza automáticamente entre dispositivos.',
+            ),
+          ),
+        ],
+        [b.button(T('Cerrar'), closeDialog, 'close')],
+      ),
+  };
+  emit();
+}
+function editor(original) {
+  const draft = original
+    ? structuredClone(original)
+    : normalize({
+        title: T('Nuevo juego'),
+        tracked: tab !== 'library',
+        sortOrder: data.games.length,
+        friendsPrivate:
+          data.settings.newGamesPrivate === true ||
+          (tab !== 'library' && data.settings.activeList === 'private'),
+        lists:
+          tab !== 'library' && data.settings.activeList.startsWith('custom:')
+            ? [data.settings.activeList.slice(7)]
+            : [],
+      });
+  const fields = {
+    title: original?.title || '',
+    platform: draft.platform,
+    steamAppId: draft.steamAppId || '',
+    status: draft.status,
+    goal: draft.goal,
+    customGoal: draft.customGoal,
+    storyPercent: draft.storyPercent ?? '',
+    notes: draft.notes,
+    friendsPrivate: draft.friendsPrivate === true,
+    tracked: draft.tracked,
+    favorite: draft.favorite,
+    tasks: draft.tasks.map((t) => `[${t.done ? 'x' : ' '}] ${t.title}`).join('\n'),
+  };
+  for (const name of data.settings.gameLists)
+    fields['list.' + name] = draft.lists.some(
+      (n) => n.toLocaleLowerCase() === name.toLocaleLowerCase(),
+    );
+  const b = build('editor', fields);
+  b.onChange = async (key, value) => {
+    if (key === 'cover' && value) {
+      if (value.size > 2097152 || !['image/png', 'image/jpeg', 'image/webp'].includes(value.type))
+        throw new Error('cover');
+      const bitmap = await createImageBitmap(value);
+      try {
+        if (bitmap.width * bitmap.height > 16000000) throw new Error('cover');
+        const scale = Math.min(1, 160 / bitmap.width, 240 / bitmap.height),
+          canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        draft.customCover = canvas.toDataURL('image/png');
+        draft.igdbCoverImageId = '';
+      } finally {
+        bitmap.close();
+      }
+    }
+  };
+  navigation.current = {
+    gameId: original?.id,
+    render: () => {
+      const items = [
+        ...b.field('title', T('Nombre del juego')),
+        ...b.field('platform', T('Plataforma')),
+        ...b.field('steamAppId', T('ID de aplicación de Steam (opcional)')),
+        ...b.field('status', T('Estado'), 'select', statusLabels()),
+        ...b.field('goal', T('Objetivo'), 'select', goalLabels()),
+        ...b.field('customGoal', T('Objetivo personal')),
+        ...b.field('storyPercent', T('Avance de historia (0–100, opcional)')),
+        ...b.field('tracked', T('Mostrar en Mi lista'), 'check'),
+        ...b.field('friendsPrivate', T('Privado para mis amigos'), 'check'),
+        text(
+          T(
+            'Los juegos de tus listas son visibles para tus amigos salvo que los marques privados. Notas y nombres de tareas siguen siendo privados.',
+          ),
+        ),
+        text(
+          T(
+            'Sin conexión, los cambios de visibilidad se aplican a tus amigos cuando vuelva la conexión.',
+          ),
+        ),
+        ...data.settings.gameLists.flatMap((name) =>
+          b.field('list.' + name, T('Lista: ') + name, 'check'),
+        ),
+        ...b.field('favorite', T('Favorito'), 'check'),
+        ...b.field('tasks', T('Tareas: una por línea. Usa [x] para las terminadas.'), 'textarea'),
+        ...b.field('notes', T('Notas privadas'), 'textarea'),
+        ...b.field('cover', T('Carátula local (PNG, JPEG o WebP, hasta 2 MiB)'), 'file'),
+      ];
+      items.at(-1).accept = 'image/png,image/jpeg,image/webp';
+      if (draft.customCover) items.push({ type: 'image', src: draft.customCover, children: [] });
+      items.push(
+        b.button(
+          T('Buscar otra carátula en IGDB'),
+          () => findCover(draft, String(fields.title).trim(), navigation.current, false, b),
+          'igdb',
+        ),
+      );
+      const actions = [
+        b.button(T('Cancelar'), closeDialog, 'cancel'),
+        b.button(
+          T('Guardar'),
+          async () => {
+            if (
+              fields.steamAppId &&
+              (!/^\d+$/.test(String(fields.steamAppId).trim()) ||
+                Number(fields.steamAppId) < 1 ||
+                Number(fields.steamAppId) > 2147483647)
+            )
+              throw new Error('invalid-steam');
+            if (
+              fields.storyPercent !== '' &&
+              (!/^\d+$/.test(String(fields.storyPercent)) || Number(fields.storyPercent) > 100)
+            )
+              throw new Error('invalid-story');
+            const candidate = normalize({
+              ...draft,
+              ...fields,
+              lists: data.settings.gameLists.filter((name) => fields['list.' + name]),
+              steamAppId: fields.steamAppId || null,
+              storyPercent: fields.storyPercent === '' ? null : Number(fields.storyPercent),
+              status: Number(fields.status),
+              goal: Number(fields.goal),
+              tasks: String(fields.tasks)
+                .split('\n')
+                .map((line) => {
+                  const match = line.match(/^\s*\[([xX ])\]\s*(.*)$/);
+                  return {
+                    title: match ? match[2] : line.trim(),
+                    done: !!match && match[1].toLowerCase() === 'x',
+                  };
+                }),
+            });
+            if (!candidate.title) throw new Error('invalid-game');
+            if (
+              candidate.steamAppId &&
+              data.games.some((g) => g.id !== candidate.id && g.steamAppId === candidate.steamAppId)
+            )
+              throw new Error('duplicate-steam');
+            if (original) {
+              const current = game(original.id);
+              if (!current) throw new Error('invalid-game');
+              candidate.achievements = current.achievements;
+              candidate.manualAchievements = current.manualAchievements;
+              candidate.removedAchievements = current.removedAchievements;
+              candidate.achievementOverrides = current.achievementOverrides;
+              candidate.retroAchievements = current.retroAchievements;
+              candidate.playtimeMinutes = current.playtimeMinutes;
+              candidate.syncedAt = current.syncedAt;
+              data.games[data.games.indexOf(current)] = candidate;
+            } else data.games.push(candidate);
+            await persist();
+            closeDialog();
+          },
+          'save',
+        ),
+      ];
+      if (original) {
+        actions.unshift(
+          b.button(
+            T('Logros'),
+            () => achievements(original.id, navigation.current),
+            'achievements',
+          ),
+          b.button(T('Eliminar'), () => confirmDelete(original.id), 'delete'),
+        );
+      }
+      return b.page(
+        original ? T('Editar juego') : T('Añadir juego'),
+        T('La historia se marca manualmente. Los logros de Steam no la completan.'),
+        items,
+        actions,
+      );
+    },
+  };
+  emit();
+}
+function gameDetails(id, parent) {
+  if (!game(id)) return;
+  const b = build('game-details', {});
+  navigation.current = {
+    render: () => {
+      const g = game(id);
+      if (!g)
+        return b.page(
+          T('Ficha del juego'),
+          T('Juego no disponible'),
+          [],
+          [b.button(T('Cerrar'), closeDialog, 'close')],
+        );
+      const p = progress(g),
+        all = g.achievements || [];
+      const actions = [];
+      if (Number.isInteger(g.steamAppId) && g.steamAppId > 0 && g.steamAppId <= 2147483647)
+        actions.push({
+          ...b.button(
+            T('Jugar'),
+            () => {
+              const link = document.createElement('a');
+              link.href = 'steam://rungameid/' + g.steamAppId;
+              link.click();
+            },
+            'play',
+          ),
+          accent: true,
+          tip: T('Requiere Steam instalado en este equipo.'),
+        });
+      actions.push(
+        {
+          ...b.button(T('Ver logros'), () => achievements(id, navigation.current), 'achievements'),
+          accent: actions.length === 0,
+        },
+        b.button(T('Editar juego'), () => editor(g), 'edit'),
+      );
+      const items = [{ type: 'row', style: 'game-actions', children: actions }];
+      if (!data.settings.lightweight && cover(g))
+        items.push({ type: 'image', src: cover(g), style: 'cover-preview', children: [] });
+      items.push(
+        text(g.platform + ' · ' + statusLabels()[g.status], true),
+        ...(goalVisible(g) ? [text(T('Objetivo') + ': ' + goalText(g))] : []),
+        text(p.text + (p.percent == null ? '' : ' · ' + p.percent + '%')),
+      );
+      if (p.percent != null)
+        items.push({
+          type: 'progress',
+          value: p.percent,
+          max: 100,
+          name: T('Progreso'),
+          children: [],
+        });
+      items.push({
+        type: 'card',
+        style: 'achievement-summary',
+        children: [
+          text(T('Logros'), true),
+          text(
+            'Steam: ' +
+              (g.achievements === null
+                ? T('Sin sincronizar')
+                : all.filter((a) => a.unlocked).length + ' / ' + all.length),
+          ),
+          text(
+            'RetroAchievements: ' +
+              (g.retroAchievements === null
+                ? T('Sin sincronizar')
+                : g.retroAchievements.filter((a) => a.unlocked).length +
+                  ' / ' +
+                  g.retroAchievements.length),
+          ),
+          text(T('Objetivos manuales') + ': ' + g.manualAchievements.length),
+        ],
+      });
+      items.push(
+        {
+          type: 'card',
+          style: 'game-playtime',
+          children: [
+            text(T('Tiempo jugado')),
+            text(
+              (g.playtimeMinutes / 60).toLocaleString(data.settings.language, {
+                maximumFractionDigits: 1,
+              }) + ' h',
+              true,
+            ),
+          ],
+        },
+        text(
+          T('Visibilidad') +
+            ': ' +
+            T(g.friendsPrivate ? 'Privado para mis amigos' : 'Visible para mis amigos'),
+        ),
+        text(T('Listas') + ': ' + (g.lists.join(', ') || T('Sin listas adicionales'))),
+        text(T('Tareas'), true),
+      );
+      items.push(
+        ...(g.tasks.length
+          ? g.tasks.map((t) => text((t.done ? '✓ ' : '○ ') + t.title))
+          : [text(T('Sin tareas'))]),
+      );
+      items.push(text(T('Notas'), true), text(g.notes || T('Sin notas')));
+      const date = (value) =>
+        value ? new Date(value).toLocaleString(data.settings.language) : T('Sin sincronizar');
+      items.push(
+        text(T('Añadido') + ': ' + date(g.addedAt)),
+        text(T('Última sincronización') + ': ' + date(g.syncedAt)),
+      );
+      if (g.finishedAt) items.push(text(T('Historia terminada') + ': ' + date(g.finishedAt)));
+      if (g.steamAppId) items.push(text('Steam ID: ' + g.steamAppId));
+      if (g.retroGameId) items.push(text('RetroAchievements ID: ' + g.retroGameId));
+      return b.page(g.title, T('Ficha del juego'), items, [
+        b.button(
+          T('Cerrar'),
+          () => {
+            navigation.current = parent || null;
+            emit();
+          },
+          'close',
+        ),
+      ]);
+    },
+  };
+  emit();
+}
+function confirmDelete(id) {
+  const g = game(id);
+  if (!g) return;
+  const b = build('delete', {});
+  navigation.current = {
+    render: () =>
+      b.page(
+        T('Eliminar juego'),
+        g.title,
+        [
+          text(
+            T(
+              'Podrás recuperar este juego desde Deshacer. Su publicación se retirará cuando haya conexión.',
+            ),
+          ),
+        ],
+        [
+          b.button(T('Cancelar'), closeDialog, 'cancel'),
+          b.button(
+            T('Eliminar'),
+            async () => {
+              data.deleted.push(structuredClone(g));
+              data.deleted = data.deleted.slice(-20);
+              data.games = data.games.filter((x) => x.id !== id);
+              if (shares[id]?.selected) {
+                shares[id].selected = false;
+                shares[id].desired = null;
+                await saveShares();
+              }
+              await persist();
+              await navigation.home();
+            },
+            'delete',
+          ),
+        ],
+      ),
+  };
+  emit();
+}
+function achievements(id, parent) {
+  if (!game(id)) return;
+  const fields = { spoilers: false, pending: true },
+    expanded = new Set(),
+    b = build('achievements', fields);
+  navigation.current = {
+    cancel: () => {
+      navigation.current = parent || null;
+      emit();
+    },
+    render: () => {
+      const g = game(id),
+        all = g ? reviewItems(g) : [],
+        done = all.filter((a) => a.unlocked).length;
+      const items = [
+        {
+          type: 'card',
+          style: 'achievement-summary',
+          children: [
+            text(`${done} / ${all.length} ${T('logros completados')}`, true),
+            {
+              type: 'progress',
+              value: all.length ? (done * 100) / all.length : 0,
+              max: 100,
+              name: T('Logros'),
+              children: [],
+            },
+            text(
+              all.length
+                ? `${all.length - done}${T(' logros pendientes')}`
+                : T('Logros sin sincronizar'),
+            ),
+          ],
+        },
+        ...b.field('spoilers', T('Mostrar logros ocultos'), 'check'),
+        ...b.field('pending', T('Solo pendientes'), 'check'),
+      ];
+      for (const a of all
+        .filter((a) => !fields.pending || !a.unlocked)
+        .sort((a, b) => Number(a.unlocked) - Number(b.unlocked))) {
+        const hidden = a.hidden && !a.sourceUnlocked && !fields.spoilers;
+        const children = [
+          text((a.unlocked ? '✓ ' : '○ ') + (hidden ? T('Logro oculto') : a.name), true),
+          text(
+            a.provider === 'manual'
+              ? T('Manual')
+              : a.provider === 'retro'
+                ? 'RetroAchievements'
+                : 'Steam',
+            false,
+            true,
+          ),
+        ];
+        if (hidden) children.push(text(T('Activa la opción superior para revelar este logro.')));
+        else {
+          const toggle = b.button(
+            T(expanded.has(a.id) ? 'Ocultar descripción' : 'Ver descripción'),
+            () => {
+              if (!expanded.delete(a.id)) expanded.add(a.id);
+            },
+            'description.' + a.id,
+          );
+          toggle.name = toggle.text + ' · ' + a.name;
+          children.push(toggle);
+          if (expanded.has(a.id))
+            children.push({
+              ...text(
+                String(a.description || '').trim()
+                  ? a.description
+                  : T(
+                      a.provider === 'steam' && a.hidden
+                        ? 'Steam no ha enviado la descripción de este logro oculto. Prueba a actualizar los logros; si sigue vacía, no está disponible en la API de Steam.'
+                        : 'Este logro no tiene descripción.',
+                    ),
+              ),
+              style: 'achievement-description',
+            });
+        }
+        items.push({ type: 'card', style: 'achievement-card', children });
+      }
+      return b.page(T('Logros'), g?.title || '', items, [
+        {
+          ...b.button(
+            T('Eliminar logros manuales'),
+            () => {
+              const previous = navigation.current,
+                c = build('clear-manual', {});
+              navigation.current = {
+                render: () =>
+                  c.page(
+                    T('Eliminar logros manuales'),
+                    g.title,
+                    [
+                      text(
+                        T(
+                          'Se eliminarán todos los logros creados manualmente de este juego. Los logros de Steam y RetroAchievements se conservarán.',
+                        ),
+                      ),
+                    ],
+                    [
+                      c.button(
+                        T('Cancelar'),
+                        () => {
+                          navigation.current = previous;
+                          emit();
+                        },
+                        'cancel',
+                      ),
+                      c.button(
+                        T('Eliminar'),
+                        async () => {
+                          const current = game(id);
+                          if (current) {
+                            current.manualAchievements = [];
+                            current.removedAchievements = current.removedAchievements.filter(
+                              (key) => !key.startsWith('manual:'),
+                            );
+                            current.achievementOverrides = Object.fromEntries(
+                              Object.entries(current.achievementOverrides).filter(
+                                ([key]) => !key.startsWith('manual:'),
+                              ),
+                            );
+                            await persist();
+                          }
+                          navigation.current = previous;
+                          emit();
+                        },
+                        'delete',
+                      ),
+                    ],
+                  ),
+              };
+              emit();
+            },
+            'clear-manual',
+          ),
+          enabled: !!g?.manualAchievements.length,
+        },
+        b.button(
+          T('Cerrar'),
+          () => {
+            if (parent) {
+              navigation.current = parent;
+              emit();
+            } else closeDialog();
+          },
+          'close',
+        ),
+        {
+          ...b.button(
+            T('Actualizar'),
+            async () => {
+              await sync(id);
+              emit();
+            },
+            'sync',
+          ),
+          enabled: !!api.steam && !steamBusy && !!g?.steamAppId,
+        },
+      ]);
+    },
+  };
+  emit();
+}
+function settings() {
+  const previous = structuredClone(data.settings),
+    fields = {
+      language: data.settings.language === 'en' ? 1 : 0,
+      theme: themes.indexOf(data.settings.theme),
+      layout: data.settings.layout,
+      opacity: data.settings.opacity,
+      interval: [15, 30, 60, 120].indexOf(data.settings.syncMinutes),
+      lightweight: data.settings.lightweight,
+    };
+  const b = build('settings', fields);
+  b.onChange = (key, value) => {
+    if (key === 'theme') data.settings.theme = themes[Number(value)] || 'dark';
+    if (key === 'opacity') data.settings.opacity = Number(value);
+  };
+  const cancel = async () => {
+    data.settings.theme = previous.theme;
+    data.settings.opacity = previous.opacity;
+    await persist();
+    closeDialog();
+  };
+  navigation.current = {
+    cancel,
+    render: () => {
+      const items = [
+        ...b.field('language', T('Idioma'), 'select', [T('Español'), T('Inglés')]),
+        ...b.field('theme', T('Tema'), 'select', themeLabels()),
+        text(
+          T(
+            'Vista previa inmediata. Guarda para conservar el tema; Cancelar recupera el anterior.',
+          ),
+          false,
+          true,
+        ),
+        ...b.field('layout', T('Vista de la colección'), 'select', [
+          T('Lista'),
+          T('Compacta'),
+          T('Cuadrícula de carátulas'),
+        ]),
+        ...b.field('opacity', T('Opacidad del fondo'), 'slider'),
+        ...b.field('lightweight', T('Modo ligero (sin carátulas)'), 'check'),
+        ...b.field(
+          'interval',
+          T('Sincronizar biblioteca y logros al abrir y cada…'),
+          'select',
+          [15, 30, 60, 120].map((n) => `${n} ${T('minutos')}`),
+        ),
+        text(
+          api.steam
+            ? T('Steam vinculado.')
+            : T('Cuenta sin vincular. El inicio de sesión se realiza en Steam.'),
+        ),
+        b.button(
+          api.steam ? T('Desvincular Steam') : T('Vincular Steam'),
+          async () => {
+            await cancel();
+            if (api.steam) {
+              await api.unlink();
+              emit();
+            } else connectSteam();
+          },
+          'steam',
+        ),
+        b.button(
+          T('Repasar todos los logros'),
+          () => reviewAchievements(navigation.current),
+          'review-achievements',
+        ),
+        b.button(
+          T('Buscar carátulas que faltan'),
+          () => reviewCovers(navigation.current),
+          'review-covers',
+        ),
+        b.button(T('Gestionar listas'), () => manageLists(navigation.current), 'lists'),
+        b.button(T('Configurar atajos'), () => shortcutSettings(), 'shortcuts'),
+        b.button(T('Sobre la versión web'), () => info(), 'info'),
+      ];
+      const slider = items.find((x) => x.type === 'slider');
+      Object.assign(slider, { min: 0.35, max: 1, step: 0.05 });
+      return b.page(T('Ajustes'), T('Ajusta Checkpoint para que encaje contigo.'), items, [
+        b.button(T('Cancelar'), cancel, 'cancel'),
+        b.button(
+          T('Guardar'),
+          async () => {
+            data.settings = {
+              ...data.settings,
+              language: Number(fields.language) === 1 ? 'en' : 'es',
+              theme: themes[fields.theme] || 'dark',
+              layout: Number(fields.layout),
+              opacity: Number(fields.opacity),
+              syncMinutes: [15, 30, 60, 120][fields.interval] || 30,
+              lightweight: fields.lightweight === true,
+            };
+            await persist();
+            restartTimer();
+            closeDialog();
+          },
+          'save',
+        ),
+      ]);
+    },
+  };
+  emit();
+}
+function chooseList(ids, source, mode = 'move', parent = navigation.current) {
+  const selected = [...new Set(ids || [])];
+  if (!selected.length || selected.some((id) => !game(id))) throw new Error('invalid-selection');
+  const fields = { target: 0 },
+    b = build('list-change', fields);
+  navigation.current = {
+    cancel: () => {
+      navigation.current = parent;
+      emit();
+    },
+    render: () =>
+      b.page(
+        T(mode === 'add' ? 'Añadir a otra lista' : 'Cambiar de lista'),
+        T(
+          'Mover desde una lista quita solo esa pertenencia. Desde Biblioteca o Mi lista reemplaza las listas actuales. Añadir conserva las demás. La privacidad no cambia.',
+        ),
+        [
+          text(T('Juegos seleccionados:') + ' ' + selected.length),
+          ...b.field('target', T('Lista de destino'), 'select', data.settings.gameLists),
+          ...(!data.settings.gameLists.length
+            ? [text(T('Crea una lista antes de mover juegos.'))]
+            : []),
+        ],
+        [
+          b.button(T('Crear lista'), () => manageLists(navigation.current), 'create'),
+          b.button(
+            T('Cancelar'),
+            () => {
+              navigation.current = parent;
+              emit();
+            },
+            'cancel',
+          ),
+          b.button(
+            T(mode === 'add' ? 'Añadir a otra lista' : 'Mover juegos'),
+            async () => {
+              const target = data.settings.gameLists[Number(fields.target)];
+              applyListAction(data.games, selected, data.settings.gameLists, mode, source, target);
+              await persist();
+              navigation.current = parent;
+              emit();
+            },
+            'apply',
+          ),
+        ],
+      ),
+  };
+  emit();
+}
+function listSheet(source) {
+  if (
+    !['all', 'private'].includes(source) &&
+    !data.settings.gameLists.some((n) => 'custom:' + n === source)
+  )
+    throw new Error('missing-list');
+  if (!listMembers(data.games, source).length) return;
+  const fields = { search: '', status: 0 },
+    picked = new Set(),
+    b = build('list-sheet', fields);
+  let page = 0;
+  b.onChange = (key, value) => {
+    if (key === 'search' || key === 'status') {
+      page = 0;
+      picked.clear();
+    } else if (key.startsWith('game.')) {
+      const id = key.slice(5);
+      if (value) {
+        if (picked.size >= 500) throw new Error('invalid-selection');
+        picked.add(id);
+      } else picked.delete(id);
+    }
+  };
+  const batch = async (operation) => {
+    applyListAction(data.games, [...picked], data.settings.gameLists, operation, source);
+    await persist();
+    picked.clear();
+    emit();
+  };
+  navigation.current = {
+    listSource: source,
+    render: () => {
+      const members = listMembers(data.games, source),
+        matches = members
+          .filter(
+            (g) =>
+              (Number(fields.status) === 0 || g.status === Number(fields.status) - 1) &&
+              g.title.toLocaleLowerCase().includes(String(fields.search).toLocaleLowerCase()),
+          )
+          .sort((a, b) => a.title.localeCompare(b.title));
+      for (const id of picked) if (!members.some((g) => g.id === id)) picked.delete(id);
+      page = Math.max(0, Math.min(page, Math.max(0, Math.ceil(matches.length / 50) - 1)));
+      const title =
+        source === 'all' ? T('Mi lista') : source === 'private' ? T('Privados') : source.slice(7);
+      const items = [
+        text(T('Juegos') + ': ' + members.length),
+        text(
+          T('Historia terminada') +
+            ': ' +
+            members.filter((g) => g.status === 3).length +
+            ' · ' +
+            T('Jugando') +
+            ': ' +
+            members.filter((g) => g.status === 1).length +
+            ' · ' +
+            T('Privados') +
+            ': ' +
+            members.filter((g) => g.friendsPrivate === true).length,
+        ),
+        text(T('Juegos seleccionados:') + ' ' + picked.size),
+        text(
+          T(
+            'La ficha incluye los juegos privados de esta lista. Quitar no elimina el juego de Biblioteca.',
+          ),
+        ),
+        ...b.field('search', T('Buscar juego')),
+        ...b.field('status', T('Filtrar por estado'), 'select', [T('Todos'), ...statusLabels()]),
+        text(T('Resultados') + ': ' + matches.length + ' / ' + members.length),
+      ];
+      for (const g of matches.slice(page * 50, page * 50 + 50)) {
+        fields['game.' + g.id] = picked.has(g.id);
+        items.push({
+          type: 'card',
+          children: [
+            ...b.field('game.' + g.id, T('Seleccionar juego') + ': ' + g.title, 'check'),
+            text(
+              g.platform +
+                ' · ' +
+                statusLabels()[g.status] +
+                ' · ' +
+                T(g.friendsPrivate ? 'Privado para mis amigos' : 'Visible para mis amigos'),
+            ),
+            text(T('Listas') + ': ' + (g.lists.join(', ') || T('Sin listas adicionales'))),
+            text(
+              progress(g).text +
+                (progress(g).percent == null ? '' : ' · ' + progress(g).percent + '%'),
+            ),
+            b.button(
+              T('Ver ficha completa'),
+              () => gameDetails(g.id, navigation.current),
+              'details.' + g.id,
+            ),
+          ],
+        });
+      }
+      if (!matches.length)
+        items.push(
+          text(
+            T(
+              members.length
+                ? 'Ningún juego coincide con los filtros.'
+                : 'Sin juegos en esta lista',
+            ),
+          ),
+        );
+      items.push(
+        text(T('Página') + ' ' + (page + 1) + ' / ' + Math.max(1, Math.ceil(matches.length / 50))),
+        {
+          type: 'row',
+          children: [
+            b.button(
+              T('Anterior'),
+              () => {
+                page = Math.max(0, page - 1);
+              },
+              'previous',
+            ),
+            b.button(
+              T('Siguiente'),
+              () => {
+                page = Math.max(0, Math.min(Math.ceil(matches.length / 50) - 1, page + 1));
+              },
+              'next',
+            ),
+            b.button(
+              T('Seleccionar esta página'),
+              () => {
+                matches.slice(page * 50, page * 50 + 50).forEach((g) => {
+                  if (picked.size < 500) picked.add(g.id);
+                });
+              },
+              'select-page',
+            ),
+            b.button(T('Limpiar selección'), () => picked.clear(), 'clear'),
+          ],
+        },
+      );
+      const actions = [
+        b.button(T('Cerrar'), closeDialog, 'close'),
+        b.button(
+          T('Cambiar de lista'),
+          () => chooseList([...picked], source, 'move', navigation.current),
+          'move',
+        ),
+        b.button(
+          T('Añadir a otra lista'),
+          () => chooseList([...picked], source, 'add', navigation.current),
+          'add',
+        ),
+      ];
+      if (source !== 'private')
+        actions.push(b.button(T('Quitar de esta lista'), () => batch('remove'), 'remove'));
+      actions.push(
+        b.button(T('Mover a Privados'), () => batch('private'), 'private'),
+        b.button(T('Hacer visible para amigos'), () => batch('public'), 'public'),
+      );
+      for (const node of actions.slice(1)) node.enabled = picked.size > 0;
+      return b.page(title, T('Ficha de la lista'), items, actions);
+    },
+  };
+  emit();
+}
+function manageLists(parent) {
+  const fields = { selected: 0, name: '', newGamesPrivate: data.settings.newGamesPrivate === true },
+    b = build('lists', fields);
+  b.onChange = (key, value) => {
+    if (key === 'selected') fields.name = data.settings.gameLists[Number(value) - 1] || '';
+  };
+  const change = async (rename) => {
+    if (b.busy) return;
+    const old = rename ? data.settings.gameLists[Number(fields.selected) - 1] : null;
+    if (rename && !old) return;
+    const next = listName(fields.name, data.settings.gameLists, old);
+    b.busy = true;
+    emit();
+    try {
+      if (old) {
+        data.settings.gameLists = data.settings.gameLists.map((n) =>
+          n.toLocaleLowerCase() === old.toLocaleLowerCase() ? next : n,
+        );
+        for (const g of [...data.games, ...data.deleted])
+          g.lists = normalizeLists(
+            g.lists.map((n) => (n.toLocaleLowerCase() === old.toLocaleLowerCase() ? next : n)),
+          );
+      } else data.settings.gameLists.push(next);
+      data.settings.activeList = 'custom:' + next;
+      tab = 'list';
+      search = '';
+      filter = 0;
+      await persist();
+      fields.selected = data.settings.gameLists.indexOf(next) + 1;
+      fields.name = next;
+    } finally {
+      b.busy = false;
+      emit();
+    }
+  };
+  navigation.current = {
+    render: () =>
+      b.page(
+        T('Gestionar listas'),
+        T(
+          'Un juego puede estar en varias listas sin duplicarse. Los privados se consultan en Privados.',
+        ),
+        [
+          ...b.field('selected', T('Lista de juegos'), 'select', [
+            T('Nueva lista'),
+            ...data.settings.gameLists,
+          ]),
+          ...b.field('name', T('Nombre de la lista')),
+          ...b.field('newGamesPrivate', T('Crear juegos nuevos como privados'), 'check'),
+          text(T('Quitar una lista conserva sus juegos, su privacidad y el resto de listas.')),
+          b.button(T('Crear lista'), () => change(false), 'create'),
+          b.button(T('Renombrar lista'), () => change(true), 'rename'),
+          {
+            ...b.button(
+              T('Ver ficha de la lista'),
+              () => {
+                const name = data.settings.gameLists[Number(fields.selected) - 1];
+                if (name) listSheet('custom:' + name);
+              },
+              'sheet',
+            ),
+            enabled:
+              !b.busy &&
+              Number(fields.selected) > 0 &&
+              listMembers(
+                data.games,
+                'custom:' + data.settings.gameLists[Number(fields.selected) - 1],
+              ).length > 0,
+          },
+          b.button(
+            T('Quitar lista'),
+            () => {
+              const name = data.settings.gameLists[Number(fields.selected) - 1];
+              if (!name) return;
+              const parent = navigation.current,
+                c = build('remove-list', {});
+              navigation.current = {
+                render: () =>
+                  c.page(
+                    T('Quitar lista'),
+                    name,
+                    [
+                      text(
+                        T(
+                          'Quitar una lista conserva sus juegos, su privacidad y el resto de listas.',
+                        ),
+                      ),
+                    ],
+                    [
+                      c.button(
+                        T('Cancelar'),
+                        () => {
+                          navigation.current = parent;
+                          emit();
+                        },
+                        'cancel',
+                      ),
+                      c.button(
+                        T('Quitar lista'),
+                        async () => {
+                          data.settings.gameLists = data.settings.gameLists.filter(
+                            (n) => n !== name,
+                          );
+                          for (const g of [...data.games, ...data.deleted])
+                            g.lists = g.lists.filter(
+                              (n) => n.toLocaleLowerCase() !== name.toLocaleLowerCase(),
+                            );
+                          data.settings.activeList = 'all';
+                          await persist();
+                          fields.selected = 0;
+                          fields.name = '';
+                          navigation.current = parent;
+                          emit();
+                        },
+                        'remove',
+                      ),
+                    ],
+                  ),
+              };
+              emit();
+            },
+            'remove',
+          ),
+        ],
+        [
+          b.button(
+            T('Cancelar'),
+            () => {
+              navigation.current = parent || null;
+              emit();
+            },
+            'cancel',
+          ),
+          b.button(
+            T('Guardar'),
+            async () => {
+              const old = data.settings.gameLists[Number(fields.selected) - 1];
+              if (String(fields.name || '').trim() && (!old || String(fields.name).trim() !== old))
+                await change(!!old);
+              data.settings.newGamesPrivate = fields.newGamesPrivate === true;
+              await persist();
+              navigation.current = parent || null;
+              emit();
+            },
+            'save',
+          ),
+        ],
+      ),
+  };
+  emit();
+}
+function shortcutSettings() {
+  const fields = effectiveShortcuts(data.settings.shortcuts),
+    b = build('shortcuts', fields);
+  navigation.current = {
+    render: () => {
+      const items = [
+        text(
+          T(
+            'Pulsa una combinación en cada campo. Tab cambia de campo; Escape cancela. No se permiten atajos repetidos.',
+          ),
+        ),
+        text(
+          T(
+            'Los atajos del navegador pueden tener prioridad. El atajo global solo funciona en Windows.',
+          ),
+        ),
+      ];
+      for (const key of Object.keys(defaults).filter((k) => k !== 'global')) {
+        const nodes = b.field(key, T(shortcutLabels[key]));
+        nodes.find((n) => n.type === 'input').shortcut = true;
+        items.push(...nodes);
+      }
+      return b.page(T('Configurar atajos'), T('Los cambios se aplican al guardar.'), items, [
+        b.button(
+          T('Restablecer predeterminados'),
+          () => {
+            Object.assign(fields, defaults);
+            emit();
+          },
+          'reset',
+        ),
+        b.button(T('Cancelar'), closeDialog, 'cancel'),
+        b.button(
+          T('Guardar'),
+          async () => {
+            data.settings.shortcuts = validateShortcuts(fields);
+            await persist();
+            closeDialog();
+          },
+          'save',
+        ),
+      ]);
+    },
+  };
+  emit();
+}
+async function sync(single) {
+  if (steamBusy || !api.steam) return;
+  steamBusy = true;
+  emit();
+  try {
+    if (!single) {
+      const library = await api.steamRequest('v1/library');
+      mergeLibrary(data.games, library.games || []);
+      if (!data.games.some((g) => g.tracked)) tab = 'library';
+      await persist();
+    }
+    const selected = single
+      ? [game(single)].filter(Boolean)
+      : data.games
+          .filter((g) => g.tracked && g.steamAppId)
+          .sort((a, b) => (a.syncedAt || '').localeCompare(b.syncedAt || ''))
+          .slice(0, 20);
+    let errors = 0;
+    for (const current of selected) {
+      try {
+        const result = await api.steamRequest(
+          `v1/games/${current.steamAppId}/achievements?lang=${data.settings.language}`,
+        );
+        const target = game(current.id);
+        if (target) {
+          target.achievements = normalize({
+            ...target,
+            achievements: result.achievements,
+          }).achievements;
+          target.syncedAt = new Date().toISOString();
+          await persist();
+        }
+      } catch {
+        errors++;
+      }
+    }
+    notice = T(
+      errors
+        ? 'Algunos logros no se pudieron actualizar. Se conserva el progreso anterior.'
+        : 'Biblioteca y progreso de Steam actualizados.',
+    );
+  } catch (error) {
+    fail(error);
+  } finally {
+    steamBusy = false;
+    emit();
+  }
+}
+async function connectSteam() {
+  const popup = window.open('about:blank', 'checkpoint-steam-login');
+  const generation = ++loginGeneration;
+  steamBusy = true;
+  emit();
+  try {
+    const flow = await api.steamRequest('v1/auth/start', {}, false),
+      url = new URL(flow.authorizeUrl);
+    if (url.origin !== 'https://steamcommunity.com' || url.pathname !== '/openid/login')
+      throw new Error('remote');
+    if (popup) popup.location.href = url.href;
+    const b = build('steam', {});
+    navigation.current = {
+      cancel: () => {
+        loginGeneration++;
+        steamBusy = false;
+        closeDialog();
+      },
+      render: () =>
+        b.page(
+          T('Vincular Steam'),
+          T('Termina el acceso en Steam y vuelve a esta página.'),
+          [
+            b.button(
+              T('Abrir Steam'),
+              () => window.open(url.href, '_blank', 'noopener,noreferrer'),
+              'open',
+            ),
+          ],
+          [
+            b.button(
+              T('Cancelar'),
+              () => {
+                loginGeneration++;
+                steamBusy = false;
+                closeDialog();
+              },
+              'cancel',
+            ),
+          ],
+        ),
+    };
+    emit();
+    const expires = Date.now() + 600000;
+    while (generation === loginGeneration && Date.now() < expires) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const result = await api.steamRequest(
+        'v1/auth/poll',
+        { flowId: flow.flowId, pollSecret: flow.pollSecret },
+        false,
+      );
+      if (generation !== loginGeneration) return;
+      if (result.status === 'complete') {
+        if (!/^[A-Za-z\d_-]{43}$/.test(result.token) || !/^7656119\d{10}$/.test(result.steamId))
+          throw new Error('auth');
+        api.steam = { token: result.token, steamId: result.steamId };
+        api.save('checkpoint-steam', api.steam);
+        closeDialog();
+        popup?.close();
+        break;
+      }
+    }
+    if (!api.steam && generation === loginGeneration) throw new Error('remote');
+  } catch (error) {
+    popup?.close();
+    fail(error);
+  } finally {
+    if (generation === loginGeneration) {
+      steamBusy = false;
+      emit();
+      if (api.steam) await sync();
+    }
+  }
+}
+async function loadFriends() {
+  if (friendsBusy || !api.social) return;
+  friendsBusy = true;
+  emit();
+  try {
+    const user = api.social.user.id;
+    const results = await Promise.all([
+      api.profiles(),
+      api.friendships(),
+      api.requests(),
+      api.publications(user),
+      api.groups(),
+      api.groupInvites(),
+      api.groupMembers(),
+    ]);
+    if (api.social?.user.id !== user) return;
+    [profiles, friendships, requests, ownPublications, groups, groupInvites, groupMembers] =
+      results;
+    if (selectedFriend)
+      publications = (await api.publications(selectedFriend)).filter(
+        (p) => p.is_shared && p.operation_payload,
+      );
+    await attachShares();
+  } catch (error) {
+    profiles = [];
+    friendships = [];
+    requests = [];
+    groups = [];
+    groupInvites = [];
+    groupMembers = [];
+    publications = [];
+    ownPublications = [];
+    fail(error);
+  } finally {
+    friendsBusy = false;
+    emit();
+  }
+}
+async function attachShares() {
+  const user = api.social?.user.id;
+  if (user === shareUser) return;
+  shareUser = user;
+  shares = user ? (await store.get('shares.' + user)) || {} : {};
+  if (user) {
+    let changed = false;
+    for (const g of data.games)
+      if (g.friendsPrivate === null) {
+        g.friendsPrivate = shares[g.id]?.selected === false;
+        changed = true;
+      }
+    if (changed) await persist();
+  }
+}
+const saveShares = () => (shareUser ? store.put('shares.' + shareUser, shares) : Promise.resolve());
+const samePayload = (a, b) =>
+  JSON.stringify(a, Object.keys(a || {}).sort()) === JSON.stringify(b, Object.keys(b || {}).sort());
+function planSharing() {
+  if (!shareUser || api.social?.user.id !== shareUser) return;
+  for (const g of data.games) {
+    const desired = shouldShare(g) ? payload(g) : null;
+    let entry = shares[g.id];
+    if (!entry && desired) {
+      const remote = ownPublications.find((p) => p.game_id === g.id);
+      entry = shares[g.id] = {
+        revision: remote?.revision || 0,
+        published: remote?.operation_payload || null,
+        pending: null,
+        conflict: false,
+      };
+    }
+    if (entry) {
+      entry.selected = desired !== null;
+      entry.desired = desired;
+    }
+  }
+  for (const [id, entry] of Object.entries(shares))
+    if (!game(id)) {
+      entry.selected = false;
+      entry.desired = null;
+    }
+}
 let publicationTimer;
-function scheduleSharing(){clearTimeout(publicationTimer);publicationTimer=setTimeout(()=>flush().catch(fail),2000);}
-async function flush(){if(publishing||!api.social||!navigator.onLine)return;await attachShares();if(publishing)return;publishing=true;planSharing();const owner=shareUser;try{await saveShares();for(const [id,entry] of Object.entries(shares)){if(entry.conflict&&entry.desired!==null)continue;for(let pass=0;pass<3;pass++){if(owner!==api.social?.user.id)throw new Error('auth');
- if(entry.desired===null&&entry.pending?.payload){const remote=(await api.publications(owner)).find(p=>p.game_id===id);entry.revision=remote?.revision||0;entry.published=remote?.operation_payload||null;entry.pending=null;entry.conflict=false;await saveShares();}
- if(!entry.pending){if(samePayload(entry.desired,entry.published))break;entry.pending={id:crypto.randomUUID(),revision:entry.revision||0,payload:entry.desired};await saveShares();}
- const operation=entry.pending;try{const revision=await api.publish(id,operation);entry.revision=revision;entry.published=operation.payload;entry.pending=null;entry.conflict=false;await saveShares();}catch(error){if(error.code==='40001'){const remote=(await api.publications(owner)).find(p=>p.game_id===id);if(entry.desired===null){entry.revision=remote?.revision||0;entry.published=remote?.operation_payload||null;entry.pending=null;entry.conflict=false;await saveShares();continue;}entry.conflict=true;await saveShares();}throw error;}}}}finally{publishing=false;emit();}}
-function shareForm(id){const g=game(id);if(!g)return;const remote=ownPublications.find(p=>p.game_id===id),b=build('sharing',{});navigation.current={render:()=>b.page(T('Compartir progreso'),g.title,[text(T('Tus amigos verán título, plataforma, estado y progreso. Las notas y el texto de las tareas permanecen privados.')),text(remote?.operation_payload?T('Ya hay progreso publicado desde otro dispositivo o sesión. Al publicar usarás los datos que ves aquí.'):T('Solo se comparten los juegos que elijas.')),text(statusLabels()[g.status]+' · '+progress(g).text)],[b.button(T('Cancelar'),closeDialog,'cancel'),b.button(T('Publicar progreso'),async()=>{await attachShares();g.friendsPrivate=false;g.tracked=true;const entry=shares[id]||{};if(!publishing)Object.assign(entry,{revision:remote?.revision||0,published:remote?.operation_payload||null,pending:null,conflict:false});shares[id]=entry;await persist();planSharing();await saveShares();closeDialog();await flush();await loadFriends();},'publish'),b.button(T('Dejar de compartir'),async()=>{await attachShares();g.friendsPrivate=true;await persist();await saveShares();closeDialog();await flush();await loadFriends();},'withdraw')])};emit();}
-async function signIn(create=false){if(authBusy)return;authBusy=true;emit();try{await api.login(friendFields.username||'',friendFields.password||'',create?(friendFields.name||friendFields.username||''):undefined);friendFields={};await loadFriends();await flush();}finally{authBusy=false;emit();}}
-function friendsSchema(){const b=build('friend',friendFields);b.busy=friendsBusy||authBusy;const items=[];const button=(label,fn,id)=>b.button(label,fn,id);const profile=id=>profiles.find(p=>p.user_id===id);const name=id=>profile(id)?.display_name||T('Amigo');
- if(!api.social){const creating=authMode==='register';items.push(text(T(creating?'Crear cuenta':'Iniciar sesión'),true),text(T(creating?'Crea una cuenta de Checkpoint para compartir tu progreso.':'Accede con tu usuario y contraseña de Checkpoint.'),false,true),text(T('Tu biblioteca sigue disponible sin cuenta. La sesión dura en esta pestaña.'),false,true),...b.field('username',T('Usuario de Checkpoint')),...b.field('password',T('Contraseña de Checkpoint'),'password'));if(creating)items.push(...b.field('name',T('Nombre visible (para crear cuenta)')));items.push({type:'row',children:[button(T(creating?'Crear cuenta':'Entrar'),()=>signIn(creating),creating?'register':'login'),button(T(creating?'Ya tengo cuenta':'Crear cuenta'),()=>{authMode=creating?'login':'register';friendFields.password='';notice='';},'auth-mode')]});return {type:'stack',children:items};}
- items.push({type:'row',children:[['friends','Amigos'],['requests','Solicitudes'],['sharing','Compartir'],['account','Cuenta']].map(([id,label])=>button(T(label),async()=>{friendPage=id;selectedFriend=null;await loadFriends();},'tab.'+id))});
- if(friendPage==='account'){const own=profile(api.social.user.id);items.push(text(own?.display_name||T('Cuenta'),true),text(T('Código de amigo')),text(own?friendCode(own.friend_code):''),button(T('Copiar código'),async()=>{if(own)await navigator.clipboard.writeText(friendCode(own.friend_code));notice=T('Código copiado.');},'copy'),button(T('Cerrar sesión'),async()=>{await api.logout();shareUser=null;shares={};profiles=[];friendFields={};authMode='login';},'logout'));}
- else if(friendPage==='requests'){items.push(text(T('Solicitudes'),true));for(const r of requests){if(!uuid(r.id))continue;const incoming=r.recipient_id===api.social.user.id;items.push(text(name(incoming?r.sender_id:r.recipient_id)),{type:'row',children:incoming?[button(T('Aceptar'),async()=>{await api.answer(r.id,true);await loadFriends();},'accept.'+r.id),button(T('Rechazar'),async()=>{await api.answer(r.id,false);await loadFriends();},'reject.'+r.id)]:[button(T('Cancelar solicitud'),async()=>{await api.cancel(r.id);await loadFriends();},'cancel.'+r.id)]});}if(!requests.length)items.push(text(T('No hay solicitudes pendientes.')));}
- else if(friendPage==='sharing'){items.push(text(T('Compartir'),true),text(T('Los juegos de tus listas son visibles para tus amigos salvo que los marques privados. Notas y nombres de tareas siguen siendo privados.'),false,true));for(const g of data.games.filter(g=>g.tracked).slice(0,500))items.push({type:'card',children:[text(g.title),text(shares[g.id]?.conflict?T('Conflicto: revisa antes de publicar.'):shares[g.id]?.selected?T(samePayload(shares[g.id].desired,shares[g.id].published)?'Compartido':'Pendiente de publicar'):T(shares[g.id]?.published?'Retirada pendiente de conexión.':'Privado'),false,true),button(T('Gestionar publicación'),async()=>{await loadFriends();shareForm(g.id);},'share.'+g.id)]});}
- else if(selectedFriend){items.push(text(name(selectedFriend),true),button(T('Volver a amigos'),()=>{selectedFriend=null;},'back'));for(const p of publications){const g=p.operation_payload;if(!g||typeof g.title!=='string')continue;const state=Math.max(0,statuses.findIndex(s=>s.toLowerCase()===g.status));const details=[text(g.title),text((g.platform||'')+' · '+statusLabels()[state])];if(Number.isInteger(g.storyPercent))details.push(text(T('Historia')+': '+g.storyPercent+'%'));if(Number.isInteger(g.tasksTotal))details.push(text(`${T('Tareas')}: ${g.tasksDone}/${g.tasksTotal}`));if(Number.isInteger(g.achievementsTotal))details.push(text(`${T('Logros')}: ${g.achievementsUnlocked}/${g.achievementsTotal}`));if(!data.settings.lightweight&&Number.isInteger(g.steamAppId)&&g.steamAppId>0)details.unshift({type:'image',src:cover({steamAppId:g.steamAppId}),children:[]});items.push({type:'card',children:details});}if(!publications.length)items.push(text(T('Tu amigo aún no ha compartido juegos.')));}
- else{items.push(text(T('Tus amigos'),true),...b.field('code',T('Código de amigo (checkpoint-…)')),button(T('Enviar solicitud'),async()=>{await api.invite(friendFields.code||'');notice=T('Solicitud enviada.');await loadFriends();},'invite'));const own=api.social.user.id;for(const f of friendships){const id=f.user_low===own?f.user_high:f.user_low;if(!uuid(id))continue;items.push({type:'card',children:[text(name(id)),{type:'row',children:[button(T('Ver progreso'),async()=>{selectedFriend=id;await loadFriends();},'progress.'+id),button(T('Quitar amistad'),async()=>{await api.unfriend(id);await loadFriends();},'remove.'+id),button(T('Bloquear'),async()=>{await api.block(id);await loadFriends();},'block.'+id)]}]});}if(!friendships.length)items.push(text(T('Comparte tu código desde Cuenta. La amistad empieza cuando se acepta la solicitud.')));}
- items.push(button(T('Actualizar'),loadFriends,'refresh'));return {type:'stack',children:items};}
-function download(){const exported={version:1,gameLists:data.settings.gameLists,exportedAt:new Date().toISOString(),games:data.games.map(g=>({...g,status:statuses[g.status],goal:goals[g.goal],customCover:null})),covers:Object.fromEntries(data.games.filter(g=>g.customCover?.startsWith('data:image/png;base64,')).map(g=>[g.id,g.customCover.split(',')[1]]))};const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='checkpoint-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-function importer(){const fields={},b=build('import',fields);navigation.current={render:()=>{const items=b.field('file',T('Copia JSON de Checkpoint'),'file');items.at(-1).accept='.json,application/json';return b.page(T('Importar copia'),T('Se añadirán juegos nuevos. Los existentes y tus notas se conservan.'),items,[b.button(T('Cancelar'),closeDialog,'cancel'),b.button(T('Importar'),async()=>{if(!fields.file||fields.file.size>16777216)throw new Error('invalid-backup');const parsed=JSON.parse(await fields.file.text());const count=importBackup(data.games,parsed);data.settings.gameLists=normalizeLists([...(data.settings.gameLists||[]),...(parsed.gameLists||[])]);await persist();notice=`${count} ${T('juegos importados')}`;closeDialog();},'import')]);}};emit();}
-async function command(message){ack=Math.max(ack,Number(message.requestId)||0);if(message.control){const handler=controls.get(String(message.control));if(handler)await handler(message.action==='value'?message.value:undefined);emit();return;}
- const g=game(message.id);switch(message.action){case'navigation-back':await navigation.back();return;case'navigation-home':await navigation.home();return;case'stop-achievement-review':if(achievementReview?.running)achievementReview.controller.abort();else achievementReview=undefined;emit();return;case'cover-missing':if(g)missingCover(g.id);break;case'ready':emit();if(api.steam)sync();if(api.social)loadFriends().then(flush).catch(fail);return;case'add':editor();return;case'achievements':if(g)achievements(g.id);return;case'details':if(g)gameDetails(g.id);return;case'edit':if(g)editor(g);return;case'configure-shortcuts':shortcutSettings();return;case'manage-lists':manageLists();return;case'list-details':listSheet(message.source||data.settings.activeList);return;case'list-change':chooseList(message.ids,message.source||data.settings.activeList,message.mode);return;case'batch':applyListAction(data.games,message.ids||[],data.settings.gameLists,message.operation,message.source,message.target);await persist();break;case'privacy':if(g){g.friendsPrivate=message.value===true;await persist();await flush();}break;case'collection':if(message.value==='all'||message.value==='private'||data.settings.gameLists.some(n=>'custom:'+n===message.value)){data.settings.activeList=message.value;tab='list';search='';filter=0;await persist();}break;case'settings':settings();return;case'cancel-dialog':await navigation.back();return;case'account':if(!api.social){authMode='login';friendFields.password='';notice='';}tab='friends';friendPage=api.social?'account':'friends';selectedFriend=null;emit();if(api.social)await loadFriends();return;case'web-info':info();return;case'import':importer();return;case'export':download();return;case'steam':connectSteam();return;case'sync':if(api.steam)sync();else connectSteam();return;
- case'tab':if(['list','library','friends'].includes(message.value)){tab=message.value;if(tab==='friends')loadFriends();}break;case'search-change':search=String(message.value||'').slice(0,140);break;case'filter':filter=Math.max(0,Math.min(5,Number(message.value)||0));break;case'search':tab='list';emit();send({kind:'focus-search'});break;
- case'cycle':data.settings.layout=(data.settings.layout+1)%3;await persist();break;
- case'state':if(g&&Number.isInteger(message.value)&&message.value>=0&&message.value<5){g.status=message.value;g.finishedAt=g.status===3?(g.finishedAt||new Date().toISOString()):null;await persist();}break;case'finish':if(g){g.status=g.status===3?0:3;g.finishedAt=g.status===3?new Date().toISOString():null;await persist();}break;case'undo':{const restored=data.deleted.pop();if(restored&&!game(restored.id))data.games.push(normalize(restored));await persist();break;}
- case'move':{const target=game(message.target);if(g&&target&&g.id!==target.id&&g.favorite===target.favorite){const ordered=[...data.games].sort((a,b)=>Number(b.favorite)-Number(a.favorite)||a.sortOrder-b.sortOrder);ordered.splice(ordered.indexOf(g),1);ordered.splice(ordered.indexOf(target)+(message.after?1:0),0,g);ordered.forEach((x,i)=>x.sortOrder=i);await persist();}break;}
- case'examples':if(!data.games.length){data.games.push(normalize({title:'Hollow Knight',steamAppId:367520,platform:'Steam'}),normalize({title:'Hades',steamAppId:1145360,platform:'Steam',status:1,sortOrder:1}),normalize({title:'Portal 2',steamAppId:620,platform:'Steam',sortOrder:2}));await persist();}break;
- }emit();}
-window.chrome=window.chrome||{};window.chrome.webview={addEventListener:(type,listener)=>{if(type==='message')listeners.push(listener);},postMessage:message=>command(message).catch(fail)};
-let timer;function restartTimer(){clearInterval(timer);timer=setInterval(()=>{if(!document.hidden&&api.steam)sync();},Math.max(15,Math.min(120,data.settings.syncMinutes))*60000);}restartTimer();
-setInterval(()=>{if(!document.hidden){flush().catch(fail);if(tab==='friends'&&!navigation.current)loadFriends();}},60000);
-window.addEventListener('online',()=>{if(api.steam)sync();flush().catch(fail);});
+function scheduleSharing() {
+  clearTimeout(publicationTimer);
+  publicationTimer = setTimeout(() => flush().catch(fail), 2000);
+}
+async function flush() {
+  if (publishing || !api.social || !navigator.onLine) return;
+  await attachShares();
+  if (publishing) return;
+  publishing = true;
+  planSharing();
+  const owner = shareUser;
+  try {
+    await saveShares();
+    for (const [id, entry] of Object.entries(shares)) {
+      if (entry.conflict && entry.desired !== null) continue;
+      for (let pass = 0; pass < 3; pass++) {
+        if (owner !== api.social?.user.id) throw new Error('auth');
+        if (entry.desired === null && entry.pending?.payload) {
+          const remote = (await api.publications(owner)).find((p) => p.game_id === id);
+          entry.revision = remote?.revision || 0;
+          entry.published = remote?.operation_payload || null;
+          entry.pending = null;
+          entry.conflict = false;
+          await saveShares();
+        }
+        if (!entry.pending) {
+          if (samePayload(entry.desired, entry.published)) break;
+          entry.pending = {
+            id: crypto.randomUUID(),
+            revision: entry.revision || 0,
+            payload: entry.desired,
+          };
+          await saveShares();
+        }
+        const operation = entry.pending;
+        try {
+          const revision = await api.publish(id, operation);
+          entry.revision = revision;
+          entry.published = operation.payload;
+          entry.pending = null;
+          entry.conflict = false;
+          await saveShares();
+        } catch (error) {
+          if (error.code === '40001') {
+            const remote = (await api.publications(owner)).find((p) => p.game_id === id);
+            if (entry.desired === null) {
+              entry.revision = remote?.revision || 0;
+              entry.published = remote?.operation_payload || null;
+              entry.pending = null;
+              entry.conflict = false;
+              await saveShares();
+              continue;
+            }
+            entry.conflict = true;
+            await saveShares();
+          }
+          throw error;
+        }
+      }
+    }
+  } finally {
+    publishing = false;
+    emit();
+  }
+}
+function shareForm(id) {
+  const g = game(id);
+  if (!g) return;
+  const remote = ownPublications.find((p) => p.game_id === id),
+    b = build('sharing', {});
+  navigation.current = {
+    render: () =>
+      b.page(
+        T('Compartir progreso'),
+        g.title,
+        [
+          text(
+            T(
+              'Tus amigos verán título, plataforma, estado y progreso. Las notas y el texto de las tareas permanecen privados.',
+            ),
+          ),
+          text(
+            remote?.operation_payload
+              ? T(
+                  'Ya hay progreso publicado desde otro dispositivo o sesión. Al publicar usarás los datos que ves aquí.',
+                )
+              : T('Solo se comparten los juegos que elijas.'),
+          ),
+          text(statusLabels()[g.status] + ' · ' + progress(g).text),
+        ],
+        [
+          b.button(T('Cancelar'), closeDialog, 'cancel'),
+          b.button(
+            T('Publicar progreso'),
+            async () => {
+              await attachShares();
+              g.friendsPrivate = false;
+              g.tracked = true;
+              const entry = shares[id] || {};
+              if (!publishing)
+                Object.assign(entry, {
+                  revision: remote?.revision || 0,
+                  published: remote?.operation_payload || null,
+                  pending: null,
+                  conflict: false,
+                });
+              shares[id] = entry;
+              await persist();
+              planSharing();
+              await saveShares();
+              closeDialog();
+              await flush();
+              await loadFriends();
+            },
+            'publish',
+          ),
+          b.button(
+            T('Dejar de compartir'),
+            async () => {
+              await attachShares();
+              g.friendsPrivate = true;
+              await persist();
+              await saveShares();
+              closeDialog();
+              await flush();
+              await loadFriends();
+            },
+            'withdraw',
+          ),
+        ],
+      ),
+  };
+  emit();
+}
+async function signIn(create = false) {
+  if (authBusy) return;
+  authBusy = true;
+  emit();
+  try {
+    await api.login(
+      friendFields.username || '',
+      friendFields.password || '',
+      create ? friendFields.name || friendFields.username || '' : undefined,
+    );
+    friendFields = {};
+    await loadFriends();
+    await flush();
+  } finally {
+    authBusy = false;
+    emit();
+  }
+}
+function friendsSchema() {
+  const b = build('friend', friendFields);
+  b.busy = friendsBusy || authBusy;
+  const items = [];
+  const button = (label, fn, id) => b.button(label, fn, id);
+  const profile = (id) => profiles.find((p) => p.user_id === id);
+  const name = (id) => profile(id)?.display_name || T('Amigo');
+  if (!api.social) {
+    const creating = authMode === 'register';
+    items.push(
+      text(T(creating ? 'Crear cuenta' : 'Iniciar sesión'), true),
+      text(
+        T(
+          creating
+            ? 'Crea una cuenta de Checkpoint para compartir tu progreso.'
+            : 'Accede con tu usuario y contraseña de Checkpoint.',
+        ),
+        false,
+        true,
+      ),
+      text(
+        T('Tu biblioteca sigue disponible sin cuenta. La sesión dura en esta pestaña.'),
+        false,
+        true,
+      ),
+      ...b.field('username', T('Usuario de Checkpoint')),
+      ...b.field('password', T('Contraseña de Checkpoint'), 'password'),
+    );
+    if (creating) items.push(...b.field('name', T('Nombre visible (para crear cuenta)')));
+    items.push({
+      type: 'row',
+      children: [
+        button(
+          T(creating ? 'Crear cuenta' : 'Entrar'),
+          () => signIn(creating),
+          creating ? 'register' : 'login',
+        ),
+        button(
+          T(creating ? 'Ya tengo cuenta' : 'Crear cuenta'),
+          () => {
+            authMode = creating ? 'login' : 'register';
+            friendFields.password = '';
+            notice = '';
+          },
+          'auth-mode',
+        ),
+      ],
+    });
+    return { type: 'stack', children: items };
+  }
+  items.push({
+    type: 'row',
+    children: [
+      ['friends', 'Amigos'],
+      ['requests', 'Solicitudes'],
+      ['sharing', 'Compartir'],
+      ['groups', 'Grupos'],
+      ['account', 'Cuenta'],
+    ].map(([id, label]) =>
+      button(
+        T(label),
+        async () => {
+          friendPage = id;
+          selectedFriend = null;
+          await loadFriends();
+        },
+        'tab.' + id,
+      ),
+    ),
+  });
+  if (friendPage === 'account') {
+    const own = profile(api.social.user.id);
+    items.push(
+      text(own?.display_name || T('Cuenta'), true),
+      text(T('Código de amigo')),
+      text(own ? friendCode(own.friend_code) : ''),
+      button(
+        T('Copiar código'),
+        async () => {
+          if (own) await navigator.clipboard.writeText(friendCode(own.friend_code));
+          notice = T('Código copiado.');
+        },
+        'copy',
+      ),
+      button(
+        T('Cerrar sesión'),
+        async () => {
+          await api.logout();
+          shareUser = null;
+          shares = {};
+          profiles = [];
+          groups = [];
+          groupInvites = [];
+          groupMembers = [];
+          friendFields = {};
+          authMode = 'login';
+        },
+        'logout',
+      ),
+    );
+  } else if (friendPage === 'requests') {
+    items.push(text(T('Solicitudes'), true));
+    for (const r of requests) {
+      if (!uuid(r.id)) continue;
+      const incoming = r.recipient_id === api.social.user.id;
+      items.push(text(name(incoming ? r.sender_id : r.recipient_id)), {
+        type: 'row',
+        children: incoming
+          ? [
+              button(
+                T('Aceptar'),
+                async () => {
+                  await api.answer(r.id, true);
+                  await loadFriends();
+                },
+                'accept.' + r.id,
+              ),
+              button(
+                T('Rechazar'),
+                async () => {
+                  await api.answer(r.id, false);
+                  await loadFriends();
+                },
+                'reject.' + r.id,
+              ),
+            ]
+          : [
+              button(
+                T('Cancelar solicitud'),
+                async () => {
+                  await api.cancel(r.id);
+                  await loadFriends();
+                },
+                'cancel.' + r.id,
+              ),
+            ],
+      });
+    }
+    if (!requests.length) items.push(text(T('No hay solicitudes pendientes.')));
+  } else if (friendPage === 'groups') {
+    items.push(
+      text(T('Grupos de logros'), true),
+      text(
+        T(
+          'El grupo comparte objetivos de Checkpoint. Marcarlos no desbloquea logros en Steam ni RetroAchievements.',
+        ),
+      ),
+    );
+    const eligible = data.games.filter((g) => reviewItems(g).some((a) => !a.hidden)).slice(0, 200);
+    if (eligible.length) {
+      items.push(
+        ...b.field('groupName', T('Nombre del grupo')),
+        ...b.field(
+          'groupGame',
+          T('Juego del grupo'),
+          'select',
+          eligible.map((g) => g.title),
+        ),
+      );
+      items.push(
+        button(
+          T('Crear grupo'),
+          async () => {
+            const chosen = eligible.find((g) => g.title === friendFields.groupGame) || eligible[0];
+            const goals = reviewItems(chosen)
+              .filter((a) => !a.hidden)
+              .slice(0, 200)
+              .map((a) => ({
+                id: crypto.randomUUID().replaceAll('-', ''),
+                name: a.name,
+                description: a.description || '',
+                completed: a.unlocked === true,
+              }));
+            await api.createGroup((friendFields.groupName || chosen.title).trim(), chosen, goals);
+            friendFields.groupName = '';
+            await loadFriends();
+          },
+          'create-group',
+        ),
+      );
+    } else items.push(text(T('Añade un juego con logros a tu biblioteca para crear un grupo.')));
+    for (const invite of groupInvites) {
+      items.push(text(T('Invitación a un grupo'), true), {
+        type: 'row',
+        children: [
+          button(
+            T('Aceptar'),
+            async () => {
+              await api.answerGroup(invite.id, true);
+              await loadFriends();
+            },
+            'group-accept.' + invite.id,
+          ),
+          button(
+            T('Rechazar'),
+            async () => {
+              await api.answerGroup(invite.id, false);
+              await loadFriends();
+            },
+            'group-reject.' + invite.id,
+          ),
+        ],
+      });
+    }
+    for (const group of groups) {
+      const goals = Array.isArray(group.goals) ? group.goals : [];
+      items.push({
+        type: 'card',
+        children: [
+          text(group.name + ' · ' + group.game_title, true),
+          text(groupMembers.filter((m) => m.group_id === group.id).length + ' ' + T('miembros')),
+          text(
+            goals.filter((x) => x.completed).length +
+              ' / ' +
+              goals.length +
+              ' ' +
+              T('objetivos completados'),
+          ),
+        ],
+      });
+      for (const goal of goals) {
+        items.push({
+          type: 'row',
+          children: [
+            text((goal.completed ? '✓ ' : '○ ') + goal.name),
+            button(
+              T(goal.completed ? 'Reabrir objetivo' : 'Marcar completado'),
+              async () => {
+                await api.updateGroupGoal(group.id, goal.id, !goal.completed);
+                await loadFriends();
+              },
+              'group-goal.' + goal.id,
+            ),
+          ],
+        });
+        if (goal.description) items.push(text(goal.description, false, true));
+      }
+      items.push(
+        ...b.field('goalName.' + group.id, T('Nuevo objetivo')),
+        ...b.field('goalDescription.' + group.id, T('Descripción del objetivo')),
+        button(
+          T('Añadir objetivo'),
+          async () => {
+            const name = friendFields['goalName.' + group.id] || '';
+            if (!name.trim()) throw new Error('manual-achievement-name');
+            await api.addGroupGoal(
+              group.id,
+              crypto.randomUUID().replaceAll('-', ''),
+              name.trim(),
+              friendFields['goalDescription.' + group.id] || '',
+            );
+            await loadFriends();
+          },
+          'group-add.' + group.id,
+        ),
+      );
+      if (group.owner_id === api.social.user.id)
+        for (const goal of goals)
+          items.push(
+            button(
+              T('Quitar objetivo') + ' · ' + goal.name,
+              async () => {
+                await api.removeGroupGoal(group.id, goal.id);
+                await loadFriends();
+              },
+              'group-remove.' + goal.id,
+            ),
+          );
+      for (const f of friendships) {
+        const friend = f.user_low === api.social.user.id ? f.user_high : f.user_low;
+        items.push(
+          button(
+            T('Invitar a ') + name(friend),
+            async () => {
+              await api.inviteGroup(group.id, friend);
+              notice = T('Invitación al grupo enviada.');
+              await loadFriends();
+            },
+            'group-invite.' + group.id + '.' + friend,
+          ),
+        );
+      }
+    }
+    if (!groups.length && !groupInvites.length)
+      items.push(text(T('Todavía no perteneces a ningún grupo.')));
+  } else if (friendPage === 'sharing') {
+    items.push(
+      text(T('Compartir'), true),
+      text(
+        T(
+          'Los juegos de tus listas son visibles para tus amigos salvo que los marques privados. Notas y nombres de tareas siguen siendo privados.',
+        ),
+        false,
+        true,
+      ),
+    );
+    for (const g of data.games.filter((g) => g.tracked).slice(0, 500))
+      items.push({
+        type: 'card',
+        children: [
+          text(g.title),
+          text(
+            shares[g.id]?.conflict
+              ? T('Conflicto: revisa antes de publicar.')
+              : shares[g.id]?.selected
+                ? T(
+                    samePayload(shares[g.id].desired, shares[g.id].published)
+                      ? 'Compartido'
+                      : 'Pendiente de publicar',
+                  )
+                : T(shares[g.id]?.published ? 'Retirada pendiente de conexión.' : 'Privado'),
+            false,
+            true,
+          ),
+          button(
+            T('Gestionar publicación'),
+            async () => {
+              await loadFriends();
+              shareForm(g.id);
+            },
+            'share.' + g.id,
+          ),
+        ],
+      });
+  } else if (selectedFriend) {
+    items.push(
+      text(name(selectedFriend), true),
+      button(
+        T('Volver a amigos'),
+        () => {
+          selectedFriend = null;
+        },
+        'back',
+      ),
+    );
+    for (const p of publications) {
+      const g = p.operation_payload;
+      if (!g || typeof g.title !== 'string') continue;
+      const state = Math.max(
+        0,
+        statuses.findIndex((s) => s.toLowerCase() === g.status),
+      );
+      const details = [
+        text(g.title, true),
+        text((g.platform || '') + ' · ' + statusLabels()[state]),
+      ];
+      const achievementDetails = [text(T('Logros'))];
+      if (
+        Number.isInteger(g.achievementsTotal) &&
+        g.achievementsTotal > 0 &&
+        g.achievementsTotal <= 10000 &&
+        Number.isInteger(g.achievementsUnlocked) &&
+        g.achievementsUnlocked >= 0 &&
+        g.achievementsUnlocked <= g.achievementsTotal
+      ) {
+        const done = g.achievementsUnlocked,
+          total = g.achievementsTotal,
+          percent = Math.round((done * 100) / total);
+        achievementDetails.push(
+          text(done + ' / ' + total + ' ' + T('logros completados'), true),
+          { type: 'progress', value: percent, max: 100, name: T('Logros'), children: [] },
+          text(
+            done === total
+              ? T('Todos los logros completados')
+              : total - done + T(' logros pendientes') + ' · ' + percent + '%',
+          ),
+        );
+      } else achievementDetails.push(text(T('Sin datos de logros publicados'), false, true));
+      details.push({ type: 'card', style: 'friend-achievements', children: achievementDetails });
+      let manual = [];
+      try {
+        manual = JSON.parse(g.manualAchievementsJson || '[]');
+      } catch {}
+      if (Array.isArray(manual))
+        for (const a of manual.slice(0, 200)) {
+          if (!a || typeof a.name !== 'string' || typeof a.completed !== 'boolean') continue;
+          details.push(text(T('Logro manual · Checkpoint') + ' — ' + a.name));
+          details.push(text(T(a.completed ? 'Completado' : 'Pendiente')));
+          if (typeof a.description === 'string' && a.description) details.push(text(a.description));
+        }
+      if (Number.isInteger(g.storyPercent))
+        details.push(text(T('Historia') + ': ' + g.storyPercent + '%'));
+      if (Number.isInteger(g.tasksTotal))
+        details.push(text(`${T('Tareas')}: ${g.tasksDone}/${g.tasksTotal}`));
+      if (!data.settings.lightweight && Number.isInteger(g.steamAppId) && g.steamAppId > 0)
+        details.unshift({ type: 'image', src: cover({ steamAppId: g.steamAppId }), children: [] });
+      items.push({ type: 'card', children: details });
+    }
+    if (!publications.length) items.push(text(T('Tu amigo aún no ha compartido juegos.')));
+  } else {
+    items.push(
+      text(T('Tus amigos'), true),
+      ...b.field('code', T('Código de amigo (checkpoint-…)')),
+      button(
+        T('Enviar solicitud'),
+        async () => {
+          await api.invite(friendFields.code || '');
+          notice = T('Solicitud enviada.');
+          await loadFriends();
+        },
+        'invite',
+      ),
+    );
+    const own = api.social.user.id;
+    for (const f of friendships) {
+      const id = f.user_low === own ? f.user_high : f.user_low;
+      if (!uuid(id)) continue;
+      items.push({
+        type: 'card',
+        children: [
+          text(name(id)),
+          {
+            type: 'row',
+            children: [
+              button(
+                T('Ver progreso'),
+                async () => {
+                  selectedFriend = id;
+                  await loadFriends();
+                },
+                'progress.' + id,
+              ),
+              button(
+                T('Quitar amistad'),
+                async () => {
+                  await api.unfriend(id);
+                  await loadFriends();
+                },
+                'remove.' + id,
+              ),
+              button(
+                T('Bloquear'),
+                async () => {
+                  await api.block(id);
+                  await loadFriends();
+                },
+                'block.' + id,
+              ),
+            ],
+          },
+        ],
+      });
+    }
+    if (!friendships.length)
+      items.push(
+        text(
+          T('Comparte tu código desde Cuenta. La amistad empieza cuando se acepta la solicitud.'),
+        ),
+      );
+  }
+  items.push(button(T('Actualizar'), loadFriends, 'refresh'));
+  return { type: 'stack', children: items };
+}
+function download() {
+  const exported = {
+    version: 1,
+    gameLists: data.settings.gameLists,
+    exportedAt: new Date().toISOString(),
+    games: data.games.map((g) => ({
+      ...g,
+      status: statuses[g.status],
+      goal: goals[g.goal],
+      customCover: null,
+    })),
+    covers: Object.fromEntries(
+      data.games
+        .filter((g) => g.customCover?.startsWith('data:image/png;base64,'))
+        .map((g) => [g.id, g.customCover.split(',')[1]]),
+    ),
+  };
+  const url = URL.createObjectURL(
+      new Blob([JSON.stringify(exported, null, 2)], { type: 'application/json' }),
+    ),
+    a = document.createElement('a');
+  a.href = url;
+  a.download = 'checkpoint-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function importer() {
+  const fields = {},
+    b = build('import', fields);
+  navigation.current = {
+    render: () => {
+      const items = b.field('file', T('Copia JSON de Checkpoint'), 'file');
+      items.at(-1).accept = '.json,application/json';
+      return b.page(
+        T('Importar copia'),
+        T('Se añadirán juegos nuevos. Los existentes y tus notas se conservan.'),
+        items,
+        [
+          b.button(T('Cancelar'), closeDialog, 'cancel'),
+          b.button(
+            T('Importar'),
+            async () => {
+              if (!fields.file || fields.file.size > 16777216) throw new Error('invalid-backup');
+              const parsed = JSON.parse(await fields.file.text());
+              const count = importBackup(data.games, parsed);
+              data.settings.gameLists = normalizeLists([
+                ...(data.settings.gameLists || []),
+                ...(parsed.gameLists || []),
+              ]);
+              await persist();
+              notice = `${count} ${T('juegos importados')}`;
+              closeDialog();
+            },
+            'import',
+          ),
+        ],
+      );
+    },
+  };
+  emit();
+}
+async function command(message) {
+  ack = Math.max(ack, Number(message.requestId) || 0);
+  if (message.control) {
+    const handler = controls.get(String(message.control));
+    if (handler) await handler(message.action === 'value' ? message.value : undefined);
+    emit();
+    return;
+  }
+  const g = game(message.id);
+  switch (message.action) {
+    case 'navigation-back':
+      await navigation.back();
+      return;
+    case 'navigation-home':
+      await navigation.home();
+      return;
+    case 'stop-achievement-review':
+      if (achievementReview?.running) achievementReview.controller.abort();
+      else achievementReview = undefined;
+      emit();
+      return;
+    case 'cover-missing':
+      if (g) missingCover(g.id);
+      break;
+    case 'ready':
+      emit();
+      if (api.steam) sync();
+      if (api.social) loadFriends().then(flush).catch(fail);
+      return;
+    case 'add':
+      editor();
+      return;
+    case 'achievements':
+      if (g) achievements(g.id);
+      return;
+    case 'details':
+      if (g) gameDetails(g.id);
+      return;
+    case 'edit':
+      if (g) editor(g);
+      return;
+    case 'configure-shortcuts':
+      shortcutSettings();
+      return;
+    case 'manage-lists':
+      manageLists();
+      return;
+    case 'list-details':
+      listSheet(message.source || data.settings.activeList);
+      return;
+    case 'list-change':
+      chooseList(message.ids, message.source || data.settings.activeList, message.mode);
+      return;
+    case 'batch':
+      applyListAction(
+        data.games,
+        message.ids || [],
+        data.settings.gameLists,
+        message.operation,
+        message.source,
+        message.target,
+      );
+      await persist();
+      break;
+    case 'privacy':
+      if (g) {
+        g.friendsPrivate = message.value === true;
+        await persist();
+        await flush();
+      }
+      break;
+    case 'collection':
+      if (
+        message.value === 'all' ||
+        message.value === 'private' ||
+        data.settings.gameLists.some((n) => 'custom:' + n === message.value)
+      ) {
+        switchTab('list');
+        data.settings.activeList = message.value;
+        search = '';
+        filter = 0;
+        await persist();
+      }
+      break;
+    case 'settings':
+      settings();
+      return;
+    case 'cancel-dialog':
+      await navigation.back();
+      return;
+    case 'account':
+      if (!api.social) {
+        authMode = 'login';
+        friendFields.password = '';
+        notice = '';
+      }
+      tab = 'friends';
+      friendPage = api.social ? 'account' : 'friends';
+      selectedFriend = null;
+      emit();
+      if (api.social) await loadFriends();
+      return;
+    case 'web-info':
+      info();
+      return;
+    case 'import':
+      importer();
+      return;
+    case 'export':
+      download();
+      return;
+    case 'steam':
+      connectSteam();
+      return;
+    case 'sync':
+      if (api.steam) sync();
+      else connectSteam();
+      return;
+    case 'tab':
+      if (message.value === 'credits') {
+        credits();
+        return;
+      }
+      if (['list', 'library', 'friends'].includes(message.value)) {
+        switchTab(message.value);
+        if (tab === 'friends') loadFriends();
+      }
+      break;
+    case 'search-change':
+      search = String(message.value || '').slice(0, 140);
+      break;
+    case 'filter':
+      filter = Math.max(0, Math.min(5, Number(message.value) || 0));
+      break;
+    case 'search':
+      if (tab === 'friends') switchTab('list');
+      emit();
+      send({ kind: 'focus-search' });
+      break;
+    case 'cycle':
+      data.settings.layout = (data.settings.layout + 1) % 3;
+      await persist();
+      break;
+    case 'state':
+      if (g && Number.isInteger(message.value) && message.value >= 0 && message.value < 5) {
+        g.status = message.value;
+        g.finishedAt = g.status === 3 ? g.finishedAt || new Date().toISOString() : null;
+        await persist();
+      }
+      break;
+    case 'finish':
+      if (g) {
+        g.status = g.status === 3 ? 0 : 3;
+        g.finishedAt = g.status === 3 ? new Date().toISOString() : null;
+        await persist();
+      }
+      break;
+    case 'undo': {
+      const restored = data.deleted.pop();
+      if (restored && !game(restored.id)) data.games.push(normalize(restored));
+      await persist();
+      break;
+    }
+    case 'move': {
+      const target = game(message.target);
+      if (g && target && g.id !== target.id && g.favorite === target.favorite) {
+        const ordered = [...data.games].sort(
+          (a, b) => Number(b.favorite) - Number(a.favorite) || a.sortOrder - b.sortOrder,
+        );
+        ordered.splice(ordered.indexOf(g), 1);
+        ordered.splice(ordered.indexOf(target) + (message.after ? 1 : 0), 0, g);
+        ordered.forEach((x, i) => (x.sortOrder = i));
+        await persist();
+      }
+      break;
+    }
+    case 'examples':
+      if (!data.games.length) {
+        data.games.push(
+          normalize({ title: 'Hollow Knight', steamAppId: 367520, platform: 'Steam' }),
+          normalize({
+            title: 'Hades',
+            steamAppId: 1145360,
+            platform: 'Steam',
+            status: 1,
+            sortOrder: 1,
+          }),
+          normalize({ title: 'Portal 2', steamAppId: 620, platform: 'Steam', sortOrder: 2 }),
+        );
+        await persist();
+      }
+      break;
+  }
+  emit();
+}
+window.chrome = window.chrome || {};
+window.chrome.webview = {
+  addEventListener: (type, listener) => {
+    if (type === 'message') listeners.push(listener);
+  },
+  postMessage: (message) => command(message).catch(fail),
+};
+let timer;
+function restartTimer() {
+  clearInterval(timer);
+  timer = setInterval(
+    () => {
+      if (!document.hidden && api.steam) sync();
+    },
+    Math.max(15, Math.min(120, data.settings.syncMinutes)) * 60000,
+  );
+}
+restartTimer();
+setInterval(() => {
+  if (!document.hidden) {
+    flush().catch(fail);
+    if (tab === 'friends' && !navigation.current) loadFriends();
+  }
+}, 60000);
+window.addEventListener('online', () => {
+  if (api.steam) sync();
+  flush().catch(fail);
+});
 await import('./ui.js');
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});

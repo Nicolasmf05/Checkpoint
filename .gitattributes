@@ -1,0 +1,6 @@
+# El formato usa LF también en Windows; los recursos binarios conservan sus bytes.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.zip binary
+*.msi binary

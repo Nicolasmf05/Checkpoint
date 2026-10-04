@@ -1,8 +1,15 @@
+-- Verifica las políticas históricas de Storage con usuarios y rutas de prueba.
 -- No file bytes or existing data changes; all synthetic rows roll back.
-begin;
-create temporary table cp_storage_results(test text primary key);
-grant insert, select on cp_storage_results to authenticated, service_role;
-do $$ begin
+BEGIN;
+
+CREATE TEMPORARY TABLE cp_storage_results (test text PRIMARY KEY);
+
+GRANT insert,
+SELECT
+  ON cp_storage_results TO authenticated,
+  service_role;
+
+DO $$ begin
  if not exists(select 1 from pg_trigger where tgname='cp_text_only_storage_guard' and tgenabled='O') then raise exception 'Missing guard'; end if;
  if (select count(*) from pg_policies where schemaname='storage' and tablename='objects' and policyname in ('cp_text_only_insert','cp_text_only_update') and permissive='RESTRICTIVE') <> 2 then raise exception 'Missing restrictive rules'; end if;
  begin
@@ -11,8 +18,11 @@ do $$ begin
  exception when insufficient_privilege then null; end;
  insert into cp_storage_results values('Upload guard enabled'),('Restrictive rules enabled'),('Privileged upload denied');
 end $$;
-set local role service_role;
-do $$ begin
+
+SET
+  local role service_role;
+
+DO $$ begin
  begin
   insert into storage.objects(bucket_id,name) values('checkpoint-assets','text-only-service.png');
   raise exception 'Service role insert allowed';
@@ -24,11 +34,29 @@ do $$ begin
  perform public.cp_steam_state('put','cache','text-only-test','{"title":"Text metadata"}',60);
  insert into cp_storage_results values('Service-role upload denied'),('Embedded image rejected'),('Text state accepted');
 end $$;
-reset role;
-insert into auth.users(id,email,raw_user_meta_data) values('91000000-0000-4000-8000-000000000001','text-only-test@example.invalid','{}');
-set local role authenticated;
-select set_config('request.jwt.claim.sub','91000000-0000-4000-8000-000000000001',true);
-do $$ declare revision bigint; begin
+
+RESET ROLE;
+
+INSERT INTO
+  auth.users (id, email, raw_user_meta_data)
+VALUES
+  (
+    '91000000-0000-4000-8000-000000000001',
+    'text-only-test@example.invalid',
+    '{}'
+  );
+
+SET
+  local role authenticated;
+
+SELECT
+  set_config(
+    'request.jwt.claim.sub',
+    '91000000-0000-4000-8000-000000000001',
+    TRUE
+  );
+
+DO $$ declare revision bigint; begin
  begin
   insert into storage.objects(bucket_id,name) values('checkpoint-assets','91000000-0000-4000-8000-000000000001/covers/test.png');
   raise exception 'Authenticated upload allowed';
@@ -47,6 +75,17 @@ do $$ declare revision bigint; begin
  exception when check_violation then null; end;
  insert into cp_storage_results values('Authenticated upload denied'),('Legacy cover path ignored'),('Text retry idempotent'),('New avatar rejected'),('Embedded publication image rejected');
 end $$;
-reset role;
-select count(*) as passed_checks,array_agg(test order by test) as checks from cp_storage_results;
-rollback;
+
+RESET ROLE;
+
+SELECT
+  count(*) AS passed_checks,
+  array_agg(
+    test
+    ORDER BY
+      test
+  ) AS checks
+FROM
+  cp_storage_results;
+
+ROLLBACK;

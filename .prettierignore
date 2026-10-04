@@ -1,0 +1,10 @@
+.git/
+.tools/
+.qa/
+artifacts/
+dist/
+node_modules/
+**/bin/
+**/obj/
+**/package-lock.json
+docs/screenshots/

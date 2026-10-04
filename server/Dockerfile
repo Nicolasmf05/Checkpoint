@@ -1,3 +1,5 @@
+# Imagen del servicio Steam con Node y directorio de datos persistentes.
+
 FROM node:24-alpine
 WORKDIR /app
 COPY --chown=node:node package.json ./
