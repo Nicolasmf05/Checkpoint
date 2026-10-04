@@ -1494,6 +1494,9 @@ try {
   await click('Settings');
   await page.getByRole('combobox', { name: 'Language', exact: true }).selectOption('0');
   await click('Save');
+  await page.waitForFunction(
+    () => window.checkpointState.kind === 'main' && window.checkpointState.language === 'es',
+  );
   check(
     (await page.locator('.achievement-review').textContent()).includes(steamFailure) &&
       !(await page.locator('.achievement-review').textContent()).includes(privacyMessage),
@@ -1502,6 +1505,9 @@ try {
   await click('Ajustes');
   await page.getByRole('combobox', { name: 'Idioma', exact: true }).selectOption('1');
   await click('Guardar');
+  await page.waitForFunction(
+    () => window.checkpointState.kind === 'main' && window.checkpointState.language === 'en',
+  );
   const afterFailure = await page.evaluate(async () => {
     const { BrowserStore } = await import('./store.mjs'),
       store = await new BrowserStore().open();
