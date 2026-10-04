@@ -46,7 +46,7 @@ internal static partial class Dialogs
                     var details=Button(expanded.Contains(item.Key)?I18n.T("Ocultar descripción"):I18n.T("Ver descripción"),(_,_)=>{if(!expanded.Add(item.Key))expanded.Remove(item.Key);Render();});
                     System.Windows.Automation.AutomationProperties.SetName(details,(expanded.Contains(item.Key)?I18n.T("Ocultar descripción"):I18n.T("Ver descripción"))+" · "+name);
                     panel.Children.Add(details);
-                    if(expanded.Contains(item.Key))panel.Children.Add(new TextBlock { Text=string.IsNullOrWhiteSpace(item.Data.Description)?I18n.T("Este logro no tiene descripción."):item.Data.Description,TextWrapping=TextWrapping.Wrap,Tag="achievement-description" });
+                    if(expanded.Contains(item.Key))panel.Children.Add(new TextBlock { Text=string.IsNullOrWhiteSpace(item.Data.Description)?I18n.T(item.Provider=="steam"&&item.Data.Hidden?"Steam no ha enviado la descripción de este logro oculto. Prueba a actualizar los logros; si sigue vacía, no está disponible en la API de Steam.":"Este logro no tiene descripción."):item.Data.Description,TextWrapping=TextWrapping.Wrap,Tag="achievement-description" });
                 }
                 panel.Children.Add(new TextBlock{Text=item.Provider=="steam"?"Steam":item.Provider=="retro"?"RetroAchievements":I18n.T("Manual"),FontSize=11});
                 var completed=Check(panel,I18n.T("Completado en Checkpoint"),item.Completed);

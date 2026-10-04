@@ -13,7 +13,7 @@
     "bucketPublic": false
   },
   "nativeIntegration": "implemented-native-tested",
-  "clientVersion": "0.8.10",
+  "clientVersion": "0.8.17",
   "authMode": "username-password",
   "confirmEmail": false,
   "steamEdgeFunctions": "deployed-custom-auth-enabled-live-endpoints-checked",
@@ -34,7 +34,14 @@
     "loginStartStatus": 200,
     "pendingPollStatus": 200,
     "invalidPollSecretStatus": 400,
-    "remainingSyntheticSteamEntriesAfterDatabaseTests": 0
+    "remainingSyntheticSteamEntriesAfterDatabaseTests": 0,
+    "achievementDescriptionFallback": {
+      "deployedOn": "2026-10-04",
+      "schemaAndPlayerText": true,
+      "cacheVersion": "descriptions-v2",
+      "sourceVerified": true,
+      "realSkulSessionValidated": false
+    }
   },
   "igdb": {
     "function": "checkpoint-covers",

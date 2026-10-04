@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.17
+
+- Steam descriptions missing from the game schema now fall back to matching player-achievement text. Old cached results are bypassed without revoking sessions. Hidden achievements remain protected until revealed; when Steam omits a hidden description from both responses, the UI explains the provider limitation.
+
 ## 0.8.16
 
 - Minimize keeps Checkpoint on the Windows taskbar by default. Settings offers an independent option to hide in the tray when minimizing; closing to the tray remains a separate choice. The global show/hide shortcut restores a minimized window.

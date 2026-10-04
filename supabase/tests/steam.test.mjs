@@ -38,8 +38,8 @@ function fixture(options={}) {
     if(url.hostname==='steamcommunity.com') return new Response(options.invalidAssertion?'is_valid:false':'is_valid:true\n');
     if(url.pathname.includes('GetOwnedGames')) return Response.json(options.privateLibrary?{response:{}}:{response:{games:[{appid:620,name:'Portal 2',playtime_forever:70},...(url.searchParams.get('include_family_licenses')==='true'?options.familyGames||[]:[])]}});
     if(url.pathname.includes('GetRecentlyPlayedGames')) return options.recentUnavailable ? new Response('',{status:503}) : Response.json({response:{games:options.recentGames||[]}});
-    if(url.pathname.includes('GetSchemaForGame')) return Response.json({game:{availableGameStats:{achievements:[{name:'FIRST',displayName:url.searchParams.get('l'),hidden:0}]}}});
-    if(url.pathname.includes('GetPlayerAchievements')) return Response.json(options.privateAchievements?{playerstats:{success:false}}:{playerstats:{success:true,achievements:[{apiname:'FIRST',achieved:1,unlocktime:1000}]}});
+    if(url.pathname.includes('GetSchemaForGame')) return Response.json({game:{availableGameStats:{achievements:options.definitions||[{name:'FIRST',displayName:url.searchParams.get('l'),hidden:0}]}}});
+    if(url.pathname.includes('GetPlayerAchievements')) return Response.json(options.privateAchievements?{playerstats:{success:false}}:{playerstats:{success:true,achievements:options.progress||[{apiname:'FIRST',achieved:1,unlocktime:1000}]}});
     throw new Error('Unexpected upstream');
   };
   const make=()=>createSteamHandler({baseUrl:base,apiKey:options.noKey?'':'server-only-secret',rpc,fetchImpl:upstream,now:()=>time});
@@ -181,4 +181,14 @@ test('browser preflight rejects unrelated, lookalike and opaque origins',async()
 test('Pages CORS responses preserve bound-session authentication and private-data checks',async()=>{
  const f=fixture();const unauthorized=await f.direct(new Request(base+'v1/library',{headers:{origin:'https://nicolasmf05.github.io'}}));assert.equal(unauthorized.status,401);assert.equal(unauthorized.headers.get('access-control-allow-origin'),'https://nicolasmf05.github.io');
  const {token}=await f.login();const valid=await f.direct(new Request(base+'v1/library',{headers:{origin:'https://nicolasmf05.github.io',authorization:'Bearer '+token}}));assert.equal(valid.status,200);assert.equal((await valid.json()).games[0].appId,620);assert.equal(valid.headers.get('vary'),'Origin');
+});
+
+test('hidden achievement descriptions fall back to player strings without changing unlock state',async()=>{
+ const f=fixture({definitions:[{name:'SECRET',hidden:1,description:' '},{name:'VISIBLE',displayName:'Schema name',description:'Schema description',hidden:0},{name:'EMPTY',hidden:1}],progress:[{apiname:'SECRET',name:'Player secret',description:'Player secret description',achieved:0},{apiname:'VISIBLE',description:'Other description',achieved:1,unlocktime:1000},{apiname:'EMPTY',description:{invalid:'not text'},achieved:0}]});
+ const session=await f.login();
+ f.db.set('cache:achievements:'+steamId+':620:spanish',{value:{achievements:[{id:'SECRET',description:''}]},expires:timestamp+300000});
+ const result=await (await f.send('v1/games/620/achievements',undefined,session.token)).json();
+ assert.equal(result.achievements[0].name,'Player secret');assert.equal(result.achievements[0].description,'Player secret description');assert.equal(result.achievements[0].hidden,true);assert.equal(result.achievements[0].unlocked,false);
+ assert.equal(result.achievements[1].description,'Schema description');assert.equal(result.achievements[2].description,'');
+ assert.equal(f.calls.find(c=>c.url.pathname.includes('GetPlayerAchievements')).url.searchParams.get('l'),'spanish');
 });

@@ -22,11 +22,11 @@ async function fixture(t, options = {}) {
     if (url.hostname === 'steamcommunity.com') return new Response('ns:http://specs.openid.net/auth/2.0\nis_valid:true\n');
     if (url.pathname.includes('GetOwnedGames')) return Response.json(options.privateLibrary ? { response: {} } : { response: { games: [{ appid: 620, name: 'Portal 2', playtime_forever: 70 },...(url.searchParams.get('include_family_licenses')==='true'?options.familyGames||[]:[])] } });
     if(url.pathname.includes('GetRecentlyPlayedGames')) return options.recentUnavailable ? new Response('',{status:503}) : Response.json({response:{games:options.recentGames||[]}});
-    if (url.pathname.includes('GetSchemaForGame')) return Response.json({ game: { availableGameStats: { achievements: [
+    if (url.pathname.includes('GetSchemaForGame')) return Response.json({ game: { availableGameStats: { achievements: options.definitions || [
       { name: 'FIRST', displayName: 'First', description: 'First step', hidden: 0 }, { name: 'SECRET', displayName: 'Secret', description: 'Spoiler', hidden: 1 }
     ] } } });
     if (url.pathname.includes('GetPlayerAchievements')) return Response.json(options.privateAchievements ? { playerstats: { success: false } } : {
-      playerstats: { success: true, achievements: [{ apiname: 'FIRST', achieved: 1, unlocktime: 1000 }, { apiname: 'SECRET', achieved: 0 }] }
+      playerstats: { success: true, achievements: options.progress || [{ apiname: 'FIRST', achieved: 1, unlocktime: 1000 }, { apiname: 'SECRET', achieved: 0 }] }
     });
     throw new Error('Unexpected upstream');
   };
@@ -162,4 +162,10 @@ test('recent library entries reject invalid IDs and names and normalize time wit
   const options={recentGames:[null,{appid:0,name:'Invalid'},{appid:2147483648,name:'Invalid'},{appid:999,name:' '},{appid:999,name:'Borrowed',playtime_forever:-2},{appid:999,name:'Borrowed',playtime_forever:2.9}]};
   const f=await fixture(t,options),{token}=await f.login();const send=(path)=>f.send(path,undefined,token);
   assert.deepEqual((await (await send('/v1/library')).json()).games,[{appId:620,name:'Portal 2',playtimeMinutes:70},{appId:999,name:'Borrowed',playtimeMinutes:2}]);
+});
+
+test('hidden descriptions use matching localized player data when schema text is missing',async t=>{
+ const f=await fixture(t,{definitions:[{name:'SECRET',hidden:1,description:''},{name:'EMPTY',hidden:1}],progress:[{apiname:'SECRET',name:'Secret',description:'Player description',achieved:0},{apiname:'EMPTY',achieved:0}]});
+ const session=await f.login();const result=await (await f.send('/v1/games/620/achievements',undefined,session.token)).json();
+ assert.equal(result.achievements[0].description,'Player description');assert.equal(result.achievements[0].hidden,true);assert.equal(result.achievements[0].unlocked,false);assert.equal(result.achievements[1].description,'');
 });

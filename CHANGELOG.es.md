@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.17
+
+- Las descripciones ausentes del esquema de Steam se recuperan de la respuesta de logros del jugador cuando está disponible. Se evita la caché anterior sin revocar sesiones. Los logros ocultos siguen protegidos hasta revelarlos; si Steam omite la descripción en ambas respuestas, la interfaz explica la limitación del proveedor.
+
 ## 0.8.16
 
 - Minimizar deja Checkpoint en la barra de tareas de Windows por defecto. Ajustes ofrece una opción independiente para ocultar en la bandeja al minimizar; ocultar al cerrar sigue siendo otra elección. El atajo global recupera una ventana minimizada.

@@ -420,6 +420,14 @@ public partial class MainWindow
                 StopAchievementReview();
             }
             Retro=backgroundRetro;Games.Clear();Games.AddRange(backgroundGames);Persist();Refresh();
+            var unavailableSecret=new Game { Title="Hidden description example",Achievements=[new(){Id="hidden-empty",Name="Unavailable secret",Hidden=true,Description=""}] };
+            Games.Add(unavailableSecret);OpenDetectedAchievements(unavailableSecret);var unavailablePage=await Dialog();
+            await ScopedScript(unavailablePage,"document.querySelector('input[aria-label=\"Show secret achievement names and descriptions\"]').click();");
+            await Wait(()=>Script(unavailablePage,"document.body.innerText.includes('Unavailable secret')"));
+            await ScopedScript(unavailablePage,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Show description').click();");
+            await Wait(()=>Script(unavailablePage,"document.querySelector('.achievement-description')?.textContent.includes('Steam did not send the description')"));
+            Check(await Script(unavailablePage,"!document.querySelector('.achievement-description').textContent.includes('This achievement has no description')"),"missing hidden Steam text is explained as unavailable provider data");
+            achievementWindows[unavailableSecret.Id].Close();Games.Remove(unavailableSecret);Refresh();
             Check(!Preferences.MinimizeToTray,"new and existing libraries minimize to the taskbar by default");
             await Run("document.querySelector('[data-label=minimize]').click();");
             await Wait(()=>Task.FromResult(IsVisible&&ShowInTaskbar&&WindowState==WindowState.Minimized));

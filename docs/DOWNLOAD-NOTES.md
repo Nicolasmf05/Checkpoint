@@ -94,3 +94,8 @@ Checkpoint utiliza la misma ventana o pestaña para ajustes, fichas de juegos/li
 ## Minimizar en Windows
 
 El botón − minimiza en la barra de tareas por defecto. Ajustes → Ocultar en la bandeja al minimizar permite ocultarlo en su lugar. Recupéralo con doble clic en el icono de la bandeja o con tu atajo global configurado. Ocultar en la bandeja al cerrar es independiente; la X sigue cerrando completamente por defecto. Escape y las acciones explícitas de mostrar u ocultar conservan su función. En el navegador se utilizan los controles de minimizar del propio navegador.
+
+
+## Descripciones de logros ocultos
+
+Activa Mostrar nombres y descripciones de logros secretos y pulsa Ver descripción en el logro. El servicio usa el texto del logro del jugador en el idioma elegido cuando el esquema del juego omite la descripción. Pulsa Actualizar para reemplazar un resultado local anterior. Si ninguna respuesta de Steam proporciona texto, Checkpoint explica que Steam no lo ha enviado; no puede inventar el objetivo oculto.

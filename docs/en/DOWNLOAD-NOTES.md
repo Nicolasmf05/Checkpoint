@@ -94,3 +94,8 @@ Checkpoint uses the same window or browser tab for settings, game/list sheets, a
 ## Minimizing on Windows
 
 The − button minimizes to the taskbar by default. Settings → Hide in the system tray when minimized enables hiding instead. Restore it by double-clicking the tray icon or using your configured global shortcut. Hide in the system tray when closed is independent; the X still exits completely by default. Escape and the explicit show/hide actions keep their configured purpose. Browser windows use the browser’s own minimize controls.
+
+
+## Hidden achievement descriptions
+
+Enable Show hidden achievements, then Show description on the achievement. The Steam service uses matching localized player-achievement text when the game schema omits a description. Press Refresh to replace an old local result. If neither Steam response supplies text, Checkpoint explains that Steam did not provide it; it cannot invent a hidden objective.

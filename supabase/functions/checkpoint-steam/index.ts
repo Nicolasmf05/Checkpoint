@@ -157,7 +157,7 @@ export function createSteamHandler({baseUrl, apiKey='', rpc, fetchImpl=fetch, no
         if(appId>2147483647) throw new ApiError(400,'Juego no válido.');
         if(!(await library(session.steamId)).games.some(g=>g.appId===appId)) throw new ApiError(403,'Este juego no está en tu biblioteca visible de Steam.');
         const language=url.searchParams.get('lang')==='en'?'english':'spanish';
-        const result=await cached(`achievements:${session.steamId}:${appId}:${language}`,async()=>{
+        const result=await cached(`achievements:${session.steamId}:${appId}:${language}:descriptions-v2`,async()=>{
           const schema=await cached(`schema:${appId}:${language}`,()=>steam('ISteamUserStats/GetSchemaForGame/v2/',{appid:appId,l:language}),86400);
           if(!schema.game||typeof schema.game!=='object') throw new ApiError(502,'Steam no ha devuelto la definición de logros de este juego.');
           const definitions=schema.game.availableGameStats?.achievements;
@@ -169,7 +169,7 @@ export function createSteamHandler({baseUrl, apiKey='', rpc, fetchImpl=fetch, no
           return {achievements:definitions.slice(0,10000).map(def=>{
             const item=unlocks.get(def.name),unlocked=item?.achieved===1;
             const date=unlocked&&Number.isFinite(item.unlocktime)&&item.unlocktime>0?new Date(item.unlocktime*1000):null;
-            return {id:def.name,name:def.displayName||def.name,description:def.description||'',hidden:Boolean(Number(def.hidden)),
+            const text=value=>typeof value==='string'&&value.trim()?value:''; return {id:def.name,name:text(def.displayName)||text(item?.name)||def.name,description:text(def.description)||text(item?.description),hidden:Boolean(Number(def.hidden)),
               unlocked,unlockedAt:date&&!isNaN(date.valueOf())?date.toISOString():null};
           })};
         }); return json(200,result);
