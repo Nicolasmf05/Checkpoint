@@ -53,6 +53,7 @@ public partial class MainWindow
     }
     private readonly HashSet<string> contributedCovers=new();
     private bool contributingCovers;
+    private static string CoverContributionKey(Game game)=>game.Title+"|"+game.Platform+"|"+game.SteamAppId+"|"+game.IgdbCoverImageId;
     internal async void ScheduleCoverContributions()
     {
         if(App.Diagnostics||Igdb is null||contributingCovers||shutdown.IsCancellationRequested)return;
@@ -60,15 +61,14 @@ public partial class MainWindow
         try
         {
             // Work from persisted games; unsaved editor previews never become shared defaults.
-            string Key(Game game)=>game.Title+"|"+game.Platform+"|"+game.SteamAppId+"|"+game.IgdbCoverImageId;
             while(!shutdown.IsCancellationRequested)
             {
-                var game=Games.FirstOrDefault(g=>g.CustomCover is not null&&CoverSuggestions.ValidImageId(g.IgdbCoverImageId)&&g.IgdbCoverSearchTitle==g.Title&&!contributedCovers.Contains(Key(g)));
+                var game=Games.FirstOrDefault(g=>g.CustomCover is not null&&CoverSuggestions.ValidImageId(g.IgdbCoverImageId)&&g.IgdbCoverSearchTitle==g.Title&&!contributedCovers.Contains(CoverContributionKey(g)));
                 if(game is null)break;
-                contributedCovers.Add(Key(game));
+                contributedCovers.Add(CoverContributionKey(game));
                 try{await Igdb.Confirm(game,shutdown.Token);}catch(Exception error) when(error is not OutOfMemoryException){}
                 if(shutdown.IsCancellationRequested)break;
-                await Task.Delay(1500,shutdown.Token);
+                await Task.Delay(5000,shutdown.Token);
             }
         }
         catch(OperationCanceledException){}
@@ -100,7 +100,7 @@ public partial class MainWindow
                 if(automatic&&(Games.All(g=>g.Id!=game.Id)||game.CustomCover is not null||game.Title!=title||!IsActive||Preferences.MiniatureView||Preferences.LightweightMode||Application.Current.Windows.Cast<Window>().Any(w=>w!=this&&w.IsVisible)))return;
                 if(!PageIsOpen(parent))return;
                 game.IgdbCoverSearchTitle=title.Trim();
-                if(shared||Dialogs.IgdbCoverPreview(this,parent,title,candidate,prepared)){game.CustomCover=Covers.SavePrepared(prepared);game.IgdbCoverImageId=candidate.ImageId;}
+                if(shared||Dialogs.IgdbCoverPreview(this,parent,title,candidate,prepared)){game.CustomCover=Covers.SavePrepared(prepared);game.IgdbCoverImageId=candidate.ImageId;if(shared)contributedCovers.Add(CoverContributionKey(game));}
                 else CoverSuggestions.Reject(game,candidate.ImageId);
             }
             if(automatic){Persist();Refresh();}

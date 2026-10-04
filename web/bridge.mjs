@@ -67,11 +67,11 @@ function build(prefix,fields){const b={fields,n:0};
  b.field=(key,label,type='input',options)=>{const id=prefix+'.field.'+key;controls.set(id,async value=>{fields[key]=value;if(b.onChange)await b.onChange(key,value);});const node={id,type,name:label,text:label,max:type==='textarea'?20000:250,enabled:!b.busy,value:type==='password'?undefined:fields[key],checked:fields[key]===true,empty:!fields[key],options,children:[]};return type==='check'?[node]:[text(label,false,true),node];};
  b.page=(heading,description,items,actions)=>({pageId:prefix,title:heading,type:'dock',children:[{type:'scroll',children:[{type:'stack',children:[text(heading,true),text(description,false,true),...(navigation.current?.error?[text(navigation.current.error,false,true)]:[]),...items]}]},{type:'row',children:actions}]});return b;}
 const contributedCovers=new Set();let contributingCovers=false;
+const coverContributionKey=g=>JSON.stringify([g.title,g.platform,g.steamAppId,g.igdbCoverImageId]);
 async function shareCovers(){
  if(contributingCovers||storageConflict||!navigator.onLine)return;contributingCovers=true;
- const key=g=>JSON.stringify([g.title,g.platform,g.steamAppId,g.igdbCoverImageId]);
- try{for(;;){const g=data.games.find(g=>g.customCover&&/^[A-Za-z0-9_-]{1,80}$/.test(g.igdbCoverImageId)&&g.igdbCoverSearchTitle===g.title&&!contributedCovers.has(key(g)));if(!g)break;contributedCovers.add(key(g));
-   try{await api.coverConfirm(structuredClone(g));}catch{}await new Promise(resolve=>setTimeout(resolve,1500));
+ try{for(;;){const g=data.games.find(g=>g.customCover&&/^[A-Za-z0-9_-]{1,80}$/.test(g.igdbCoverImageId)&&g.igdbCoverSearchTitle===g.title&&!contributedCovers.has(coverContributionKey(g)));if(!g)break;contributedCovers.add(coverContributionKey(g));
+   try{await api.coverConfirm(structuredClone(g));}catch{}await new Promise(resolve=>setTimeout(resolve,5000));
  }}finally{contributingCovers=false;}
 }
 setTimeout(shareCovers,2000);
@@ -92,7 +92,7 @@ async function findCover(g,title,parent,automatic=false,builder){
   try{if(bitmap.width*bitmap.height>16000000)throw new Error('igdb-unavailable');const scale=Math.min(1,160/bitmap.width,240/bitmap.height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);png=canvas.toDataURL('image/png');}finally{bitmap.close();}
   if((navigation.current||null)!==parent||automatic&&(!game(g.id)||g.customCover||g.title!==title||data.settings.lightweight))return;
   g.igdbCoverSearchTitle=title;
-  if(shared){g.customCover=png;g.igdbCoverImageId=candidate.imageId;await remember();return;}
+  if(shared){g.customCover=png;g.igdbCoverImageId=candidate.imageId;contributedCovers.add(coverContributionKey(g));await remember();return;}
   const choice=build('cover-choice',{});let deciding=false;
   const decide=async accept=>{if(deciding)return;deciding=true;choice.busy=true;emit();try{if(accept){g.customCover=png;g.igdbCoverImageId=candidate.imageId;}else if(!g.rejectedIgdbCovers.includes(candidate.imageId))g.rejectedIgdbCovers.push(candidate.imageId);await remember();navigation.current=parent||undefined;emit();}catch(error){choice.busy=false;deciding=false;fail(error);}};
   navigation.current={cancel:()=>decide(false),render:()=>choice.page(T('Carátula de IGDB'),title,[{type:'image',src:png,style:'cover-preview',children:[]},text(candidate.name+(Number.isInteger(candidate.year)?' · '+candidate.year:''),true),text(T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.')),text(T('Si la rechazas no volveremos a ofrecerla. Puedes buscar otra desde el editor del juego.')),text(T('Al guardar, compartes la referencia de IGDB como carátula por defecto para este juego. No se sube la imagen ni tus datos personales.'))],[choice.button(T('No usar esta carátula'),()=>decide(false),'reject'),choice.button(T('Usar esta carátula'),()=>decide(true),'accept')])};
