@@ -108,7 +108,7 @@ public sealed class Settings
     public bool LightTheme { get; set; }
     public string Theme { get; set; } = "";
     public bool LightweightMode { get; set; }
-    public bool CloseToTray { get; set; } = true;
+    public bool CloseToTray { get; set; }
     public bool StartWithWindows { get; set; }
     public int SyncMinutes { get; set; } = 30;
     public string ServiceUrl { get; set; } = "";

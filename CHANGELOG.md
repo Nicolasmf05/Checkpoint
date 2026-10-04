@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.11 — Exit on close by default
+
+The X button now exits Windows Checkpoint completely for new settings. Hiding in the tray remains optional in Settings; existing saved choices are preserved. README screenshots now show simple example collections with real Steam covers.
+
 ## 0.8.10 — Text-only cloud storage
 
 Supabase rejects new file uploads, including privileged Storage writes. Existing files are preserved. Windows shares only game metadata and progress; local covers and legacy image paths are excluded from publication. Migration and rollback tests document the policy.

@@ -41,12 +41,12 @@ App real en el navegador, con el tema Claro y una pequeña colección de ejemplo
 
 ## Descargar y utilizar
 
-La versión actual es **0.8.10**. En la carpeta `dist` se generan:
+La versión actual es **0.8.11**. En la carpeta `dist` se generan:
 
-Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.10), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
+Descarga el portable o instalador desde [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.11), o compila con las instrucciones de este repositorio. El workflow **Build and verify** también genera el ZIP y MSI como artefactos cuando finaliza correctamente.
 
-- `Checkpoint-0.8.10-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
-- `Checkpoint-0.8.10-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
+- `Checkpoint-0.8.11-win-x64.msi`: instalador por usuario con acceso en el menú Inicio y desinstalación desde Windows.
+- `Checkpoint-0.8.11-win-x64.zip`: edición portable. Extrae el ZIP y abre `Checkpoint/Checkpoint.exe`. Todos los archivos quedan dentro de la carpeta `Checkpoint`.
 - Archivos `.sha256`: comprobación de integridad.
 
 Los paquetes incluyen el runtime de .NET; el usuario no necesita instalar herramientas de desarrollo. La versión x64 está dirigida a Windows 11; Windows 10 no ha sido validado. La compilación ARM64 está preparada en el script, pero no se ha probado en hardware ARM.
@@ -75,6 +75,8 @@ Elige en **Ajustes → Tema**: Oscuro, Claro, Medianoche, Océano, Bosque, Cirue
 ## Modos de ventana
 
 Usa el selector de la cabecera o Ajustes → Modo de ventana: **Ventana completa**, **Ventana pequeña**, **Miniatura**. La completa ocupa el área de trabajo del monitor actual, dejando disponible la barra de tareas, y utiliza siempre **opacidad al 100 %**. La pequeña recupera su tamaño guardado y opacidad elegida. Miniatura conserva la lista de nombre/estado y su tamaño independiente; con clic derecho puedes elegir cualquiera de los tres modos. La elección se guarda al reiniciar. Las vistas de colección (lista, compacta, cuadrícula) son independientes.
+
+Por defecto, la X cierra Checkpoint para Windows completamente. Para dejarlo funcionando en la bandeja, activa Ajustes → Ocultar en la bandeja al cerrar. Se conservan las preferencias que ya estuvieran guardadas.
 
 ## Incluido
 
@@ -211,7 +213,7 @@ El proyecto incluye `.gitignore`, licencia Checkpoint Attribution License 1.0, d
 
 Publica únicamente los archivos de código y documentación. `.tools`, `.qa`, `dist`, `.env`, bases de datos y tokens son locales y se excluyen.
 
-También se entrega `dist/Checkpoint-source-0.8.10.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
+También se entrega `dist/Checkpoint-source-0.8.11.zip`, con el código limpio para trasladarlo a GitHub. `scripts/Export-Source.ps1` lo regenera usando ripgrep y las exclusiones de `.gitignore`. La versión de los ejecutables, nombres de archivo e instalador se toma de `Directory.Build.props`.
 
 ## Próximas versiones
 

@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.11 — Cierre completo por defecto
+
+La X cierra Checkpoint para Windows completamente cuando se usan ajustes nuevos. Ocultar en la bandeja sigue siendo opcional en Ajustes; se conservan las preferencias guardadas. Las capturas del README muestran colecciones sencillas de ejemplo con carátulas reales de Steam.
+
 ## 0.8.10 — Almacenamiento en la nube solo de texto
 
 Supabase rechaza nuevas subidas de archivos, incluidas las escrituras privilegiadas en Storage. Los archivos existentes se conservan. Windows comparte únicamente datos de juegos y progreso; las carátulas locales y las rutas antiguas de imágenes se excluyen de las publicaciones. La migración y las pruebas con reversión documentan esta política.
