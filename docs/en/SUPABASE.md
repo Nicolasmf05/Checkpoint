@@ -46,3 +46,7 @@ Version 0.6 source adds a private Steam-state migration and Edge Function. See [
 Apply `supabase/migrations/202610040001_checkpoint_text_only.sql` after the social and Steam migrations. It blocks INSERT/UPDATE in Storage through restrictive RLS and a database trigger, including service-role writes. Existing objects remain readable under their original permissions. New publications ignore legacy cover paths; new avatar references and embedded base64 image data are rejected. Windows no longer uploads local covers. External provider URLs and local covers do not consume Supabase Storage.
 
 Audit on October 4, 2026: database 12,007,091 bytes (about 11.5 MiB, including infrastructure); Checkpoint tables 614,400 bytes (600 KiB); one existing Storage image 101,125 bytes (about 99 KiB), retained at the owner’s request. Use `supabase/tests/storage_usage.sql` to measure again and `storage_rls.sql` for rollback checks. This policy limits file storage, not the growth of legitimate text data.
+
+## Shared cover references (0.8.19)
+
+Apply `supabase/migrations/202610040002_checkpoint_community_covers.sql` after the earlier migrations and deploy the updated checkpoint-covers function. The private `checkpoint_steam.community_covers` table stores text and IGDB metadata, with RLS and a maximum of 10,000 rows. Only the service can execute `cp_community_cover`; clients retrieve or confirm verified references through the Edge Function. Images are never written to Storage.

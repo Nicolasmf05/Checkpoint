@@ -29,6 +29,8 @@ export class BrowserApi {
   block(id){return this.request('rest/v1/cp_blocks',{blocker_id:this.social.user.id,blocked_id:id},{auth:true});}
   publish(id,operation){return this.rpc('cp_publish_game',{p_game_id:id,p_expected_revision:operation.revision,p_operation_id:operation.id,p_game:operation.payload});}
   coverSearch(title,excluded,refresh=false){return this.request('functions/v1/checkpoint-covers/v1/search',{title,excluded,refresh});}
+  coverShared(g){return this.request('functions/v1/checkpoint-covers/v1/shared',{title:g.title,platform:g.platform,steamAppId:g.steamAppId,excluded:g.rejectedIgdbCovers});}
+  coverConfirm(g){return this.request('functions/v1/checkpoint-covers/v1/confirm',{title:g.title,platform:g.platform,steamAppId:g.steamAppId,imageId:g.igdbCoverImageId});}
   async coverImage(id){
     if(!/^[A-Za-z0-9_-]{1,80}$/.test(id))throw new RemoteError('igdb-unavailable');
     const response=await this.fetch(this.config.url+'/functions/v1/checkpoint-covers/v1/image/'+id,{headers:{apikey:this.config.publishableKey},credentials:'omit',referrerPolicy:'no-referrer',signal:AbortSignal.timeout(35000)});

@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.19
+
+- Una carátula de IGDB aceptada y guardada puede servir de carátula por defecto para otros usuarios del mismo juego cuando falta la de Steam. Se aplica sin otra confirmación, incluso en Biblioteca, conservando las imágenes personales y los rechazos. Supabase guarda solo texto e IDs de IGDB; las imágenes siguen almacenándose localmente.
+
 ## 0.8.18
 
 - Las acciones principales de la ficha aparecen arriba: Jugar, Ver logros y Editar juego. Jugar, guardar y aceptar tienen mayor tamaño y contraste; la ficha web también permite abrir juegos de Steam instalados en el equipo. Los juegos manuales destacan sus logros sin ofrecer un inicio de Steam incorrecto.

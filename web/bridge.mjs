@@ -42,7 +42,7 @@ const fail=error=>{
     invalid_credentials:'El usuario o la contraseña no son correctos.',user_already_exists:'Ese nombre de usuario ya está en uso.',email_exists:'Ese nombre de usuario ya está en uso.',weak_password:'Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres.',unauthorized:'La sesión no es válida. Vuelve a entrar en Checkpoint.',forbidden:'No tienes permiso para consultar o cambiar estos datos.',rate:'Demasiadas consultas. Espera antes de volver a intentarlo.','40001':'El progreso cambió en otro equipo. Revisa el conflicto antes de publicar.','not-found':'No se encontró un usuario disponible con ese código.'};
   notice=T(keys[code]||'No se pudo completar la operación. Los datos locales se conservan.');if(navigation.current)navigation.current.error=notice;emit();
 };
-function persist(){data.settings.gameLists=normalizeLists([...(data.settings.gameLists||[]),...data.games.flatMap(g=>g.lists)]);planSharing();const snapshot=structuredClone({games:data.games,deleted:data.deleted,settings:data.settings});persistQueue=persistQueue.catch(()=>{}).then(async()=>{if(storageConflict)throw new Error('local-conflict');try{data.revision=await store.save(snapshot,data.revision);}catch(error){if(error.message==='local-conflict')storageConflict=true;throw error;}});persistQueue.catch(fail);scheduleSharing();return persistQueue;}
+function persist(){data.settings.gameLists=normalizeLists([...(data.settings.gameLists||[]),...data.games.flatMap(g=>g.lists)]);planSharing();const snapshot=structuredClone({games:data.games,deleted:data.deleted,settings:data.settings});persistQueue=persistQueue.catch(()=>{}).then(async()=>{if(storageConflict)throw new Error('local-conflict');try{data.revision=await store.save(snapshot,data.revision);}catch(error){if(error.message==='local-conflict')storageConflict=true;throw error;}});persistQueue.catch(fail);persistQueue.then(shareCovers,()=>{});scheduleSharing();return persistQueue;}
 async function commit(){await persist();emit();}
 function progress(g){if(g.goal===0&&g.storyPercent!=null)return {text:T('Historia · avance manual'),percent:g.storyPercent};if(g.goal===2&&g.tasks.length)return {text:`${g.tasks.filter(t=>t.done).length} / ${g.tasks.length} ${T('tareas')}`,percent:Math.round(g.tasks.filter(t=>t.done).length*100/g.tasks.length)};if(!g.achievements)return {text:T('Logros sin sincronizar'),percent:null};return {text:g.achievements.length?`${g.achievements.filter(a=>a.unlocked).length} / ${g.achievements.length} ${T('logros')}`:T('Sin logros de Steam'),percent:g.achievements.length?Math.round(g.achievements.filter(a=>a.unlocked).length*100/g.achievements.length):null};}
 const cover=g=>g.customCover||(g.steamAppId?`https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`:null);
@@ -66,24 +66,36 @@ function build(prefix,fields){const b={fields,n:0};
  b.button=(label,run,tag)=>{const id=prefix+'.'+(tag||++b.n);controls.set(id,run);return {id,type:'button',text:label,enabled:!b.busy,accent:['save','accept','apply','import','signin','signup'].includes(tag),children:[]};};
  b.field=(key,label,type='input',options)=>{const id=prefix+'.field.'+key;controls.set(id,async value=>{fields[key]=value;if(b.onChange)await b.onChange(key,value);});const node={id,type,name:label,text:label,max:type==='textarea'?20000:250,enabled:!b.busy,value:type==='password'?undefined:fields[key],checked:fields[key]===true,empty:!fields[key],options,children:[]};return type==='check'?[node]:[text(label,false,true),node];};
  b.page=(heading,description,items,actions)=>({pageId:prefix,title:heading,type:'dock',children:[{type:'scroll',children:[{type:'stack',children:[text(heading,true),text(description,false,true),...(navigation.current?.error?[text(navigation.current.error,false,true)]:[]),...items]}]},{type:'row',children:actions}]});return b;}
-const coverQueue=new Set(),coverAttempts=new Set();let coverBusy=false;
-function missingCover(id){const g=game(id);if(g?.tracked&&!g.customCover&&g.igdbCoverSearchTitle!==g.title&&coverAttempts.size<10&&coverQueue.size<10&&!coverAttempts.has(g.id+'|'+g.title))coverQueue.add(id);}
-setInterval(async()=>{if(coverBusy||navigation.current||document.hidden||document.querySelector('.menu,.shortcut-help:modal')||tab==='friends'||data.settings.lightweight)return;if(coverAttempts.size>=10){coverQueue.clear();return;}const id=coverQueue.values().next().value;if(!id)return;coverQueue.delete(id);const g=game(id);if(!g||!g.tracked||g.customCover||g.igdbCoverSearchTitle===g.title)return;coverAttempts.add(g.id+'|'+g.title);await findCover(g,g.title,null,true);},3000);
+const contributedCovers=new Set();let contributingCovers=false;
+async function shareCovers(){
+ if(contributingCovers||storageConflict||!navigator.onLine)return;contributingCovers=true;
+ const key=g=>JSON.stringify([g.title,g.platform,g.steamAppId,g.igdbCoverImageId]);
+ try{for(;;){const g=data.games.find(g=>g.customCover&&/^[A-Za-z0-9_-]{1,80}$/.test(g.igdbCoverImageId)&&g.igdbCoverSearchTitle===g.title&&!contributedCovers.has(key(g)));if(!g)break;contributedCovers.add(key(g));
+   try{await api.coverConfirm(structuredClone(g));}catch{}await new Promise(resolve=>setTimeout(resolve,1500));
+ }}finally{contributingCovers=false;}
+}
+setTimeout(shareCovers,2000);
+const coverQueue=new Set(),coverAttempts=new Set();let coverBusy=false,coverProposalCount=0;
+function missingCover(id){const g=game(id);if(g&&!g.customCover&&coverQueue.size<100&&!coverAttempts.has(g.id+'|'+g.title))coverQueue.add(id);}
+setInterval(async()=>{if(coverBusy||navigation.current||document.hidden||document.querySelector('.menu,.shortcut-help:modal')||tab==='friends'||data.settings.lightweight)return;const id=coverQueue.values().next().value;if(!id)return;coverQueue.delete(id);const g=game(id);if(!g||g.customCover)return;coverAttempts.add(g.id+'|'+g.title);await findCover(g,g.title,null,true);},3000);
 async function findCover(g,title,parent,automatic=false,builder){
  if(coverBusy)return;coverBusy=true;if(builder)builder.busy=true;emit();
  const remember=async()=>{const current=game(g.id);if(automatic){await persist();}else if(current){current.rejectedIgdbCovers=[...g.rejectedIgdbCovers];current.igdbCoverSearchTitle=g.igdbCoverSearchTitle;await persist();}};
  try{
   if(!title||title.length>140)throw new Error('invalid-game');if(g.rejectedIgdbCovers.length>=200)throw new Error('igdb-exhausted');
-  const result=await api.coverSearch(title,g.rejectedIgdbCovers,!automatic);if((navigation.current||null)!==parent)return;
+  let result,shared=false;
+  if(automatic){try{result=await api.coverShared(g);shared=!!result?.candidate;}catch{}if(!shared){if(!g.tracked||g.igdbCoverSearchTitle===g.title||coverProposalCount>=10)return;coverProposalCount++;}}
+  if(!shared)result=await api.coverSearch(title,g.rejectedIgdbCovers,!automatic);if((navigation.current||null)!==parent)return;
   const candidate=result?.candidate;if(candidate==null){g.igdbCoverSearchTitle=title;await remember();if(!automatic)notice=T('No hay otra carátula de IGDB disponible para este nombre.');return;}
   if(!Number.isSafeInteger(candidate.id)||candidate.id<1||typeof candidate.name!=='string'||candidate.name.length>250||!candidate.name||!(/^[A-Za-z0-9_-]{1,80}$/).test(candidate.imageId)||g.rejectedIgdbCovers.includes(candidate.imageId))throw new Error('igdb-unavailable');
   const blob=await api.coverImage(candidate.imageId),bitmap=await createImageBitmap(blob);let png;
   try{if(bitmap.width*bitmap.height>16000000)throw new Error('igdb-unavailable');const scale=Math.min(1,160/bitmap.width,240/bitmap.height),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);png=canvas.toDataURL('image/png');}finally{bitmap.close();}
   if((navigation.current||null)!==parent||automatic&&(!game(g.id)||g.customCover||g.title!==title||data.settings.lightweight))return;
   g.igdbCoverSearchTitle=title;
+  if(shared){g.customCover=png;g.igdbCoverImageId=candidate.imageId;await remember();return;}
   const choice=build('cover-choice',{});let deciding=false;
   const decide=async accept=>{if(deciding)return;deciding=true;choice.busy=true;emit();try{if(accept){g.customCover=png;g.igdbCoverImageId=candidate.imageId;}else if(!g.rejectedIgdbCovers.includes(candidate.imageId))g.rejectedIgdbCovers.push(candidate.imageId);await remember();navigation.current=parent||undefined;emit();}catch(error){choice.busy=false;deciding=false;fail(error);}};
-  navigation.current={cancel:()=>decide(false),render:()=>choice.page(T('Carátula de IGDB'),title,[{type:'image',src:png,style:'cover-preview',children:[]},text(candidate.name+(Number.isInteger(candidate.year)?' · '+candidate.year:''),true),text(T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.')),text(T('Si la rechazas no volveremos a ofrecerla. Puedes buscar otra desde el editor del juego.'))],[choice.button(T('No usar esta carátula'),()=>decide(false),'reject'),choice.button(T('Usar esta carátula'),()=>decide(true),'accept')])};
+  navigation.current={cancel:()=>decide(false),render:()=>choice.page(T('Carátula de IGDB'),title,[{type:'image',src:png,style:'cover-preview',children:[]},text(candidate.name+(Number.isInteger(candidate.year)?' · '+candidate.year:''),true),text(T('Coincidencia más cercana por nombre. Comprueba que sea tu juego. Carátula: IGDB.')),text(T('Si la rechazas no volveremos a ofrecerla. Puedes buscar otra desde el editor del juego.')),text(T('Al guardar, compartes la referencia de IGDB como carátula por defecto para este juego. No se sube la imagen ni tus datos personales.'))],[choice.button(T('No usar esta carátula'),()=>decide(false),'reject'),choice.button(T('Usar esta carátula'),()=>decide(true),'accept')])};
  }catch(error){if(!automatic&&navigation.current===parent)fail(error);}
  finally{coverBusy=false;if(builder)builder.busy=false;emit();}
 }

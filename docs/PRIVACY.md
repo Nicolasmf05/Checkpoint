@@ -45,3 +45,7 @@ La detección consulta nombres/rutas de procesos y títulos de ventanas localmen
 ## Búsquedas de carátulas de IGDB
 
 Las propuestas y búsquedas manuales envían el título a Supabase/IGDB, incluso para juegos privados para amigos. No incluyen notas, contraseñas ni progreso. Se envían los identificadores rechazados para filtrar propuestas; las imágenes aceptadas y el historial permanecen locales y no se publican para amigos. El servicio guarda coincidencias públicas durante siete días y utiliza identificadores resumidos de IP para limitar consultas. [Detalles](IGDB.md).
+
+## Carátulas compartidas de IGDB
+
+Al guardar una carátula aceptada de IGDB, se puede compartir únicamente su referencia, el título y la plataforma como carátula por defecto para ese juego. No se incluyen cuentas, progreso ni archivos de imagen. Las referencias no se asocian a personas y permanecen hasta su retirada administrativa. La app puede reutilizarlas automáticamente cuando falta la imagen de Steam; tus imágenes propias y rechazos se conservan.

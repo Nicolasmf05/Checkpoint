@@ -2,7 +2,18 @@
 
 **English** · [Español](../IGDB.md)
 
-When the Steam cover for a listed game fails, Checkpoint searches IGDB by title and proposes its closest match. Manually added games without Steam IDs are supported too. Existing custom covers are preserved.
+When the Steam cover is missing, Checkpoint first checks for a shared reference for that game. If none exists and the game is in your list, it searches IGDB by title and proposes its closest match. Manually added games without Steam IDs are supported too. Existing custom covers are preserved.
+
+## Shared default covers
+
+When the Steam image is missing, Checkpoint first looks for an IGDB reference another user accepted and saved for the same game. If available, it applies automatically and caches the image locally, including games only in Library. An earlier search with no results does not prevent retrieving a new shared reference when reopening the app.
+
+Personal covers are retained and rejected references are excluded. You can choose another through the editor. Steam games use their application ID and normalized title; manual games use title and platform to keep editions separate. Approximate matches from other games are not reused.
+
+The first saved choice becomes the shared default. Later replacements remain personal choices. An editor preview you do not save is never shared. Previously accepted references can be contributed when reopening Checkpoint online.
+
+Supabase stores only title, platform and IGDB ID/metadata, without images, local paths, accounts or progress. Images are downloaded from IGDB and cached on the device. The private table uses RLS, service-only writes, request limits and a maximum of 10,000 references. References remain until the administrator removes them and are not tied to an account.
+
 
 ## Choosing a cover
 

@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.19
+
+- An accepted, saved IGDB cover can become the default for other users of the same game when the Steam cover is missing. It applies without another confirmation, including in Library, while retaining personal covers and rejected-image exclusions. Supabase stores only text and IGDB IDs; images remain local.
+
 ## 0.8.18
 
 - Game sheets put Play, View achievements and Edit game at the top. Play, save and accept actions have stronger contrast and larger targets; web game sheets can also open locally installed Steam games. Manual games emphasize achievements without offering an invalid Steam launch.

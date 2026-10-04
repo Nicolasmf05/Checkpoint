@@ -248,7 +248,7 @@ public partial class MainWindow : Window
         web?.Publish();
     }
     internal static SolidColorBrush Brush(string color) => (SolidColorBrush)new BrushConverter().ConvertFromString(color)!;
-    internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); }
+    internal void Persist() { CaptureBounds(); Store.Save(Games, Preferences); SchedulePublications(); ScheduleCoverContributions(); }
     internal void PersistListChange(string previous,string? next)
     {
         CaptureBounds();Store.SaveListChange(Games,Preferences,previous,next);

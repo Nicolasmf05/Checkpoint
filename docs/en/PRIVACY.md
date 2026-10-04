@@ -39,3 +39,7 @@ Detection reads process names/paths and window titles locally; the process inven
 ## IGDB cover searches
 
 Missing-cover proposals and manual searches send the game title to Supabase/IGDB, even for games private to friends. No notes, passwords or progress are included. Rejected image IDs are sent to filter proposals; accepted images and rejection history remain local and are excluded from friend publications. The service caches public matches for seven days and uses hashed IP identifiers for rate limiting. [Details](IGDB.md).
+
+## Shared IGDB covers
+
+Saving an accepted IGDB cover can share only its reference, title and platform as the default cover for that game. Accounts, progress and image files are excluded. References are not associated with people and remain until administrative removal. The app can automatically reuse them when the Steam image is missing; personal images and rejected references are retained.

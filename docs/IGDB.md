@@ -2,7 +2,18 @@
 
 **Español** · [English](en/IGDB.md)
 
-Cuando falla la carátula de Steam de un juego añadido a tu lista, Checkpoint busca en IGDB por su título y propone la coincidencia más cercana. También funciona con juegos añadidos manualmente sin ID de Steam. Las carátulas personalizadas existentes se conservan.
+Cuando falta la carátula de Steam, Checkpoint busca primero una referencia compartida para ese juego. Si no existe y el juego está en tu lista, busca en IGDB por su título y propone la coincidencia más cercana. También funciona con juegos añadidos manualmente sin ID de Steam. Las carátulas personalizadas existentes se conservan.
+
+## Carátula compartida por defecto
+
+Cuando falta la imagen de Steam, Checkpoint consulta primero una referencia de IGDB que otro usuario haya aceptado y guardado para ese mismo juego. Si existe, la aplica automáticamente y guarda la imagen localmente, también para juegos que solo están en Biblioteca. Una búsqueda anterior sin resultados no impide recuperar una referencia nueva al abrir de nuevo la app.
+
+Se conservan tus carátulas propias y se excluyen las referencias que hayas rechazado. Puedes elegir otra desde el editor. Los juegos de Steam se identifican por su ID y título normalizado; los manuales, por título y plataforma, para evitar mezclar ediciones. No se reutilizan coincidencias aproximadas de otros juegos.
+
+La primera elección guardada sirve de valor compartido. Cambiar tu imagen después conserva tu elección personal. Una propuesta del editor que no guardes no se comparte. Las referencias aceptadas anteriormente pueden incorporarse al volver a abrir Checkpoint con conexión.
+
+Supabase almacena únicamente título, plataforma e ID/metadata de IGDB, sin imágenes, rutas locales, cuentas ni progreso. La descarga se hace desde IGDB y la copia queda en tu dispositivo. La tabla privada tiene RLS, escritura exclusiva del servicio, límites de solicitudes y un máximo de 10.000 referencias. La referencia se conserva hasta que el administrador la retire; no está ligada a ninguna cuenta.
+
 
 ## Elegir una carátula
 

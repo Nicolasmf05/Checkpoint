@@ -28,6 +28,22 @@ internal sealed class IgdbClient : IDisposable
             throw new InvalidOperationException(I18n.T("IGDB no está disponible. Inténtalo más tarde."));
         return candidate;
     }
+    internal async Task<IgdbCover?> Shared(Game game,CancellationToken cancellation=default)
+    {
+        using var response=await http.PostAsJsonAsync(new Uri(endpoint,"v1/shared"),new {title=game.Title,platform=game.Platform,steamAppId=game.SteamAppId,excluded=game.RejectedIgdbCovers},DataJson.Options,cancellation);
+        if(!response.IsSuccessStatusCode)throw new InvalidOperationException(await Error(response));
+        using var json=JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellation));
+        var value=json.RootElement.GetProperty("candidate");if(value.ValueKind==JsonValueKind.Null)return null;
+        var candidate=value.Deserialize<IgdbCover>(DataJson.Options);
+        if(candidate is null||candidate.Id<=0||string.IsNullOrWhiteSpace(candidate.Name)||candidate.Name.Length>250||!CoverSuggestions.ValidImageId(candidate.ImageId)||game.RejectedIgdbCovers.Contains(candidate.ImageId)||!double.IsFinite(candidate.Score)||candidate.Score is <0 or >1)
+            throw new InvalidOperationException(I18n.T("IGDB no está disponible. Inténtalo más tarde."));
+        return candidate;
+    }
+    internal async Task Confirm(Game game,CancellationToken cancellation=default)
+    {
+        using var response=await http.PostAsJsonAsync(new Uri(endpoint,"v1/confirm"),new {title=game.Title,platform=game.Platform,steamAppId=game.SteamAppId,imageId=game.IgdbCoverImageId},DataJson.Options,cancellation);
+        if(!response.IsSuccessStatusCode)throw new InvalidOperationException(await Error(response));
+    }
     internal async Task<byte[]> Image(string id,CancellationToken cancellation=default)
     {
         if(!CoverSuggestions.ValidImageId(id))throw new ArgumentException(I18n.T("La configuración de carátulas no es válida."));

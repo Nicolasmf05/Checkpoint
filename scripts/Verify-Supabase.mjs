@@ -7,6 +7,7 @@ if (origin.protocol !== 'https:' || origin.hostname !== `${project.projectRef}.s
     || origin.pathname !== '/' || origin.search || origin.hash || origin.username || origin.password
     || !project.publishableKey.startsWith('sb_publishable_')) throw new Error('Invalid public project configuration');
 const checks = [
+  {name:'Anonymous community-cover state RPC',path:'rest/v1/rpc/cp_community_cover',body:{p_action:'get',p_id:'f'.repeat(64),p_value:{}}},
   { name: 'Anonymous Steam state RPC', path: 'rest/v1/rpc/cp_steam_state', body: {
     p_action: 'get', p_kind: 'session', p_id: 'public-permission-check', p_value: {}, p_ttl: 600
   } },

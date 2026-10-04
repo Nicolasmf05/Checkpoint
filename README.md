@@ -29,7 +29,7 @@ Click a game card, title or cover to open its complete sheet, including status, 
 
 ## Missing game covers
 
-When a listed game has no working Steam cover, Checkpoint proposes the closest IGDB match for your approval. Declined images are remembered; Edit game → Search IGDB for another cover requests a fresh alternative. Accepted images are stored locally. Available in Windows and the browser. [Setup and behavior](docs/en/IGDB.md).
+When the Steam cover is missing, Checkpoint automatically applies an IGDB reference another user accepted and saved for the same game. If none exists, it proposes the closest IGDB match for your approval. Declined images are remembered; Edit game → Search IGDB for another cover requests a fresh alternative. Accepted images are stored locally. Available in Windows and the browser. [Setup and behavior](docs/en/IGDB.md).
 
 ## Screenshots
 
@@ -41,13 +41,13 @@ Actual browser app, shown with the Light theme and a small example collection. G
 
 ## Download and run
 
-Current version: **0.8.18**. Build outputs in `dist`:
+Current version: **0.8.19**. Build outputs in `dist`:
 
-- `Checkpoint-0.8.18-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
-- `Checkpoint-0.8.18-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
+- `Checkpoint-0.8.19-win-x64.zip`: portable edition. Extract the ZIP and open `Checkpoint/Checkpoint.exe`. All files stay inside the `Checkpoint` folder.
+- `Checkpoint-0.8.19-win-x64.msi`: per-user installer with Start menu shortcut and Windows uninstall support.
 - `.sha256` files: integrity checksums.
 
-Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.18), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
+Download the portable ZIP or MSI from [GitHub Releases](https://github.com/Nicolasmf05/Checkpoint/releases/tag/v0.8.19), or build from source below. The **Build and verify** GitHub Actions workflow also produces artifacts after a successful run. Packages include the .NET runtime; end users need no development tools. Windows 11 x64 is the target. Windows 10 and ARM64 hardware have not been validated; ARM64 packaging is supported. The MSI and EXE are unsigned; Windows may warn or block them. See [Windows security messages](docs/en/WINDOWS-SECURITY.md). No private certificates are included.
 
 
 Microsoft Store packaging is being prepared separately: [MSIX build and submission guide](docs/en/MICROSOFT-STORE.md). The unsigned MSIX preview is for developer validation and does not remove warnings from the current GitHub downloads.
@@ -193,7 +193,7 @@ Only the newest complete stable release is public. Earlier releases are retained
 
 The Checkpoint Attribution License 1.0, source, docs and build workflow are included. Set repository variable `CHECKPOINT_SERVICE_URL` for a hosted Steam service. The workflow uploads artifacts but does not publish a release automatically. Never upload `.tools`, `.qa`, `dist`, `.env`, databases, tokens or private keys.
 
-`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.8.18.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
+`scripts/Export-Source.ps1` creates `dist/Checkpoint-source-0.8.19.zip` using ripgrep and `.gitignore`. Versions come from `Directory.Build.props`. Built-in translations live in `src/Checkpoint.Core/Localization/en.json`, XAML keys in `src/Checkpoint.App/LocalizationKeys.json`. User content and API wire values are not translated.
 
 See [roadmap](docs/en/ROADMAP.md) and [changelog](CHANGELOG.md). Notifications, monthly statistics and private-library cloud sync are future work.
 
