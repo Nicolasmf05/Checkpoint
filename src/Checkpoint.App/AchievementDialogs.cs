@@ -10,8 +10,8 @@ internal static partial class Dialogs
     internal static Window Achievements(MainWindow owner, Game initial, bool automatic = false, Window? parent = null)
     {
         var window = Modal(owner, I18n.T("Logros · ") + initial.Title, 620, 720);
-        if(parent is not null)window.Owner=parent;
-        if(automatic) { window.Owner=null; window.ShowInTaskbar=true; window.ShowActivated=false; window.WindowStartupLocation=WindowStartupLocation.CenterScreen; }
+        if(parent is not null)Parent(window,parent);
+        if(automatic&&!App.UseCss) { window.Owner=null; window.ShowInTaskbar=true; window.ShowActivated=false; window.WindowStartupLocation=WindowStartupLocation.CenterScreen; }
         var body=Panel(); Layout(window,body,out var footer);
         Heading(body,I18n.T("Logros de ")+initial.Title,I18n.T("Los cambios manuales solo afectan a Checkpoint. No desbloquean logros en Steam ni RetroAchievements."));
         var summary=new TextBlock { FontSize=24, FontWeight=FontWeights.Bold };
@@ -73,14 +73,14 @@ internal static partial class Dialogs
         {
             bool closed=false;var timer=new DispatcherTimer{Interval=TimeSpan.FromSeconds(60)};
             async System.Threading.Tasks.Task Update() { if(closed)return;await owner.RefreshGameAchievements(Current());if(!closed)Render(); }
-            timer.Tick+=async(_,_)=>await Update();window.Loaded+=async(_,_)=>{timer.Start();await Update();};window.Closed+=(_,_)=>{closed=true;timer.Stop();};window.Show();
+            timer.Tick+=async(_,_)=>await Update();window.Loaded+=async(_,_)=>{timer.Start();await Update();};window.Closed+=(_,_)=>{closed=true;timer.Stop();};ShowPage(window,true);
         }
-        else window.ShowDialog();
+        else ShowPage(window);
         return window;
     }
     internal static void RetroSettings(MainWindow owner,Window parent)
     {
-        var window=Modal(owner,I18n.T("Configurar RetroAchievements"),540,560);window.Owner=parent;
+        var window=Modal(owner,I18n.T("Configurar RetroAchievements"),540,560);Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,"RetroAchievements",I18n.T("Introduce tu usuario y tu clave web personal. La clave se cifra en Windows y no se incluye en las copias de seguridad."));
         var username=Input(body,I18n.T("Usuario de RetroAchievements"),owner.Retro.Session?.Username??"");
@@ -94,6 +94,6 @@ internal static partial class Dialogs
             try { string value=key.Password;if(value.Length==0&&owner.Retro.Session is {} previous&&previous.Username==username.Text.Trim())value=previous.ApiKey;
                 owner.Retro.Save(username.Text,value,hardcore.IsChecked==true);key.Clear();owner.ResetAchievementRefresh();window.Close(); }
             catch(Exception ex){owner.Notice(I18n.Error(ex));}
-        },true));window.ShowDialog();
+        },true));ShowPage(window);
     }
 }

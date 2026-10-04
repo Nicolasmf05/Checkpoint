@@ -106,18 +106,6 @@ internal sealed class WebSurface : IDisposable
         previous = value; Browser.CoreWebView2.PostWebMessageAsJson(value);
     }
     internal void Event(object value) { if (loaded && !disposed) Browser.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(value,Json)); }
-    internal static void AttachDialog(Window window)
-    {
-        if (window.Tag is WebSurface || window.Content is not FrameworkElement root) return;
-        var controls = new WebControls();
-        if (window.SizeToContent != SizeToContent.Manual) { window.SizeToContent = SizeToContent.Manual; window.Height = 240; }
-        string directory = (Application.Current.MainWindow as MainWindow)?.Store.DirectoryPath
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Checkpoint");
-        var surface = new WebSurface(window,directory,() => new { kind="dialog", language=I18n.Language,
-            light=(Application.Current.MainWindow as MainWindow) is MainWindow main && Themes.IsLight(main.Preferences),
-            theme=(Application.Current.MainWindow as MainWindow) is MainWindow themed ? Themes.Id(themed.Preferences) : "dark", title=window.Title, root=controls.Capture(root) },message => { if (message.TryGetProperty("action",out var action) && action.GetString() == "cancel-dialog") window.Close(); else controls.Dispatch(message); });
-        window.Tag = surface;
-    }
     internal static string ImageUri(BitmapSource image) => imageCache.GetValue(image,key => new EncodedImage("data:image/png;base64,"+Convert.ToBase64String(ImageBytes(key)))).Value;
     internal static byte[] ImageBytes(BitmapSource image)
     {
@@ -133,7 +121,7 @@ internal sealed class WebControls
 {
     private readonly Dictionary<FrameworkElement,int> identities = new();
     private readonly Dictionary<int,FrameworkElement> active = new();
-    private int next;
+    private static int next;
     internal object? Capture(FrameworkElement root)
     {
         active.Clear(); var result = Node(root,true);
@@ -143,7 +131,7 @@ internal sealed class WebControls
     private object? Node(FrameworkElement element, bool root = false)
     {
         if (!root && element.Visibility != Visibility.Visible) return null;
-        if (!identities.TryGetValue(element,out int id)) identities[element] = id = ++next;
+        if (!identities.TryGetValue(element,out int id)) identities[element] = id = System.Threading.Interlocked.Increment(ref next);
         active[id] = element;
         var node = new Dictionary<string,object?> { ["id"]=id, ["enabled"]=element.IsEnabled,
             ["name"]=System.Windows.Automation.AutomationProperties.GetName(element), ["tip"]=element.ToolTip?.ToString(),

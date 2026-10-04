@@ -14,7 +14,7 @@ internal static partial class Dialogs
     internal static bool IgdbCoverPreview(MainWindow owner,Window parent,string title,IgdbCover candidate,byte[] prepared)
     {
         var window=Modal(owner,I18n.T("Carátula de IGDB"),460,590);
-        window.Owner=parent;var body=Panel();Layout(window,body,out var footer);
+        Parent(window,parent);var body=Panel();Layout(window,body,out var footer);
         Heading(body,I18n.T("¿Quieres usar esta carátula?"),title);
         body.Children.Add(new Image { Source=CoverCache.ReadPrepared(prepared),Height=240,Tag="cover-preview" });
         body.Children.Add(new TextBlock { Text=candidate.Name+(candidate.Year is {} year?" · "+year:""),FontSize=18,TextWrapping=TextWrapping.Wrap });
@@ -23,7 +23,7 @@ internal static partial class Dialogs
         bool accepted=false;
         footer.Children.Add(Button(I18n.T("No usar esta carátula"),(_,_)=>window.Close()));
         footer.Children.Add(Button(I18n.T("Usar esta carátula"),(_,_)=>{accepted=true;window.Close();},true));
-        window.ShowDialog();return accepted;
+        ShowPage(window);return accepted;
     }
 }
 public partial class MainWindow
@@ -40,7 +40,7 @@ public partial class MainWindow
             if(File.Exists(path))Igdb=new(JsonSerializer.Deserialize<SocialProject>(File.ReadAllText(path),DataJson.Options)!);
         }catch(Exception error) when(error is IOException or JsonException or ArgumentException){}
         coverTimer.Tick+=async(_,_)=>{
-            if(coverSuggestionBusy||!IsActive||Preferences.MiniatureView||Preferences.LightweightMode||friendsVisible||Application.Current.Windows.Cast<Window>().Any(w=>w!=this&&w.IsVisible))return;
+            if(HasInlinePage||coverSuggestionBusy||!IsActive||Preferences.MiniatureView||Preferences.LightweightMode||friendsVisible||Application.Current.Windows.Cast<Window>().Any(w=>w!=this&&w.IsVisible))return;
             if(!missingCovers.TryDequeue(out var id))return;
             var game=Games.FirstOrDefault(g=>g.Id==id);if(game is null||!CoverSuggestions.ShouldSuggest(game))return;
             coverSuggestionBusy=true;
@@ -66,7 +66,7 @@ public partial class MainWindow
             {
                 var prepared=CoverCache.PrepareRemote(await Igdb.Image(candidate.ImageId,shutdown.Token));
                 if(automatic&&(Games.All(g=>g.Id!=game.Id)||game.CustomCover is not null||game.Title!=title||!IsActive||Preferences.MiniatureView||Preferences.LightweightMode||Application.Current.Windows.Cast<Window>().Any(w=>w!=this&&w.IsVisible)))return;
-                if(!parent.IsVisible)return;
+                if(!PageIsOpen(parent))return;
                 game.IgdbCoverSearchTitle=title.Trim();
                 if(Dialogs.IgdbCoverPreview(this,parent,title,candidate,prepared)){game.CustomCover=Covers.SavePrepared(prepared);game.IgdbCoverImageId=candidate.ImageId;}
                 else CoverSuggestions.Reject(game,candidate.ImageId);

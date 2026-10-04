@@ -24,13 +24,15 @@ public partial class MainWindow
             for (int attempt=0;attempt<200;attempt++) { if (await condition()) return; await Task.Delay(50); }
             throw new TimeoutException("CSS UI condition timed out");
         }
-        async Task<bool> Script(WebSurface surface,string script) => await surface.Browser.CoreWebView2.ExecuteScriptAsync(script) == "true";
-        async Task Run(string script) { await web!.Browser.CoreWebView2.ExecuteScriptAsync("(() => {"+script+"})()"); await Task.Delay(350); }
+        // Every page now shares one JavaScript realm; diagnostic snippets need local scope.
+        Task<string> ScopedScript(WebSurface surface,string script) => surface.Browser.CoreWebView2.ExecuteScriptAsync("(() => eval("+JsonSerializer.Serialize(script)+"))()");
+        async Task<bool> Script(WebSurface surface,string script) => await ScopedScript(surface,script) == "true";
+        async Task Run(string script) { await Wait(()=>Script(web!,"window.checkpointState?.kind==='main'"));await ScopedScript(web!,"(() => {"+script+"})()"); await Task.Delay(350); }
         async Task<WebSurface> Dialog()
         {
             WebSurface? found=null;
             await Wait(async () => { found=Application.Current.Windows.OfType<Window>().Where(w=>w!=this).Select(w=>w.Tag).OfType<WebSurface>().FirstOrDefault();
-                return found?.Browser.CoreWebView2 is not null && await Script(found,"window.checkpointState?.kind === 'dialog'"); });
+                return found?.Browser.CoreWebView2 is not null && HasInlinePage && await Script(found,"window.checkpointState?.kind === 'dialog' && window.checkpointState.root?.pageId==='"+inlinePages[^1].Id+"'"); });
             return found!;
         }
         async Task Capture(WebSurface surface,string name)
@@ -64,11 +66,11 @@ public partial class MainWindow
             await Run("const search=document.querySelector('#search');search.value='';search.dispatchEvent(new Event('input',{bubbles:true}));");
             await Run("document.querySelector('[data-label=add]').click();");
             var add=await Dialog();
-            await add.Browser.CoreWebView2.ExecuteScriptAsync("const title=document.querySelector('input[aria-label=\"Nombre del juego\"]');title.value='CSS test game';title.dispatchEvent(new Event('input',{bubbles:true}));const notes=document.querySelector('textarea');notes.value='Offline CSS notes';notes.dispatchEvent(new Event('input',{bubbles:true}));");
+            await ScopedScript(add,"const title=document.querySelector('input[aria-label=\"Nombre del juego\"]');title.value='CSS test game';title.dispatchEvent(new Event('input',{bubbles:true}));const notes=document.querySelector('textarea');notes.value='Offline CSS notes';notes.dispatchEvent(new Event('input',{bubbles:true}));");
             await Task.Delay(350);
             Check(await Script(add,"document.querySelector('textarea').value==='Offline CSS notes'"),"CSS form values survive native acknowledgement and rerendering");
             await Capture(add,"css-editor-es.png");
-            await add.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Guardar').click();");
+            await ScopedScript(add,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Guardar').click();");
             await Wait(()=>Task.FromResult(Games.Any(g=>g.Title=="CSS test game")));
             Check(Store.LoadGames().Single(g=>g.Title=="CSS test game").Notes=="Offline CSS notes","CSS editor saves a game and notes to existing SQLite storage");
             var achievementFixture=Games.Single(g=>g.Title=="CSS test game");
@@ -76,38 +78,48 @@ public partial class MainWindow
             Refresh();await Wait(()=>Script(web,"!!document.querySelector('.achievement-link')"));
             await Run("document.querySelector('[data-game=\""+achievementFixture.Id+"\"] .achievement-link').click();");var achievementDialog=await Dialog();
             Check(await Script(achievementDialog,"!!document.querySelector('.achievement-summary progress') && !document.body.innerText.includes('Official pending')"),"library opens achievement overview directly with collapsed descriptions");
-            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Ver descripción').click();");
+            await ScopedScript(achievementDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Ver descripción').click();");
             await Wait(()=>Script(achievementDialog,"document.body.innerText.includes('Official pending')"));
             Check(await Script(achievementDialog,"!!document.querySelector('.achievement-description')"),"achievement description expands inside its emphasized CSS card");
             Check(await Script(achievementDialog,"document.body.innerText.includes('No desbloquean logros en Steam') && !!document.querySelector('input[aria-label=\"Nombre del logro manual\"]')"),"detected achievement window renders localized manual controls in CSS");
-            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("const name=document.querySelector('input[aria-label=\"Nombre del logro manual\"]');name.value='CSS manual goal';name.dispatchEvent(new Event('input',{bubbles:true}));[...document.querySelectorAll('button')].find(b=>b.textContent==='Añadir logro manual').click();");
+            await ScopedScript(achievementDialog,"const name=document.querySelector('input[aria-label=\"Nombre del logro manual\"]');name.value='CSS manual goal';name.dispatchEvent(new Event('input',{bubbles:true}));[...document.querySelectorAll('button')].find(b=>b.textContent==='Añadir logro manual').click();");
             await Wait(()=>Task.FromResult(achievementFixture.ManualAchievements.Count==1));
             Check(Store.LoadGames().Single(g=>g.Id==achievementFixture.Id).ManualAchievements.Count==1,"CSS manual achievement add persists to SQLite");
-            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('input[type=checkbox]')].at(-1).click();");
+            await ScopedScript(achievementDialog,"[...document.querySelectorAll('input[type=checkbox]')].at(-1).click();");
             await Wait(()=>Task.FromResult(AchievementTracking.Items(achievementFixture).Last().Completed));
             Check(!achievementFixture.ManualAchievements[0].Unlocked,"CSS completion retains official source status separately");
-            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Quitar de mi lista').click();");
+            await Wait(()=>Script(achievementDialog,"!document.body.innerText.includes('CSS manual goal')"));
+            await ScopedScript(achievementDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Quitar de mi lista').click();");
             await Wait(()=>Task.FromResult(achievementFixture.RemovedAchievements.Count==1));
             Check(achievementFixture.Achievements.Count==1,"CSS removal hides an API achievement without altering its raw data");
-            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Restaurar logros quitados').click();");
+            await ScopedScript(achievementDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Restaurar logros quitados').click();");
             await Wait(()=>Task.FromResult(achievementFixture.RemovedAchievements.Count==0));
             await Capture(achievementDialog,"css-achievements-es.png");
-            await achievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cerrar').click();");
+            await ScopedScript(achievementDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cerrar').click();");
             await Run("document.querySelector('[data-label=settings]').click();");
             var settings=await Dialog();
+            Check(ReferenceEquals(settings,web)&&Application.Current.Windows.OfType<Window>().Count(w=>w.IsVisible)==1,"Windows settings reuse the main browser with no additional visible window");
             Check(await Script(settings,"!!document.querySelector('select[aria-label=\"Idioma\"]') && document.querySelector('select[aria-label=\"Tema\"]').options[3].textContent==='Océano' && !document.querySelector('input[aria-label=\"Language / Idioma\"]')"),"settings controls render as localized HTML elements");
-            await settings.Browser.CoreWebView2.ExecuteScriptAsync("const language=document.querySelector('select[aria-label=\"Idioma\"]');language.value=1;language.dispatchEvent(new Event('change',{bubbles:true}));");
+            await ScopedScript(settings,"const language=document.querySelector('select[aria-label=\"Idioma\"]');language.value=1;language.dispatchEvent(new Event('change',{bubbles:true}));");
             await Task.Delay(200);
-            await settings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Guardar').click();");
+            await ScopedScript(settings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Configurar atajos').click();");
+            var nestedShortcuts=await Dialog();
+            await Wait(()=>Script(nestedShortcuts,"document.body.innerText.includes('Pulsa una combinación')"));
+            Check(ReferenceEquals(nestedShortcuts,settings)&&inlinePages.Count==2&&Application.Current.Windows.OfType<Window>().Count(w=>w.IsVisible)==1,"nested Windows pages retain one visible window and one WebView");
+            await ScopedScript(nestedShortcuts,"document.querySelector('.page-navigation button').click();");
+            await Wait(()=>Script(settings,"!!document.querySelector('select[aria-label=\"Idioma\"]')"));
+            Check(await Script(settings,"document.querySelector('select[aria-label=\"Idioma\"]').value==='1'"),"Back preserves the unsaved language field in the parent settings page");
+            await ScopedScript(settings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Guardar').click();");
             await Wait(()=>Script(web,"document.documentElement.lang==='en'"));
             Check(Preferences.Language=="en" && Store.LoadSettings().Language=="en" && await Script(web,"document.querySelector('[data-tab=library]').textContent==='Library'"),"CSS settings save language and update the main interface immediately");
             var englishAchievements=new Game{Title="Achievement example",Achievements=[new(){Id="first",Name="First steps",Description="Complete the first chapter"}],RetroAchievements=[new(){Id="retro-first",Name="Retro goal",Description="Finish the first level"}]};
             Games.Add(englishAchievements);var personal=AchievementTracking.Add(englishAchievements,"Personal challenge","Finish without hints");englishAchievements.AchievementOverrides["manual:"+personal.Id]=true;
             OpenDetectedAchievements(englishAchievements);var englishAchievementDialog=await Dialog();
-            Controls<System.Windows.Controls.CheckBox>(achievementWindows[englishAchievements.Id]).Single(c=>(string?)c.Content=="Show pending only").IsChecked=false;
+            await Wait(()=>Script(englishAchievementDialog,"!!document.querySelector('input[aria-label=\"Show pending only\"]')"));
+            await ScopedScript(englishAchievementDialog,"document.querySelector('input[aria-label=\"Show pending only\"]').click();");
             await Wait(()=>Script(englishAchievementDialog,"document.body.innerText.includes('Personal challenge') && document.body.innerText.includes('Completed in Checkpoint')"));
             Check(await Script(englishAchievementDialog,"document.body.innerText.includes('Steam') && document.body.innerText.includes('RetroAchievements') && !document.body.innerText.includes('Completado en')"),"English achievement window separates providers and local completion with translated controls");
-            await englishAchievementDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Show description').click();");
+            await ScopedScript(englishAchievementDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Show description').click();");
             await Wait(()=>Script(englishAchievementDialog,"document.body.innerText.includes('Complete the first chapter')"));
             await Capture(englishAchievementDialog,"css-achievements-en.png");achievementWindows[englishAchievements.Id].Close();Games.Remove(englishAchievements);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'F1',bubbles:true}));");
@@ -116,37 +128,37 @@ public partial class MainWindow
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
             await Run("document.querySelector('[data-label=settings]').click();");
             var themeSettings=await Dialog();
-            await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Updates').click();");
+            await ScopedScript(themeSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Updates').click();");
             WebSurface? updateDialog=null;
             await Wait(async()=>{updateDialog=Application.Current.Windows.OfType<Window>().FirstOrDefault(w=>w.Title=="Updates · Checkpoint")?.Tag as WebSurface;return updateDialog?.Browser.CoreWebView2 is not null&&await Script(updateDialog,"window.checkpointState?.kind==='dialog'");});
             Check(await Script(updateDialog!,"document.body.innerText.includes('Installed version:') && document.body.innerText.includes('once a day') && [...document.querySelectorAll('button')].some(b=>b.textContent==='Download and install' && b.disabled) && !document.body.innerText.includes('Descargar e instalar')"),"CSS update dialog renders English daily checking, installed version and disabled installation without a release");
-            await Capture(updateDialog!,"css-updates-en.png");await updateDialog!.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");
+            await Capture(updateDialog!,"css-updates-en.png");await ScopedScript(updateDialog!,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");
             Check(await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').options.length===22 && document.body.innerText.includes('Instant preview') && [...document.querySelector('select[aria-label=\"Theme\"]').options].some(option=>option.textContent==='High contrast')"),"settings offer 22 localized themes with preview instructions");
             string initialTheme=Themes.Id(Preferences);
             var paletteColors=new HashSet<string>();
             for(int index=0;index<Themes.Ids.Count;index++)
             {
                 string id=Themes.Ids[index];
-                await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("(() => {const theme=document.querySelector('select[aria-label=\"Theme\"]');theme.value="+index+";theme.dispatchEvent(new Event('change',{bubbles:true}));})()");
+                await ScopedScript(themeSettings,"(() => {const theme=document.querySelector('select[aria-label=\"Theme\"]');theme.value="+index+";theme.dispatchEvent(new Event('change',{bubbles:true}));})()");
                 await Wait(async ()=> await Script(web,"document.documentElement.dataset.theme==='"+id+"'") && await Script(themeSettings,"document.documentElement.dataset.theme==='"+id+"'"));
                 Check(Themes.Id(Preferences)==id && await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').value==='"+index+"'"),"theme previews immediately in both main and settings windows: "+id);
-                paletteColors.Add((await web.Browser.CoreWebView2.ExecuteScriptAsync("getComputedStyle(document.querySelector('.window')).backgroundColor+'|'+getComputedStyle(document.documentElement).getPropertyValue('--accent')")));
+                paletteColors.Add((await ScopedScript(web,"getComputedStyle(document.querySelector('.dialog-page')||document.querySelector('.window')).backgroundColor+'|'+getComputedStyle(document.documentElement).getPropertyValue('--accent')")));
                 await Capture(web,"css-theme-"+id+"-en.png");
             }
             Check(paletteColors.Count==22,"all 22 themes have distinct rendered palettes");
-            await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Cancel').click();");
+            await ScopedScript(themeSettings,"[...document.querySelectorAll('button')].find(button=>button.textContent==='Cancel').click();");
             await Wait(()=>Script(web,"document.documentElement.dataset.theme==='"+initialTheme+"'"));
             Check(Themes.Id(Preferences)==initialTheme && Themes.Id(Store.LoadSettings())==initialTheme,"canceling preview restores and persists the previous theme");
             await Run("document.querySelector('[data-label=settings]').click();");
             themeSettings=await Dialog();
-            await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("const theme=document.querySelector('select[aria-label=\"Theme\"]');theme.value=3;theme.dispatchEvent(new Event('change',{bubbles:true}));");
+            await ScopedScript(themeSettings,"const theme=document.querySelector('select[aria-label=\"Theme\"]');theme.value=3;theme.dispatchEvent(new Event('change',{bubbles:true}));");
             await Wait(()=>Script(web,"document.documentElement.dataset.theme==='ocean'"));
-            await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Save').click();");
+            await ScopedScript(themeSettings,"[...document.querySelectorAll('button')].find(button=>button.textContent==='Save').click();");
             await Run("document.querySelector('[data-label=settings]').click();");
             themeSettings=await Dialog();
             Check(Themes.Id(Store.LoadSettings())=="ocean" && await Script(themeSettings,"document.querySelector('select[aria-label=\"Theme\"]').value==='3'"),"saving a theme persists it and restores the selected option when reopening settings");
             await Capture(themeSettings,"css-theme-settings-en.png");
-            await themeSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Cancel').click();");
+            await ScopedScript(themeSettings,"[...document.querySelectorAll('button')].find(button=>button.textContent==='Cancel').click();");
             await Capture(web,"css-widget-en.png");
             await Run("document.querySelector('[data-tab=friends]').click();");
             await Wait(()=>Script(web,"!!document.querySelector('input[aria-label=\"Checkpoint username\"]')"));
@@ -158,9 +170,9 @@ public partial class MainWindow
             await Run("document.querySelector('[data-tab=list]').click();document.querySelector('[data-label=settings]').click();");
             settings=await Dialog();
             await Capture(settings,"css-settings-en.png");
-            await settings.Browser.CoreWebView2.ExecuteScriptAsync("const view=document.querySelector('select[aria-label=\"Collection view\"]');view.value=3;view.dispatchEvent(new Event('change',{bubbles:true}));");
+            await ScopedScript(settings,"const view=document.querySelector('select[aria-label=\"Collection view\"]');view.value=3;view.dispatchEvent(new Event('change',{bubbles:true}));");
             await Task.Delay(200);
-            await settings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");
+            await ScopedScript(settings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");
             await Wait(()=>Script(web,"window.checkpointState.mini"));
             Check(await Script(web,"document.documentElement.dataset.theme==='ocean' && getComputedStyle(document.querySelector('.window')).getPropertyValue('--accent').trim()==='#6edcf7'"),"Miniature retains the selected custom theme");
             Check(await Script(web,"getComputedStyle(document.querySelector('.header')).display==='none' && document.querySelectorAll('.minirow').length===4 && !document.querySelector('.minirow img')"),"CSS Miniature displays only game names and states");
@@ -178,7 +190,7 @@ public partial class MainWindow
             foreach(var item in Games)item.Tracked=miniatureTracked[item.Id];Preferences.GameLists=miniatureLists;Preferences.ActiveList=miniatureActive;Preferences.Language="en";I18n.SetLanguage("en");Preferences.MiniatureView=true;ApplyPreferences();Persist();Refresh();await Task.Delay(350);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));");
             Check(await Script(web,"document.activeElement.matches('.minirow')"),"CSS Miniature keyboard navigation focuses an HTML game row");
-            var activeGameId=Guid.Parse(JsonSerializer.Deserialize<string>(await web.Browser.CoreWebView2.ExecuteScriptAsync("document.activeElement.dataset.game"))!);
+            var activeGameId=Guid.Parse(JsonSerializer.Deserialize<string>(await ScopedScript(web,"document.activeElement.dataset.game"))!);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));");
             Check(await Script(web,"document.querySelectorAll('.menu button[role=menuitemradio]').length===5 && !document.querySelector('.menu').textContent.includes('Settings')"),"Miniature game menu contains only game actions");
             await Run("[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Playing')).click();");
@@ -197,7 +209,7 @@ public partial class MainWindow
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'F2',bubbles:true}));");
             var edit=await Dialog();
             Check(await Script(edit,"!!document.querySelector('input[aria-label=\"Game title\"]')"),"Miniature F2 opens the CSS game editor");
-            await edit.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");
+            await ScopedScript(edit,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");
             await Task.Delay(350);
             Check(await Script(web,"document.activeElement.matches('.minirow')"),"canceling a CSS game editor restores Miniature row focus");
             int before=Games.Count;
@@ -234,7 +246,7 @@ public partial class MainWindow
             Check(await Script(notice,"getComputedStyle(document.querySelector('.dialog-page')).backgroundColor==='rgb(66, 40, 75)'"),"app notices follow the chosen custom theme");
             Check(await Script(notice,"document.body.innerText.includes('The operation could not be completed') && [...document.querySelectorAll('button')].some(b=>b.textContent==='OK')"),"app notices render English text and buttons in CSS");
             await Capture(notice,"css-notice-en.png");
-            await notice.Browser.CoreWebView2.ExecuteScriptAsync("document.querySelector('button').click();"); await Task.Delay(200);
+            await ScopedScript(notice,"document.querySelector('button').click();"); await Task.Delay(200);
             Preferences.Theme="dark"; ApplyPreferences(); Refresh();
             double smallWidth=Width, smallHeight=Height;
             Preferences.BackgroundOpacity=.61; Persist(); Refresh();
@@ -259,32 +271,33 @@ public partial class MainWindow
             await Run("document.querySelector('[data-label=settings]').click();");
             var modesSettings=await Dialog();
             Check(await Script(modesSettings,"document.querySelector('select[aria-label=\"Window mode\"]').value==='0' && document.body.innerText.includes('100% opacity')"),"settings expose localized window modes and the full-opacity explanation");
-            await modesSettings.Browser.CoreWebView2.ExecuteScriptAsync("const mode=document.querySelector('select[aria-label=\"Window mode\"]');mode.value=1;mode.dispatchEvent(new Event('change',{bubbles:true}));"); await Task.Delay(200);
-            await modesSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(button=>button.textContent==='Save').click();"); await Task.Delay(350);
+            await ScopedScript(modesSettings,"const mode=document.querySelector('select[aria-label=\"Window mode\"]');mode.value=1;mode.dispatchEvent(new Event('change',{bubbles:true}));"); await Task.Delay(200);
+            await ScopedScript(modesSettings,"[...document.querySelectorAll('button')].find(button=>button.textContent==='Save').click();"); await Task.Delay(350);
             Check(!IsFullWindow && !Preferences.MiniatureView && !Store.LoadSettings().FullWindow,"CSS settings save the small window mode");
             _ = Dispatcher.BeginInvoke(new Action(()=>Dialogs.ShortcutSettings(this)));
             var shortcutsDialog=await Dialog();
             Check(await Script(shortcutsDialog,"document.querySelectorAll('input').length===17"),"shortcut configuration exposes local, Miniature, reorder and global actions");
-            await shortcutsDialog.Browser.CoreWebView2.ExecuteScriptAsync("document.querySelector('input[aria-label=\"Add game\"]').dispatchEvent(new KeyboardEvent('keydown',{key:'N',ctrlKey:true,shiftKey:true,bubbles:true}));"); await Task.Delay(300);
+            await ScopedScript(shortcutsDialog,"document.querySelector('input[aria-label=\"Add game\"]').dispatchEvent(new KeyboardEvent('keydown',{key:'N',ctrlKey:true,shiftKey:true,bubbles:true}));"); await Task.Delay(300);
             await Capture(shortcutsDialog,"css-configure-shortcuts-en.png");
-            await shortcutsDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();"); await Task.Delay(400);
+            await ScopedScript(shortcutsDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();"); await Task.Delay(400);
             Check(Store.LoadSettings().Shortcuts.GetValueOrDefault("add")=="Ctrl+Shift+N","CSS shortcut editor saves the captured combination to SQLite");
             Check(await Script(web,"document.querySelector('.shortcutbar').textContent.includes('Ctrl+Shift+N')"),"shortcut hints update to the configured combination");
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'N',ctrlKey:true,shiftKey:true,bubbles:true}));");
             var shortcutEditor=await Dialog();
             Check(await Script(shortcutEditor,"!!document.querySelector('input[aria-label=\"Game title\"]')"),"custom desktop shortcut opens the game editor");
-            await shortcutEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);
+            await ScopedScript(shortcutEditor,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);
             await Run("document.querySelector('.manage-lists').click();");
             var listsDialog=await Dialog();
             Check(await Script(listsDialog,"!!document.querySelector('input[aria-label=\"List name\"]') && document.body.innerText.includes('without duplication')"),"CSS list manager explains membership and renders localized controls");
-            await listsDialog.Browser.CoreWebView2.ExecuteScriptAsync("const n=document.querySelector('input[aria-label=\"List name\"]');n.value='Weekend';n.dispatchEvent(new Event('input',{bubbles:true}));[...document.querySelectorAll('button')].find(b=>b.textContent==='Create list').click();");await Task.Delay(350);
+            await ScopedScript(listsDialog,"const n=document.querySelector('input[aria-label=\"List name\"]');n.value='Weekend';n.dispatchEvent(new Event('input',{bubbles:true}));[...document.querySelectorAll('button')].find(b=>b.textContent==='Create list').click();");await Task.Delay(350);
             Check(Store.LoadSettings().GameLists.Contains("Weekend") && Preferences.ActiveList=="custom:Weekend","CSS list creation persists the catalog and active selection");
             await Capture(listsDialog,"css-lists-en.png");
-            await listsDialog.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(250);
+            await ScopedScript(listsDialog,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(250);
             Check(await Script(web,"document.querySelector('.collection-selector').value==='custom:Weekend' && !window.checkpointState.games.length"),"an empty custom list is independently selectable");
             await Run("document.querySelector('[data-label=add]').click();");
             var privateEditor=await Dialog();
-            await privateEditor.Browser.CoreWebView2.ExecuteScriptAsync("const n=document.querySelector('input[aria-label=\"Game title\"]');n.value='Private list fixture';n.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('input[aria-label=\"Private to my friends\"]').click();[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(400);
+            await ScopedScript(privateEditor,"const n=document.querySelector('input[aria-label=\"Game title\"]');n.value='Private list fixture';n.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('input[aria-label=\"Private to my friends\"]').click();[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(400);
+            await Wait(()=>Task.FromResult(Games.Any(g=>g.Title=="Private list fixture")));
             var privateFixture=Games.Single(g=>g.Title=="Private list fixture");
             Check(privateFixture.FriendsPrivate==true && privateFixture.Lists.Contains("Weekend") && Store.LoadGames().Single(g=>g.Id==privateFixture.Id).FriendsPrivate==true,"CSS initial save persists privacy and the active custom membership");
             Check(await Script(web,"!window.checkpointState.games.some(g=>g.title==='Private list fixture')"),"private games are excluded from public custom lists");
@@ -299,37 +312,39 @@ public partial class MainWindow
                 WebSurface? found=null;
                 await Wait(async()=>{found=Application.Current.Windows.Cast<Window>().Where(w=>w.Title==I18n.T("Carátula de IGDB")).Select(w=>w.Tag).OfType<WebSurface>().FirstOrDefault();return found?.Browser.CoreWebView2 is not null&&await Script(found,"window.checkpointState?.kind==='dialog'");});return found!;
             }
-            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Search IGDB for another cover').click();");
+            await ScopedScript(coverEditor,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Search IGDB for another cover').click();");
             var coverPreview=await CoverPreview();
             Check(await Script(coverPreview,"!!document.querySelector('img.cover-preview') && document.body.innerText.includes('Closest cover fixture')"),"CSS game editor opens an IGDB candidate preview with its matched name");
             await Capture(coverPreview,"css-igdb-cover-en.png");
-            await coverPreview.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Do not use this cover').click();");await Task.Delay(300);
-            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(300);
+            await ScopedScript(coverPreview,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Do not use this cover').click();");await Task.Delay(300);
+            await ScopedScript(coverEditor,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(300);
             Check(Store.LoadGames().Single(g=>g.Id==privateFixture.Id).RejectedIgdbCovers.Contains("fixture_first")&&!CoverSuggestions.ShouldSuggest(privateFixture)&&privateFixture.CustomCover is null,"explicit IGDB rejection persists even after cancelling the game editor and suppresses automatic repetition");
             await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"] .game-tools button:nth-child(2)').click();");coverEditor=await Dialog();
-            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Search IGDB for another cover').click();");coverPreview=await CoverPreview();
+            await ScopedScript(coverEditor,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Search IGDB for another cover').click();");coverPreview=await CoverPreview();
             Check(await Script(coverPreview,"document.body.innerText.includes('Second cover fixture')&&!document.body.innerText.includes('Closest cover fixture')"),"manual IGDB retry proposes a different image and excludes the declined one");
-            await coverPreview.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Use this cover').click();");await Task.Delay(300);
-            await coverEditor.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
+            await ScopedScript(coverPreview,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Use this cover').click();");await Task.Delay(300);
+            await ScopedScript(coverEditor,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
             var acceptedCover=Store.LoadGames().Single(g=>g.Id==privateFixture.Id);
             Check(acceptedCover.IgdbCoverImageId=="fixture_second"&&BackupFiles.IsCustomCoverName(acceptedCover.CustomCover)&&File.Exists(Path.Combine(Covers.DirectoryPath,acceptedCover.CustomCover!)),"accepted IGDB cover is saved locally and survives SQLite reload");
             await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"] .game-title').click();");
             var gameSheet=await Dialog();
             Check(await Script(gameSheet,"document.body.innerText.includes('Game details') && document.body.innerText.includes('Visibility: Private to my friends') && document.body.innerText.includes('Notes') && document.body.innerText.includes('RetroAchievements')"),"clicking a game opens its complete localized CSS sheet without editing");
             await Capture(gameSheet,"css-game-details-en.png");
-            await gameSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(250);
+            await ScopedScript(gameSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(250);
             Preferences.MiniatureView=true;ApplyPreferences();Refresh();await Task.Delay(350);
+            var miniatureSheetSize=(Width,Height);
             await Run("document.querySelector('[data-game=\""+privateFixture.Id+"\"]').click();");gameSheet=await Dialog();
             Check(await Script(gameSheet,"document.body.innerText.includes('Game details') && document.body.innerText.includes('Private list fixture')"),"a Miniature row opens the full game sheet by mouse without changing window mode");
-            await gameSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            await ScopedScript(gameSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            Check(Math.Abs(Width-miniatureSheetSize.Width)<1&&Math.Abs(Height-miniatureSheetSize.Height)<1,"returning from a full sheet restores Miniature dimensions");
             Preferences.MiniatureView=false;ApplyPreferences();Refresh();
             await Task.Delay(250);
             await Run("document.querySelector('[data-label=settings]').click();");
             var bulkSettings=await Dialog();
-            await bulkSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(250);
+            await ScopedScript(bulkSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(250);
             await Run("document.querySelector('.manage-lists').click();");var saveLists=await Dialog();
-            await saveLists.Browser.CoreWebView2.ExecuteScriptAsync("const name=document.querySelector('input[aria-label=\"List name\"]');name.value='CSS saved list';name.dispatchEvent(new Event('input',{bubbles:true}));");await Task.Delay(250);
-            await saveLists.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
+            await ScopedScript(saveLists,"const name=document.querySelector('input[aria-label=\"List name\"]');name.value='CSS saved list';name.dispatchEvent(new Event('input',{bubbles:true}));");await Task.Delay(250);
+            await ScopedScript(saveLists,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Save').click();");await Task.Delay(350);
             Check(Preferences.GameLists.Contains("CSS saved list")&&Store.LoadSettings().GameLists.Contains("CSS saved list")&&Preferences.ActiveList=="custom:CSS saved list","Save creates the typed Windows list and persists its selection");
             var bulkA=new Game{Title="Bulk first",Tracked=false,Notes="Bulk notes",Lists=["Weekend"]};var bulkB=new Game{Title="Bulk second",FriendsPrivate=true};Games.AddRange(new[]{bulkA,bulkB});Persist();
             await Run("document.querySelector('[data-tab=library]').click();");
@@ -341,10 +356,10 @@ public partial class MainWindow
             await Run("document.querySelector('.list-details').click();");var listSheet=await Dialog();
             Check(await Script(listSheet,"document.body.innerText.includes('List details')&&document.body.innerText.includes('Bulk second')&&document.querySelectorAll('input[type=checkbox]').length===2"),"Windows list sheet includes private members with individual selection");
             await Capture(listSheet,"css-list-details-en.png");
-            await listSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Select this page').click();");await Task.Delay(200);
-            await listSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Make visible to friends').click();");await Task.Delay(250);
+            await ScopedScript(listSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Select this page').click();");await Task.Delay(200);
+            await ScopedScript(listSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Make visible to friends').click();");await Task.Delay(250);
             Check(!bulkA.FriendsPrivate.GetValueOrDefault()&&!bulkB.FriendsPrivate.GetValueOrDefault()&&bulkA.Notes=="Bulk notes","Windows sheet publishes selected games without touching private notes");
-            await listSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            await ScopedScript(listSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
             await Run("document.querySelector('.game').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:30,clientY:100}));");
             Check(await Script(web,"document.querySelector('.menu').textContent.includes('Change list')&&!document.querySelector('.menu').textContent.includes('Settings')&&!document.querySelector('.menu').textContent.includes('Full window')"),"Windows game menu excludes application settings and window controls");
             await Capture(web,"css-game-menu-en.png");await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));");
@@ -357,24 +372,24 @@ public partial class MainWindow
             {
                 WebSurface? found=null;await Wait(async()=>{found=Application.Current.Windows.Cast<Window>().Where(w=>w.Title==title).Select(w=>w.Tag).OfType<WebSurface>().FirstOrDefault();return found?.Browser.CoreWebView2 is not null&&await Script(found,"window.checkpointState?.kind==='dialog'");});return found!;
             }
-            await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Review all achievements').click();");
+            await ScopedScript(reviewSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Review all achievements').click();");
             var reviewSheet=await ReviewWindow(I18n.T("Repasar todos los logros"));
             Check(await Script(reviewSheet,"document.body.innerText.includes('Game 1 / 2')&&document.body.innerText.includes('Achievements: 1 / 1')"),"Windows achievement review includes private untracked games and manual goals");await Capture(reviewSheet,"css-achievement-review-en.png");
-            await reviewSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Next game').click();");await Task.Delay(300);
+            await ScopedScript(reviewSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Next game').click();");await Task.Delay(300);
             Check(await Script(reviewSheet,"document.body.innerText.includes('ZZ cover review')&&document.body.innerText.includes('Game 2 / 2')"),"Windows achievement review advances through the entire library");
-            await reviewSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            await ScopedScript(reviewSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
             Preferences.LightweightMode=true;Covers.SetEnabled(false);
-            await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Find missing covers').click();");
+            await ScopedScript(reviewSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Find missing covers').click();");
             var coversSheet=await ReviewWindow(I18n.T("Buscar carátulas que faltan"));await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Closest cover fixture')&&!!document.querySelector('img.cover-preview')"));
             Check(await Script(coversSheet,"document.body.innerText.includes('AA cover review')&&document.body.innerText.includes('Accept')&&document.body.innerText.includes('Next cover')&&document.body.innerText.includes('Next game')"),"Windows covers review works in lightweight mode and offers the three review choices");await Capture(coversSheet,"css-cover-review-en.png");
-            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Next cover').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Second cover fixture')"));
+            await ScopedScript(coversSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Next cover').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Second cover fixture')"));
             Check(Store.LoadGames().First(g=>g.Id==reviewFirst.Id).RejectedIgdbCovers.Contains("fixture_first"),"Windows Next cover saves a rejection before another IGDB search");
-            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Accept').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('ZZ cover review')&&document.body.innerText.includes('Closest cover fixture')"));
+            await ScopedScript(coversSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Accept').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('ZZ cover review')&&document.body.innerText.includes('Closest cover fixture')"));
             Check(reviewFirst.IgdbCoverImageId=="fixture_second"&&reviewFirst.CustomCover is not null&&Store.LoadGames().First(g=>g.Id==reviewFirst.Id).Notes=="Review notes","Windows Accept immediately saves a cover without changing notes or privacy");
-            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Next game').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Review complete')"));
+            await ScopedScript(coversSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Next game').click();");await Wait(()=>Script(coversSheet,"document.body.innerText.includes('Review complete')"));
             Check(reviewSecond.CustomCover is null&&reviewSecond.RejectedIgdbCovers.Contains("fixture_first"),"Windows Next game skips the cover and finishes the review");
-            await coversSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
-            await reviewSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);Preferences.LightweightMode=false;Covers.SetEnabled(true);Games.Clear();Games.AddRange(reviewSavedGames);Persist();Refresh();
+            await ScopedScript(coversSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Close').click();");await Task.Delay(200);
+            await ScopedScript(reviewSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click();");await Task.Delay(200);Preferences.LightweightMode=false;Covers.SetEnabled(true);Games.Clear();Games.AddRange(reviewSavedGames);Persist();Refresh();
             var backgroundGames=Games.ToArray();var backgroundRetro=Retro;int backgroundCalls=0,backgroundActive=0,backgroundPeak=0;
             Directory.CreateDirectory(Path.Combine(output,"background-review"));
             using(var backgroundClient=new RetroClient(Path.Combine(output,"background-review"),new ReviewSmokeHandler(async(request,token)=>
@@ -388,8 +403,8 @@ public partial class MainWindow
                 backgroundClient.Save("fixture_review","FIXTURE_REVIEW_KEY",false);Retro=backgroundClient;Games.Clear();
                 Games.AddRange(Enumerable.Range(1,5).Select(id=>new Game{Title="Background "+id,RetroGameId=id,Tracked=false,FriendsPrivate=true,Notes="Keep review notes",ManualAchievements=[new(){Id="local",Name="Local goal"}]}));Persist();Refresh();
                 await Run("document.querySelector('[data-label=settings]').click();");var backgroundSettings=await ReviewWindow(I18n.T("Ajustes · Checkpoint"));
-                await backgroundSettings.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Review all achievements').click();");var backgroundSheet=await ReviewWindow(I18n.T("Repasar todos los logros"));
-                await backgroundSheet.Browser.CoreWebView2.ExecuteScriptAsync("[...document.querySelectorAll('button')].find(b=>b.textContent==='Update all achievements').click();");
+                await ScopedScript(backgroundSettings,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Review all achievements').click();");var backgroundSheet=await ReviewWindow(I18n.T("Repasar todos los logros"));
+                await ScopedScript(backgroundSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Update all achievements').click();");
                 await Wait(()=>Script(web,"window.checkpointState.achievementReview?.running && !document.querySelector('.achievement-review').hidden"));
                 Check(IsEnabled&&!Application.Current.Windows.OfType<Window>().Any(w=>w.Tag==backgroundSettings||w.Tag==backgroundSheet),"Windows achievement review releases both modal windows and continues in the background");
                 await Run("[...document.querySelectorAll('.navigation button')].find(b=>b.textContent==='Library').click();");
@@ -409,7 +424,7 @@ public partial class MainWindow
             Console.WriteLine("CSS smoke test passed: "+checks.Count+" checks, "+output);
         }
         catch (Exception error)
-        { Console.Error.WriteLine(error); Environment.ExitCode=1; File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new {ok=false,checks=checks.Count,error=error.ToString()},DataJson.Options)); }
+        { if(web is not null)await Capture(web,"css-failure.png");Console.Error.WriteLine(error); Environment.ExitCode=1; File.WriteAllText(Path.Combine(output,"web-smoke.json"),JsonSerializer.Serialize(new {ok=false,checks=checks.Count,error=error.ToString()},DataJson.Options)); }
         finally { Exit(); }
     }
     private sealed class ReviewSmokeHandler(Func<HttpRequestMessage,CancellationToken,Task<HttpResponseMessage>> respond):HttpMessageHandler

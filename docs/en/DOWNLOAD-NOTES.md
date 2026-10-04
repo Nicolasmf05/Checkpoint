@@ -85,3 +85,7 @@ When the default My list has no visible games, Miniature uses Library automatica
 ## Background achievement review
 
 Settings → Review all achievements → Update all achievements returns to the collection and continues in the background. The progress indicator has Stop review; completed results remain saved. Up to three queries run at once, with starts paced to respect Steam limits. Windows updates only the changed game in SQLite. You can browse and edit your games during the review. Closing the Windows app or reloading/closing the browser stops the remaining work. The browser reviews Steam; Windows also reviews linked RetroAchievements games.
+
+## Navigation in one window
+
+Checkpoint uses the same window or browser tab for settings, game/list sheets, achievements, reviews and notices. Back returns one level; Back to collection returns to your current collection. Opening a related page preserves the parent form. Leaving an unsaved form cancels its pending changes; use Save to keep them. Miniature expands temporarily to make full sheets readable and restores its size on return. Native file pickers and Steam authorization remain system/external interfaces.

@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.15
+
+- Las pantallas de Checkpoint comparten una sola ventana/superficie: ajustes, fichas de juegos/listas, logros, avisos y repasos. Volver y Volver a la colección muestran una ruta clara. Los formularios conservan su pantalla anterior; Miniatura se amplía temporalmente para las fichas y recupera su tamaño. El progreso del repaso sigue visible en las páginas.
+
 ## 0.8.14
 
 - El repaso de logros continúa en segundo plano en Windows y en el navegador, con progreso y Detener repaso. Hasta tres consultas simultáneas con inicio espaciado para respetar los límites de Steam. Windows guarda solo el juego actualizado; detener conserva los resultados recibidos y cambios locales.

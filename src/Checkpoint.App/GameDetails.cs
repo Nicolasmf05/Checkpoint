@@ -9,12 +9,16 @@ internal static partial class Dialogs
     internal static void GameDetails(MainWindow owner,Game game,Window? parent=null)
     {
         var window=Modal(owner,I18n.T("Ficha del juego")+" · "+game.Title,620,760);
-        if(parent is not null)window.Owner=parent;
+        if(parent is not null)Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
+        void Render()
+        {
+            body.Children.Clear();window.Title=I18n.T("Ficha del juego")+" · "+game.Title;
         Heading(body,game.Title,I18n.T("Ficha del juego"));
         var image=new Image { Height=240,Tag="cover-preview",Visibility=Visibility.Collapsed };
         if(!owner.Preferences.LightweightMode)body.Children.Add(image);
-        window.Loaded+=async(_,_)=>{if(owner.Preferences.LightweightMode)return;try{image.Source=await owner.Covers.Get(game);if(image.Source is not null)image.Visibility=Visibility.Visible;}catch(Exception error) when(error is not OutOfMemoryException){} };
+        async System.Threading.Tasks.Task LoadCover(){if(owner.Preferences.LightweightMode)return;try{image.Source=await owner.Covers.Get(game);if(image.Source is not null)image.Visibility=Visibility.Visible;}catch(Exception error) when(error is not OutOfMemoryException){} }
+        _=LoadCover();
         void Line(string text)=>body.Children.Add(new TextBlock { Text=text,TextWrapping=TextWrapping.Wrap });
         void Section(string title)=>body.Children.Add(new TextBlock { Text=I18n.T(title),FontSize=22,FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap });
         Line(game.Platform+" · "+game.StatusText);
@@ -35,9 +39,11 @@ internal static partial class Dialogs
         Line(I18n.T("Añadido")+": "+Date(game.AddedAt));Line(I18n.T("Última sincronización")+": "+(game.SyncedAt is {} synced?Date(synced):I18n.T("Sin sincronizar")));
         if(game.FinishedAt is {} finished)Line(I18n.T("Historia terminada")+": "+Date(finished));
         if(game.SteamAppId is {} steam)Line("Steam ID: "+steam);if(game.RetroGameId is {} retro)Line("RetroAchievements ID: "+retro);
+        }
+        Render();
         footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));
-        footer.Children.Add(Button(I18n.T("Editar juego"),(_,_)=>{window.Close();Edit(owner,game);}));
-        footer.Children.Add(Button(I18n.T("Ver logros"),(_,_)=>{window.Close();Achievements(owner,game);},true));
-        window.ShowDialog();
+        footer.Children.Add(Button(I18n.T("Editar juego"),(_,_)=>{if(!App.UseCss){window.Close();Edit(owner,game);return;}Edit(owner,game);if(owner.Games.FirstOrDefault(g=>g.Id==game.Id) is {} current){game=current;Render();}else window.Close();}));
+        footer.Children.Add(Button(I18n.T("Ver logros"),(_,_)=>{if(!App.UseCss){window.Close();Achievements(owner,game);return;}Achievements(owner,game,false,window);Render();},true));
+        ShowPage(window);
     }
 }

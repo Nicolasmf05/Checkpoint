@@ -18,7 +18,7 @@ public partial class MainWindow
     private void StartWebInterface()
     {
         InitializeCoverSuggestions();
-        web = new WebSurface(this,Store.DirectoryPath,WebSnapshot,WebCommand,() => friendsVisible);
+        web = new WebSurface(this,Store.DirectoryPath,()=>HasInlinePage?InlineSnapshot():WebSnapshot(),WebCommand,() => friendsVisible||HasInlinePage);
         _ = ConfigureWebResources();
     }
     private object WebSnapshot() => new
@@ -29,7 +29,7 @@ public partial class MainWindow
         pinned=Preferences.AlwaysOnTop, globalHotkey=hotkeyRegistered, lightweight=Preferences.LightweightMode, busy=syncing,
         tab=friendsVisible ? "friends" : allLibrary ? "library" : "list", search=Search.Text, filter=StatusFilter.SelectedIndex,
         summary=Summary.Text, notice=NoticeText.Text, connection=ConnectionText.Text,
-        achievementReview=achievementReviewVisible ? new {text=AchievementReviewText,cancelText=I18n.T(achievementReviewCancellation is not null ? "Detener repaso" : "Cerrar"),running=achievementReviewCancellation is not null} : null,
+        achievementReview=achievementReviewVisible ? new {text=AchievementReviewText,cancelText=I18n.T(achievementReviewCancellation is not null ? "Detener repaso" : "Ocultar progreso"),running=achievementReviewCancellation is not null} : null,
         emptyTitle=EmptyTitle.Text, emptyText=EmptyText.Text, miniEmpty=I18n.T("Esta lista no tiene juegos."), examples=Games.Count == 0, undo=DeletedGames.Count > 0,
         labels=new { title=I18n.T("Mi lista"),
             friendsTitle=I18n.T("Amigos"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
@@ -60,6 +60,7 @@ public partial class MainWindow
     }
     private void WebCommand(JsonElement message)
     {
+        if(InlineCommand(message))return;
         if (message.TryGetProperty("control",out _)) { if (friendsVisible) friendControls.Dispatch(message); return; }
         string action=message.GetProperty("action").GetString() ?? "";
         Game? game=null;

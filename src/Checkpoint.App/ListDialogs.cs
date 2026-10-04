@@ -11,7 +11,7 @@ internal static partial class Dialogs
 {
     internal static void ManageLists(MainWindow owner,Window? parent=null)
     {
-        var window=Modal(owner,I18n.T("Gestionar listas"),540,600);if(parent is not null)window.Owner=parent;
+        var window=Modal(owner,I18n.T("Gestionar listas"),540,600);if(parent is not null)Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,I18n.T("Gestionar listas"),I18n.T("Un juego puede estar en varias listas sin duplicarse. Los privados se consultan en Privados."));
         var selection=new ComboBox();Label(body,I18n.T("Lista de juegos"));body.Children.Add(selection);
@@ -46,6 +46,6 @@ internal static partial class Dialogs
         }));
         footer.Children.Add(Button(I18n.T("Cancelar"),(_,_)=>window.Close()));
         footer.Children.Add(Button(I18n.T("Guardar"),(_,_)=>{try{string? previous=selection.SelectedIndex>0?selection.SelectedItem as string:null;if(!string.IsNullOrWhiteSpace(name.Text)&&name.Text.Trim()!=previous&&!Change(previous is not null))return;owner.Preferences.NewGamesPrivate=defaultsPrivate.IsChecked==true;owner.Persist();owner.Refresh();window.Close();}catch(Exception ex){notice.Text=I18n.Error(ex);}},true));
-        Reload();window.ShowDialog();
+        Reload();ShowPage(window);
     }
 }

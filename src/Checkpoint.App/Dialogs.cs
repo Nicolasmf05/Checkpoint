@@ -22,7 +22,6 @@ internal static partial class Dialogs
             ShowInTaskbar = false, FontFamily = new FontFamily("Segoe UI"), FontSize = 13,
             Background = (Brush)Application.Current.Resources["InputBrush"], Foreground = (Brush)Application.Current.Resources["TextBrush"] };
         window.Height = Math.Min(height, SystemParameters.WorkArea.Height - 35);
-        if (App.UseCss) window.Loaded += (_, _) => WebSurface.AttachDialog(window);
         return window;
     }
     private static StackPanel Panel() => new() { Margin = new Thickness(23, 18, 23, 18) };
@@ -112,7 +111,7 @@ internal static partial class Dialogs
         imageButtons.Children.Add(Button(I18n.T("Elegir imagen"), (_, _) =>
         {
             var picker = new OpenFileDialog { Filter = I18n.T("Imágenes|*.png;*.jpg;*.jpeg;*.webp;*.bmp"), Title = I18n.T("Elegir carátula") };
-            if (picker.ShowDialog(window) == true)
+            if (picker.ShowDialog(PickerOwner(window)) == true)
             {
                 try { game.CustomCover = owner.Covers.Import(picker.FileName);game.IgdbCoverImageId=""; coverNotice.Text = I18n.T("Carátula personalizada preparada."); }
                 catch (Exception ex) { LocalizedNotice.Show(window, I18n.T("No se pudo leer la imagen: ") + I18n.Error(ex), "Checkpoint"); }
@@ -186,11 +185,11 @@ internal static partial class Dialogs
                 }
                 AddTask();
                 if (creating) owner.Games.Add(game); else owner.Games[owner.Games.IndexOf(original!)] = game;
-                owner.Persist(); owner.Refresh(); window.DialogResult = true;
+                owner.Persist(); owner.Refresh(); Finish(window);
             }
             catch (Exception ex) when (ex is ArgumentException or IOException or InvalidOperationException) { LocalizedNotice.Show(window, I18n.Error(ex), I18n.T("Revisa el juego")); }
         }, true));
-        window.Loaded += (_, _) => title.Focus(); window.ShowDialog();
+        window.Loaded += (_, _) => title.Focus(); ShowPage(window);
     }
 
     internal static void DeletedGames(MainWindow owner)
@@ -219,7 +218,7 @@ internal static partial class Dialogs
                 restore.Tag = deleted.RecoveryId; restore.VerticalAlignment = VerticalAlignment.Center; Grid.SetColumn(restore, 1); row.Children.Add(restore); rows.Children.Add(row);
             }
         }
-        Render(); footer.Children.Add(Button(I18n.T("Cerrar"), (_, _) => window.Close(), true)); window.ShowDialog();
+        Render(); footer.Children.Add(Button(I18n.T("Cerrar"), (_, _) => window.Close(), true)); ShowPage(window);
     }
 
     internal static void Settings(MainWindow owner)
@@ -282,13 +281,13 @@ internal static partial class Dialogs
         backups.Children.Add(Button(I18n.T("Exportar"), (_, _) =>
         {
             var picker = new SaveFileDialog { Filter = I18n.T("Copia completa de Checkpoint|*.checkpoint|JSON compatible (sin imágenes)|*.json"), DefaultExt = ".checkpoint", FileName = "checkpoint-" + DateTime.Now.ToString("yyyy-MM-dd") };
-            if (picker.ShowDialog(window) == true)
+            if (picker.ShowDialog(PickerOwner(window)) == true)
                 try { owner.ExportBackup(picker.FileName); backupNotice.Text = I18n.T("Copia exportada: ") + Path.GetFileName(picker.FileName); }
                 catch (Exception ex) { backupNotice.Text = I18n.T("No se pudo exportar: ") + I18n.Error(ex); }
         }));
         backups.Children.Add(Button(I18n.T("Importar"), (_, _) =>
         {
-            var picker = new OpenFileDialog { Filter = I18n.T("Copias de Checkpoint|*.checkpoint;*.json;*.zip") }; if (picker.ShowDialog(window) != true) return;
+            var picker = new OpenFileDialog { Filter = I18n.T("Copias de Checkpoint|*.checkpoint;*.json;*.zip") }; if (picker.ShowDialog(PickerOwner(window)) != true) return;
             try
             {
                 var result = owner.ImportBackup(picker.FileName); backupNotice.Text = (I18n.IsEnglish ? $"{result.Added} games imported · {result.Skipped} already in your library." : $"{result.Added} juegos importados · {result.Skipped} ya estaban en tu biblioteca.");
@@ -322,11 +321,11 @@ internal static partial class Dialogs
             }
             catch (Exception ex) { LocalizedNotice.Show(window, I18n.Error(ex), I18n.T("No se pudieron guardar los ajustes")); }
         }, true));
-        window.Closed += (_, _) => { if (!saved) { prefs.BackgroundOpacity = previousOpacity; prefs.Theme = previousTheme; prefs.LightTheme = previousLight; owner.ApplyPreferences(); owner.Refresh(); owner.Store.SaveSettings(prefs); } }; window.ShowDialog();
+        window.Closed += (_, _) => { if (!saved) { prefs.BackgroundOpacity = previousOpacity; prefs.Theme = previousTheme; prefs.LightTheme = previousLight; owner.ApplyPreferences(); owner.Refresh(); owner.Store.SaveSettings(prefs); } }; ShowPage(window);
     }
     internal static void ShortcutSettings(MainWindow owner, Window? parent = null)
     {
-        var window=Modal(owner,I18n.T("Configurar atajos")); if(parent is not null)window.Owner=parent;
+        var window=Modal(owner,I18n.T("Configurar atajos")); if(parent is not null)Parent(window,parent);
         var body=Panel(); Layout(window,body,out var footer);
         Heading(body,I18n.T("Configurar atajos"),I18n.T("Pulsa una combinación en cada campo. Tab cambia de campo; Escape cancela. No se permiten atajos repetidos."));
         var values=Shortcuts.Effective(owner.Preferences.Shortcuts); var fields=new Dictionary<string,TextBox>();
@@ -349,7 +348,7 @@ internal static partial class Dialogs
             }
             catch(Exception ex){LocalizedNotice.Show(window,I18n.Error(ex),I18n.T("Configurar atajos"));}
         },true));
-        window.ShowDialog();
+        ShowPage(window);
     }
     internal static void RestoreStartupIfMissing()
     {

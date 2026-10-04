@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.15
+
+- Checkpoint screens share one window/browser surface, including settings, game/list sheets, achievements, notices and review tools. Back and Back to collection show a clear screen path. Nested forms preserve their parent; Miniature temporarily expands for full sheets and restores its dimensions. Background review controls remain visible on pages.
+
 ## 0.8.14
 
 - Achievement review runs in the background in Windows and the browser, with progress and Stop review. Up to three requests overlap, with paced starts to respect Steam limits. Windows persists only the updated game; completed results and local edits survive stopping the job.

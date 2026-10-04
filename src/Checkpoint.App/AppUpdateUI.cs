@@ -54,7 +54,7 @@ internal static partial class Dialogs
 {
     internal static void AppUpdatesDialog(MainWindow owner,Window? parent=null)
     {
-        var window=Modal(owner,I18n.T("Actualizaciones · Checkpoint"),560,600);if(parent is not null)window.Owner=parent;
+        var window=Modal(owner,I18n.T("Actualizaciones · Checkpoint"),560,600);if(parent is not null)Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,I18n.T("Actualizaciones"),I18n.T("Versión instalada: ")+MainWindow.CurrentVersion.ToString(3));
         var automatic=Check(body,I18n.T("Comprobar actualizaciones al abrir (una vez al día)"),owner.Preferences.AutomaticUpdates);
@@ -89,6 +89,6 @@ internal static partial class Dialogs
         void Render(){status.Text=owner.AvailableUpdate is {} update?I18n.T("Versión disponible: ")+update.Version:I18n.T(checkedVersion?"Checkpoint está actualizado.":"Busca actualizaciones para comprobar si hay una versión nueva.");}
         body.Children.Add(check);body.Children.Add(install);
         body.Children.Add(Button(I18n.T("Ver versiones en GitHub"),(_,_)=>Process.Start(new ProcessStartInfo(owner.AvailableUpdate?.ReleaseUrl??"https://github.com/Nicolasmf05/Checkpoint/releases"){UseShellExecute=true})));
-        footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));window.Closed+=(_,_)=>{closed=true;cancellation.Cancel();};Render();installState();window.ShowDialog();
+        footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));window.Closed+=(_,_)=>{closed=true;cancellation.Cancel();};Render();installState();ShowPage(window);
     }
 }

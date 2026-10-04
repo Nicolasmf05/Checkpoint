@@ -10,7 +10,7 @@ internal static partial class Dialogs
 {
     internal static void ReviewAchievements(MainWindow owner, Window parent)
     {
-        var window=Modal(owner,I18n.T("Repasar todos los logros"),600,620);window.Owner=parent;
+        var window=Modal(owner,I18n.T("Repasar todos los logros"),600,620);Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,I18n.T("Repasar todos los logros"),I18n.T("Incluye toda la Biblioteca, también los juegos privados y los que no están en Mi lista. Los cambios manuales se conservan."));
         var ids=owner.Games.OrderBy(g=>g.Title,StringComparer.OrdinalIgnoreCase).Select(g=>g.Id).ToArray();int index=0;
@@ -36,12 +36,12 @@ internal static partial class Dialogs
             message.Text=owner.AchievementReviewText;
             update.IsEnabled=!owner.AchievementSyncBusy&&owner.Games.Any(owner.CanReviewAchievements);
         }
-        Reload();window.ShowDialog();
+        Reload();ShowPage(window);
     }
 
     internal static void ReviewCovers(MainWindow owner, Window parent)
     {
-        var window=Modal(owner,I18n.T("Buscar carátulas que faltan"),620,730);window.Owner=parent;
+        var window=Modal(owner,I18n.T("Buscar carátulas que faltan"),620,730);Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,I18n.T("Buscar carátulas que faltan"),I18n.T("Se comprueba Steam antes de buscar en IGDB. Siguiente carátula descarta la propuesta; Siguiente juego continúa sin añadirla. Las decisiones se guardan al instante."));
         var ids=owner.Games.OrderBy(g=>g.Title,StringComparer.OrdinalIgnoreCase).Select(g=>g.Id).ToArray();int index=-1;bool busy=false,closed=false;
@@ -92,7 +92,7 @@ internal static partial class Dialogs
             catch(Exception error){if(!closed)message.Text=I18n.Error(error);}
             finally{busy=false;if(!closed)Buttons();}
         }
-        window.Loaded+=async(_,_)=>await Load(true);window.Closed+=(_,_)=>{closed=true;cancellation.Cancel();};Buttons();window.ShowDialog();
+        window.Loaded+=async(_,_)=>await Load(true);window.Closed+=(_,_)=>{closed=true;cancellation.Cancel();};Buttons();ShowPage(window);
     }
 }
 public partial class MainWindow

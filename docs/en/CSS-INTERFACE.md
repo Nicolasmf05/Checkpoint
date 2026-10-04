@@ -1,10 +1,16 @@
 # CSS interface
 
-Checkpoint 0.7.0 renders its collection, Miniature, friends, forms and notices with local HTML/CSS/JavaScript in Microsoft Edge WebView2. No website is hosted and no React, npm build or remote interface is used.
+Checkpoint 0.8.15 renders its collection, Miniature, friends, forms and notices with local HTML/CSS/JavaScript in Microsoft Edge WebView2. No website is hosted and no React, npm build or remote interface is used.
+
+## Single-surface navigation
+
+Production uses one native window and one WebView2 document. `InlineNavigation.cs` keeps a stack of hidden WPF form controllers, reuses their validation, and renders the active page through the main `WebSurface`. Back cancels the current unsaved form and returns to its parent; Back to collection cancels open forms and returns to the library. Parent drafts remain intact while a child page is open. Opening a page from Miniature temporarily expands the window and restores its previous bounds when returning.
+
+The web app uses the same CSS renderer with its own page stack in `web/bridge.mjs`; internal screens stay in the current browser tab. File pickers and Steam sign-in remain external system/provider flows. Achievement review progress stays visible on internal pages.
 
 ## Themes
 
-Eight palettes use variables in `Web/app.css` and the document `data-theme` attribute. `Checkpoint.Core/Themes.cs` defines allowed identifiers and localized names; `Settings.Theme` stores the selection in SQLite. Missing or invalid choices honor the legacy `LightTheme` preference. Forms, friends and help share color variables. Settings previews the palette across CSS windows; Cancel restores and saves the previous values even if another save occurred during preview. Themes do not change opacity or window mode.
+Twenty-two palettes use variables in `Web/app.css` and the document `data-theme` attribute. `Checkpoint.Core/Themes.cs` defines allowed identifiers and localized names; `Settings.Theme` stores the selection in SQLite. Missing or invalid choices honor the legacy `LightTheme` preference. Forms, friends and help share color variables. Settings previews the palette across the interface; Cancel restores and saves the previous values even if another save occurred during preview. Themes do not change opacity or window mode.
 
 ## Where to change it
 

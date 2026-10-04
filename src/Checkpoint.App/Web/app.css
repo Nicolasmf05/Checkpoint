@@ -117,3 +117,9 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .achievement-review[hidden],.mini .achievement-review { display:none; }
 .achievement-review span { flex:1;min-width:0;overflow-wrap:anywhere; }
 .achievement-review button { font-size:11px;padding:4px 8px;min-height:28px;flex:none; }
+
+.page-navigation { display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--input);position:sticky;top:0;z-index:4; }
+.page-navigation button { font-size:12px;padding:6px 10px;flex:none; }
+.page-trail { flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted); }
+.dialog-page>.achievement-review { margin:8px 12px; }
+@media(max-width:400px) { .page-navigation { flex-wrap:wrap; } .page-trail { order:3;flex-basis:100%; } }

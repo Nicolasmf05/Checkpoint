@@ -17,7 +17,7 @@ internal static class LocalizedNotice
             MaxHeight = SystemParameters.WorkArea.Height - 35, ResizeMode = ResizeMode.NoResize,
             ShowInTaskbar = owner is null, WindowStartupLocation = owner is null
                 ? WindowStartupLocation.CenterScreen : WindowStartupLocation.CenterOwner };
-        if (owner is not null) window.Owner = owner;
+        if (owner is not null) Dialogs.Parent(window,owner);
         if (Application.Current.TryFindResource("InputBrush") is Brush background) window.Background = background;
         if (Application.Current.TryFindResource("TextBrush") is Brush foreground) window.Foreground = foreground;
         var panel = new DockPanel { Margin = new Thickness(20) };
@@ -27,7 +27,6 @@ internal static class LocalizedNotice
         panel.Children.Add(new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap } });
         window.Content = panel;
-        if (App.UseCss) window.Loaded += (_, _) => WebSurface.AttachDialog(window);
-        window.ShowDialog();
+        Dialogs.ShowPage(window);
     }
 }

@@ -10,7 +10,7 @@ internal static partial class Dialogs
     internal static void ChooseList(MainWindow owner,Guid[] ids,string source,string mode="move",Window? parent=null)
     {
         if(ids.Length is <1 or >500||ids.Any(id=>!owner.Games.Any(g=>g.Id==id)))throw new ArgumentException(I18n.T("Selecciona entre 1 y 500 juegos existentes."));
-        var window=Modal(owner,I18n.T(mode=="add"?"Añadir a otra lista":"Cambiar de lista"),580,540);if(parent is not null)window.Owner=parent;
+        var window=Modal(owner,I18n.T(mode=="add"?"Añadir a otra lista":"Cambiar de lista"),580,540);if(parent is not null)Parent(window,parent);
         var body=Panel();Layout(window,body,out var footer);
         Heading(body,I18n.T(mode=="add"?"Añadir a otra lista":"Cambiar de lista"),I18n.T("Mover desde una lista quita solo esa pertenencia. Desde Biblioteca o Mi lista reemplaza las listas actuales. Añadir conserva las demás. La privacidad no cambia."));
         body.Children.Add(new TextBlock{Text=I18n.T("Juegos seleccionados:")+" "+ids.Length});
@@ -19,7 +19,7 @@ internal static partial class Dialogs
         var apply=Button(I18n.T(mode=="add"?"Añadir a otra lista":"Mover juegos"),(_,_)=>{try{owner.ApplyListAction(ids,mode,source,target.SelectedItem as string);window.Close();}catch(Exception error){notice.Text=I18n.Error(error);}},true);
         void Reload(){target.ItemsSource=owner.Preferences.GameLists.ToArray();target.SelectedIndex=owner.Preferences.GameLists.Count>0?0:-1;apply.IsEnabled=target.SelectedIndex>=0;notice.Text=apply.IsEnabled?"":I18n.T("Crea una lista antes de mover juegos.");}
         body.Children.Add(Button(I18n.T("Crear lista"),(_,_)=>{ManageLists(owner,window);Reload();}));
-        footer.Children.Add(Button(I18n.T("Cancelar"),(_,_)=>window.Close()));footer.Children.Add(apply);Reload();window.ShowDialog();
+        footer.Children.Add(Button(I18n.T("Cancelar"),(_,_)=>window.Close()));footer.Children.Add(apply);Reload();ShowPage(window);
     }
     internal static void ListDetails(MainWindow owner,string source)
     {
@@ -58,6 +58,6 @@ internal static partial class Dialogs
         paging.Children.Add(Button(I18n.T("Anterior"),(_,_)=>{page--;Reload();}));paging.Children.Add(Button(I18n.T("Siguiente"),(_,_)=>{page++;Reload();}));
         paging.Children.Add(Button(I18n.T("Seleccionar esta página"),(_,_)=>{foreach(var game in Matches().Skip(page*50).Take(50)){if(selected.Count<500)selected.Add(game.Id);}Reload();}));
         paging.Children.Add(Button(I18n.T("Limpiar selección"),(_,_)=>{selected.Clear();Reload();}));
-        search.TextChanged+=(_,_)=>{page=0;Reload();};footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));Reload();window.ShowDialog();
+        search.TextChanged+=(_,_)=>{page=0;Reload();};footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));Reload();ShowPage(window);
     }
 }

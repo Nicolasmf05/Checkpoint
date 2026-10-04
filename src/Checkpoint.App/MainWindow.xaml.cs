@@ -255,7 +255,7 @@ public partial class MainWindow : Window
     }
     private void CaptureBounds()
     {
-        if (fullWindowApplied) return;
+        if (fullWindowApplied||inlineMiniatureBounds is not null) return;
         if (miniatureApplied == true) { Preferences.MiniatureWidth = Width; Preferences.MiniatureHeight = Height; }
         else { Preferences.Width = Width; Preferences.Height = Height; }
         Preferences.Left = Left; Preferences.Top = Top;
@@ -588,7 +588,7 @@ public partial class MainWindow : Window
     }
     protected override void OnClosed(EventArgs e)
     {
-        shutdown.Cancel(); Updates.Dispose(); detectionTimer.Stop();foreach(var window in achievementWindows.Values.ToArray())window.Close();Retro?.Dispose(); timer.Stop(); boundsTimer.Stop(); dragScrollTimer.Stop(); if (hotkeyRegistered && source is not null) UnregisterHotKey(source.Handle, HotkeyId);
+        shutdown.Cancel(); CloseInlinePages(); Updates.Dispose(); detectionTimer.Stop();foreach(var window in achievementWindows.Values.ToArray())window.Close();Retro?.Dispose(); timer.Stop(); boundsTimer.Stop(); dragScrollTimer.Stop(); if (hotkeyRegistered && source is not null) UnregisterHotKey(source.Handle, HotkeyId);
         socialTimer.Stop(); publicationTimer.Stop(); Social?.Dispose();
         tray.Dispose(); Steam.Dispose(); Covers.Dispose(); Store.Dispose(); base.OnClosed(e); Application.Current.Shutdown(Environment.ExitCode);
     }

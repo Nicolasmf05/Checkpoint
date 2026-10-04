@@ -619,5 +619,10 @@
   "Actualizando logros en segundo plano:": "Updating achievements in the background:",
   "Repaso de logros detenido:": "Achievement review stopped:",
   "Repaso de logros terminado:": "Achievement review finished:",
-  "Detener repaso": "Stop review"
+  "Detener repaso": "Stop review",
+  "Volver": "Back",
+  "Volver a la colección": "Back to collection",
+  "Cerrar Checkpoint": "Close Checkpoint",
+  "Ocultar progreso": "Hide progress",
+  "Ajusta Checkpoint para que encaje contigo.": "Customize Checkpoint to suit you."
 }

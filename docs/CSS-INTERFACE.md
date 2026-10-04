@@ -1,10 +1,16 @@
 # Interfaz CSS
 
-Checkpoint 0.7.0 muestra colección, Miniatura, amigos, formularios y avisos con HTML/CSS/JavaScript locales en Microsoft Edge WebView2. Sin alojar una web, React, compilación npm ni interfaz remota.
+Checkpoint 0.8.15 muestra colección, Miniatura, amigos, formularios y avisos con HTML/CSS/JavaScript locales en Microsoft Edge WebView2. Sin alojar una web, React, compilación npm ni interfaz remota.
+
+## Navegación en una sola superficie
+
+La aplicación usa una única ventana nativa y un documento WebView2. `InlineNavigation.cs` mantiene una pila de controladores WPF ocultos, reutiliza su validación y muestra la pantalla activa en el `WebSurface` principal. Volver cancela el formulario actual sin guardar y regresa al anterior; Volver a la colección cancela los formularios abiertos y regresa a la biblioteca. Los borradores de las pantallas anteriores se conservan al abrir una pantalla hija. Desde Miniatura se amplía temporalmente la ventana y se recupera su tamaño anterior al volver.
+
+La web utiliza el mismo renderizador CSS con su propia pila de pantallas en `web/bridge.mjs`; la navegación interna permanece en la pestaña actual. Los selectores de archivos y el inicio de sesión en Steam siguen siendo procesos externos del sistema o proveedor. El progreso del repaso de logros sigue visible en las pantallas internas.
 
 ## Temas
 
-Las ocho paletas usan variables de `Web/app.css` y `data-theme` en el documento. `Checkpoint.Core/Themes.cs` define los identificadores permitidos y nombres traducidos; `Settings.Theme` guarda la elección en SQLite. Sin una elección válida se respeta la antigua preferencia `LightTheme`. Los formularios, amigos y ayuda comparten las variables de color. Ajustes aplica la vista previa a las ventanas CSS; Cancelar restaura y vuelve a guardar los valores anteriores, incluso si se produjo un guardado mientras se mostraba la vista previa. El tema no modifica la opacidad ni el modo de ventana.
+Las veintidós paletas usan variables de `Web/app.css` y `data-theme` en el documento. `Checkpoint.Core/Themes.cs` define los identificadores permitidos y nombres traducidos; `Settings.Theme` guarda la elección en SQLite. Sin una elección válida se respeta la antigua preferencia `LightTheme`. Los formularios, amigos y ayuda comparten las variables de color. Ajustes aplica la vista previa a toda la interfaz; Cancelar restaura y vuelve a guardar los valores anteriores, incluso si se produjo un guardado mientras se mostraba la vista previa. El tema no modifica la opacidad ni el modo de ventana.
 
 ## Dónde modificarla
 

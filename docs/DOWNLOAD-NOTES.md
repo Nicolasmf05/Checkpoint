@@ -85,3 +85,7 @@ Cuando Mi lista no contiene juegos visibles, Miniatura usa automáticamente Bibl
 ## Repaso de logros en segundo plano
 
 Ajustes → Repasar todos los logros → Actualizar todos los logros vuelve a la colección y continúa en segundo plano. El indicador incluye Detener repaso; los resultados recibidos quedan guardados. Se ejecutan hasta tres consultas simultáneas, con inicio espaciado para respetar los límites de Steam. Windows actualiza solo el juego cambiado en SQLite. Puedes consultar y editar juegos durante el repaso. Cerrar la app de Windows o recargar/cerrar el navegador detiene el trabajo pendiente. La web repasa Steam; Windows también los juegos de RetroAchievements vinculados.
+
+## Navegación en una sola ventana
+
+Checkpoint utiliza la misma ventana o pestaña para ajustes, fichas de juegos/listas, logros, repasos y avisos. Volver retrocede un nivel; Volver a la colección regresa a tu colección actual. Abrir una pantalla relacionada conserva el formulario anterior. Salir de un formulario sin guardar cancela sus cambios pendientes; utiliza Guardar para conservarlos. Miniatura se amplía temporalmente para leer las fichas y recupera su tamaño al volver. Los selectores de archivos y la autorización de Steam siguen siendo interfaces del sistema/externas.
