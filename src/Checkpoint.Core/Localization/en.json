@@ -628,5 +628,7 @@
   "Minimizar": "Minimize",
   "Ocultar en la bandeja al minimizar": "Hide in the system tray when minimized",
   "Desactivado: minimizar deja Checkpoint en la barra de tareas. Activado: lo oculta en la bandeja; haz doble clic en su icono para volver.": "Off: minimizing keeps Checkpoint on the taskbar. On: it hides in the system tray; double-click its icon to return.",
-  "Steam no ha enviado la descripción de este logro oculto. Prueba a actualizar los logros; si sigue vacía, no está disponible en la API de Steam.": "Steam did not send the description of this hidden achievement. Try refreshing achievements; if it stays empty, it is unavailable through the Steam API."
+  "Steam no ha enviado la descripción de este logro oculto. Prueba a actualizar los logros; si sigue vacía, no está disponible en la API de Steam.": "Steam did not send the description of this hidden achievement. Try refreshing achievements; if it stays empty, it is unavailable through the Steam API.",
+  "No se pudo abrir Steam. Comprueba que esté instalado en este equipo.": "Could not open Steam. Check that it is installed on this computer.",
+  "Requiere Steam instalado en este equipo.": "Requires Steam installed on this computer."
 }

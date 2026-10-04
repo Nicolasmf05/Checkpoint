@@ -133,7 +133,7 @@ internal static partial class Dialogs
             if (game.SteamAppId is int appId)
             {
                 actions.Children.Add(Button(I18n.T("Abrir en Steam"), (_, _) => Process.Start(new ProcessStartInfo($"https://store.steampowered.com/app/{appId}/") { UseShellExecute = true })));
-                actions.Children.Add(Button(I18n.T("Jugar"), (_, _) => Process.Start(new ProcessStartInfo($"steam://rungameid/{appId}") { UseShellExecute = true })));
+                actions.Children.Add(Button(I18n.T("Jugar"), (_, _) => LaunchSteam(window,appId),true));
             }
             Label(body, I18n.T("Biblioteca"));
             body.Children.Add(Button(I18n.T("Eliminar juego"), (_, _) =>

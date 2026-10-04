@@ -13,7 +13,7 @@
     "bucketPublic": false
   },
   "nativeIntegration": "implemented-native-tested",
-  "clientVersion": "0.8.17",
+  "clientVersion": "0.8.18",
   "authMode": "username-password",
   "confirmEmail": false,
   "steamEdgeFunctions": "deployed-custom-auth-enabled-live-endpoints-checked",

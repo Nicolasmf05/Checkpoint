@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.18
+
+- Game sheets put Play, View achievements and Edit game at the top. Play, save and accept actions have stronger contrast and larger targets; web game sheets can also open locally installed Steam games. Manual games emphasize achievements without offering an invalid Steam launch.
+
 ## 0.8.17
 
 - Steam descriptions missing from the game schema now fall back to matching player-achievement text. Old cached results are bypassed without revoking sessions. Hidden achievements remain protected until revealed; when Steam omits a hidden description from both responses, the UI explains the provider limitation.

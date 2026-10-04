@@ -110,7 +110,7 @@ function schema(node) {
     case 'details': element = el('details', 'type-details'); element.open = node.open; element.append(el('summary', '', node.text)); element.addEventListener('toggle', () => { if (element.open !== node.open) update(element.open); }); break;
     default: element = el('div', `type-${node.type}`); break;
   }
-  if(['achievement-card','achievement-summary','achievement-description','cover-preview'].includes(node.style))element.classList.add(node.style);
+  if(['achievement-card','achievement-summary','achievement-description','cover-preview','game-actions'].includes(node.style))element.classList.add(node.style);
   if (node.type === 'grid') { element.style.gridTemplateColumns = node.columnWidths?.join(' ') || `repeat(${node.columns},minmax(0,1fr))`; if (node.rows?.length) element.style.gridTemplateRows = node.rows.join(' '); }
   element.dataset.control = node.id; if (node.name) element.setAttribute('aria-label', node.name); if (node.tip) element.title = node.tip;
   if ('disabled' in element) element.disabled = !node.enabled;

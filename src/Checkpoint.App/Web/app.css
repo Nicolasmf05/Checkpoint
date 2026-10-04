@@ -123,3 +123,12 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .page-trail { flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted); }
 .dialog-page>.achievement-review { margin:8px 12px; }
 @media(max-width:400px) { .page-navigation { flex-wrap:wrap; } .page-trail { order:3;flex-basis:100%; } }
+
+/* Give the main task a clear hierarchy without changing the classic theme. */
+.type-button.accent,.navigation .add,.web-account { min-height:38px;padding:9px 18px;font-weight:700;border-width:2px; }
+.game-actions { display:flex;flex-wrap:wrap;gap:8px;padding:12px 0;margin-bottom:4px;border-bottom:1px solid var(--line); }
+.game-actions .type-button { min-height:44px;padding:10px 18px;font-size:14px; }
+.game-actions button:not(.accent):first-of-type,.game-actions button:nth-child(2):not(:last-child) { border-color:var(--accent-ink,var(--accent));font-weight:600; }
+.game-actions button:last-child:not(.accent) { font-size:13px; }
+button.accent:focus-visible { outline-color:var(--text);outline-offset:3px; }
+@media(max-width:400px) { .game-actions button { flex:1 1 auto;padding:9px 12px; } }

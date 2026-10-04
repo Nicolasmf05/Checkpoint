@@ -6,6 +6,13 @@ using Checkpoint.Core;
 namespace Checkpoint.App;
 internal static partial class Dialogs
 {
+    private static void LaunchSteam(Window owner,int appId)
+    {
+        if(appId<=0)return;
+        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo($"steam://rungameid/{appId}"){UseShellExecute=true}); }
+        catch(Exception error) when(error is System.ComponentModel.Win32Exception or InvalidOperationException)
+        { LocalizedNotice.Show(owner,I18n.T("No se pudo abrir Steam. Comprueba que esté instalado en este equipo."),"Checkpoint"); }
+    }
     internal static void GameDetails(MainWindow owner,Game game,Window? parent=null)
     {
         var window=Modal(owner,I18n.T("Ficha del juego")+" · "+game.Title,620,760);
@@ -15,6 +22,10 @@ internal static partial class Dialogs
         {
             body.Children.Clear();window.Title=I18n.T("Ficha del juego")+" · "+game.Title;
         Heading(body,game.Title,I18n.T("Ficha del juego"));
+        var actions=new WrapPanel { Tag="game-actions" };body.Children.Add(actions);
+        if(game.SteamAppId is >0)actions.Children.Add(Button(I18n.T("Jugar"),(_,_)=>LaunchSteam(window,game.SteamAppId.Value),true));
+        actions.Children.Add(Button(I18n.T("Ver logros"),(_,_)=>{if(!App.UseCss){window.Close();Achievements(owner,game);return;}Achievements(owner,game,false,window);Render();},game.SteamAppId is not >0));
+        actions.Children.Add(Button(I18n.T("Editar juego"),(_,_)=>{if(!App.UseCss){window.Close();Edit(owner,game);return;}Edit(owner,game);if(owner.Games.FirstOrDefault(g=>g.Id==game.Id) is {} current){game=current;Render();}else window.Close();}));
         var image=new Image { Height=240,Tag="cover-preview",Visibility=Visibility.Collapsed };
         if(!owner.Preferences.LightweightMode)body.Children.Add(image);
         async System.Threading.Tasks.Task LoadCover(){if(owner.Preferences.LightweightMode)return;try{image.Source=await owner.Covers.Get(game);if(image.Source is not null)image.Visibility=Visibility.Visible;}catch(Exception error) when(error is not OutOfMemoryException){} }
@@ -42,8 +53,6 @@ internal static partial class Dialogs
         }
         Render();
         footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));
-        footer.Children.Add(Button(I18n.T("Editar juego"),(_,_)=>{if(!App.UseCss){window.Close();Edit(owner,game);return;}Edit(owner,game);if(owner.Games.FirstOrDefault(g=>g.Id==game.Id) is {} current){game=current;Render();}else window.Close();}));
-        footer.Children.Add(Button(I18n.T("Ver logros"),(_,_)=>{if(!App.UseCss){window.Close();Achievements(owner,game);return;}Achievements(owner,game,false,window);Render();},true));
         ShowPage(window);
     }
 }

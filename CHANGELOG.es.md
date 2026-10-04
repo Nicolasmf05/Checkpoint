@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.18
+
+- Las acciones principales de la ficha aparecen arriba: Jugar, Ver logros y Editar juego. Jugar, guardar y aceptar tienen mayor tamaño y contraste; la ficha web también permite abrir juegos de Steam instalados en el equipo. Los juegos manuales destacan sus logros sin ofrecer un inicio de Steam incorrecto.
+
 ## 0.8.17
 
 - Las descripciones ausentes del esquema de Steam se recuperan de la respuesta de logros del jugador cuando está disponible. Se evita la caché anterior sin revocar sesiones. Los logros ocultos siguen protegidos hasta revelarlos; si Steam omite la descripción en ambas respuestas, la interfaz explica la limitación del proveedor.
