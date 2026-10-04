@@ -47,6 +47,7 @@ public partial class MainWindow : Window
     private int dragScrollDirection;
     private bool? miniatureApplied;
     private bool fullWindowApplied;
+    internal bool MiniatureUsesLibrary => Preferences.MiniatureView && Preferences.ActiveList == "all" && !Games.Any(g => GameLists.Visible(g,"all"));
     internal bool IsFullWindow => Preferences.FullWindow && !Preferences.MiniatureView;
     internal double EffectiveOpacity => IsFullWindow ? 1 : Preferences.BackgroundOpacity;
     internal void SetWindowMode(int mode)
@@ -268,7 +269,8 @@ public partial class MainWindow : Window
         bool restoreFocus = Preferences.MiniatureView && GameList.IsKeyboardFocusWithin;
         int finished = Games.Count(g => g.Status == GameStatus.Finished);
         Summary.Text = I18n.IsEnglish ? $"{Games.Count(g => g.Tracked)} in your list  ·  {finished} stories finished" : $"{Games.Count(g => g.Tracked)} en tu lista  ·  {finished} historias terminadas";
-        var filtered = GameRules.InDisplayOrder(Games.Where(g => allLibrary || GameLists.Visible(g,Preferences.ActiveList))
+        bool showLibrary = allLibrary || MiniatureUsesLibrary;
+        var filtered = GameRules.InDisplayOrder(Games.Where(g => showLibrary || GameLists.Visible(g,Preferences.ActiveList))
             .Where(g => g.Title.Contains(Search.Text, StringComparison.CurrentCultureIgnoreCase))
             .Where(g => StatusFilter.SelectedIndex <= 0 || (int)g.Status == StatusFilter.SelectedIndex - 1)).ToList();
         visibleCards = filtered.Select(g => new CardView(g, Preferences.Compact, Themes.IsLight(Preferences), Preferences.LightweightMode || Preferences.MiniatureView)).ToList();

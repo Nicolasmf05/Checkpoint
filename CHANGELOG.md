@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.13 — Imported games in Miniature
+
+Miniature falls back to Library when the default My list is empty, so fresh Steam imports remain visible. A source label identifies the fallback without changing tracking or friend privacy. Empty custom lists show a localized message and a Library action instead of a blank viewport.
+
 ## 0.8.12 — Uninstall shortcuts
 
 The MSI adds Windows Installer uninstall shortcuts to the Start menu and installed folder. Spanish Windows receives Spanish shortcut names; other Windows languages receive English names. The normal uninstall confirmation remains visible, and user library/settings are preserved. Portable removal is documented separately.

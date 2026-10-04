@@ -77,3 +77,7 @@ Checkpoint originally created by **Nicolasmf05** — https://github.com/Nicolasm
 MSI: close Checkpoint, then use Start → Checkpoint → Uninstall Checkpoint, or the uninstall shortcut inside the installed folder. The shortcut follows the Windows language (Spanish or English) and opens the Windows Installer confirmation. Windows Settings → Apps → Checkpoint → Uninstall also works. The app and installed shortcuts are removed; library and settings in `%LOCALAPPDATA%\Checkpoint` remain.
 
 Portable: disable Start with Windows if enabled, close Checkpoint and remove its extracted folder. The portable ZIP does not install MSI shortcuts.
+
+## Empty Miniature lists
+
+When the default My list has no visible games, Miniature uses Library automatically and labels its source **Library**. Imported games therefore remain visible even before you add them to My list. This does not track, publish or change the privacy of any game. Empty custom lists stay empty with a localized explanation and a Library button that exits Miniature into the normal Library view.

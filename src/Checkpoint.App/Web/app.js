@@ -143,13 +143,14 @@ function frame() {
   resize.addEventListener('pointermove', e => { if (!point) return; const x=e.screenX-point[0], y=e.screenY-point[1]; point=[e.screenX,e.screenY]; if (x || y) action('resize',{x,y}); }); resize.addEventListener('pointerup', () => point = undefined); resize.addEventListener('lostpointercapture', () => point = undefined);
   const collectionbar=el('div','collectionbar'),collections=el('select','collection-selector');collections.addEventListener('change',()=>action('collection',{value:collections.value}));collectionbar.append(collections,button('', 'list-details', '', {},'list-details'),button('', 'manage-lists', '', {},'manage-lists'));
   const selectionbar=el('div','selectionbar');
-  const miniControls=el('div','mini-controls');miniControls.append(button('', 'exit-mini', '', {}, 'mini-exit'));
+  const miniControls=el('div','mini-controls');miniControls.append(el('span','mini-source'),button('', 'exit-mini', '', {}, 'mini-exit'));
   windowNode.append(header,intro,navigation,searchbar,collectionbar,selectionbar,miniControls,viewport,footer,shortcutbar,strip,resize); root.append(windowNode);
   windowNode.addEventListener('contextmenu', e => { if (state.mini && !e.target.closest('[data-game]')) { e.preventDefault(); showMenu(null,e.clientX,e.clientY); } });
 }
 function renderMain() {
   if (dialogMode || !root.querySelector('.window')) frame(); dialogMode = false;
   const host = root.querySelector('.window'); host.classList.toggle('mini', state.mini); host.classList.toggle('full',state.full);
+  const miniSource=host.querySelector('.mini-source');miniSource.textContent=state.miniLibrary?state.labels.library:'';miniSource.hidden=!state.miniLibrary;
   const miniExit=host.querySelector('.mini-exit');miniExit.textContent='↗ '+state.labels.exitMini;miniExit.title=state.labels.exitMini;miniExit.setAttribute('aria-label',state.labels.exitMini);
   if(!state.mini && document.activeElement?.closest('.mini-controls'))host.querySelector('.viewport').focus({preventScroll:true});
   if(state.mini && document.activeElement?.closest('.header,.navigation,.searchbar,.collectionbar,.footer,.shortcutbar,.web-toolbar'))host.querySelector('.viewport').focus({preventScroll:true});
@@ -188,6 +189,7 @@ function renderSelection(){
 function renderGames() {
   if (!state || state.kind !== 'main' || state.tab === 'friends') return;
   const viewport = root.querySelector('.viewport'); if (!viewport) return;
+  if (!state.games.length && state.mini) { const empty=el('div','mini-empty');empty.append(el('p','',state.miniEmpty),button(state.labels.library,'mini-library'));viewport.replaceChildren(empty);return; }
   if (!state.games.length && !state.mini) { const empty=el('div','empty'); empty.append(el('h2','',state.emptyTitle),el('p','',state.emptyText),button(state.labels.add,'add'),button(state.labels.steam,'steam')); if (state.examples) empty.append(button(state.labels.examples,'examples')); viewport.replaceChildren(empty); return; }
   const focusWasRow = document.activeElement?.closest('[data-game]');
   const columns = state.grid && !state.mini ? Math.max(1,Math.floor(viewport.clientWidth / 155)) : 1;

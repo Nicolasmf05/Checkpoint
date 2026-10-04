@@ -109,3 +109,6 @@ input::placeholder,textarea::placeholder { color:var(--muted); opacity:1; }
 .game.grid .game-selection { position:absolute;top:12px;left:12px;z-index:1; }
 .menu-caption { padding:7px;font-weight:600; }
 .collectionbar { flex-wrap:wrap; }.collectionbar button { font-size:11px;padding:6px 8px; }
+
+.mini-source { margin-right:auto;align-self:center;color:var(--muted);font-size:11px; }
+.mini-empty { text-align:center;font-size:11px;padding:4px; } .mini-empty p { margin:0 0 6px; } .mini-empty button { font-size:11px;min-height:28px;padding:4px 8px; }

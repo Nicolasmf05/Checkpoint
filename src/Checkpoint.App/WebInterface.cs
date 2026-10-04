@@ -24,12 +24,12 @@ public partial class MainWindow
     private object WebSnapshot() => new
     {
         kind="main", collection=Preferences.ActiveList, collections=new[]{new {value="all",label=I18n.T("Mi lista")},new{value="private",label=I18n.T("Privados")}}.Concat(Preferences.GameLists.Select(n=>new{value="custom:"+n,label=n})).ToArray(), shortcuts=Shortcuts.Effective(Preferences.Shortcuts), language=I18n.Language, light=Themes.IsLight(Preferences), theme=Themes.Id(Preferences),
-        opacity=EffectiveOpacity, full=IsFullWindow, mini=Preferences.MiniatureView, compact=Preferences.Compact,
+        opacity=EffectiveOpacity, full=IsFullWindow, mini=Preferences.MiniatureView, miniLibrary=MiniatureUsesLibrary, compact=Preferences.Compact,
         grid=Preferences.GridView, textSize=Preferences.MiniatureTextSize, locked=Preferences.PositionLocked,
         pinned=Preferences.AlwaysOnTop, globalHotkey=hotkeyRegistered, lightweight=Preferences.LightweightMode, busy=syncing,
         tab=friendsVisible ? "friends" : allLibrary ? "library" : "list", search=Search.Text, filter=StatusFilter.SelectedIndex,
         summary=Summary.Text, notice=NoticeText.Text, connection=ConnectionText.Text,
-        emptyTitle=EmptyTitle.Text, emptyText=EmptyText.Text, examples=Games.Count == 0, undo=DeletedGames.Count > 0,
+        emptyTitle=EmptyTitle.Text, emptyText=EmptyText.Text, miniEmpty=I18n.T("Esta lista no tiene juegos."), examples=Games.Count == 0, undo=DeletedGames.Count > 0,
         labels=new { title=I18n.T("Mi lista"),
             friendsTitle=I18n.T("Amigos"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
             add=I18n.T("Añadir juego"), settings=I18n.T("Ajustes"), hide=I18n.T("Ocultar widget"), close=I18n.T("Cerrar"),
@@ -98,6 +98,7 @@ public partial class MainWindow
             case "examples": AddExamples(); Persist(); Refresh(); break;
             case "pin": Preferences.AlwaysOnTop=!Preferences.AlwaysOnTop; ApplyPreferences(); Persist(); break;
             case "lock": Preferences.PositionLocked=!Preferences.PositionLocked; ApplyPreferences(); Persist(); break;
+            case "mini-library": Preferences.MiniatureView=false; ApplyPreferences(); LibraryClick(this,new RoutedEventArgs()); Persist(); break;
             case "exit-mini": Preferences.MiniatureView=false; ApplyPreferences(); Persist(); Refresh(); break;
             case "hide": Hide(); break;
             case "close": Close(); break;

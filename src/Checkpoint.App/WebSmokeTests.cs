@@ -161,6 +161,18 @@ public partial class MainWindow
             await Wait(()=>Script(web,"window.checkpointState.mini"));
             Check(await Script(web,"document.documentElement.dataset.theme==='ocean' && getComputedStyle(document.querySelector('.window')).getPropertyValue('--accent').trim()==='#6edcf7'"),"Miniature retains the selected custom theme");
             Check(await Script(web,"getComputedStyle(document.querySelector('.header')).display==='none' && document.querySelectorAll('.minirow').length===4 && !document.querySelector('.minirow img')"),"CSS Miniature displays only game names and states");
+            var miniatureTracked=Games.ToDictionary(g=>g.Id,g=>g.Tracked);var miniatureLists=Preferences.GameLists.ToList();var miniatureActive=Preferences.ActiveList;
+            foreach(var item in Games)item.Tracked=false;Preferences.ActiveList="all";Persist();Refresh();await Task.Delay(350);
+            Check(await Script(web,"window.checkpointState.miniLibrary && document.querySelectorAll('.minirow').length===4 && document.querySelector('.mini-source').textContent==='Library' && document.querySelector('.minirow').getBoundingClientRect().height>0"),"Miniature shows imported Library games when My list is empty");
+            Check(Store.LoadGames().All(g=>!g.Tracked),"Miniature library fallback preserves tracking and sharing choices");
+            await Capture(web,"css-miniature-library-en.png");
+            Preferences.GameLists.Add("Empty miniature list");Preferences.ActiveList="custom:Empty miniature list";Refresh();await Task.Delay(350);
+            Check(await Script(web,"!window.checkpointState.miniLibrary && document.querySelectorAll('.minirow').length===0 && document.querySelector('.mini-empty').textContent.includes('This list has no games.')"),"an empty custom list shows a localized Miniature explanation without unrelated games");
+            Preferences.Language="es";I18n.SetLanguage("es");ApplyPreferences();Refresh();await Task.Delay(350);
+            Check(await Script(web,"document.querySelector('.mini-empty').textContent.includes('Esta lista no tiene juegos.') && !document.querySelector('.mini-empty').textContent.includes('This list')"),"empty Miniature text uses Spanish throughout");
+            await Run("document.querySelector('.mini-empty button').click();");
+            Check(!Preferences.MiniatureView&&!Store.LoadSettings().MiniatureView&&await Script(web,"window.checkpointState.tab==='library' && window.checkpointState.games.length===4"),"empty Miniature Library action restores the normal window and opens imported games");
+            foreach(var item in Games)item.Tracked=miniatureTracked[item.Id];Preferences.GameLists=miniatureLists;Preferences.ActiveList=miniatureActive;Preferences.Language="en";I18n.SetLanguage("en");Preferences.MiniatureView=true;ApplyPreferences();Persist();Refresh();await Task.Delay(350);
             await Run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));");
             Check(await Script(web,"document.activeElement.matches('.minirow')"),"CSS Miniature keyboard navigation focuses an HTML game row");
             var activeGameId=Guid.Parse(JsonSerializer.Deserialize<string>(await web.Browser.CoreWebView2.ExecuteScriptAsync("document.activeElement.dataset.game"))!);

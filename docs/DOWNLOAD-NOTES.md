@@ -77,3 +77,7 @@ Checkpoint creado originalmente por **Nicolasmf05** — https://github.com/Nicol
 MSI: cierra Checkpoint y usa Inicio → Checkpoint → Desinstalar Checkpoint, o el acceso de desinstalación de la carpeta instalada. El nombre depende del idioma de Windows (español o inglés) y abre la confirmación de Windows Installer. También sirve Configuración de Windows → Aplicaciones → Checkpoint → Desinstalar. Se eliminan la app y sus accesos instalados; la biblioteca y los ajustes en `%LOCALAPPDATA%\Checkpoint` se conservan.
 
 Portátil: desactiva Iniciar con Windows si estaba activado, cierra Checkpoint y elimina la carpeta extraída. El ZIP portátil no instala accesos MSI.
+
+## Listas vacías en Miniatura
+
+Cuando Mi lista no contiene juegos visibles, Miniatura usa automáticamente Biblioteca y muestra **Biblioteca** como origen. Los juegos importados se ven aunque todavía no estén añadidos a Mi lista. Esto no selecciona, publica ni cambia la privacidad de ningún juego. Las listas personalizadas vacías muestran un aviso traducido y un botón Biblioteca que sale de Miniatura y abre la biblioteca normal.

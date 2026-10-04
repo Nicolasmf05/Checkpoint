@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.13 — Juegos importados en Miniatura
+
+Miniatura muestra Biblioteca cuando Mi lista está vacía, para que los juegos recién importados de Steam sigan visibles. Una etiqueta identifica el origen sin cambiar selección ni privacidad. Las listas personalizadas vacías muestran un aviso traducido y una acción Biblioteca en vez de un panel en blanco.
+
 ## 0.8.12 — Accesos para desinstalar
 
 El MSI añade accesos al desinstalador de Windows en Inicio y en la carpeta instalada. El nombre aparece en español para Windows en español y en inglés para los demás idiomas. Se mantiene la confirmación de desinstalación y se conservan biblioteca y ajustes. Se documenta aparte la eliminación del portátil.

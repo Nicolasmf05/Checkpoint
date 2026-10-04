@@ -613,5 +613,6 @@
   "Revisión terminada": "Review complete",
   "No quedan juegos sin carátula por revisar.": "No more games with missing covers to review.",
   "En la web se actualiza Steam. RetroAchievements se sincroniza desde la app de Windows.": "The web version updates Steam. RetroAchievements syncs through the Windows app.",
-  "Pendientes": "Remaining"
+  "Pendientes": "Remaining",
+  "Esta lista no tiene juegos.": "This list has no games."
 }
