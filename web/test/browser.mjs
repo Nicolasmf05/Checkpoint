@@ -1241,6 +1241,40 @@ try {
     'batch list changes persist after browser reload',
   );
 
+  await click('Library');
+  const directTitle = 'Browser fixture <img src=x>',
+    directBefore = (await readBulk()).find((g) => g.title === directTitle),
+    directGame = () => page.locator('.game').filter({ hasText: directTitle });
+  await directGame().click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Remove from My list', exact: true }).click();
+  await page.waitForFunction(
+    (title) => window.checkpointState.games.some((g) => g.title === title && !g.tracked),
+    directTitle,
+  );
+  await directGame().click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Add to My list', exact: true }).click();
+  await page.waitForFunction(
+    (title) => window.checkpointState.games.some((g) => g.title === title && g.tracked),
+    directTitle,
+  );
+  await directGame().click({ button: 'right' });
+  check(
+    (await page.getByRole('menuitem', { name: 'Add to My list', exact: true }).count()) === 0 &&
+      (await page.getByRole('menuitem', { name: 'Remove from My list', exact: true }).isVisible()),
+    'Library right-click tracks directly and hides the add action for tracked games',
+  );
+  await page.keyboard.press('Escape');
+  await page.reload();
+  await page.locator('.window').waitFor();
+  const directAfter = (await readBulk()).find((g) => g.title === directTitle);
+  check(
+    directAfter.tracked &&
+      directAfter.friendsPrivate === directBefore.friendsPrivate &&
+      JSON.stringify(directAfter.lists) === JSON.stringify(directBefore.lists) &&
+      directAfter.notes === directBefore.notes,
+    'direct Library tracking survives reload and preserves privacy memberships and notes',
+  );
+
   // Explicit settings review must include more than the periodic 20-game batch.
   libraryEmpty = true;
   await page.evaluate(async () => {

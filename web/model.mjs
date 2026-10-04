@@ -299,7 +299,7 @@ export function applyListAction(games, ids, catalog, operation, source, target) 
     chosen = games.filter((g) => keys.has(g.id));
   if (!keys.size || keys.size > 500 || chosen.length !== keys.size || ![...keys].every(uuid))
     throw new Error('invalid-selection');
-  if (!['move', 'add', 'remove', 'private', 'public'].includes(operation))
+  if (!['move', 'add', 'track', 'remove', 'private', 'public'].includes(operation))
     throw new Error('invalid-list-action');
   const destination = catalog.find(
     (n) => n.toLocaleLowerCase() === String(target || '').toLocaleLowerCase(),
@@ -323,7 +323,8 @@ export function applyListAction(games, ids, catalog, operation, source, target) 
     if (operation === 'move' || operation === 'add') {
       g.lists = normalizeLists([...g.lists, destination]);
       g.tracked = true;
-    } else if (operation === 'remove') {
+    } else if (operation === 'track') g.tracked = true;
+    else if (operation === 'remove') {
       if (source.startsWith('custom:'))
         g.lists = g.lists.filter(
           (n) => n.toLocaleLowerCase() !== source.slice(7).toLocaleLowerCase(),

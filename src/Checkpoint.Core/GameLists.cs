@@ -94,7 +94,7 @@ public static class GameLists
         var chosen = games.Where(g => keys.Contains(g.Id)).ToArray();
         if (keys.Count is < 1 or > 500 || chosen.Length != keys.Count)
             throw new ArgumentException(I18n.T("Selecciona entre 1 y 500 juegos existentes."));
-        if (operation is not ("move" or "add" or "remove" or "private" or "public"))
+        if (operation is not ("move" or "add" or "track" or "remove" or "private" or "public"))
             throw new ArgumentException(I18n.T("Acción de lista no válida."));
         string? destination = null;
         if (operation is "move" or "add")
@@ -130,6 +130,8 @@ public static class GameLists
                     goto case "add";
                 case "add":
                     game.Lists = Normalize(game.Lists.Append(destination!));
+                    goto case "track";
+                case "track":
                     game.Tracked = true;
                     break;
                 case "remove":

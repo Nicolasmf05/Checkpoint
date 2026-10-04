@@ -161,6 +161,11 @@ function showMenu(game, x, y) {
     const l = state.labels,
       ids = picked.has(game.id) && picked.size > 1 ? [...picked] : [game.id],
       source = state.tab === 'library' ? 'library' : state.collection;
+    if (
+      source === 'library' &&
+      ids.some((id) => state.games.some((candidate) => candidate.id === id && !candidate.tracked))
+    )
+      entry(l.track, 'batch', { ids, operation: 'track', source });
     if (ids.length === 1) {
       entry(l.details, 'details', { id: game.id });
       entry(l.achievements, 'achievements', { id: game.id });

@@ -131,6 +131,7 @@ public partial class MainWindow
                 moveTo = I18n.T("Mover a"),
                 changeList = I18n.T("Cambiar de lista"),
                 addToList = I18n.T("Añadir a otra lista"),
+                track = I18n.T("Añadir a Mi lista"),
                 removeFromList = I18n.T("Quitar de esta lista"),
                 untrack = I18n.T("Quitar de Mi lista"),
                 selectedGames = I18n.T("Juegos seleccionados:"),

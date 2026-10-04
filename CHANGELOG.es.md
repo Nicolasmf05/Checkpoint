@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.24
+
+- El menú de clic derecho de Biblioteca permite añadir juegos directamente a Mi lista. La opción aparece cuando la selección incluye juegos que todavía no están en ella, funciona con varios juegos seleccionados y conserva la privacidad, las otras listas y el progreso.
+
 ## 0.8.23
 
 - Biblioteca conserva todos los juegos; Mi lista queda como una selección aparte. Volver a Amigos abre su menú inicial.

@@ -181,6 +181,13 @@ test('batch list operations preserve private data, memberships and owner visibil
     b = normalize({ title: 'Two', lists: ['Source'], tasks: [{ title: 'Keep task' }] }),
     games = [a, b],
     catalog = ['Source', 'Other', 'Target'];
+  applyListAction(games, [a.id, b.id], catalog, 'track', 'library');
+  assert.ok(games.every((g) => g.tracked));
+  assert.equal(a.friendsPrivate, true);
+  assert.deepEqual(a.lists, ['Source', 'Other']);
+  assert.equal(a.notes, 'Keep notes');
+  assert.equal(a.storyPercent, 37);
+  assert.equal(b.tasks[0].title, 'Keep task');
   applyListAction(games, [a.id, b.id], catalog, 'move', 'custom:Source', 'Target');
   assert.deepEqual(a.lists, ['Other', 'Target']);
   assert.deepEqual(b.lists, ['Target']);

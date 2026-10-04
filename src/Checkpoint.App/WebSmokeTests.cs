@@ -1417,6 +1417,42 @@ public partial class MainWindow
             );
             Search.Clear();
             StatusFilter.SelectedIndex = 0;
+            Search.Text = bulkA.Title;
+            Refresh();
+            await Run(
+                "document.querySelector('.game').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:30,clientY:100}));"
+            );
+            Check(
+                await Script(
+                    web,
+                    "[...document.querySelectorAll('.menu button')].some(b=>b.textContent==='Add to My list')"
+                ),
+                "Windows Library menu offers direct tracking for an untracked game"
+            );
+            await Run(
+                "[...document.querySelectorAll('.menu button')].find(b=>b.textContent==='Add to My list').click();"
+            );
+            Check(
+                bulkA.Tracked
+                    && bulkA.Lists.SequenceEqual(new[] { "Weekend" })
+                    && bulkA.Notes == "Bulk notes"
+                    && Store.LoadGames().Single(g => g.Id == bulkA.Id).Tracked,
+                "Windows direct tracking persists without changing other memberships or notes"
+            );
+            await Run(
+                "document.querySelector('.game').dispatchEvent(new MouseEvent('contextmenu',{bubbles:true,clientX:30,clientY:100}));"
+            );
+            Check(
+                await Script(
+                    web,
+                    "![...document.querySelectorAll('.menu button')].some(b=>b.textContent==='Add to My list')"
+                ),
+                "Windows Library hides direct tracking once the game is in My list"
+            );
+            await Run(
+                "document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));"
+            );
+            Search.Clear();
             Refresh();
             await Run(
                 "const viewport=document.querySelector('.viewport');viewport.scrollTop=viewport.scrollHeight;viewport.dispatchEvent(new Event('scroll'));"

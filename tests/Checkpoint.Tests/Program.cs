@@ -149,6 +149,16 @@ var batchTwo = new Game
 };
 var batchGames = new List<Game> { batchOne, batchTwo };
 string[] batchCatalog = ["Source", "Other", "Target"];
+GameLists.Apply(batchGames, [batchOne.Id, batchTwo.Id], batchCatalog, "track", "library");
+Check(
+    batchGames.All(g => g.Tracked)
+        && batchOne.FriendsPrivate == true
+        && batchOne.Lists.SequenceEqual(new[] { "Source", "Other" })
+        && batchOne.Notes == "Keep notes"
+        && batchOne.StoryPercent == 37
+        && batchTwo.Tasks.Single().Title == "Keep task",
+    "adding library games to My list preserves privacy memberships and progress"
+);
 GameLists.Apply(
     batchGames,
     [batchOne.Id, batchTwo.Id],

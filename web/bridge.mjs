@@ -390,6 +390,7 @@ function snapshot() {
       moveTo: T('Mover a'),
       changeList: T('Cambiar de lista'),
       addToList: T('Añadir a otra lista'),
+      track: T('Añadir a Mi lista'),
       removeFromList: T('Quitar de esta lista'),
       untrack: T('Quitar de Mi lista'),
       selectedGames: T('Juegos seleccionados:'),
