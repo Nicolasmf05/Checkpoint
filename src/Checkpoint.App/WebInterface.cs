@@ -34,7 +34,7 @@ public partial class MainWindow
         labels=new { title=I18n.T("Mi lista"),
             friendsTitle=I18n.T("Amigos"), list=I18n.T("Mi lista"), library=I18n.T("Biblioteca"), friends=I18n.T("Amigos"),
             add=I18n.T("Añadir juego"), settings=I18n.T("Ajustes"), hide=I18n.T("Ocultar widget"), minimize=I18n.T("Minimizar"), close=I18n.T("Cerrar"),
-            pin=I18n.T("Mantener siempre visible"), search=I18n.T("Buscar juego"), sync=I18n.T("Actualizar"),
+            pin=I18n.T("Mantener siempre visible"), search=I18n.T("Buscar juego"), filterStatus=I18n.T("Filtrar por estado"), sync=I18n.T("Actualizar"),
             details=I18n.T("Ver ficha completa"), achievements=I18n.T("Ver logros"), steam=I18n.T("Conectar Steam"), edit=I18n.T("Editar juego"), exitMini=I18n.T("Salir de miniatura"),
             locked=I18n.T("Bloquear posición y tamaño"), view=I18n.T("Cambiar vista"), undo=I18n.T("Recuperar último juego eliminado"),
             examples=I18n.T("Añadir ejemplos"), finish=I18n.T("Marcar o desmarcar historia terminada"),

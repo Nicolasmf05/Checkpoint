@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.20
+
+- Visible status filters in the library and collections, also available in list details. Combine them with title search; changing list filters clears selections to keep batch actions safe.
+
 ## 0.8.19
 
 - An accepted, saved IGDB cover can become the default for other users of the same game when the Steam cover is missing. It applies without another confirmation, including in Library, while retaining personal covers and rejected-image exclusions. Supabase stores only text and IGDB IDs; images remain local.

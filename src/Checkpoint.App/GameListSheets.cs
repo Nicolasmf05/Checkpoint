@@ -30,15 +30,16 @@ internal static partial class Dialogs
         var summary=new TextBlock{TextWrapping=TextWrapping.Wrap};body.Children.Add(summary);
         body.Children.Add(new TextBlock{Text=I18n.T("La ficha incluye los juegos privados de esta lista. Quitar no elimina el juego de Biblioteca."),TextWrapping=TextWrapping.Wrap});
         var search=Input(body,I18n.T("Buscar juego"),"");var count=new TextBlock();body.Children.Add(count);
+        Label(body,I18n.T("Filtrar por estado"));var status=new ComboBox{ItemsSource=new[]{I18n.T("Todos")}.Concat(Enum.GetValues<GameStatus>().Select(Labels.Status)).ToArray(),SelectedIndex=0};System.Windows.Automation.AutomationProperties.SetName(status,I18n.T("Filtrar por estado"));body.Children.Add(status);var results=new TextBlock();body.Children.Add(results);
         var selected=new HashSet<Guid>();int page=0;var actions=new WrapPanel();body.Children.Add(actions);
         var rows=new StackPanel();body.Children.Add(rows);var paging=new WrapPanel();body.Children.Add(paging);var pagination=new TextBlock();body.Children.Add(pagination);
         var notice=new TextBlock{TextWrapping=TextWrapping.Wrap};body.Children.Add(notice);
         Button Action(string text,System.Action run){var button=Button(I18n.T(text),(_,_)=>{try{run();}catch(Exception error){notice.Text=I18n.Error(error);}});actions.Children.Add(button);return button;}
         void Selection(){count.Text=I18n.T("Juegos seleccionados:")+" "+selected.Count+" · "+I18n.T("Hasta 500 juegos a la vez");foreach(Button action in actions.Children)action.IsEnabled=selected.Count>0;}
-        Game[] Matches()=>GameLists.Members(owner.Games,source).Where(g=>g.Title.Contains(search.Text,StringComparison.OrdinalIgnoreCase)).OrderBy(g=>g.Title,StringComparer.OrdinalIgnoreCase).ToArray();
+        Game[] Matches()=>GameLists.Members(owner.Games,source).Where(g=>(status.SelectedIndex==0||g.Status==(GameStatus)(status.SelectedIndex-1))&&g.Title.Contains(search.Text,StringComparison.OrdinalIgnoreCase)).OrderBy(g=>g.Title,StringComparer.OrdinalIgnoreCase).ToArray();
         void Reload()
         {
-            var members=GameLists.Members(owner.Games,source).ToArray();selected.RemoveWhere(id=>!members.Any(g=>g.Id==id));var matches=Matches();page=Math.Clamp(page,0,Math.Max(0,(matches.Length+49)/50-1));rows.Children.Clear();
+            var members=GameLists.Members(owner.Games,source).ToArray();selected.RemoveWhere(id=>!members.Any(g=>g.Id==id));var matches=Matches();page=Math.Clamp(page,0,Math.Max(0,(matches.Length+49)/50-1));rows.Children.Clear();results.Text=I18n.T("Resultados")+": "+matches.Length+" / "+members.Length;
             summary.Text=I18n.T("Juegos")+": "+members.Length+" · "+I18n.T("Historia terminada")+": "+members.Count(g=>g.Status==GameStatus.Finished)+" · "+I18n.T("Jugando")+": "+members.Count(g=>g.Status==GameStatus.Playing)+" · "+I18n.T("Privados")+": "+members.Count(g=>g.FriendsPrivate==true);
             foreach(var game in matches.Skip(page*50).Take(50))
             {
@@ -49,7 +50,7 @@ internal static partial class Dialogs
                 card.Children.Add(new TextBlock{Text=I18n.T("Listas")+": "+(game.Lists.Count>0?string.Join(", ",game.Lists):I18n.T("Sin listas adicionales")),TextWrapping=TextWrapping.Wrap});
                 card.Children.Add(Button(I18n.T("Ver ficha completa"),(_,_)=>{GameDetails(owner,game,window);Reload();}));rows.Children.Add(new Border{Child=card});
             }
-            if(matches.Length==0)rows.Children.Add(new TextBlock{Text=I18n.T("Sin juegos en esta lista")});
+            if(matches.Length==0)rows.Children.Add(new TextBlock{Text=I18n.T(members.Length>0?"Ningún juego coincide con los filtros.":"Sin juegos en esta lista")});
             pagination.Text=I18n.T("Página")+" "+(page+1)+" / "+Math.Max(1,(matches.Length+49)/50);Selection();
         }
         void Batch(string operation){owner.ApplyListAction(selected.ToArray(),operation,source);selected.Clear();Reload();}
@@ -58,6 +59,6 @@ internal static partial class Dialogs
         paging.Children.Add(Button(I18n.T("Anterior"),(_,_)=>{page--;Reload();}));paging.Children.Add(Button(I18n.T("Siguiente"),(_,_)=>{page++;Reload();}));
         paging.Children.Add(Button(I18n.T("Seleccionar esta página"),(_,_)=>{foreach(var game in Matches().Skip(page*50).Take(50)){if(selected.Count<500)selected.Add(game.Id);}Reload();}));
         paging.Children.Add(Button(I18n.T("Limpiar selección"),(_,_)=>{selected.Clear();Reload();}));
-        search.TextChanged+=(_,_)=>{page=0;Reload();};footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));Reload();ShowPage(window);
+        search.TextChanged+=(_,_)=>{page=0;selected.Clear();Reload();};status.SelectionChanged+=(_,_)=>{page=0;selected.Clear();Reload();};footer.Children.Add(Button(I18n.T("Cerrar"),(_,_)=>window.Close()));Reload();ShowPage(window);
     }
 }

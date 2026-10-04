@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.20
+
+- Filtros de estado visibles en Biblioteca y colecciones, también en las fichas de listas. Se combinan con la búsqueda por nombre; cambiar los filtros limpia la selección para evitar acciones sobre juegos ocultos.
+
 ## 0.8.19
 
 - Una carátula de IGDB aceptada y guardada puede servir de carátula por defecto para otros usuarios del mismo juego cuando falta la de Steam. Se aplica sin otra confirmación, incluso en Biblioteca, conservando las imágenes personales y los rechazos. Supabase guarda solo texto e IDs de IGDB; las imágenes siguen almacenándose localmente.

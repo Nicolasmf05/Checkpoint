@@ -356,6 +356,10 @@ public partial class MainWindow
             await Run("document.querySelector('.list-details').click();");var listSheet=await Dialog();
             Check(await Script(listSheet,"document.body.innerText.includes('List details')&&document.body.innerText.includes('Bulk second')&&document.querySelectorAll('input[type=checkbox]').length===2"),"Windows list sheet includes private members with individual selection");
             await Capture(listSheet,"css-list-details-en.png");
+            await ScopedScript(listSheet,"const select=[...document.querySelectorAll('select')].find(s=>s.getAttribute('aria-label')==='Filter by status');select.value='5';select.dispatchEvent(new Event('change',{bubbles:true}));");await Task.Delay(250);
+            Check(await Script(listSheet,"document.body.innerText.includes('No games match the filters.')&&document.querySelectorAll('input[type=checkbox]').length===0"),"Windows list sheet filters members by status");
+            await ScopedScript(listSheet,"const select=[...document.querySelectorAll('select')].find(s=>s.getAttribute('aria-label')==='Filter by status');select.value='0';select.dispatchEvent(new Event('change',{bubbles:true}));");await Task.Delay(250);
+            Check(await Script(listSheet,"document.querySelectorAll('input[type=checkbox]').length===2"),"Windows All restores list members");
             await ScopedScript(listSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Select this page').click();");await Task.Delay(200);
             await ScopedScript(listSheet,"[...document.querySelectorAll('button')].find(b=>b.textContent==='Make visible to friends').click();");await Task.Delay(250);
             Check(!bulkA.FriendsPrivate.GetValueOrDefault()&&!bulkB.FriendsPrivate.GetValueOrDefault()&&bulkA.Notes=="Bulk notes","Windows sheet publishes selected games without touching private notes");
