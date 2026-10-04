@@ -1352,6 +1352,17 @@ function editor(original) {
 function gameDetails(id, parent) {
   if (!game(id)) return;
   const b = build('game-details', {});
+  b.onChange = async (key, value) => {
+    const current = game(id);
+    if (!current || storageConflict) return;
+    if (key === 'notes') current.notes = String(value).slice(0, 20000);
+    else if (key.startsWith('task-')) {
+      const task = current.tasks[Number(key.slice(5))];
+      if (!task) return;
+      task.done = value === true;
+    } else return;
+    await commit();
+  };
   navigation.current = {
     render: () => {
       const g = game(id);
@@ -1362,8 +1373,12 @@ function gameDetails(id, parent) {
           [],
           [b.button(T('Cerrar'), closeDialog, 'close')],
         );
-      const p = progress(g),
-        all = g.achievements || [];
+      const all = reviewItems(g),
+        completed = all.filter((a) => a.unlocked).length,
+        percent = all.length ? Math.round((completed * 100) / all.length) : null;
+      const label = (value, style, heading = false) => ({ ...text(value, heading), style });
+      const group = (style, children, type = 'stack') => ({ type, style, children });
+      b.busy = storageConflict;
       const actions = [];
       if (Number.isInteger(g.steamAppId) && g.steamAppId > 0 && g.steamAppId <= 2147483647)
         actions.push({
@@ -1380,97 +1395,215 @@ function gameDetails(id, parent) {
           tip: T('Requiere Steam instalado en este equipo.'),
         });
       actions.push(
-        {
-          ...b.button(T('Ver logros'), () => achievements(id, navigation.current), 'achievements'),
-          accent: actions.length === 0,
-        },
+        b.button(T('Ver logros'), () => achievements(id, navigation.current), 'achievements'),
         b.button(T('Editar juego'), () => editor(g), 'edit'),
       );
-      const items = [{ type: 'row', style: 'game-actions', children: actions }];
-      if (!data.settings.lightweight && cover(g))
-        items.push({ type: 'image', src: cover(g), style: 'cover-preview', children: [] });
-      items.push(
-        text(g.platform + ' · ' + statusLabels()[g.status], true),
-        ...(goalVisible(g) ? [text(T('Objetivo') + ': ' + goalText(g))] : []),
-        text(p.text + (p.percent == null ? '' : ' · ' + p.percent + '%')),
-      );
-      if (p.percent != null)
-        items.push({
-          type: 'progress',
-          value: p.percent,
-          max: 100,
-          name: T('Progreso'),
-          children: [],
-        });
-      items.push({
-        type: 'card',
-        style: 'achievement-summary',
-        children: [
-          text(T('Logros'), true),
-          text(
-            'Steam: ' +
-              (g.achievements === null
-                ? T('Sin sincronizar')
-                : all.filter((a) => a.unlocked).length + ' / ' + all.length),
-          ),
-          text(
-            'RetroAchievements: ' +
-              (g.retroAchievements === null
-                ? T('Sin sincronizar')
-                : g.retroAchievements.filter((a) => a.unlocked).length +
-                  ' / ' +
-                  g.retroAchievements.length),
-          ),
-          text(T('Objetivos manuales') + ': ' + g.manualAchievements.length),
-        ],
-      });
-      items.push(
-        {
-          type: 'card',
-          style: 'game-playtime',
-          children: [
-            text(T('Tiempo jugado')),
+      const summary = group('game-detail-stats', [
+        group(
+          'game-playtime',
+          [
             text(
               (g.playtimeMinutes / 60).toLocaleString(data.settings.language, {
                 maximumFractionDigits: 1,
               }) + ' h',
               true,
             ),
+            text(T('Tiempo jugado')),
           ],
-        },
-        text(
-          T('Visibilidad') +
-            ': ' +
-            T(g.friendsPrivate ? 'Privado para mis amigos' : 'Visible para mis amigos'),
+          'card',
         ),
-        text(T('Listas') + ': ' + (g.lists.join(', ') || T('Sin listas adicionales'))),
-        text(T('Tareas'), true),
-      );
-      items.push(
-        ...(g.tasks.length
-          ? g.tasks.map((t) => text((t.done ? '✓ ' : '○ ') + t.title))
-          : [text(T('Sin tareas'))]),
-      );
-      items.push(text(T('Notas'), true), text(g.notes || T('Sin notas')));
-      const date = (value) =>
-        value ? new Date(value).toLocaleString(data.settings.language) : T('Sin sincronizar');
-      items.push(
-        text(T('Añadido') + ': ' + date(g.addedAt)),
-        text(T('Última sincronización') + ': ' + date(g.syncedAt)),
-      );
-      if (g.finishedAt) items.push(text(T('Historia terminada') + ': ' + date(g.finishedAt)));
-      if (g.steamAppId) items.push(text('Steam ID: ' + g.steamAppId));
-      if (g.retroGameId) items.push(text('RetroAchievements ID: ' + g.retroGameId));
-      return b.page(g.title, T('Ficha del juego'), items, [
-        b.button(
-          T('Cerrar'),
-          () => {
-            navigation.current = parent || null;
-            emit();
-          },
-          'close',
+        group(
+          'game-detail-visibility',
+          [text(T(g.friendsPrivate ? 'Privado' : 'Visible'), true), text(T('Solo amigos'))],
+          'card',
+        ),
+        group(
+          'game-detail-progress',
+          [
+            label(percent == null ? '—' : percent + '%', 'game-detail-percent', true),
+            group(
+              'game-detail-progress-line',
+              [
+                {
+                  type: 'progress',
+                  value: percent || 0,
+                  max: 100,
+                  name: T('Logros'),
+                  children: [],
+                },
+                label(completed + ' / ' + all.length + ' ' + T('logros'), 'game-detail-count'),
+              ],
+              'row',
+            ),
+            text(T('Estado') + ': ' + statusLabels()[g.status]),
+            ...(g.storyPercent != null ? [text(T('Historia') + ': ' + g.storyPercent + '%')] : []),
+          ],
+          'card',
         ),
       ]);
+      const hero = group('game-detail-hero', [
+        ...(!data.settings.lightweight && cover(g)
+          ? [
+              {
+                type: 'image',
+                src: cover(g),
+                name: g.platform,
+                style: 'cover-preview',
+                children: [],
+              },
+            ]
+          : [label(g.platform, 'game-detail-cover-empty')]),
+        summary,
+      ]);
+      const syncButton = {
+        ...b.button(
+          T(api.steam ? 'Actualizar' : 'Conectar'),
+          async () => {
+            if (api.steam) await sync(id);
+            else await connectSteam();
+          },
+          'sync',
+        ),
+        enabled: !steamBusy && !storageConflict && (!api.steam || !!g.steamAppId),
+      };
+      const services = group('game-detail-services', [
+        group(
+          'game-detail-sync',
+          [
+            label(T('Sincronización'), 'game-detail-panel-heading', true),
+            group(
+              'game-detail-sync-body',
+              [
+                group('game-detail-providers', [
+                  label(T(api.steam ? 'Vinculado' : 'Desvinculado'), 'game-detail-steam'),
+                  label(T('Solo en Windows'), 'game-detail-retro'),
+                ]),
+                syncButton,
+              ],
+              'row',
+            ),
+            ...(g.achievements !== null
+              ? [
+                  text(
+                    'Steam: ' +
+                      g.achievements.filter((a) => a.unlocked).length +
+                      ' / ' +
+                      g.achievements.length,
+                  ),
+                ]
+              : []),
+            ...(g.retroAchievements !== null
+              ? [
+                  text(
+                    'RetroAchievements: ' +
+                      g.retroAchievements.filter((a) => a.unlocked).length +
+                      ' / ' +
+                      g.retroAchievements.length,
+                  ),
+                ]
+              : []),
+            ...(g.manualAchievements.length
+              ? [text(T('Objetivos manuales') + ': ' + g.manualAchievements.length)]
+              : []),
+          ],
+          'card',
+        ),
+        group(
+          'game-detail-lists',
+          [
+            label(T('Listas'), 'game-detail-panel-heading', true),
+            group(
+              'game-detail-list-items',
+              g.lists.length
+                ? g.lists.map((name) =>
+                    b.button(
+                      '· ' + name,
+                      () => listSheet('custom:' + name, navigation.current),
+                      'list-' + name,
+                    ),
+                  )
+                : [text(T('Sin listas adicionales'))],
+            ),
+          ],
+          'card',
+        ),
+      ]);
+      const tasks = g.tasks.map((task, index) => {
+        const key = 'task-' + index;
+        b.fields[key] = task.done;
+        return group('game-detail-task', b.field(key, task.title, 'check'), 'card');
+      });
+      b.fields.notes = g.notes;
+      const notes = {
+        ...b.field('notes', T('Notas'), 'textarea').at(-1),
+        style: 'game-detail-notes',
+        tip: T('Las notas se guardan automáticamente.'),
+      };
+      const date = (value) =>
+        value ? new Date(value).toLocaleString(data.settings.language) : T('Sin sincronizar');
+      const detail = (title, value, style) => group(style, [text(title + ':'), text(value)]);
+      const metadata = group('game-detail-additional', [
+        group(
+          'game-detail-additional-title',
+          T('Información adicional')
+            .split(' ')
+            .map((part) => text(part, true)),
+        ),
+        group('game-detail-metadata', [
+          detail(T('Añadido'), date(g.addedAt), 'game-detail-added'),
+          detail(
+            T('Historia terminada'),
+            g.finishedAt ? date(g.finishedAt) : T('Sin completar'),
+            'game-detail-finished',
+          ),
+          ...(g.steamAppId
+            ? [detail('Steam ID', String(g.steamAppId), 'game-detail-steam-id')]
+            : []),
+          detail(T('Última sincronización'), date(g.syncedAt), 'game-detail-synced'),
+          ...(g.retroGameId
+            ? [detail('RetroAchievements ID', String(g.retroGameId), 'game-detail-retro-id')]
+            : []),
+        ]),
+      ]);
+      const items = [
+        group('game-detail-intro', [
+          text(g.title, true),
+          { type: 'row', style: 'game-actions', children: actions },
+          text(g.platform),
+          ...(goalVisible(g) ? [text(T('Objetivo') + ': ' + goalText(g))] : []),
+        ]),
+        ...(navigation.current?.error ? [text(navigation.current.error)] : []),
+        group('game-detail-main', [
+          hero,
+          services,
+          label(T('Tareas'), 'game-detail-section-title', true),
+          ...(tasks.length ? tasks : [text(T('Sin tareas'))]),
+          label(T('Notas'), 'game-detail-section-title', true),
+          notes,
+          { ...b.button(T('Volver arriba'), () => {}, 'top'), style: 'game-detail-top' },
+        ]),
+        metadata,
+      ];
+      const page = b.page(
+        T('Ficha del juego') + ' · ' + g.title,
+        '',
+        [],
+        [
+          b.button(
+            T('Cerrar'),
+            () => {
+              navigation.current = parent || null;
+              emit();
+            },
+            'close',
+          ),
+        ],
+      );
+      page.style = 'game-detail-page';
+      const body = page.children[0].children[0];
+      body.style = 'game-detail-sheet';
+      body.children = items;
+      return page;
     },
   };
   emit();

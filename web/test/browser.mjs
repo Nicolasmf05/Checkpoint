@@ -40,7 +40,8 @@ const server = http.createServer(async (req, res) => {
     res.end();
   }
 });
-await new Promise((resolve) => server.listen(4173, '127.0.0.1', resolve));
+const testPort = Number(process.env.CHECKPOINT_TEST_PORT || 4173);
+await new Promise((resolve) => server.listen(testPort, '127.0.0.1', resolve));
 const browser = await chromium.launch({
     headless: true,
     ...(process.env.CHECKPOINT_BROWSER_CHANNEL
@@ -288,7 +289,7 @@ await context.route('https://steamcommunity.com/**', (route) =>
 );
 await context.route('https://cdn.cloudflare.steamstatic.com/**', (route) => route.abort());
 try {
-  await page.goto('http://127.0.0.1:4173/Checkpoint/');
+  await page.goto(`http://127.0.0.1:${testPort}/Checkpoint/`);
   check(
     (await page.getByRole('link', { name: 'Abrir Checkpoint', exact: true }).isVisible()) &&
       (await page.locator('.window').count()) === 0 &&
@@ -918,7 +919,7 @@ try {
   await click('Cancel');
   const offlineContext = await browser.newContext({ serviceWorkers: 'allow' }),
     offlinePage = await offlineContext.newPage();
-  await offlinePage.goto('http://127.0.0.1:4173/Checkpoint/app.html');
+  await offlinePage.goto(`http://127.0.0.1:${testPort}/Checkpoint/app.html`);
   await offlinePage.locator('.window').waitFor();
   await offlinePage.waitForFunction(() => !!navigator.serviceWorker.controller);
   await offlineContext.setOffline(true);
@@ -1056,13 +1057,13 @@ try {
     .filter({ hasText: 'IGDB cover fixture' })
     .locator('.game-title')
     .click();
-  await page.getByText('Game details', { exact: true }).waitFor();
+  await page.locator('.game-detail-sheet').waitFor();
   check(
     (await page.getByRole('button', { name: 'Play', exact: true }).count()) === 0 &&
       (await page
         .getByRole('button', { name: 'View achievements', exact: true })
-        .evaluate((n) => n.classList.contains('accent'))),
-    'manual game sheet emphasizes achievements without offering an invalid Steam launch',
+        .evaluate((n) => !n.classList.contains('accent'))),
+    'manual game sheet keeps achievements and editing consistent without offering an invalid Steam launch',
   );
   const redesignedSheet = (await page.locator('.game-detail-visibility').count()) > 0;
   check(
@@ -1082,13 +1083,13 @@ try {
   await page.getByText('Achievements', { exact: true }).first().waitFor();
   await click('Close');
   check(
-    await page.getByText('Game details', { exact: true }).isVisible(),
+    await page.locator('.game-detail-sheet').isVisible(),
     'achievement navigation returns to the game sheet',
   );
   await click('Close');
   await page.locator('.game').filter({ hasText: 'IGDB cover fixture' }).focus();
   await page.keyboard.press('Enter');
-  await page.getByText('Game details', { exact: true }).waitFor();
+  await page.locator('.game-detail-sheet').waitFor();
   check(true, 'Enter on a focused game opens its sheet');
   await click('Edit game');
   await page.getByRole('textbox', { name: 'Game title', exact: true }).waitFor();
@@ -1678,7 +1679,7 @@ try {
     .filter({ hasText: 'Optional goal fixture' })
     .locator('.game-title')
     .click();
-  await page.getByText('Game details', { exact: true }).waitFor();
+  await page.locator('.game-detail-sheet').waitFor();
   check(
     !(await page.locator('.dialog-page').innerText()).includes('Goal:'),
     'No goal removes the objective from game details',

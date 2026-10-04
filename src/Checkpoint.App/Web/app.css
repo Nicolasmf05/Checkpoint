@@ -1383,3 +1383,500 @@ button.accent:focus-visible {
     font-size: 24px;
   }
 }
+
+/* Figma game sheet. Every layout and palette change is scoped to this page. */
+@font-face {
+  font-family: "Checkpoint Bagel";
+  src: url("assets/game-details/BagelFatOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Checkpoint Inconsolata";
+  src: url("assets/game-details/Inconsolata.ttf") format("truetype");
+  font-weight: 200 900;
+  font-display: swap;
+}
+.dialog-page:has(.game-detail-page) {
+  background: #1a1c1b;
+}
+.game-detail-page {
+  max-width: 480px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  gap: 0;
+  background: white;
+  color: black;
+  color-scheme: light;
+  font-family: "Checkpoint Inconsolata", monospace;
+  font-size: 15px;
+}
+.dialog-page .game-detail-page > .type-scroll,
+.dialog-page .game-detail-page .game-detail-sheet {
+  padding: 0 !important;
+  gap: 0;
+}
+.game-detail-sheet .type-card {
+  margin: 0;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: white;
+  color: black;
+  padding: 0;
+  min-width: 0;
+}
+.game-detail-sheet .type-text {
+  line-height: 1.2;
+}
+.game-detail-sheet .game-actions {
+  margin: 0;
+  padding: 8px 0;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  justify-content: flex-start;
+  gap: 6px;
+}
+.game-detail-sheet .game-actions .type-button {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 14px;
+  border: 1px solid #ffffff80;
+  background: transparent;
+  color: white;
+}
+.game-detail-sheet .game-actions .type-button:not(.accent) {
+  border-color: #ffffff80;
+  background: transparent;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+.game-detail-sheet .game-actions .accent {
+  background: white;
+  color: #1a1c1b;
+  border-color: white;
+}
+.game-detail-intro {
+  min-height: 150px;
+  padding: 20px 17px;
+  background: #1a1c1b;
+  color: white;
+  justify-content: center;
+  gap: 5px;
+}
+.game-detail-sheet .game-detail-intro .heading {
+  font-family: "Checkpoint Bagel", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+.game-detail-main {
+  padding: 14px 17px 27px;
+  gap: 18px;
+}
+.game-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 174fr) minmax(0, 253fr) !important;
+  align-items: center;
+  gap: 15px;
+}
+.game-detail-sheet .cover-preview {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 174 / 263;
+  max-height: none;
+  margin: 0;
+  border-radius: 5px;
+  object-fit: cover;
+}
+.game-detail-cover-empty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 174 / 263;
+  background: #1a1c1b;
+  border-radius: 5px;
+  color: white;
+}
+.game-detail-stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 18px 16px;
+}
+.game-detail-sheet .game-playtime,
+.game-detail-visibility {
+  position: relative;
+  padding: 32px 8px 9px !important;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0;
+}
+.game-detail-sheet .game-playtime::before,
+.game-detail-visibility::before,
+.game-detail-progress::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  width: 25px;
+  height: 25px;
+  background: url("assets/game-details/clock.png") center / contain no-repeat;
+  mask: none;
+  opacity: 0.8;
+}
+.game-detail-visibility::before {
+  background-image: url("assets/game-details/visibility.png");
+  opacity: 0.9;
+}
+.game-detail-sheet .game-detail-visibility {
+  border: 0;
+  border-radius: 0;
+  aspect-ratio: 118 / 100;
+  background: url("assets/game-details/visibility-card.svg") center / contain no-repeat;
+}
+.game-detail-sheet .game-playtime .heading,
+.game-detail-visibility .heading,
+.game-detail-sheet .game-detail-percent {
+  margin: 0;
+  color: black;
+  font-family: "Checkpoint Bagel", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.43;
+  white-space: nowrap;
+}
+.game-detail-sheet .game-playtime .type-text:last-child,
+.game-detail-visibility .type-text:last-child {
+  color: black;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.game-detail-progress {
+  grid-column: 1 / -1 !important;
+  position: relative;
+  padding: 0 10px 10px !important;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.game-detail-progress::before {
+  background-image: url("assets/game-details/achievement.png");
+  opacity: 0.9;
+}
+.game-detail-percent {
+  align-self: flex-end;
+}
+.game-detail-progress-line {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.game-detail-progress-line progress {
+  flex: 1;
+  min-width: 55px;
+  width: auto;
+  height: 11px;
+  appearance: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  overflow: hidden;
+  background: white;
+}
+.game-detail-progress-line progress::-webkit-progress-bar {
+  background: white;
+}
+.game-detail-progress-line progress::-webkit-progress-value {
+  background: #00ff11;
+  border-radius: 4px;
+}
+.game-detail-count {
+  font-family: "Checkpoint Bagel", sans-serif;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.game-detail-progress > .type-text:not(.game-detail-percent) {
+  text-align: center;
+}
+.game-detail-services {
+  display: grid;
+  grid-template-columns: minmax(0, 254fr) minmax(0, 170fr) !important;
+  gap: 18px;
+  align-items: start;
+}
+.game-detail-sheet .game-detail-panel-heading {
+  position: relative;
+  background: black;
+  color: white;
+  padding: 2px 8px 3px 34px;
+  min-height: 27px;
+  font-size: 20px;
+  font-weight: 400;
+  border-radius: 4px 4px 0 0;
+}
+.game-detail-panel-heading::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 1px;
+  width: 25px;
+  height: 25px;
+  background: url("assets/game-details/sync-heading.svg") center / auto no-repeat;
+}
+.game-detail-lists .game-detail-panel-heading::before {
+  background-image: url("assets/game-details/lists.svg");
+}
+.game-detail-sync-body {
+  padding: 13px 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.game-detail-providers {
+  gap: 9px;
+  flex: 1;
+  min-width: 116px;
+}
+.game-detail-steam,
+.game-detail-retro {
+  position: relative;
+  padding-left: 26px;
+  min-height: 18px;
+}
+.game-detail-steam::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 18px;
+  background: url("assets/game-details/steam.png") -5.88px -6px / 29.412px 30px no-repeat;
+}
+.game-detail-retro::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 3px;
+  width: 19px;
+  height: 11px;
+  background: url("assets/game-details/retro.png") 0 -4px / 19px 19px no-repeat;
+}
+.game-detail-sheet .game-detail-sync-body button {
+  border: 0;
+  border-radius: 10px;
+  min-height: 30px;
+  padding: 4px 7px;
+  background: black;
+  color: white;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 300;
+}
+.game-detail-sync > .type-text:not(.game-detail-panel-heading) {
+  padding: 0 10px 8px;
+  font-size: 13px;
+}
+.game-detail-list-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 80px), 1fr));
+  gap: 5px;
+  padding: 10px;
+}
+.game-detail-list-items > .type-text {
+  grid-column: 1 / -1;
+  grid-row: auto !important;
+}
+.game-detail-list-items > button,
+.game-detail-metadata > .type-stack {
+  grid-column: auto !important;
+  grid-row: auto !important;
+}
+.game-detail-list-items button {
+  background: transparent;
+  color: black;
+  border: 0;
+  padding: 0;
+  min-height: 19px;
+  font-family: inherit;
+  text-align: left;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.game-detail-sheet .game-detail-section-title {
+  font-family: "Checkpoint Bagel", sans-serif;
+  font-size: 40px;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+.game-detail-sheet .game-detail-task {
+  min-height: 50px;
+  padding: 12px 8px;
+}
+.game-detail-task .type-check {
+  position: relative;
+  padding-left: 31px;
+  min-height: 24px;
+  cursor: pointer;
+}
+.game-detail-task .type-check::before,
+.game-detail-task .type-check:has(input:checked)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  background: url("assets/game-details/task-circle.svg") center / auto no-repeat;
+}
+.game-detail-task .type-check:has(input:checked)::after {
+  background-image: url("assets/game-details/task-check.svg");
+}
+.game-detail-task input {
+  position: absolute;
+  left: 0;
+  opacity: 0;
+  width: 20px;
+  height: 20px;
+}
+.game-detail-task .type-check:has(input:checked) span {
+  text-decoration: line-through;
+}
+.game-detail-task .type-check:has(input:focus-visible) {
+  outline: 2px solid #304838;
+  outline-offset: 4px;
+}
+.game-detail-sheet .game-detail-notes {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: white;
+  color: black;
+  font-family: inherit;
+  font-size: 15px;
+}
+.game-detail-sheet .game-detail-top {
+  margin-top: 10px;
+  align-self: flex-end;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  background:
+    url("assets/game-details/top.svg") center / auto no-repeat,
+    url("assets/game-details/top-circle.svg") center / auto no-repeat;
+  font-size: 0;
+}
+.game-detail-additional {
+  background: black;
+  color: white;
+  padding: 24px 12px;
+  gap: 22px;
+}
+.game-detail-sheet .game-detail-additional-title {
+  padding: 0 8px 16px;
+  border-bottom: 1px solid white;
+  font-family: "Checkpoint Bagel", sans-serif;
+  font-weight: 400;
+  font-size: 35px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  gap: 0;
+}
+.game-detail-sheet .game-detail-additional-title .type-text {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+}
+.game-detail-additional-title .type-text:first-child {
+  text-align: left;
+}
+.game-detail-additional-title .type-text:last-child {
+  text-align: right;
+}
+.game-detail-metadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 29px 22px;
+}
+.game-detail-metadata > .type-stack {
+  position: relative;
+  padding-left: 43px;
+  min-width: 0;
+  gap: 10px;
+}
+.game-detail-added::before,
+.game-detail-finished::before,
+.game-detail-steam-id::before,
+.game-detail-synced::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 4px;
+  width: 30px;
+  height: 32px;
+  background: url("assets/game-details/calendar.svg") center / auto no-repeat;
+}
+.game-detail-finished::before {
+  background-image: url("assets/game-details/story.svg");
+}
+.game-detail-steam-id::before {
+  background-image: url("assets/game-details/steam-id.svg");
+}
+.game-detail-synced::before {
+  background-image: url("assets/game-details/sync.svg");
+}
+.dialog-page .game-detail-page > .type-row {
+  padding: 12px 17px;
+  margin: 0;
+  justify-content: flex-end;
+  background: black;
+}
+.game-detail-page button:focus-visible,
+.game-detail-page textarea:focus-visible {
+  outline: 2px solid #304838;
+  outline-offset: 3px;
+}
+@media (max-width: 450px) {
+  .game-detail-main {
+    padding: 14px 12px 24px;
+  }
+  .game-detail-hero {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .game-detail-hero > * {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+  .game-detail-sheet .cover-preview,
+  .game-detail-cover-empty {
+    max-width: 174px;
+    justify-self: center;
+  }
+  .game-detail-stats {
+    gap: 14px;
+  }
+  .game-detail-services {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .game-detail-services > .type-card {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+  .game-detail-metadata {
+    gap: 24px 12px;
+  }
+  .game-detail-metadata > .type-stack {
+    padding-left: 0;
+    padding-top: 40px;
+  }
+}

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <Version>0.8.25</Version>
+    <Version>0.8.26</Version>
     <Authors>Nicolasmf05</Authors>
     <Copyright>Copyright (c) 2026 Nicolasmf05 and Checkpoint contributors</Copyright>
     <Product>Checkpoint</Product>

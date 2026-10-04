@@ -36,6 +36,11 @@ internal static partial class Dialogs
 
     internal static void GameDetails(MainWindow owner, Game game, Window? parent = null)
     {
+        if (App.UseCss)
+        {
+            GameDetailsSheet(owner, game, parent);
+            return;
+        }
         var window = Modal(owner, I18n.T("Ficha del juego") + " · " + game.Title, 620, 760);
         if (parent is not null)
             Parent(window, parent);

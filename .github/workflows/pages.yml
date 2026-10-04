@@ -33,6 +33,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
         working-directory: web
       - run: node web/test/browser.mjs
+      - run: node web/test/game-details.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

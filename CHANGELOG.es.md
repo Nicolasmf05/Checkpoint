@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.26
+
+- Las fichas de juegos integran el diseño de Figma en Windows y en la web, con carátula, tiempo jugado, privacidad, progreso de logros, sincronización, listas y datos del juego. Las tareas y notas se guardan automáticamente.
+- La navegación superior conserva Volver, el nombre de la ficha y Volver a la colección. El título y las acciones aparecen en la banda oscura; Ver logros y Editar juego usan el mismo estilo, y se elimina el rótulo repetido Ficha del juego del contenido.
+- Las fuentes y los iconos se distribuyen localmente; la ficha se adapta a ventanas estrechas y la versión web los conserva para el uso sin conexión.
+
 ## 0.8.25
 
 - La barra de selección de Biblioteca incluye Añadir a Mi lista para varios juegos seleccionados. Aparece cuando alguno todavía no está añadido y conserva la privacidad, las otras listas y el progreso; los juegos que ya estaban en Mi lista se mantienen.

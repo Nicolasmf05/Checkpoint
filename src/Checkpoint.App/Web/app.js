@@ -311,7 +311,9 @@ function schema(node) {
     case 'button':
       element = el('button', `type-button${node.accent ? ' accent' : ''}`, node.text);
       element.type = 'button';
-      element.addEventListener('click', () => send({ action: 'click', control: node.id }));
+      element.addEventListener('click', () => {
+        if (node.style !== 'game-detail-top') send({ action: 'click', control: node.id });
+      });
       break;
     case 'input':
     case 'password':
@@ -372,6 +374,17 @@ function schema(node) {
       if (node.src) element.src = node.src;
       element.alt = '';
       element.loading = 'lazy';
+      element.addEventListener(
+        'error',
+        () => {
+          if (node.style !== 'cover-preview' || !element.closest('.game-detail-hero')) return;
+          element.style.display = 'none';
+          const fallback = el('div', 'game-detail-cover-empty', node.name || '');
+          fallback.style.gridColumn = element.style.gridColumn;
+          element.before(fallback);
+        },
+        { once: true },
+      );
       break;
     case 'file':
       element = el('input', 'type-file');
@@ -400,7 +413,8 @@ function schema(node) {
       'game-actions',
       'friend-achievements',
       'game-playtime',
-    ].includes(node.style)
+    ].includes(node.style) ||
+    /^game-detail-[a-z-]+$/.test(node.style || '')
   )
     element.classList.add(node.style);
   if (node.type === 'grid') {
@@ -415,6 +429,12 @@ function schema(node) {
   if (node.column) element.style.gridColumn = node.column;
   if (node.row) element.style.gridRow = node.row;
   if (node.width) element.style.width = `${node.width}px`;
+  if (node.style === 'game-detail-top')
+    element.addEventListener('click', () => {
+      const page = element.closest('.dialog-page');
+      page?.scrollTo({ top: 0, behavior: 'smooth' });
+      page?.querySelector('.game-actions button')?.focus({ preventScroll: true });
+    });
   for (const child of node.children || []) element.append(schema(child));
   return element;
 }

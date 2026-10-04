@@ -685,5 +685,17 @@
   "Solicitud no válida": "The request is invalid.",
   "miembros": "members",
   " miembros": " members",
-  "objetivos completados": "goals completed"
+  "objetivos completados": "goals completed",
+  "logros": "achievements",
+  "Visible": "Visible",
+  "Solo amigos": "Friends only",
+  "Sincronización": "Synchronization",
+  "Desvinculado": "Disconnected",
+  "Vinculado": "Connected",
+  "Conectar": "Connect",
+  "Solo en Windows": "Windows only",
+  "Información adicional": "Additional information",
+  "Volver arriba": "Back to top",
+  "Sin completar": "Not completed",
+  "Las notas se guardan automáticamente.": "Notes are saved automatically."
 }

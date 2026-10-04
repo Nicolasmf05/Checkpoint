@@ -2,7 +2,7 @@
 // El hash del contenido versiona módulos y estilos para mantener coherente la caché del navegador.
 
 import { createHash } from 'node:crypto';
-import { readFile, mkdir, copyFile, writeFile } from 'node:fs/promises';
+import { readFile, mkdir, copyFile, writeFile, cp, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
@@ -34,6 +34,17 @@ for (const [from, to] of [
   ['shortcuts.mjs', 'shortcuts.mjs'],
 ])
   await copyFile(path.join(root, 'src', 'Checkpoint.App', 'Web', from), path.join(out, to));
+const detailAssets = 'assets/game-details';
+await cp(
+  path.join(root, 'src', 'Checkpoint.App', 'Web', detailAssets),
+  path.join(out, detailAssets),
+  {
+    recursive: true,
+  },
+);
+const detailFiles = (await readdir(path.join(out, detailAssets)))
+  .sort()
+  .map((file) => `${detailAssets}/${file}`);
 const english = {
   ...JSON.parse(
     await readFile(path.join(root, 'src', 'Checkpoint.Core', 'Localization', 'en.json'), 'utf8'),
@@ -55,6 +66,7 @@ for (const file of [
   'shortcuts.mjs',
   'en.json',
   'config.json',
+  ...detailFiles,
 ])
   hash.update(await readFile(path.join(out, file)));
 const revision = hash.digest('hex').slice(0, 16);
@@ -78,6 +90,10 @@ await writeFile(
   path.join(out, 'sw.js'),
   sw
     .replace('checkpoint-web-1', 'checkpoint-web-' + revision)
+    .replace(
+      'const assets = [',
+      'const assets = [' + detailFiles.map((file) => JSON.stringify(file)).join(',') + ',',
+    )
     .replace(/'([\w.-]+\.(?:mjs|js|css))'/g, (_, url) => "'" + url + '?v=' + revision + "'"),
 );
 await writeFile(path.join(out, '.nojekyll'), '');

@@ -334,14 +334,17 @@ internal sealed class WebControls
         };
         if (
             element.Tag is string style
-            && style
-                is "achievement-card"
-                    or "achievement-summary"
-                    or "achievement-description"
-                    or "cover-preview"
-                    or "game-actions"
-                    or "friend-achievements"
-                    or "game-playtime"
+            && (
+                style.StartsWith("game-detail-", StringComparison.Ordinal)
+                || style
+                    is "achievement-card"
+                        or "achievement-summary"
+                        or "achievement-description"
+                        or "cover-preview"
+                        or "game-actions"
+                        or "friend-achievements"
+                        or "game-playtime"
+            )
         )
             node["style"] = style;
         switch (element)
@@ -451,7 +454,19 @@ internal sealed class WebControls
                 break;
             case Decorator decorator:
                 node["type"] = "card";
-                node["children"] = Children(decorator.Child);
+                node["children"] =
+                    decorator.Child is StackPanel detailContent
+                    && decorator.Tag is string detailStyle
+                    && (
+                        detailStyle.StartsWith("game-detail-", StringComparison.Ordinal)
+                        || detailStyle == "game-playtime"
+                    )
+                        ? detailContent
+                            .Children.OfType<FrameworkElement>()
+                            .Select(child => Node(child))
+                            .Where(child => child is not null)
+                            .ToArray()
+                        : Children(decorator.Child);
                 break;
             case ScrollViewer scroll:
                 node["type"] = "scroll";

@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.26
+
+- Game details now follow the Figma design on Windows and the web, including cover art, playtime, privacy, achievement progress, synchronization, lists and game metadata. Tasks and notes save automatically.
+- The top navigation retains Back, the game details title and Back to collection. The dark header contains the game title and actions; View achievements and Edit game share the same style, and the repeated Game details label is removed from the content.
+- Fonts and icons are bundled locally; the sheet adapts to narrow windows and the web version caches its assets for offline use.
+
 ## 0.8.25
 
 - Library’s selection bar now includes Add to My list for multiple selected games. The action appears when any selected game is not tracked yet and preserves privacy, other lists and progress; games already in My list are retained.
