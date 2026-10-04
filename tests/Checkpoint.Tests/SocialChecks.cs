@@ -10,7 +10,9 @@ internal static class SocialChecks
         var user = Guid.NewGuid(); var game = new Game { Title = "Social test", Notes = "NEVER UPLOAD NOTES", CustomGoal = "Goal",
             Goal = GameGoal.Custom, StoryPercent = 40, Tasks = [new() { Title = "NEVER UPLOAD TASK", Done = true }],
             Achievements = [new() { Id = "PRIVATE-ID", Name = "PRIVATE-NAME", Unlocked = true }] };
+        game.CustomCover = "C:/private/local-cover.png";
         var payload = SharedGamePayload.From(game);
+        check(payload.CoverPath is null,"local custom covers are excluded from shared progress");
         string json = JsonSerializer.Serialize(payload,SocialApi.Json);
         check(!json.Contains("NEVER") && !json.Contains("PRIVATE-") && !json.Contains("notes",StringComparison.OrdinalIgnoreCase),"social projection excludes notes, task labels and achievement details");
         check(payload.TasksDone == 1 && payload.AchievementsUnlocked == 1 && payload.StoryPercent == 40,"shared counters stay separate from story percentage");
@@ -19,13 +21,19 @@ internal static class SocialChecks
         box.SetDesired(game.Id,payload); var operation = box.Prepare(game.Id)!;
         box.SetDesired(game.Id,payload with { StoryPercent = 60 });
         check(box.Prepare(game.Id)!.Id == operation.Id && operation.Payload!.StoryPercent == 40,"new edits preserve the in-flight operation for idempotency");
+        operation.Payload = operation.Payload! with { CoverPath = "legacy/image.png" };
+        operation.LocalCover = "C:/private/image.png";
+        box.Entry(game.Id).Desired = box.Entry(game.Id).Desired! with { CoverPath = "legacy/image.png" };
         string path = Path.Combine(root,"social-queue.json"); box.Save(path);
         box = SocialOutbox.Load(path,box.ProjectUrl,user);
         check(box.Prepare(game.Id)!.Id == operation.Id && box.Entry(game.Id).Desired!.StoryPercent == 60,"outbox survives a restart with operation and later desired state");
+        check(box.Entry(game.Id).Desired!.CoverPath is null && box.Prepare(game.Id)!.Payload!.CoverPath is null && box.Prepare(game.Id)!.LocalCover is null,"legacy queues discard image paths without losing pending progress");
         reject(() => SocialOutbox.Load(path,box.ProjectUrl,Guid.NewGuid()),"publication consent is bound to its account");
         var remote = new SocialPublication(user,game.Id,1,operation.Id,true,payload,DateTimeOffset.UtcNow);
         box.Reconcile(game.Id,remote);
         check(!box.Entry(game.Id).Conflict && box.Entry(game.Id).Revision == 1 && box.Prepare(game.Id)!.Payload!.StoryPercent == 60,"lost acknowledgement reconciles before publishing a newer edit");
+        box.Reconcile(game.Id,remote with { OperationId = Guid.NewGuid(), Payload = payload with { StoryPercent = 60, CoverPath = "legacy/image.png" } });
+        check(!box.Entry(game.Id).Conflict && box.Entry(game.Id).Published!.CoverPath is null,"legacy remote covers do not cause false progress conflicts");
         box.Reconcile(game.Id,remote with { Revision = 2, OperationId = Guid.NewGuid(), Payload = payload with { StoryPercent = 70 } });
         check(box.Entry(game.Id).Conflict && box.Prepare(game.Id) is null,"a different device causes an explicit publication conflict");
         box.ResolveWithLocal(game.Id);
@@ -67,7 +75,9 @@ internal static class SocialChecks
         await api.Find("cp-abcdef012345");
         using (var lookup = JsonDocument.Parse(calls.Last().Body!))
             check(lookup.RootElement.GetProperty("p_code").GetString() == "cp-abcdef012345", "previously copied friend codes still resolve the same identity");
-        await api.Publish(game.Id,new() { ExpectedRevision = 0, Payload = payload });
+        await api.Publish(game.Id,new() { ExpectedRevision = 0, Payload = payload with { CoverPath = "legacy/covers/image.png" } });
+        using (var publication = JsonDocument.Parse(calls.Last().Body!))
+            check(publication.RootElement.GetProperty("p_game").GetProperty("coverPath").ValueKind == JsonValueKind.Null,"API strips legacy image references before publication");
         check(calls.Last().Token == "ACCESS-FIXTURE" && !calls.Last().Body!.Contains("NEVER"),"publication carries owner authentication and an allowlisted body");
         await api.Publish(game.Id,new() { ExpectedRevision = 1, Payload = null });
         using (var body = JsonDocument.Parse(calls.Last().Body!)) check(body.RootElement.GetProperty("p_game").ValueKind == JsonValueKind.Null,"withdrawal sends explicit SQL null argument");

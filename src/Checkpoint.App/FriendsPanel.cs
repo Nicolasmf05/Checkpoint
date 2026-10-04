@@ -176,14 +176,7 @@ internal sealed class FriendsPanel : ScrollViewer
         try
         {
             var game = publication.Payload!; BitmapImage? bitmap = null;
-            if (game.CoverPath is string path)
-            {
-                var bytes = await owner.Social!.DownloadCover(path,publication.OwnerId);
-                BackupFiles.ValidatePngImage(bytes);
-                using var input = new MemoryStream(bytes); bitmap = new BitmapImage(); bitmap.BeginInit(); bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.DecodePixelWidth = 220; bitmap.StreamSource = input; bitmap.EndInit(); bitmap.Freeze();
-            }
-            else if (game.SteamAppId is int app) bitmap = await owner.Covers.Get(new Game { Title = game.Title, SteamAppId = app });
+            if (game.SteamAppId is int app) bitmap = await owner.Covers.Get(new Game { Title = game.Title, SteamAppId = app });
             if (current == generation) image.Source = bitmap;
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or System.Net.Http.HttpRequestException or ArgumentException or NotSupportedException or FormatException or OperationCanceledException) { }

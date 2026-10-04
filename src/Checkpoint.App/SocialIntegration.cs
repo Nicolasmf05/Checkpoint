@@ -80,19 +80,9 @@ public partial class MainWindow
     internal void SaveOutbox() { if (Outbox is not null) Outbox.Save(OutboxPath(Outbox.UserId)); }
     private (SharedGamePayload Payload, string? LocalCover) ProjectGame(Game game)
     {
-        string? remote = null, local = null;
-        if (BackupFiles.IsCustomCoverName(game.CustomCover))
-        {
-            string file = Path.Combine(Covers.DirectoryPath,game.CustomCover!);
-            if (File.Exists(file))
-            {
-                if (new FileInfo(file).Length > 2097152) throw new ArgumentException(I18n.T("La carátula compartida debe ocupar menos de 2 MiB."));
-                remote = Outbox!.UserId + "/covers/" + Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(file))).ToLowerInvariant() + ".png";
-                local = game.CustomCover;
-            }
-        }
-        return (SharedGamePayload.From(game,remote),local);
+        return (SharedGamePayload.From(game),null);
     }
+
     internal void SetShared(Game game, bool share)
     {
         if (Outbox is null) throw new InvalidOperationException(I18n.T("Entra en Checkpoint antes de compartir."));
@@ -141,14 +131,6 @@ public partial class MainWindow
                     }
                     try
                     {
-                        if (operation.Payload?.CoverPath is string path && operation.LocalCover is string local)
-                        {
-                            if (!BackupFiles.IsCustomCoverName(local)) throw new InvalidDataException(I18n.T("Carátula local no válida."));
-                            var bytes = File.ReadAllBytes(Path.Combine(Covers.DirectoryPath,local));
-                            if (!path.EndsWith(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() + ".png",StringComparison.Ordinal))
-                                throw new InvalidDataException(I18n.T("La carátula cambió; revisa la publicación."));
-                            await api.UploadCover(path,bytes,shutdown.Token);
-                        }
                         if(operation.Payload is not null && box.Entry(id).Desired is null)continue;
                         long revision = await api.Publish(id,operation,shutdown.Token);
                         box.Acknowledge(id,revision); SaveOutbox();

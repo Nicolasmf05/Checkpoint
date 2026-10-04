@@ -144,3 +144,7 @@ Pasan 162 comprobaciones de núcleo, 177 WPF y 68 CSS reales, además de 18 prue
 Actualización del acceso web: 40 comprobaciones de navegador verifican el botón Iniciar sesión, acceso a Mi cuenta y cierre de sesión, con servicios simulados.
 
 Adaptación web: 48 comprobaciones de navegador incluyen seis tamaños entre 320 y 1440 píxeles de ancho, ventanas de poca altura, ausencia de modos de ventana y cambios de vista sin entrar en Miniatura.
+
+## 0.8.10: almacenamiento solo de texto
+
+En Supabase real pasaron 11 comprobaciones SQL con reversión: bloqueo de Storage con permisos privilegiados, service_role y usuario; rechazo de imágenes incrustadas y avatares nuevos; publicación de texto y reintentos compatibles con referencias antiguas. No se eliminaron archivos existentes. La prueba nativa de amigos ahora confirma que no se solicitan carátulas de Storage. Las pruebas antiguas de subida describen versiones anteriores.

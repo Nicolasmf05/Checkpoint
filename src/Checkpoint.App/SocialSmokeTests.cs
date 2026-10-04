@@ -24,7 +24,6 @@ public partial class MainWindow
         Guid loginUser = own; bool accepted = false, blocked = false;
         var shared = new Dictionary<Guid,SocialPublication>();
         string? lastPublishedBody = null;
-        bool privateCoverAuthenticated = false;
         int privateCoverRequests = 0;
         byte[] sharedCover = File.ReadAllBytes(Directory.GetFiles(Covers.DirectoryPath,"custom-*.png").First());
         var project = new SocialProject("https://fixture.supabase.co","sb_publishable_native_fixture");
@@ -37,7 +36,6 @@ public partial class MainWindow
             if (path.Contains("/storage/v1/object/authenticated/"))
             {
                 privateCoverRequests++;
-                privateCoverAuthenticated = request.Headers.Authorization?.Parameter == "NATIVE-ACCESS-FIXTURE";
                 return new(HttpStatusCode.OK) { Content = new ByteArrayContent(sharedCover) };
             }
             if (path.EndsWith("/cp_profiles")) return SocialResponse(new[] {
@@ -59,7 +57,7 @@ public partial class MainWindow
             {
                 if (request.RequestUri.Query.Contains(friend.ToString())) return SocialResponse(blocked ? Array.Empty<SocialPublication>() : new[] {
                     new SocialPublication(friend,Guid.NewGuid(),1,Guid.NewGuid(),true,
-                        SharedGamePayload.From(new Game { Title = "Celeste", Status = GameStatus.Playing, StoryPercent = 60 },friend + "/covers/fixture.png"),DateTimeOffset.UtcNow) });
+                        SharedGamePayload.From(new Game { Title = "Celeste", Status = GameStatus.Playing, StoryPercent = 60 }) with {CoverPath=friend+"/covers/fixture.png"},DateTimeOffset.UtcNow) });
                 return SocialResponse(shared.Values.ToArray());
             }
             if (path.EndsWith("/cp_publish_game"))
@@ -127,7 +125,7 @@ public partial class MainWindow
         check(SocialOutbox.Load(OutboxPath(own),project.Validate().AbsoluteUri,own).Entry(game.Id).Selected,"sharing consent and revision persist for this account");
         await ClickSocial("Amigos"); await ClickSocial("Ver progreso de Ana");
         check(Texts(this).Contains("Celeste") && Texts(this).Contains("Historia: 60%"),"friend view shows progress from Checkpoint publications");
-        check(privateCoverAuthenticated && VisualChildren(FriendsView).OfType<Image>().Any(i => i.Source is not null),"private friend cover downloads with account authorization and renders");
+        check(privateCoverRequests==0 && Texts(this).Contains("Historia: 60%"),"friend progress ignores legacy Supabase image references and requests no stored images");
         RenderElement(this,Path.Combine(output,"widget-friends-progress.png"));
         int requestsBeforeLightweight = privateCoverRequests;
         Preferences.LightweightMode = true; ApplyPreferences(); FriendsView.RefreshLanguage();
@@ -136,7 +134,7 @@ public partial class MainWindow
             !VisualChildren(FriendsView).OfType<Image>().Any(i => i.IsVisible || i.Source is not null), "lightweight friends preserve progress without requesting private covers");
         Preferences.LightweightMode = false; ApplyPreferences(); FriendsView.RefreshLanguage();
         await ClickSocial("Ver progreso de Ana");
-        check(privateCoverRequests > requestsBeforeLightweight && VisualChildren(FriendsView).OfType<Image>().Any(i => i.Source is not null), "disabling lightweight mode restores friend covers");
+        check(privateCoverRequests==0 && Texts(this).Contains("Historia: 60%"), "disabling lightweight mode never downloads legacy Supabase covers");
         var publicationBeforeLanguage = shared[game.Id].Payload;
         Preferences.Language = "en"; ApplyLanguage(); await ClickSocial("View progress for Ana");
         check(Texts(this).Contains("Story: 60%") && Texts(this).Contains("Goal: finish the story"), "English friend progress translates status, goal and counters");

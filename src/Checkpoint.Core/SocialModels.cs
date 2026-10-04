@@ -39,12 +39,12 @@ public sealed record SharedGamePayload(string Title, string Platform, string Sta
     string? GoalText, int? StoryPercent, int? TasksDone, int? TasksTotal,
     int? AchievementsUnlocked, int? AchievementsTotal, int? SteamAppId, string? CoverPath, DateTimeOffset? FinishedAt)
 {
-    public static SharedGamePayload From(Game game, string? coverPath = null) => new(
+    public static SharedGamePayload From(Game game) => new(
         game.Title, game.Platform, game.Status.ToString().ToLowerInvariant(), game.Goal.ToString().ToLowerInvariant(),
         game.Goal == GameGoal.Custom ? game.CustomGoal : null, game.StoryPercent,
         game.Tasks.Count > 0 ? game.Tasks.Count(t => t.Done) : null, game.Tasks.Count > 0 ? game.Tasks.Count : null,
         game.Achievements is { Count: > 0 } ? game.UnlockedCount : null,
-        game.Achievements is { Count: > 0 } ? game.Achievements.Count : null, game.SteamAppId, coverPath, game.FinishedAt);
+        game.Achievements is { Count: > 0 } ? game.Achievements.Count : null, game.SteamAppId, null, game.FinishedAt);
     [JsonIgnore] public string StatusText => Status switch { "pending" => I18n.T("Pendiente"), "playing" => I18n.T("Jugando"),
         "paused" => I18n.T("Pausado"), "finished" => I18n.T("Terminado"), _ => I18n.T("Abandonado") };
     [JsonIgnore] public string ProgressText => string.Join(" · ", new[] {
@@ -110,6 +110,7 @@ public sealed class SocialOutbox
     public void Reconcile(Guid id, SocialPublication remote)
     {
         var entry = Entry(id);
+        if (remote.Payload is {} payload) remote = remote with { Payload = payload with { CoverPath = null } };
         if (entry.Pending?.Id == remote.OperationId) { Acknowledge(id, remote.Revision); return; }
         entry.Revision = remote.Revision; entry.Published = remote.Payload; entry.Pending = null;
         // Withdrawals take priority. Other changes require explicit conflict resolution.
@@ -122,6 +123,14 @@ public sealed class SocialOutbox
         if (result is null) return new() { ProjectUrl = project, UserId = user };
         if (result.UserId != user || result.ProjectUrl != project || result.Games is null || result.Games.Count > 10000)
             throw new InvalidDataException(I18n.T("La cola de publicación pertenece a otra cuenta o no es válida."));
+        // Old queues retain operation IDs and revisions, but never publish local images.
+        foreach(var entry in result.Games.Values)
+        {
+            if(entry.Desired is {} desired)entry.Desired=desired with{CoverPath=null};
+            if(entry.Published is {} published)entry.Published=published with{CoverPath=null};
+            entry.LocalCover=null;
+            if(entry.Pending is {} pending){if(pending.Payload is {} payload)pending.Payload=payload with{CoverPath=null};pending.LocalCover=null;}
+        }
         return result;
     }
     public void Save(string path)

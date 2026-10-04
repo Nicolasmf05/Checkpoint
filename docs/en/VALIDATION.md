@@ -138,3 +138,7 @@ Validated 152 core cases, 18 Node service tests, 21 Supabase Steam tests, 175 WP
 Web sign-in update: 40 browser checks verify the visible Sign in entry, My account and sign-out, using simulated services.
 
 Responsive web update: 48 browser checks cover six viewport sizes from 320 to 1440 pixels wide, short windows, no window presets and layout cycling without Miniature.
+
+## 0.8.10: text-only storage
+
+Eleven live Supabase SQL checks passed in a rolled-back transaction: privileged, service-role and authenticated Storage uploads denied; embedded images and new avatars rejected; text publications and legacy-path retries accepted. Existing files were not deleted. Native friend checks now verify that Storage covers are never requested. Earlier upload checks describe historical releases.

@@ -10,7 +10,7 @@ Since 0.7.6, tracked games are visible to accepted Checkpoint friends by default
 
 Consent and pending operations persist locally per account. Withdrawal clears published content after acknowledgment; offline withdrawal can leave it visible until sync. A revision tombstone prevents stale clients republishing silently. Signing out preserves publications and queued operations.
 
-Custom shared covers use a private bucket. Friends read only images referenced by authorized data. Removing/blocking revokes server access; polling clears the view on revoked access or failed reads. Private images stay in memory without disk cache. This cannot erase screenshots/downloads from other clients, orphan Storage images, provider backups or logs. Full account/file deletion requires operator management.
+Supabase stores only text, identifiers and progress counters. New file uploads are blocked on the server; the client does not upload or download private covers. Local images and Steam or IGDB covers remain available without being stored in Supabase. Existing files are preserved; this update does not delete them.
 
 Automatic covers contact Steam's CDN with the connection address and app ID. Custom images are copied locally. The last 20 deleted games persist in recovery history until displaced by newer deletions; deleting games does not immediately remove cached images.
 

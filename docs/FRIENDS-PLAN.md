@@ -96,3 +96,5 @@ La función Amigos no requiere una clave de Steam. La conexión opcional de logr
 Probar acceso de una tercera cuenta sin amistad, solicitudes no aceptadas, bloqueos, permisos retirados, identificadores manipulados, imágenes, duplicados de reintentos, eliminación sin conexión y restauración de copias. Verificar que las notas privadas nunca salen del PC en la publicación inicial.
 
 Referencias de implementación: [autenticación de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html) y [autorización de OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html). Son guías para el desarrollo; no confirman que estos controles estén ya implementados en Checkpoint.
+
+Desde 0.8.10 las subidas de archivos están bloqueadas: solo se comparten datos de juegos y progreso. Las carátulas locales no se publican; los archivos antiguos conservan sus permisos de lectura.

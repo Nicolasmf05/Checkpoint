@@ -19,10 +19,9 @@ Registration is enabled; **Confirm email is disabled**, at the owner's request, 
 - Explicitly selected publications with status, goal and counters. Notes/task labels rejected.
 - Row-level access to own data and accepted friends' shared games; pending requests grant no game access.
 - Revisions, idempotent operations and conflicts; withdrawal clears content and retains a tombstone.
-- Private `checkpoint-assets`, PNG/JPEG/WebP up to 2 MiB; owner paths and visibility-based reads.
+- Legacy private `checkpoint-assets`: existing files are preserved; migration 0.8.10 blocks new uploads.
 - Persistent invitation limits including canceled attempts; blocking deletes relationships/requests.
 
-The client uploads normalized PNGs and downloads private images with authorization, keeping them in memory. Lost access clears views on refresh; received images cannot be revoked retroactively. Avatars are supported by the schema but have no UI. Polling every 60 seconds; no Realtime publication.
 
 ## Reproduce setup
 
@@ -32,12 +31,18 @@ The client uploads normalized PNGs and downloads private images with authorizati
 4. Include only project URL and **publishable** key in public config. Never distribute Postgres passwords or secret/service-role keys.
 5. Enable registration and disable Confirm email for username/password. Do not configure recovery for internal addresses.
 6. Build the native app. Imports do not publish new games without selection. Offline withdrawals need acknowledgment.
-7. Before a public release, test two real users, Storage upload/download, disconnects, conflicts and access revocation.
+7. Before a public release, test two real users, text-only upload rejection, disconnects, conflicts and access revocation.
 
 `supabase/project.json` is public config only. SQL Editor does not automatically populate migration history; preserve migration files and `deployment.json`.
 
 SQLite stores the private collection; Supabase stores selected social data. Full cloud restore, avatar editing and recovery are pending. Version 0.6 adds the Steam Edge Function; its server-side key and custom-auth setting must be configured before linking.
 
-Tests cover anonymous/direct-write permissions, profiles, publications/retries/conflicts, private/invalid fields, consent, third-party isolation, blocking and withdrawal. Storage tests exercise metadata permissions/request limits, not live Storage upload/download or multi-connection concurrency. Native HTTP responses are simulated. Repeat HTTP checks with `node scripts/Verify-Supabase.mjs`; audit: `supabase/tests/deployment_audit.sql`. See [validation](VALIDATION.md).
+Tests cover anonymous/direct-write permissions, profiles, publications/retries/conflicts, private/invalid fields, consent, third-party isolation, blocking and withdrawal. Current Storage tests exercise upload denial across roles and text-only publication, without multi-connection concurrency. Native HTTP responses are simulated. Repeat HTTP checks with `node scripts/Verify-Supabase.mjs`; audit: `supabase/tests/deployment_audit.sql`. See [validation](VALIDATION.md).
 
 Version 0.6 source adds a private Steam-state migration and Edge Function. See [Steam deployment](STEAM-SERVICE.md) for secrets, custom authentication and validation.
+
+## Text-only storage (0.8.10)
+
+Apply `supabase/migrations/202610040001_checkpoint_text_only.sql` after the social and Steam migrations. It blocks INSERT/UPDATE in Storage through restrictive RLS and a database trigger, including service-role writes. Existing objects remain readable under their original permissions. New publications ignore legacy cover paths; new avatar references and embedded base64 image data are rejected. Windows no longer uploads local covers. External provider URLs and local covers do not consume Supabase Storage.
+
+Audit on October 4, 2026: database 12,007,091 bytes (about 11.5 MiB, including infrastructure); Checkpoint tables 614,400 bytes (600 KiB); one existing Storage image 101,125 bytes (about 99 KiB), retained at the owner’s request. Use `supabase/tests/storage_usage.sql` to measure again and `storage_rls.sql` for rollback checks. This policy limits file storage, not the growth of legitimate text data.

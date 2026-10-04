@@ -35,3 +35,5 @@ An HTTPS backend must stay available even when another PC is off. GitHub distrib
 Implemented automated checks cover consent, third-party isolation, pending-request restrictions, blocks, private fields, manipulated IDs, retries, conflicts and withdrawals. Remaining tests: two real accounts/PCs; live private-image upload/download; simultaneous clients; offline deletion and backup restore; account changes; clean installer and real Steam linking. Account deletion/retention needs an operator-managed process.
 
 See [deployment](SUPABASE.md), [privacy](PRIVACY.md) and [validation](VALIDATION.md). Design references: [OWASP authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html), [authorization](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html); these guides do not themselves prove implementation correctness.
+
+Since 0.8.10 file uploads are blocked: only game metadata and progress are shared. Local covers are not published; existing files retain their read permissions.

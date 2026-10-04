@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.10 — Text-only cloud storage
+
+Supabase rejects new file uploads, including privileged Storage writes. Existing files are preserved. Windows shares only game metadata and progress; local covers and legacy image paths are excluded from publication. Migration and rollback tests document the policy.
+
 ## 0.8.9
 
 - Settings now review achievements across the entire Library, including untracked and private games, with sequential navigation and an explicit update of every linked game. Local achievement changes are preserved.

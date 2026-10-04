@@ -50,19 +50,13 @@ public sealed class SocialApi : IDisposable
         }
         finally { sessionGate.Release(); }
     }
-    private async Task<T> Send<T>(HttpMethod method, string path, object? body, bool auth, CancellationToken ct,
-        byte[]? bytes = null)
+    private async Task<T> Send<T>(HttpMethod method, string path, object? body, bool auth, CancellationToken ct)
     {
         if (auth) await RefreshSession(ct);
         using var request = new HttpRequestMessage(method, new Uri(origin, path));
         request.Headers.Add("apikey", project.PublishableKey);
         if (auth) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Session!.AccessToken);
-        if (bytes is not null)
-        {
-            request.Content = new ByteArrayContent(bytes); request.Content.Headers.ContentType = new("image/png");
-            request.Headers.Add("x-upsert", "true");
-        }
-        else if (body is not null) request.Content = JsonContent.Create(body, options: Json);
+        if (body is not null) request.Content = JsonContent.Create(body, options: Json);
         using var response = await http.SendAsync(request, ct);
         if (!response.IsSuccessStatusCode)
         {
@@ -158,28 +152,6 @@ public sealed class SocialApi : IDisposable
     public Task<SocialPublication[]> Publications(Guid owner, CancellationToken ct = default) => Send<SocialPublication[]>(HttpMethod.Get,
         $"rest/v1/cp_game_publications?owner_id=eq.{owner}&select=owner_id,game_id,revision,operation_id,is_shared,operation_payload,updated_at&limit=10000",null,true,ct);
     public Task<long> Publish(Guid id, ShareOperation operation, CancellationToken ct = default) => Send<long>(HttpMethod.Post,"rest/v1/rpc/cp_publish_game",
-        new { p_game_id = id, p_expected_revision = operation.ExpectedRevision, p_operation_id = operation.Id, p_game = operation.Payload },true,ct);
-    public Task<bool> UploadCover(string path, byte[] png, CancellationToken ct = default)
-    {
-        ValidateCoverPath(path, Session?.UserId ?? Guid.Empty);
-        if (png.Length > 2097152) throw new ArgumentException(I18n.T("La carátula supera 2 MiB."));
-        return Send<bool>(HttpMethod.Post,"storage/v1/object/checkpoint-assets/" + path,null,true,ct,png);
-    }
-    public async Task<byte[]> DownloadCover(string path, Guid owner, CancellationToken ct = default)
-    {
-        ValidateCoverPath(path, owner); await RefreshSession(ct);
-        using var request = new HttpRequestMessage(HttpMethod.Get,new Uri(origin,"storage/v1/object/authenticated/checkpoint-assets/" + path));
-        request.Headers.Add("apikey",project.PublishableKey); request.Headers.Authorization = new("Bearer",Session!.AccessToken);
-        using var response = await http.SendAsync(request,ct);
-        if (!response.IsSuccessStatusCode) throw new SocialApiException(I18n.T("La carátula ya no está disponible."));
-        var bytes = await response.Content.ReadAsByteArrayAsync(ct);
-        if (bytes.Length > 2097152) throw new InvalidDataException(I18n.T("Carátula demasiado grande."));
-        return bytes;
-    }
-    private static void ValidateCoverPath(string path, Guid owner)
-    {
-        if (owner == Guid.Empty || !System.Text.RegularExpressions.Regex.IsMatch(path,"^" + owner + "/covers/[a-zA-Z0-9_-]+\\.(png|jpg|jpeg|webp)$"))
-            throw new ArgumentException(I18n.T("La referencia de carátula no es válida."));
-    }
+        new { p_game_id = id, p_expected_revision = operation.ExpectedRevision, p_operation_id = operation.Id, p_game = operation.Payload is {} payload ? payload with { CoverPath = null } : null },true,ct);
     public void Dispose() { http.Dispose(); sessionGate.Dispose(); }
 }

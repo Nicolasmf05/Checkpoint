@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.10 — Almacenamiento en la nube solo de texto
+
+Supabase rechaza nuevas subidas de archivos, incluidas las escrituras privilegiadas en Storage. Los archivos existentes se conservan. Windows comparte únicamente datos de juegos y progreso; las carátulas locales y las rutas antiguas de imágenes se excluyen de las publicaciones. La migración y las pruebas con reversión documentan esta política.
+
 ## 0.8.9
 
 - Ajustes permite repasar los logros de toda la Biblioteca, incluidos juegos privados y fuera de Mi lista, avanzar juego por juego y actualizar todos los vinculados. Se conservan los cambios manuales.
