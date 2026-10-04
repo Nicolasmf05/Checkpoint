@@ -1118,6 +1118,17 @@ document.addEventListener('keydown', (e) => {
 });
 window.addEventListener('resize', renderGames);
 window.chrome?.webview?.addEventListener('message', (event) => {
+  if (event.data.kind === 'section-home') {
+    dismissMenu();
+    picked.clear();
+    selected = undefined;
+    const viewport = root.querySelector('.viewport'),
+      friends = root.querySelector('.friends-content');
+    if (viewport) viewport.scrollTop = 0;
+    if (friends) friends.scrollTop = 0;
+    renderMain();
+    return;
+  }
   if (event.data.kind === 'focus-game') {
     selected = event.data.id;
     requestAnimationFrame(() =>

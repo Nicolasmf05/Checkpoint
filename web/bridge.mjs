@@ -173,7 +173,9 @@ const themeLabels = () =>
   ].map(T);
 const game = (id) => data.games.find((g) => g.id === id);
 const send = (value) => listeners.forEach((listener) => listener({ data: value }));
-const fail = (error) => {
+const errorText = (error) => {
+  if (typeof error?.detail === 'string' && Object.hasOwn(english, error.detail))
+    return T(error.detail);
   const code = error?.code || error?.message;
   const keys = {
     'igdb-not-configured': 'El responsable de esta edición debe configurar IGDB en Supabase.',
@@ -205,12 +207,16 @@ const fail = (error) => {
     email_exists: 'Ese nombre de usuario ya está en uso.',
     weak_password: 'Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres.',
     unauthorized: 'La sesión no es válida. Vuelve a entrar en Checkpoint.',
+    'steam-unauthorized': 'La sesión ha caducado. Vuelve a vincular Steam.',
     forbidden: 'No tienes permiso para consultar o cambiar estos datos.',
     rate: 'Demasiadas consultas. Espera antes de volver a intentarlo.',
     40001: 'El progreso cambió en otro equipo. Revisa el conflicto antes de publicar.',
     'not-found': 'No se encontró un usuario disponible con ese código.',
   };
-  notice = T(keys[code] || 'No se pudo completar la operación. Los datos locales se conservan.');
+  return T(keys[code] || 'No se pudo completar la operación. Los datos locales se conservan.');
+};
+const fail = (error) => {
+  notice = errorText(error);
   if (navigation.current) navigation.current.error = notice;
   emit();
 };
@@ -270,8 +276,8 @@ const cover = (g) =>
     ? `https://cdn.cloudflare.steamstatic.com/steam/apps/${g.steamAppId}/library_600x900.jpg`
     : null);
 const sectionFilters = { list: { search: '', filter: 0 }, library: { search: '', filter: 0 } };
-function switchTab(next) {
-  if (next === tab) return;
+function switchTab(next, home = false) {
+  if (next === tab && !home) return;
   if (sectionFilters[tab]) sectionFilters[tab] = { search, filter };
   tab = next;
   if (next === 'friends') {
@@ -279,7 +285,11 @@ function switchTab(next) {
     selectedFriend = null;
     publications = [];
   }
-  if (sectionFilters[next]) ({ search, filter } = sectionFilters[next]);
+  if (sectionFilters[next]) {
+    if (home) sectionFilters[next] = { search: '', filter: 0 };
+    ({ search, filter } = sectionFilters[next]);
+  }
+  if (home && next === 'list') data.settings.activeList = 'all';
 }
 // Traduce el estado del navegador al mismo contrato que recibe la interfaz desde la aplicación nativa.
 function snapshot() {
@@ -773,7 +783,8 @@ function reviewStatus() {
     ' · ' +
     T('No se pudieron actualizar:') +
     ' ' +
-    r.errors
+    r.errors +
+    (r.firstError ? ' · ' + r.firstError : '')
   );
 }
 function startAchievementReview() {
@@ -785,6 +796,7 @@ function startAchievementReview() {
       done: 0,
       total: ids.length,
       errors: 0,
+      firstError: '',
       running: true,
       stopped: false,
       controller: new AbortController(),
@@ -833,6 +845,7 @@ function startAchievementReview() {
           } catch (error) {
             if (signal.aborted) throw error;
             r.errors++;
+            r.firstError ||= target.title + ': ' + errorText(error);
           }
           r.done++;
           emit();
@@ -2180,6 +2193,7 @@ function shortcutSettings() {
 async function sync(single) {
   if (steamBusy || !api.steam) return;
   steamBusy = true;
+  if (navigation.current) navigation.current.error = '';
   emit();
   try {
     if (!single) {
@@ -2194,7 +2208,7 @@ async function sync(single) {
           .filter((g) => g.tracked && g.steamAppId)
           .sort((a, b) => (a.syncedAt || '').localeCompare(b.syncedAt || ''))
           .slice(0, 20);
-    let errors = 0;
+    let firstError = '';
     for (const current of selected) {
       try {
         const result = await api.steamRequest(
@@ -2209,15 +2223,16 @@ async function sync(single) {
           target.syncedAt = new Date().toISOString();
           await persist();
         }
-      } catch {
-        errors++;
+      } catch (error) {
+        firstError ||= current.title + ': ' + errorText(error);
       }
     }
-    notice = T(
-      errors
-        ? 'Algunos logros no se pudieron actualizar. Se conserva el progreso anterior.'
-        : 'Biblioteca y progreso de Steam actualizados.',
-    );
+    notice = firstError
+      ? T('Algunos logros no se pudieron actualizar. Se conserva el progreso anterior.') +
+        ' ' +
+        firstError
+      : T('Biblioteca y progreso de Steam actualizados.');
+    if (firstError && navigation.current) navigation.current.error = notice;
   } catch (error) {
     fail(error);
   } finally {
@@ -3171,7 +3186,14 @@ async function command(message) {
         return;
       }
       if (['list', 'library', 'friends'].includes(message.value)) {
-        switchTab(message.value);
+        const home = message.value === tab;
+        const savedList = data.settings.activeList;
+        switchTab(message.value, home);
+        if (home) {
+          emit();
+          send({ kind: 'section-home' });
+          if (savedList !== data.settings.activeList) await persist();
+        }
         if (tab === 'friends') loadFriends();
       }
       break;

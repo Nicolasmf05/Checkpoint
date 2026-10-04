@@ -5,6 +5,8 @@
 ## 0.8.25
 
 - Library’s selection bar now includes Add to My list for multiple selected games. The action appears when any selected game is not tracked yet and preserves privacy, other lists and progress; games already in My list are retained.
+- Pressing the active Library or My list section button returns to its initial screen, clearing filters and selection. My list returns to all tracked games. Pressing Friends again returns from a friend or subsection to the main friends menu.
+- Steam achievement updates now show the localized failure reason instead of only a generic message or error count. Background review identifies the first failing game, and expired web Steam sessions ask to link Steam again. Saved progress is retained on failure.
 
 ## 0.8.24
 

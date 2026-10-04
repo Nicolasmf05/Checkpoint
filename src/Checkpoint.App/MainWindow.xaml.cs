@@ -704,9 +704,29 @@ public partial class MainWindow : Window
         Refresh();
     }
 
-    private void TrackedClick(object sender, RoutedEventArgs e) => SwitchCollection(false);
+    private void OpenCollection(bool library)
+    {
+        bool home = !friendsVisible && allLibrary == library;
+        SwitchCollection(library);
+        if (!home)
+            return;
+        bool save = !library && Preferences.ActiveList != "all";
+        if (!library)
+            Preferences.ActiveList = "all";
+        Search.Clear();
+        StatusFilter.SelectedIndex = 0;
+        sectionFilters[library] = ("", 0);
+        GameList.SelectedItems.Clear();
+        FindVisual<ScrollViewer>(GameList)?.ScrollToTop();
+        if (save)
+            Persist();
+        Refresh();
+        web?.Event(new { kind = "section-home" });
+    }
 
-    private void LibraryClick(object sender, RoutedEventArgs e) => SwitchCollection(true);
+    private void TrackedClick(object sender, RoutedEventArgs e) => OpenCollection(false);
+
+    private void LibraryClick(object sender, RoutedEventArgs e) => OpenCollection(true);
 
     private void AddClick(object sender, RoutedEventArgs e) => Dialogs.Edit(this, null);
 

@@ -5,6 +5,8 @@
 ## 0.8.25
 
 - La barra de selección de Biblioteca incluye Añadir a Mi lista para varios juegos seleccionados. Aparece cuando alguno todavía no está añadido y conserva la privacidad, las otras listas y el progreso; los juegos que ya estaban en Mi lista se mantienen.
+- Volver a pulsar el botón del apartado activo de Biblioteca o Mi lista vuelve a su pantalla inicial, limpiando filtros y selección. Mi lista vuelve a todos sus juegos. Pulsar Amigos de nuevo vuelve desde un amigo o subapartado al menú principal de amigos.
+- Las actualizaciones de logros de Steam muestran la causa del fallo en el idioma seleccionado, en lugar de un mensaje genérico o solo el contador. El repaso en segundo plano identifica el primer juego que falla, y una sesión web de Steam caducada pide volver a vincular Steam. Se conserva el progreso guardado cuando hay errores.
 
 ## 0.8.24
 

@@ -81,6 +81,7 @@ const coverPng = Buffer.from(
   'base64',
 );
 let libraryEmpty = false,
+  steamFailure = null,
   libraryCalls = 0,
   achievementCalls = 0,
   authCalls = 0,
@@ -261,6 +262,7 @@ await context.route('https://fumdnvvvoiwoiziwtmsu.supabase.co/**', async (route)
   }
   if (url.pathname.endsWith('/achievements')) {
     achievementCalls++;
+    if (steamFailure) return respond({ error: steamFailure }, 403);
     if (Number(url.pathname.split('/').at(-2)) >= 10000)
       await new Promise((resolve) =>
         setTimeout(resolve, Number(url.pathname.split('/').at(-2)) === 10000 ? 4000 : 1800),
@@ -753,6 +755,14 @@ try {
     'friend manual achievements are visible with explicit Checkpoint source and descriptions',
   );
   await page.screenshot({ path: path.join(evidence, 'web-friends-en.png') });
+  await page.locator('[data-tab=friends]').click();
+  await page.getByRole('button', { name: 'View progress', exact: true }).waitFor();
+  check(
+    (await page.getByText('Friend game', { exact: true }).count()) === 0,
+    'pressing the active Friends button returns from friend progress to its initial menu',
+  );
+  await click('View progress');
+  await page.getByText('Friend game', { exact: true }).waitFor();
   await click('Library');
   await page.locator('[data-tab=friends]').click();
   await page.getByRole('button', { name: 'View progress', exact: true }).waitFor();
@@ -1448,6 +1458,47 @@ try {
   await click('Close');
   await click('Cancel');
   // Covers review: covered games are skipped; rejection, acceptance and skipping persist independently.
+  steamFailure =
+    'Steam no permite consultar estos logros. Revisa la privacidad de tus detalles de juegos.';
+  const privacyMessage =
+    'Steam does not allow achievement access. Check your Game details privacy settings.';
+  await page.getByText('Review game 00', { exact: true }).click();
+  await click('View achievements');
+  await click('Refresh');
+  await page.getByText(new RegExp(privacyMessage.replaceAll('.', '\\.'))).waitFor();
+  check(
+    (await page.locator('.dialog-page').textContent()).includes(privacyMessage),
+    'individual Steam achievement refresh displays the localized backend privacy cause',
+  );
+  await click('Back to collection');
+  await click('Settings');
+  await click('Review all achievements');
+  await click('Update all achievements');
+  await page.waitForFunction(
+    () => window.checkpointState.achievementReview?.running === false,
+    null,
+    { timeout: 30000 },
+  );
+  check(
+    (await page.locator('.achievement-review').textContent()).includes('Could not update: 22') &&
+      (await page.locator('.achievement-review').textContent()).includes(privacyMessage),
+    'background Steam review displays a failing game and translated cause alongside the error count',
+  );
+  const afterFailure = await page.evaluate(async () => {
+    const { BrowserStore } = await import('./store.mjs'),
+      store = await new BrowserStore().open();
+    return (await store.get('library')).games;
+  });
+  check(
+    afterFailure.every(
+      (g) =>
+        g.achievements.length === 2 &&
+        g.syncedAt === reviewed.find((previous) => previous.id === g.id).syncedAt,
+    ),
+    'Steam privacy failures preserve the previously saved achievements and sync timestamps',
+  );
+  steamFailure = null;
+  await page.locator('.achievement-review button').click();
   coversEnabled = true;
   await context.route('https://cdn.cloudflare.steamstatic.com/steam/apps/99999/**', (route) =>
     route.fulfill({ status: 200, contentType: 'image/png', body: coverPng }),
@@ -1556,6 +1607,29 @@ try {
     await page.locator('.collectionbar').isHidden(),
     'Library does not expose My list collection controls',
   );
+  await click('Library');
+  check(
+    (await page.getByRole('searchbox', { name: 'Search games', exact: true }).inputValue()) ===
+      '' &&
+      (await page.getByRole('combobox', { name: 'Filter by status', exact: true }).inputValue()) ===
+        '0',
+    'pressing the active Library button resets filters to its initial screen',
+  );
+  await click('My list');
+  const collection = page.locator('.collectionbar select');
+  await collection.selectOption('private');
+  await page.getByRole('searchbox', { name: 'Search games', exact: true }).fill('ZZ');
+  await click('My list');
+  await page.waitForFunction(
+    () => window.checkpointState.collection === 'all' && window.checkpointState.search === '',
+  );
+  check(
+    (await collection.inputValue()) === 'all' &&
+      (await page.getByRole('searchbox', { name: 'Search games', exact: true }).inputValue()) ===
+        '',
+    'pressing the active My list button returns from Private to all tracked games',
+  );
+  await click('Library');
   await page.getByRole('searchbox', { name: 'Search games', exact: true }).fill('');
   await page.getByRole('combobox', { name: 'Filter by status', exact: true }).selectOption('0');
   await click('Add game');

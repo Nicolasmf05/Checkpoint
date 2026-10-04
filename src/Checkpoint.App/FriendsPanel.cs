@@ -42,6 +42,7 @@ internal sealed class FriendsPanel : ScrollViewer
         publications = [];
         message = "";
         Render();
+        ScrollToTop();
     }
 
     internal void RefreshLanguage()

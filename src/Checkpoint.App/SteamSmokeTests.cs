@@ -175,6 +175,51 @@ public partial class MainWindow
             I18n.SetLanguage("es");
         }
         bool wrongServer = false;
+        foreach (string selectedLanguage in new[] { "es", "en" })
+        {
+            I18n.SetLanguage(selectedLanguage);
+            foreach (
+                var failure in new[]
+                {
+                    (
+                        HttpStatusCode.Forbidden,
+                        "Steam no permite consultar estos logros. Revisa la privacidad de tus detalles de juegos."
+                    ),
+                    (
+                        HttpStatusCode.Unauthorized,
+                        "La sesión ha caducado. Vuelve a vincular Steam."
+                    ),
+                }
+            )
+            {
+                using var errorClient = new SteamClient(
+                    Path.Combine(output, "steam-error-fixture"),
+                    new NativeSteamHandler(_ => new HttpResponseMessage(failure.Item1)
+                    {
+                        Content = new StringContent(
+                            JsonSerializer.Serialize(new { error = failure.Item2 })
+                        ),
+                    })
+                );
+                bool localized = false;
+                try
+                {
+                    await errorClient.BeginLogin(endpoint, CancellationToken.None);
+                }
+                catch (InvalidOperationException error)
+                {
+                    localized = I18n.Error(error) == I18n.T(failure.Item2);
+                }
+                check(
+                    localized,
+                    "Steam privacy and expired-session causes are localized "
+                        + selectedLanguage
+                        + " "
+                        + (int)failure.Item1
+                );
+            }
+        }
+        I18n.SetLanguage("es");
         try
         {
             await client.Library("https://another.example/", CancellationToken.None);

@@ -3,9 +3,10 @@
 
 import { account, friendCode } from './model.mjs';
 export class RemoteError extends Error {
-  constructor(code) {
+  constructor(code, detail = '') {
     super(code);
     this.code = code;
+    this.detail = typeof detail === 'string' && detail.length < 300 ? detail : '';
   }
 }
 export class BrowserApi {
@@ -64,12 +65,15 @@ export class BrowserApi {
         data?.code ||
           data?.error_code ||
           (response.status === 401
-            ? 'unauthorized'
+            ? steam
+              ? 'steam-unauthorized'
+              : 'unauthorized'
             : response.status === 403
               ? 'forbidden'
               : response.status === 429
                 ? 'rate'
                 : 'remote'),
+        steam ? data?.error : '',
       );
     return data;
   }

@@ -1415,6 +1415,23 @@ public partial class MainWindow
                 Search.Text == "Bulk" && StatusFilter.SelectedIndex == 1,
                 "Windows Library restores its own search and status filters"
             );
+            await Run("document.querySelector('[data-tab=library]').click();");
+            Check(
+                Search.Text == "" && StatusFilter.SelectedIndex == 0 && allLibrary,
+                "pressing the active Windows Library button clears its filters and returns home"
+            );
+            await Run("document.querySelector('[data-tab=list]').click();");
+            SelectGameList("custom:CSS saved list");
+            Search.Text = "Bulk";
+            StatusFilter.SelectedIndex = 1;
+            await Run("document.querySelector('[data-tab=list]').click();");
+            Check(
+                Preferences.ActiveList == "all"
+                    && Search.Text == ""
+                    && StatusFilter.SelectedIndex == 0,
+                "pressing the active Windows My list button returns from a custom list to all tracked games"
+            );
+            await Run("document.querySelector('[data-tab=library]').click();");
             Search.Clear();
             StatusFilter.SelectedIndex = 0;
             Search.Text = bulkA.Title;
@@ -1734,6 +1751,7 @@ public partial class MainWindow
                 backgroundActive = 0,
                 backgroundPeak = 0;
             Directory.CreateDirectory(Path.Combine(output, "background-review"));
+            bool failBackgroundReview = false;
             using (
                 var backgroundClient = new RetroClient(
                     Path.Combine(output, "background-review"),
@@ -1745,6 +1763,8 @@ public partial class MainWindow
                             backgroundPeak = Math.Max(backgroundPeak, backgroundActive);
                             try
                             {
+                                if (failBackgroundReview)
+                                    throw new HttpRequestException("Fixture connection failure");
                                 await Task.Delay(1800, token);
                                 string id = request
                                     .RequestUri!.Query.Split('&')
@@ -1856,6 +1876,18 @@ public partial class MainWindow
                         && achievementReviewErrors == 0
                         && Store.LoadGames().All(g => g.RetroAchievements?.Count == 1),
                     "Windows background review can restart and persist the entire library"
+                );
+                failBackgroundReview = true;
+                StartAchievementReview();
+                await Wait(() => Task.FromResult(!AchievementSyncBusy));
+                Check(
+                    achievementReviewErrors == 5
+                        && AchievementReviewText.Contains("Background")
+                        && AchievementReviewText.Contains(
+                            I18n.T("Sin conexión. Puedes seguir usando tu biblioteca local.")
+                        )
+                        && Store.LoadGames().All(g => g.RetroAchievements?.Count == 1),
+                    "Windows background review displays its failing game and localized cause without erasing saved achievements"
                 );
                 StopAchievementReview();
             }

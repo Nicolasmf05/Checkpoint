@@ -343,6 +343,14 @@ public partial class MainWindow
         );
         RenderElement(this, Path.Combine(output, "widget-friends-progress.png"));
         bool originalCollection = allLibrary;
+        FriendsClick(this, new RoutedEventArgs());
+        await FriendsView.Reload();
+        check(
+            !Texts(this).Contains("Celeste")
+                && Controls<Button>(this).Any(b => (string?)b.Content == "Ver progreso de Ana"),
+            "pressing the active Friends button returns from a friend to the initial menu"
+        );
+        await ClickSocial("Ver progreso de Ana");
         LibraryClick(this, new RoutedEventArgs());
         FriendsClick(this, new RoutedEventArgs());
         await FriendsView.Reload();

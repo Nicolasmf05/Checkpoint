@@ -364,6 +364,7 @@ public partial class MainWindow
         achievementReviewErrors;
     private bool achievementReviewVisible,
         achievementReviewStopped;
+    private string achievementReviewError = "";
     internal string AchievementReviewText =>
         !achievementReviewVisible
             ? ""
@@ -379,7 +380,8 @@ public partial class MainWindow
                 + " · "
                 + I18n.T("No se pudieron actualizar:")
                 + " "
-                + achievementReviewErrors;
+                + achievementReviewErrors
+                + (achievementReviewError.Length > 0 ? " · " + achievementReviewError : "");
 
     internal void StopAchievementReview()
     {
@@ -404,6 +406,7 @@ public partial class MainWindow
         );
         achievementReviewDone = 0;
         achievementReviewErrors = 0;
+        achievementReviewError = "";
         achievementReviewTotal = selected.Length;
         achievementReviewVisible = true;
         achievementReviewStopped = false;
@@ -466,9 +469,11 @@ public partial class MainWindow
                                 Store.SaveExistingGame(target);
                             }
                         }
-                        catch (OperationCanceledException) when (!token.IsCancellationRequested)
+                        catch (OperationCanceledException error)
+                            when (!token.IsCancellationRequested)
                         {
                             failed = true;
+                            RecordError(current, error);
                         }
                         catch (Exception error)
                             when (error
@@ -477,6 +482,7 @@ public partial class MainWindow
                             )
                         {
                             failed = true;
+                            RecordError(current, error);
                         }
                     }
                     if (
@@ -503,9 +509,11 @@ public partial class MainWindow
                                 Store.SaveExistingGame(target);
                             }
                         }
-                        catch (OperationCanceledException) when (!token.IsCancellationRequested)
+                        catch (OperationCanceledException error)
+                            when (!token.IsCancellationRequested)
                         {
                             failed = true;
+                            RecordError(current, error);
                         }
                         catch (Exception error)
                             when (error
@@ -514,6 +522,7 @@ public partial class MainWindow
                             )
                         {
                             failed = true;
+                            RecordError(current, error);
                         }
                     }
                     if (failed)
@@ -547,5 +556,11 @@ public partial class MainWindow
                 Refresh();
             }
         }
+    }
+
+    private void RecordError(Game game, Exception error)
+    {
+        if (achievementReviewError.Length == 0)
+            achievementReviewError = game.Title + ": " + I18n.Error(error);
     }
 }

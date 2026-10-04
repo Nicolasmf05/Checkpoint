@@ -315,10 +315,10 @@ public partial class MainWindow
 
     private async void FriendsClick(object sender, RoutedEventArgs e)
     {
-        if (!friendsVisible)
-            FriendsView.OpenHome();
+        FriendsView.OpenHome();
         friendsVisible = true;
         Refresh();
+        web?.Event(new { kind = "section-home" });
         await FriendsView.Reload();
     }
 
