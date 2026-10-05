@@ -101,6 +101,8 @@ export function createSteamHandler({
     } catch {
       throw new ApiError(502, 'Steam no responde. Se conserva tu último progreso.');
     }
+    if (response.status === 429)
+      throw new ApiError(429, 'Demasiadas consultas. Espera un minuto y vuelve a intentarlo.');
     if (!response.ok)
       throw new ApiError(
         502,
@@ -112,12 +114,44 @@ export function createSteamHandler({
       throw new ApiError(502, 'Steam ha devuelto una respuesta no válida.');
     }
   }
+  // Coalesce concurrent misses within an Edge worker; never retain rejected promises.
+  const pendingCache = new Map();
   async function cached(id, produce, ttl = 900, valid = () => true) {
-    const old = await state('get', 'cache', id);
-    if (old !== null && valid(old)) return old;
-    const value = await produce();
-    await state('put', 'cache', id, value, ttl);
-    return value;
+    if (pendingCache.has(id)) return pendingCache.get(id);
+    const pending = (async () => {
+      const old = await state('get', 'cache', id);
+      if (old !== null && valid(old)) return old;
+      const value = await produce();
+      await state('put', 'cache', id, value, ttl);
+      return value;
+    })();
+    pendingCache.set(id, pending);
+    try {
+      return await pending;
+    } finally {
+      if (pendingCache.get(id) === pending) pendingCache.delete(id);
+    }
+  }
+
+  function validSchema(schema) {
+    if (!schema?.game || typeof schema.game !== 'object' || Array.isArray(schema.game))
+      return false;
+    const definitions = schema.game.availableGameStats?.achievements;
+    if (definitions == null) return true;
+    if (!Array.isArray(definitions) || definitions.length > 10000) return false;
+    const ids = new Set();
+    return definitions.every((def) => {
+      if (
+        !def ||
+        typeof def.name !== 'string' ||
+        !def.name.trim() ||
+        def.name.length > 250 ||
+        ids.has(def.name)
+      )
+        return false;
+      ids.add(def.name);
+      return true;
+    });
   }
   async function library(steamId) {
     const result = await cached(
@@ -256,12 +290,13 @@ export function createSteamHandler({
           ok: true,
           version: '0.6.0',
           steamConfigured: Boolean(apiKey),
+          achievementCacheSeconds: 60,
           libraryImportVersion: 2,
         });
       if (method === 'GET' && path === '/privacy')
         return page(
-          'Independent application, not affiliated with Valve. Operator: Checkpoint. Contact: https://github.com/Nicolasmf05/Checkpoint/issues. Steam ID, visible games, playtime and achievements are processed on Supabase (Ireland). Login flows expire after 10 minutes, session hashes after 7 days, library and progress cache after 15 minutes and public achievement definitions after 24 hours. Expired rows are removed during subsequent requests. Unlinking revokes the session and clears its game cache. Passwords and plaintext session tokens are never stored in the database. Local data remains on your PC. Hosting logs/backups follow Supabase retention. Steam data availability and accuracy depend on Valve.',
-          'Aplicación independiente, sin afiliación con Valve. Responsable: Checkpoint. Contacto: https://github.com/Nicolasmf05/Checkpoint/issues. SteamID, juegos visibles, horas y logros se procesan en Supabase (Irlanda). Vinculaciones: 10 minutos; hashes de sesiones: 7 días; caché de biblioteca y progreso: 15 minutos; definiciones públicas: 24 horas. Los registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y elimina su caché de juegos. No almacenamos contraseñas ni tokens de sesión en texto claro. Los datos locales permanecen en tu PC. Registros y copias de seguridad siguen la retención de Supabase. Los datos dependen de Valve.',
+          'Independent application, not affiliated with Valve. Operator: Checkpoint. Contact: https://github.com/Nicolasmf05/Checkpoint/issues. Steam ID, visible games, playtime and achievements are processed on Supabase (Ireland). Login flows expire after 10 minutes, session hashes after 7 days, library cache after 15 minutes, progress cache after 1 minute and public achievement definitions after 24 hours. Expired rows are removed during subsequent requests. Unlinking revokes the session and clears its game cache. Passwords and plaintext session tokens are never stored in the database. Local data remains on your PC. Hosting logs/backups follow Supabase retention. Steam data availability and accuracy depend on Valve.',
+          'Aplicación independiente, sin afiliación con Valve. Responsable: Checkpoint. Contacto: https://github.com/Nicolasmf05/Checkpoint/issues. SteamID, juegos visibles, horas y logros se procesan en Supabase (Irlanda). Vinculaciones: 10 minutos; hashes de sesiones: 7 días; caché de biblioteca: 15 minutos; progreso: 1 minuto; definiciones públicas: 24 horas. Los registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y elimina su caché de juegos. No almacenamos contraseñas ni tokens de sesión en texto claro. Los datos locales permanecen en tu PC. Registros y copias de seguridad siguen la retención de Supabase. Los datos dependen de Valve.',
         );
       if (method === 'GET' && path === '/')
         return page(
@@ -355,12 +390,21 @@ export function createSteamHandler({
           throw new ApiError(403, 'Este juego no está en tu biblioteca visible de Steam.');
         const language = url.searchParams.get('lang') === 'en' ? 'english' : 'spanish';
         const result = await cached(
-          `achievements:${session.steamId}:${appId}:${language}:descriptions-v2`,
+          `achievements:${session.steamId}:${appId}:${language}:descriptions-v3`,
           async () => {
             const schema = await cached(
-              `schema:${appId}:${language}`,
-              () => steam('ISteamUserStats/GetSchemaForGame/v2/', { appid: appId, l: language }),
+              `schema:${appId}:${language}:validated-v2`,
+              async () => {
+                const value = await steam('ISteamUserStats/GetSchemaForGame/v2/', {
+                  appid: appId,
+                  l: language,
+                });
+                if (!validSchema(value))
+                  throw new ApiError(502, 'Steam ha devuelto una respuesta no válida.');
+                return value;
+              },
               86400,
+              validSchema,
             );
             if (!schema.game || typeof schema.game !== 'object')
               throw new ApiError(
@@ -368,9 +412,10 @@ export function createSteamHandler({
                 'Steam no ha devuelto la definición de logros de este juego.',
               );
             const definitions = schema.game.availableGameStats?.achievements;
-            if (!definitions?.length) return { achievements: [] };
+            if (definitions == null) return { achievements: [] };
             if (!Array.isArray(definitions))
               throw new ApiError(502, 'Steam ha devuelto una respuesta no válida.');
+            if (!definitions.length) return { achievements: [] };
             const progress = await steam('ISteamUserStats/GetPlayerAchievements/v1/', {
               steamid: session.steamId,
               appid: appId,
@@ -384,6 +429,14 @@ export function createSteamHandler({
                 403,
                 'Steam no permite consultar estos logros. Revisa la privacidad de tus detalles de juegos.',
               );
+            if (
+              progress.playerstats.achievements.length > 10000 ||
+              progress.playerstats.achievements.some(
+                (item) =>
+                  !item || typeof item.apiname !== 'string' || ![0, 1].includes(item.achieved),
+              )
+            )
+              throw new ApiError(502, 'Steam ha devuelto una respuesta no válida.');
             const unlocks = new Map(
               progress.playerstats.achievements.map((item) => [item.apiname, item]),
             );
@@ -398,8 +451,8 @@ export function createSteamHandler({
                 const text = (value) => (typeof value === 'string' && value.trim() ? value : '');
                 return {
                   id: def.name,
-                  name: text(def.displayName) || text(item?.name) || def.name,
-                  description: text(def.description) || text(item?.description),
+                  name: (text(def.displayName) || text(item?.name) || def.name).slice(0, 250),
+                  description: (text(def.description) || text(item?.description)).slice(0, 2000),
                   hidden: Boolean(Number(def.hidden)),
                   unlocked,
                   unlockedAt: date && !isNaN(date.valueOf()) ? date.toISOString() : null,
@@ -407,6 +460,7 @@ export function createSteamHandler({
               }),
             };
           },
+          60,
         );
         return json(200, result);
       }

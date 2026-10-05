@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -18,6 +19,7 @@ public sealed record RetroSession(string Username, string ApiKey, bool Hardcore)
 public sealed class RetroClient : IDisposable
 {
     private readonly HttpClient http;
+    private readonly AchievementRequests<List<Achievement>> achievementRequests = new();
     private readonly string file;
     public RetroSession? Session { get; private set; }
 
@@ -76,10 +78,7 @@ public sealed class RetroClient : IDisposable
             File.Delete(file);
     }
 
-    public async Task<List<Achievement>> Achievements(
-        int id,
-        CancellationToken cancellation = default
-    )
+    public Task<List<Achievement>> Achievements(int id, CancellationToken cancellation = default)
     {
         if (Session is not { } session)
             throw new InvalidOperationException(
@@ -89,6 +88,59 @@ public sealed class RetroClient : IDisposable
             throw new ArgumentException(
                 I18n.T("El ID de RetroAchievements debe ser un número positivo.")
             );
+        return achievementRequests.Run(
+            session.Username + "|" + session.ApiKey + "|" + session.Hardcore + "|" + id,
+            token => FetchAchievements(id, session, token),
+            cancellation
+        );
+    }
+
+    private async Task<HttpResponseMessage> Send(string url, CancellationToken cancellation)
+    {
+        for (int attempt = 0; ; attempt++)
+        {
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.UserAgent.ParseAdd("Checkpoint/0.8");
+                var response = await http.SendAsync(request, cancellation);
+                if (
+                    attempt == 0
+                    && response.StatusCode
+                        is HttpStatusCode.BadGateway
+                            or HttpStatusCode.GatewayTimeout
+                )
+                {
+                    response.Dispose();
+                    await Task.Delay(500, cancellation);
+                    continue;
+                }
+                return response;
+            }
+            catch (Exception error)
+                when (error is HttpRequestException
+                    || error is OperationCanceledException && !cancellation.IsCancellationRequested
+                )
+            {
+                if (attempt > 0)
+                    throw new AchievementServiceException(
+                        I18n.T("RetroAchievements no responde. Se conserva el progreso anterior."),
+                        HttpStatusCode.GatewayTimeout,
+                        true
+                    );
+                await Task.Delay(500, cancellation);
+            }
+        }
+    }
+
+    private async Task<List<Achievement>> FetchAchievements(
+        int id,
+        RetroSession session,
+        CancellationToken cancellation
+    )
+    {
+        if (Session != session)
+            throw new OperationCanceledException(cancellation);
         var url =
             "https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?g="
             + id
@@ -98,14 +150,20 @@ public sealed class RetroClient : IDisposable
             + Uri.EscapeDataString(session.ApiKey);
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.UserAgent.ParseAdd("Checkpoint/0.8");
-            using var response = await http.SendAsync(request, cancellation);
+            using var response = await Send(url, cancellation);
             if (!response.IsSuccessStatusCode)
-                throw new InvalidOperationException(
+                throw new AchievementServiceException(
                     I18n.T(
-                        "No se pudo consultar RetroAchievements. Revisa tu clave y conserva el último progreso."
-                    )
+                        response.StatusCode == HttpStatusCode.TooManyRequests
+                            ? "Demasiadas consultas. Espera un minuto y vuelve a intentarlo."
+                            : "No se pudo consultar RetroAchievements. Revisa tu clave y conserva el último progreso."
+                    ),
+                    response.StatusCode,
+                    response.StatusCode
+                        is HttpStatusCode.Unauthorized
+                            or HttpStatusCode.Forbidden
+                            or HttpStatusCode.TooManyRequests
+                            or HttpStatusCode.ServiceUnavailable
                 );
             using var json = JsonDocument.Parse(
                 await response.Content.ReadAsStringAsync(cancellation)
@@ -183,6 +241,7 @@ public sealed class RetroClient : IDisposable
                     I18n.T("RetroAchievements devolvió datos no válidos.")
                 );
             }
+            AchievementData.Validate(results);
             return results;
         }
         catch (HttpRequestException)

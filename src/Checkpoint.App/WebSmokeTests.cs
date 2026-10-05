@@ -1761,7 +1761,8 @@ public partial class MainWindow
                 backgroundActive = 0,
                 backgroundPeak = 0;
             Directory.CreateDirectory(Path.Combine(output, "background-review"));
-            bool failBackgroundReview = false;
+            bool failBackgroundReview = false,
+                missingBackgroundGame = false;
             using (
                 var backgroundClient = new RetroClient(
                     Path.Combine(output, "background-review"),
@@ -1775,6 +1776,11 @@ public partial class MainWindow
                             {
                                 if (failBackgroundReview)
                                     throw new HttpRequestException("Fixture connection failure");
+                                if (missingBackgroundGame)
+                                    return new HttpResponseMessage(HttpStatusCode.NotFound)
+                                    {
+                                        Content = new StringContent("{}"),
+                                    };
                                 await Task.Delay(1800, token);
                                 string id = request
                                     .RequestUri!.Query.Split('&')
@@ -1888,10 +1894,14 @@ public partial class MainWindow
                     "Windows background review can restart and persist the entire library"
                 );
                 failBackgroundReview = true;
+                int beforeFailedCalls = backgroundCalls;
                 StartAchievementReview();
                 await Wait(() => Task.FromResult(!AchievementSyncBusy));
                 Check(
-                    achievementReviewErrors == 5
+                    achievementReviewErrors is >= 1 and <= 3
+                        && achievementReviewDone < 5
+                        && achievementReviewStopped
+                        && backgroundCalls - beforeFailedCalls <= 6
                         && AchievementReviewText.Contains("Background")
                         && AchievementReviewText.Contains(
                             I18n.T(
@@ -1899,7 +1909,7 @@ public partial class MainWindow
                             )
                         )
                         && Store.LoadGames().All(g => g.RetroAchievements?.Count == 1),
-                    "Windows background review displays its failing game and localized cause without erasing saved achievements"
+                    "Windows global failure stops queued games, bounds retries and displays its localized cause without erasing saved achievements"
                 );
                 I18n.SetLanguage("es");
                 Check(
@@ -1907,6 +1917,17 @@ public partial class MainWindow
                         "RetroAchievements no responde. Se conserva el progreso anterior."
                     ) && !AchievementReviewText.Contains("RetroAchievements is not responding"),
                     "Windows background failure is translated again after changing language"
+                );
+                failBackgroundReview = false;
+                missingBackgroundGame = true;
+                StartAchievementReview();
+                await Wait(() => Task.FromResult(!AchievementSyncBusy));
+                Check(
+                    achievementReviewDone == 5
+                        && achievementReviewErrors == 5
+                        && !achievementReviewStopped
+                        && Store.LoadGames().All(g => g.RetroAchievements?.Count == 1),
+                    "Windows per-game failures continue the review and preserve saved achievements"
                 );
                 I18n.SetLanguage("en");
                 StopAchievementReview();

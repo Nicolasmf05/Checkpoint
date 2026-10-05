@@ -286,7 +286,7 @@ internal static partial class Dialogs
             {
                 if (closed)
                     return;
-                await owner.RefreshGameAchievements(Current());
+                await owner.RefreshGameAchievements(Current(), automatic: true);
                 if (!closed)
                     Render();
             }

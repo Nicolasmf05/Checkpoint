@@ -83,6 +83,7 @@ const coverPng = Buffer.from(
 );
 let libraryEmpty = false,
   steamFailure = null,
+  steamFailureStatus = 403,
   libraryCalls = 0,
   achievementCalls = 0,
   authCalls = 0,
@@ -263,7 +264,7 @@ await context.route('https://fumdnvvvoiwoiziwtmsu.supabase.co/**', async (route)
   }
   if (url.pathname.endsWith('/achievements')) {
     achievementCalls++;
-    if (steamFailure) return respond({ error: steamFailure }, 403);
+    if (steamFailure) return respond({ error: steamFailure }, steamFailureStatus);
     if (Number(url.pathname.split('/').at(-2)) >= 10000)
       await new Promise((resolve) =>
         setTimeout(resolve, Number(url.pathname.split('/').at(-2)) === 10000 ? 4000 : 1800),
@@ -1522,6 +1523,19 @@ try {
     ),
     'Steam privacy failures preserve the previously saved achievements and sync timestamps',
   );
+  steamFailureStatus = 401;
+  steamFailure = 'La sesión ha caducado. Vuelve a vincular Steam.';
+  const beforeExpiredCalls = achievementCalls;
+  await click('Settings');
+  await click('Review all achievements');
+  await click('Update all achievements');
+  await page.waitForFunction(() => window.checkpointState.achievementReview?.running === false);
+  check(
+    achievementCalls - beforeExpiredCalls <= 3 &&
+      (await page.locator('.achievement-review').textContent()).includes('Link Steam again'),
+    'expired Steam sessions stop the full review without querying the remaining library',
+  );
+  steamFailureStatus = 403;
   steamFailure = null;
   await page.locator('.achievement-review button').click();
   coversEnabled = true;

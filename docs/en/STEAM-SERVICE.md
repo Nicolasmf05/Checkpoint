@@ -6,7 +6,20 @@ Version 0.6 source includes a dependency-free Supabase Edge Function. Node remai
 
 ## Automatic desktop synchronization
 
-When Steam is linked, Checkpoint checks the library and playtime on every launch and every 30 minutes by default. Settings offers 15, 30, 60 or 120 minutes. No Refresh click is required. New games appear in Library; adding them to My list remains manual. Each cycle updates achievements for up to 20 tracked games, starting with the least recently synced. Manual states, notes and story progress are preserved. Offline failures keep saved data and retry at the next cycle. Sync requests never overlap.
+When Steam is linked, Checkpoint checks the library and playtime on every launch and every 30 minutes by default. Settings offers 15, 30, 60 or 120 minutes. No Refresh click is required. New games appear in Library; adding them to My list remains manual. Each cycle updates achievements for up to 20 tracked games, starting with the least recently synced. Manual states, notes and story progress are preserved. Offline failures keep saved data and retry at the next cycle. Automatic cycles never overlap. An individual refresh may join a running achievement request.
+
+## Request and error handling
+
+From 0.8.27, reviews and automatic updates use up to three concurrent reads, with starts spaced by 750 ms. Active reads for the same game, account and language share one request. Reads have one retry for network failures, timeouts or HTTP 502/504; linking operations, authentication failures and rate limits are not retried. Rate limits stop the batch and impose a cooldown. Cancelling one consumer does not interrupt another consumer of the same request.
+
+Service-wide failures stop pending requests; per-game failures allow the review to continue. Incomplete responses or duplicate identifiers cannot replace progress. Account changes, deleted games or edited identifiers cannot receive stale results. Notes, manual achievements, personal overrides and privacy are retained. Web persistence batches eight changes or two seconds and flushes on completion or cancellation; Windows saves each existing game individually.
+
+- **Expired session:** link Steam again; signing into Checkpoint does not renew Steam authentication.
+- **Privacy:** check Game details visibility on the linked account. A public profile alone is insufficient.
+- **Unavailable service or rate limit:** keep your progress and retry later. Removing games or manual achievements is unnecessary.
+- **Invalid response:** progress and synchronization timestamps remain unchanged; retry when Steam responds correctly.
+
+Hosted progress caching lasts one minute; Refresh within that minute may return the same information. Valid definitions are reused for 24 hours and failures are never stored as successful results. Server request coalescing is local to each Edge worker, not shared across workers.
 
 ## Supabase deployment
 
@@ -17,7 +30,7 @@ When Steam is linked, Checkpoint checks the library and playtime on every launch
 5. Verify `/health` reports `steamConfigured: true`, press Link Steam in the app and finish sign-in yourself on Steam. Review Game details visibility if Steam denies access.
 6. The default build endpoint is `https://fumdnvvvoiwoiziwtmsu.supabase.co/functions/v1/checkpoint-steam/`. Fork operators must supply their own public project/service configuration.
 
-Flows, session/nonce hashes, limits and caches persist in a private schema, accessible only through a service-role RPC. Polling atomically consumes the flow and creates a session; losing a successful polling response requires relinking. Flows expire after 10 minutes, sessions after seven days; expired rows are purged during later requests. Unlink revokes the session and removes its game cache. Library/progress cache lasts 15 minutes, language-specific public definitions 24 hours. Shared limits: 30 links/minute, 2,000 requests/minute, 90 requests/session/minute and 90,000 upstream calls/day. Caller-supplied IP headers are not trusted. Review capacity before broad distribution. Hosting logs/backups follow Supabase retention. The browser callback is readable bilingual text because Supabase rewrites HTML responses.
+Flows, session/nonce hashes, limits and caches persist in a private schema, accessible only through a service-role RPC. Polling atomically consumes the flow and creates a session; losing a successful polling response requires relinking. Flows expire after 10 minutes, sessions after seven days; expired rows are purged during later requests. Unlink revokes the session and removes its game cache. Library cache lasts 15 minutes and achievement progress one minute; language-specific public definitions 24 hours. Shared limits: 30 links/minute, 2,000 requests/minute, 90 requests/session/minute and 90,000 upstream calls/day. Caller-supplied IP headers are not trusted. Review capacity before broad distribution. Hosting logs/backups follow Supabase retention. The browser callback is readable bilingual text because Supabase rewrites HTML responses.
 
 Run `node --test supabase/tests/steam.test.mjs` for simulated HTTP/security checks. Live Steam validation requires the server secret and a person completing sign-in.
 
@@ -62,6 +75,6 @@ Eligibility/availability depend on Valve. [Web API](https://partner.steamgames.c
 
 The service requests family licenses alongside owned games and merges Steam's recently played games as a supplemental source. Duplicate AppIDs keep the largest reported total playtime. Import is limited to games Steam exposes for the linked user's visible profile; this is not a complete enumeration of unplayed family-group games. No other family member's credentials or progress is imported.
 
-Achievements are requested for the linked SteamID, including borrowed games present in the combined visible library. Private profiles remain restricted. If the recent-games endpoint fails, the owned library is retained. Steam results cache for 15 minutes. The hosted service replaces old owned-only cache entries automatically; use the widget's Update button and open Library. Existing desktop releases work without reinstalling.
+Achievements are requested for the linked SteamID, including borrowed games present in the combined visible library. Private profiles remain restricted. If the recent-games endpoint fails, the owned library is retained. The hosted library cache lasts 15 minutes and achievement progress one minute. The hosted service replaces old owned-only cache entries automatically; use the widget's Update button and open Library. Existing desktop releases work without reinstalling.
 
 The `include_family_licenses` flag is treated as a compatibility hint; Valve may ignore it or restrict returned data. The recent-games route is documented by [Valve](https://partner.steamgames.com/doc/webapi/IPlayerService). Family-account validation remains pending; passing simulated HTTP tests is not proof that every shared game is available for every profile.

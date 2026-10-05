@@ -1515,79 +1515,84 @@ public partial class MainWindow : Window
     // Evita sincronizaciones simultáneas y combina los datos remotos con los campos editados localmente.
     internal async Task Sync(bool importLibrary, Game? single = null)
     {
+        if (single is not null)
+        {
+            await RefreshGameAchievements(single);
+            return;
+        }
         if (syncing || Steam.Session is null)
             return;
         syncing = true;
         Refresh();
-        var errors = new List<string>();
+        var session = Steam.Session;
+        string? firstError = null;
         try
         {
             if (importLibrary)
             {
                 var library = await Steam.Library(Preferences.ServiceUrl, shutdown.Token);
+                shutdown.Token.ThrowIfCancellationRequested();
+                if (Steam.Session != session)
+                    return;
                 int added = GameRules.MergeSteamLibrary(Games, library.Games);
+                Persist();
                 Notice(
-                    (
-                        I18n.IsEnglish
-                            ? $"{added} games imported. Add them to My list from their cards."
-                            : $"{added} juegos importados. Añádelos a Mi lista desde su ficha."
-                    )
+                    I18n.IsEnglish
+                        ? $"{added} games imported. Add them to My list from their cards."
+                        : $"{added} juegos importados. Añádelos a Mi lista desde su ficha."
                 );
                 if (Games.All(g => !g.Tracked))
                     allLibrary = true;
             }
-            var selected = single is null
-                ? Games
-                    .Where(g => g.Tracked && g.SteamAppId.HasValue)
-                    .OrderBy(g => g.SyncedAt ?? DateTimeOffset.MinValue)
-                    .Take(20)
-                    .ToList()
-                : new List<Game> { single };
-            foreach (var game in selected)
-            {
-                if (game.SteamAppId is not int appId)
-                    continue;
-                try
+            var selected = Games
+                .Where(g => g.Tracked && g.SteamAppId.HasValue)
+                .OrderBy(g => g.SyncedAt ?? DateTimeOffset.MinValue)
+                .Take(20)
+                .ToArray();
+            await AchievementReviewQueue.Run(
+                selected,
+                async (game, token) =>
                 {
-                    var result = await Steam.Achievements(
-                        Preferences.ServiceUrl,
-                        appId,
-                        shutdown.Token
-                    );
-                    game.Achievements = result.Achievements.ToList();
-                    game.SyncedAt = DateTimeOffset.UtcNow;
-                }
-                catch (InvalidOperationException ex)
-                {
-                    errors.Add(game.Title + ": " + I18n.Error(ex));
-                }
-            }
-            Persist();
-            if (errors.Count > 0)
-                Notice(errors[0]);
-            else if (selected.Count > 0)
+                    if (Steam.Session != session)
+                        throw new OperationCanceledException(token);
+                    var result = await UpdateGameAchievements(game.Id, true, false, token);
+                    if (result.Errors.Count > 0)
+                        firstError ??= game.Title + ": " + I18n.Error(result.Errors[0]);
+                    if (result.BlockingError is { } blocking)
+                        throw blocking;
+                },
+                shutdown.Token
+            );
+            if (firstError is not null)
+                Notice(firstError);
+            else if (selected.Length > 0)
                 Notice(I18n.T("Última sincronización: ") + DateTime.Now.ToString("HH:mm") + ".");
         }
         catch (OperationCanceledException)
         {
-            if (!shutdown.IsCancellationRequested)
+            if (!shutdown.IsCancellationRequested && Steam.Session == session)
                 Notice(I18n.T("Se agotó el tiempo. Se conserva el progreso anterior."));
         }
-        catch (Exception ex)
-            when (ex
+        catch (Exception error)
+            when (error
                     is System.Net.Http.HttpRequestException
                         or InvalidOperationException
                         or ArgumentException
                         or IOException
+                        or System.Text.Json.JsonException
             )
         {
-            Notice(I18n.Error(ex));
+            if (!shutdown.IsCancellationRequested)
+                Notice(firstError ?? I18n.Error(error));
         }
         finally
         {
             syncing = false;
             if (!shutdown.IsCancellationRequested)
+            {
+                SchedulePublications();
                 Refresh();
+            }
         }
     }
 

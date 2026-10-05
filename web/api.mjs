@@ -3,10 +3,19 @@
 
 import { account, friendCode } from './model.mjs';
 export class RemoteError extends Error {
-  constructor(code, detail = '') {
+  constructor(code, detail = '', status = 0) {
     super(code);
     this.code = code;
     this.detail = typeof detail === 'string' && detail.length < 300 ? detail : '';
+    this.status = status;
+    this.stopsBatch =
+      ['steam-unauthorized', 'rate', 'offline', 'timeout'].includes(code) ||
+      status === 503 ||
+      [
+        'Steam no responde. Se conserva tu último progreso.',
+        'Se ha alcanzado el límite diario. Inténtalo mañana.',
+        'Steam no permite consultar tu biblioteca. Revisa la visibilidad de Detalles de juegos en Steam.',
+      ].includes(this.detail);
   }
 }
 export class BrowserApi {
@@ -15,6 +24,8 @@ export class BrowserApi {
     this.fetch = fetchImpl;
     this.social = this.restore('checkpoint-social');
     this.steam = this.restore('checkpoint-steam');
+    this.steamRequests = new Map();
+    this.steamRetryAfter = 0;
   }
   restore(key) {
     try {
@@ -40,43 +51,91 @@ export class BrowserApi {
     if (!steam) headers.apikey = this.config.publishableKey;
     if (auth)
       headers.authorization = 'Bearer ' + (steam ? this.steam?.token : this.social?.access_token);
-    const response = await this.fetch(
-      this.config.url + (steam ? '/functions/v1/checkpoint-steam/' : '/') + path,
-      {
-        method,
-        headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        signal: signal
-          ? AbortSignal.any([signal, AbortSignal.timeout(35000)])
-          : AbortSignal.timeout(35000),
-      },
-    );
-    const text = await response.text();
-    let data;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      throw new RemoteError('remote');
+    for (let attempt = 0; ; attempt++) {
+      signal?.throwIfAborted();
+      if (steam && auth && Date.now() < this.steamRetryAfter)
+        throw new RemoteError('rate', '', 429);
+      const timeout = AbortSignal.timeout(35000);
+      try {
+        const response = await this.fetch(
+          this.config.url + (steam ? '/functions/v1/checkpoint-steam/' : '/') + path,
+          {
+            method,
+            headers,
+            body: body === undefined ? undefined : JSON.stringify(body),
+            credentials: 'omit',
+            referrerPolicy: 'no-referrer',
+            signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+          },
+        );
+        if (steam && method === 'GET' && attempt === 0 && [502, 504].includes(response.status)) {
+          await response.body?.cancel();
+          await this.retryDelay(signal);
+          continue;
+        }
+        const text = await response.text();
+        let data;
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          throw new RemoteError('remote');
+        }
+        if (!response.ok) {
+          if (steam && response.status === 429) {
+            const header = response.headers.get('retry-after'),
+              seconds =
+                header && /^\d+$/.test(header)
+                  ? Number(header)
+                  : header
+                    ? (Date.parse(header) - Date.now()) / 1000
+                    : 60;
+            this.steamRetryAfter =
+              Date.now() +
+              Math.max(1, Math.min(300, Number.isFinite(seconds) ? seconds : 60)) * 1000;
+          }
+          throw new RemoteError(
+            data?.code ||
+              data?.error_code ||
+              (response.status === 401
+                ? steam
+                  ? 'steam-unauthorized'
+                  : 'unauthorized'
+                : response.status === 403
+                  ? 'forbidden'
+                  : response.status === 429
+                    ? 'rate'
+                    : 'remote'),
+            steam ? data?.error : '',
+            response.status,
+          );
+        }
+        return data;
+      } catch (error) {
+        if (signal?.aborted) throw signal.reason;
+        if (error instanceof RemoteError) throw error;
+        if (steam && method === 'GET' && attempt === 0) {
+          await this.retryDelay(signal);
+          continue;
+        }
+        throw new RemoteError(timeout.aborted ? 'timeout' : 'offline');
+      }
     }
-    if (!response.ok)
-      throw new RemoteError(
-        data?.code ||
-          data?.error_code ||
-          (response.status === 401
-            ? steam
-              ? 'steam-unauthorized'
-              : 'unauthorized'
-            : response.status === 403
-              ? 'forbidden'
-              : response.status === 429
-                ? 'rate'
-                : 'remote'),
-        steam ? data?.error : '',
-      );
-    return data;
   }
+  retryDelay(signal) {
+    return new Promise((resolve, reject) => {
+      signal?.throwIfAborted();
+      const abort = () => {
+        clearTimeout(timer);
+        reject(signal.reason);
+      };
+      const timer = setTimeout(() => {
+        signal?.removeEventListener('abort', abort);
+        resolve();
+      }, 500);
+      signal?.addEventListener('abort', abort, { once: true });
+    });
+  }
+
   accept(data) {
     if (
       !data?.access_token ||
@@ -306,8 +365,39 @@ export class BrowserApi {
     return new Blob(parts, { type: response.headers.get('content-type') });
   }
   steamRequest(path, body, auth = true, signal) {
-    return this.request(path, body, { steam: true, auth, signal });
+    if (body !== undefined) return this.request(path, body, { steam: true, auth, signal });
+    signal?.throwIfAborted();
+    const session = this.steam,
+      key = (session?.token || '') + '|' + auth + '|' + path;
+    let entry = this.steamRequests.get(key);
+    if (!entry) {
+      const controller = new AbortController();
+      entry = { controller, readers: 0 };
+      entry.task = this.request(path, undefined, { steam: true, auth, signal: controller.signal });
+      this.steamRequests.set(key, entry);
+    }
+    entry.readers++;
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = (fn, value) => {
+        if (settled) return;
+        settled = true;
+        signal?.removeEventListener('abort', abort);
+        if (--entry.readers === 0) {
+          if (this.steamRequests.get(key) === entry) this.steamRequests.delete(key);
+          entry.controller.abort();
+        }
+        fn(value);
+      };
+      const abort = () => finish(reject, signal.reason);
+      signal?.addEventListener('abort', abort, { once: true });
+      entry.task.then(
+        (value) => finish(resolve, value),
+        (error) => finish(reject, error),
+      );
+    });
   }
+
   async unlink() {
     try {
       if (this.steam) await this.steamRequest('v1/auth/logout', {});

@@ -32,7 +32,10 @@ const server = http.createServer(async (req, res) => {
   }
 });
 await new Promise((resolve) => server.listen(4174, '127.0.0.1', resolve));
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({
+  headless: true,
+  channel: process.env.CHECKPOINT_BROWSER_CHANNEL || undefined,
+});
 const context = await browser.newContext({
   viewport: { width: 1280, height: 1000 },
   serviceWorkers: 'block',

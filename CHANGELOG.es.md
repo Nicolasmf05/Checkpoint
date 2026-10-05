@@ -2,6 +2,13 @@
 
 # Historial de cambios
 
+## 0.8.27
+
+- La actualización individual, automática y el repaso comparten la aplicación de resultados. Las consultas simultáneas del mismo juego comparten una petición; actualizar un juego durante otro repaso ya no se ignora. El límite de un minuto se aplica solo a actualizaciones automáticas correctas.
+- Consultas con concurrencia limitada, un único reintento para fallos temporales y cancelación de peticiones pendientes ante sesión caducada, límites o fallos generales. Los errores de privacidad de un juego no detienen los demás.
+- Validación de respuestas antes de sustituir logros, protección frente a cambios de cuenta o juego durante una consulta y conservación de objetivos manuales, notas, privacidad y progreso parcial.
+- La web guarda resultados por lotes y cada dos segundos, con guardado final al terminar o detenerse. Supabase comparte consultas simultáneas, conserva el progreso durante un minuto y evita guardar definiciones inválidas.
+
 ## 0.8.26
 
 - Las fichas de juegos integran el diseño de Figma en Windows y en la web, con carátula, tiempo jugado, privacidad, progreso de logros, sincronización, listas y datos del juego. Las tareas y notas se guardan automáticamente.

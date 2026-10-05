@@ -6,7 +6,20 @@ El código de 0.6 incluye una función de Supabase sin dependencias externas. No
 
 ## Sincronización automática en la aplicación
 
-Con Steam vinculado, Checkpoint consulta la biblioteca y las horas jugadas cada vez que se inicia y cada 30 minutos por defecto. En Ajustes puedes elegir 15, 30, 60 o 120 minutos. No hace falta pulsar Actualizar. Los nuevos juegos aparecen en Biblioteca; añadirlos a Mi lista sigue siendo una decisión manual. Se actualizan los logros de hasta 20 juegos seguidos por ciclo, empezando por los menos recientes. Los estados, notas y progreso de historia manual no se sobrescriben. Sin conexión se conserva lo guardado y se vuelve a intentar en el siguiente ciclo. No se ejecutan dos sincronizaciones a la vez.
+Con Steam vinculado, Checkpoint consulta la biblioteca y las horas jugadas cada vez que se inicia y cada 30 minutos por defecto. En Ajustes puedes elegir 15, 30, 60 o 120 minutos. No hace falta pulsar Actualizar. Los nuevos juegos aparecen en Biblioteca; añadirlos a Mi lista sigue siendo una decisión manual. Se actualizan los logros de hasta 20 juegos de Mi lista por ciclo, empezando por los menos recientes. Los estados, notas y progreso de historia manual no se sobrescriben. Sin conexión se conserva lo guardado y se vuelve a intentar en el siguiente ciclo. Los ciclos automáticos no se solapan; una actualización individual puede compartir una consulta activa del repaso.
+
+## Gestión de consultas y errores
+
+Desde 0.8.27, el repaso y las actualizaciones automáticas usan hasta tres consultas simultáneas, separadas por 750 ms. Las consultas activas del mismo juego, cuenta e idioma se comparten. Cada lectura admite un reintento de red, tiempo agotado o HTTP 502/504; las operaciones de vinculación y los errores de autenticación o límites no se reintentan. Cancelar un consumidor no interrumpe a otro que siga usando la misma petición.
+
+Los errores generales detienen las solicitudes pendientes; un error aislado permite continuar. Una respuesta incompleta o con identificadores duplicados no sustituye el progreso. Los cambios de cuenta, juegos eliminados o identificadores editados mientras se consulta no reciben resultados antiguos. Notas, logros manuales, marcas personales y privacidad se conservan. El guardado web se agrupa en lotes de ocho cambios o dos segundos y se vacía al finalizar o detenerse; Windows guarda cada juego existente por separado.
+
+- **Sesión caducada:** vuelve a vincular Steam; iniciar sesión en Checkpoint no renueva la sesión de Steam.
+- **Privacidad:** comprueba la visibilidad de Detalles de juegos de la cuenta vinculada. Un perfil público no basta.
+- **Sin respuesta o límite:** conserva el progreso y vuelve a intentar más tarde. No hace falta eliminar juegos ni logros manuales.
+- **Datos no válidos:** no se cambia el progreso ni la fecha de sincronización; vuelve a intentar cuando Steam responda correctamente.
+
+La caché de progreso del servicio alojado dura un minuto; pulsar Actualizar durante ese minuto puede devolver la misma información. Las definiciones válidas se reutilizan durante 24 horas y los errores no se guardan como respuestas correctas. La deduplicación del servidor se limita a cada proceso Edge, sin coordinar procesos diferentes.
 
 ## Despliegue en Supabase
 
@@ -17,7 +30,7 @@ Con Steam vinculado, Checkpoint consulta la biblioteca y las horas jugadas cada 
 5. Comprueba que `/health` indica `steamConfigured: true`. Pulsa Vincular Steam en la app y termina tú el acceso en Steam. Si Steam deniega acceso, revisa Detalles de juegos.
 6. El endpoint predeterminado es `https://fumdnvvvoiwoiziwtmsu.supabase.co/functions/v1/checkpoint-steam/`. Para distribuir un fork, configura tu propio proyecto y servicio.
 
-Vinculaciones, hashes de sesiones/respuestas, límites y caché persisten en un esquema privado, accesible solo por RPC privilegiada. El sondeo consume la vinculación y crea una sesión en una transacción; si se pierde su respuesta correcta, hay que volver a vincular. Vinculaciones: 10 minutos; sesiones: siete días; registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y limpia su caché de juegos. Biblioteca/logros: 15 minutos; definiciones por idioma: 24 horas. Límites compartidos: 30 vinculaciones/minuto, 2.000 peticiones/minuto, 90 peticiones/sesión/minuto y 90.000 consultas Steam/día. No se confía en cabeceras IP del cliente. Revisa capacidad antes de distribución amplia. Registros/copias siguen la retención de Supabase. El callback muestra texto bilingüe porque Supabase convierte HTML a texto.
+Vinculaciones, hashes de sesiones/respuestas, límites y caché persisten en un esquema privado, accesible solo por RPC privilegiada. El sondeo consume la vinculación y crea una sesión en una transacción; si se pierde su respuesta correcta, hay que volver a vincular. Vinculaciones: 10 minutos; sesiones: siete días; registros caducados se eliminan en consultas posteriores. Desvincular revoca la sesión y limpia su caché de juegos. Biblioteca: 15 minutos; progreso de logros: un minuto; definiciones por idioma: 24 horas. Límites compartidos: 30 vinculaciones/minuto, 2.000 peticiones/minuto, 90 peticiones/sesión/minuto y 90.000 consultas Steam/día. No se confía en cabeceras IP del cliente. Revisa capacidad antes de distribución amplia. Registros/copias siguen la retención de Supabase. El callback muestra texto bilingüe porque Supabase convierte HTML a texto.
 
 Pruebas simuladas: `node --test supabase/tests/steam.test.mjs`. La prueba con Steam real requiere configurar el secreto y completar personalmente el inicio de sesión.
 
@@ -63,6 +76,6 @@ La cuenta del operador puede tener restricciones para registrar claves. Las cond
 
 El servicio solicita licencias familiares junto a los juegos propios y combina los juegos jugados recientemente como fuente complementaria. Los AppID duplicados conservan el mayor tiempo total comunicado. Solo se importan los juegos que Steam expone para el perfil visible del usuario vinculado; no es una enumeración completa de juegos familiares todavía sin jugar. No se importan credenciales ni progreso de otros familiares.
 
-Los logros se solicitan para el SteamID vinculado, también en juegos prestados presentes en la biblioteca visible combinada. Los perfiles privados siguen restringidos. Si falla la consulta de recientes, se conserva la biblioteca propia. La caché dura 15 minutos. El servicio alojado reemplaza automáticamente las cachés antiguas de juegos propios; pulsa Actualizar en el widget y abre Biblioteca. Las versiones actuales del escritorio funcionan sin reinstalar.
+Los logros se solicitan para el SteamID vinculado, también en juegos prestados presentes en la biblioteca visible combinada. Los perfiles privados siguen restringidos. Si falla la consulta de recientes, se conserva la biblioteca propia. La caché alojada de biblioteca dura 15 minutos; el progreso de logros, un minuto. El servicio alojado reemplaza automáticamente las cachés antiguas de juegos propios; pulsa Actualizar en el widget y abre Biblioteca. Las versiones actuales del escritorio funcionan sin reinstalar.
 
 El parámetro `include_family_licenses` se utiliza como indicación de compatibilidad; Valve puede ignorarlo o limitar los datos devueltos. La consulta de recientes está documentada por [Valve](https://partner.steamgames.com/doc/webapi/IPlayerService). Sigue pendiente validar una cuenta familiar real; las pruebas HTTP simuladas no demuestran que todos los juegos compartidos sean accesibles para cualquier perfil.

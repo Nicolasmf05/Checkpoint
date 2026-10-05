@@ -242,6 +242,89 @@ public partial class MainWindow
             malformed && client.Session?.Token == token,
             "Malformed Steam sessions preserve the existing session"
         );
+        int attempts = 0;
+        string retryFolder = Path.Combine(output, "steam-retry-fixture");
+        Directory.CreateDirectory(retryFolder);
+        using (
+            var retryClient = new SteamClient(
+                retryFolder,
+                new NativeSteamHandler(_ =>
+                    ++attempts == 1
+                        ? new HttpResponseMessage(HttpStatusCode.BadGateway)
+                        {
+                            Content = new StringContent("{}"),
+                        }
+                        : SteamResponse(new { achievements = Array.Empty<Achievement>() })
+                )
+            )
+        )
+        {
+            retryClient.SaveSession(endpoint, new LoginResult("complete", token, steamId));
+            var result = await retryClient.Achievements(endpoint, 620, CancellationToken.None);
+            check(
+                attempts == 2 && result.Achievements.Length == 0,
+                "Steam retries a transient read once and accepts a known empty achievement list"
+            );
+        }
+        attempts = 0;
+        using (
+            var limitedClient = new SteamClient(
+                retryFolder,
+                new NativeSteamHandler(_ =>
+                {
+                    attempts++;
+                    var response = new HttpResponseMessage(HttpStatusCode.TooManyRequests)
+                    {
+                        Content = new StringContent("{}"),
+                    };
+                    response.Headers.RetryAfter =
+                        new System.Net.Http.Headers.RetryConditionHeaderValue(
+                            TimeSpan.FromSeconds(60)
+                        );
+                    return response;
+                })
+            )
+        )
+        {
+            for (int id = 1; id <= 2; id++)
+            {
+                bool blocked = false;
+                try
+                {
+                    await limitedClient.Achievements(endpoint, id, CancellationToken.None);
+                }
+                catch (AchievementServiceException error)
+                {
+                    blocked = error.StopsBatch && error.Status == HttpStatusCode.TooManyRequests;
+                }
+                check(blocked, "Steam rate failures stop a batch and retain a typed reason");
+            }
+            check(
+                attempts == 1,
+                "Steam cooldown prevents subsequent games from sending more requests"
+            );
+        }
+        using (
+            var malformedClient = new SteamClient(
+                retryFolder,
+                new NativeSteamHandler(_ => SteamResponse(new { ok = true }))
+            )
+        )
+        {
+            bool rejected = false;
+            try
+            {
+                await malformedClient.Achievements(endpoint, 620, CancellationToken.None);
+            }
+            catch (InvalidDataException)
+            {
+                rejected = true;
+            }
+            check(
+                rejected,
+                "Steam rejects missing achievement payloads instead of clearing existing progress"
+            );
+        }
         await client.Disconnect();
         check(
             client.Session is null && !File.Exists(Path.Combine(folder, "steam-session.dat")),

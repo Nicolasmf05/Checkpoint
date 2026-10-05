@@ -2,6 +2,13 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.27
+
+- Individual, automatic and full achievement updates share result application. Concurrent reads of the same game share one request; individual updates no longer disappear during another review. The one-minute throttle applies only to successful automatic refreshes.
+- Bounded concurrency, one retry for transient read failures and cancellation of pending requests on expired sessions, rate limits or service-wide failures. Per-game privacy failures do not stop other games.
+- Responses are validated before replacing achievements; account or game changes during requests cannot overwrite current data. Manual goals, notes, privacy and partial progress are retained.
+- The web saves results in batches and every two seconds, flushing on completion or cancellation. Supabase coalesces concurrent reads, caches progress for one minute and does not cache invalid definitions.
+
 ## 0.8.26
 
 - Game details now follow the Figma design on Windows and the web, including cover art, playtime, privacy, achievement progress, synchronization, lists and game metadata. Tasks and notes save automatically.

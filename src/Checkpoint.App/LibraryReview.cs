@@ -445,96 +445,18 @@ public partial class MainWindow
                         Refresh();
                         return;
                     }
-                    var steamId = current.SteamAppId;
-                    var retroId = current.RetroGameId;
-                    if (
-                        steamId is int appId
-                        && steamSession is not null
-                        && Steam.Session == steamSession
-                    )
-                    {
-                        try
-                        {
-                            var result = await Steam.Achievements(
-                                Preferences.ServiceUrl,
-                                appId,
-                                token
-                            );
-                            token.ThrowIfCancellationRequested();
-                            var target = Games.FirstOrDefault(g => g.Id == game.Id);
-                            if (
-                                Steam.Session == steamSession
-                                && target is not null
-                                && target.SteamAppId == steamId
-                            )
-                            {
-                                target.Achievements = result.Achievements.ToList();
-                                target.SyncedAt = DateTimeOffset.UtcNow;
-                                Store.SaveExistingGame(target);
-                            }
-                        }
-                        catch (OperationCanceledException error)
-                            when (!token.IsCancellationRequested)
-                        {
-                            failed = true;
-                            RecordError(current, error);
-                        }
-                        catch (Exception error)
-                            when (error
-                                    is not OutOfMemoryException
-                                        and not OperationCanceledException
-                            )
-                        {
-                            failed = true;
-                            RecordError(current, error);
-                        }
-                    }
-                    if (
-                        retroId is int id
-                        && retroSession is not null
-                        && Retro.Session == retroSession
-                    )
-                    {
-                        try
-                        {
-                            var result = await Retro.Achievements(id, token);
-                            token.ThrowIfCancellationRequested();
-                            GameRules.Validate(
-                                new Game { Title = game.Title, RetroAchievements = result }
-                            );
-                            var target = Games.FirstOrDefault(g => g.Id == game.Id);
-                            if (
-                                Retro.Session == retroSession
-                                && target is not null
-                                && target.RetroGameId == retroId
-                            )
-                            {
-                                target.RetroAchievements = result;
-                                Store.SaveExistingGame(target);
-                            }
-                        }
-                        catch (OperationCanceledException error)
-                            when (!token.IsCancellationRequested)
-                        {
-                            failed = true;
-                            RecordError(current, error);
-                        }
-                        catch (Exception error)
-                            when (error
-                                    is not OutOfMemoryException
-                                        and not OperationCanceledException
-                            )
-                        {
-                            failed = true;
-                            RecordError(current, error);
-                        }
-                    }
+                    var result = await UpdateGameAchievements(current.Id, true, true, token);
+                    failed = result.Errors.Count > 0;
+                    foreach (var error in result.Errors)
+                        RecordError(current, error);
                     if (failed)
                         achievementReviewErrors++;
                     achievementReviewDone++;
                     if (achievementReviewDone % 10 == 0)
                         SchedulePublications();
                     Refresh();
+                    if (result.BlockingError is { } blocking)
+                        throw blocking;
                 },
                 cancellation.Token
             );

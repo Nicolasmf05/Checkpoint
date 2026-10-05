@@ -26,9 +26,21 @@ public sealed record AchievementsResult(Achievement[] Achievements);
 
 public sealed record SavedSession(string ServiceUrl, string Token, string SteamId);
 
+public sealed class AchievementServiceException(
+    string message,
+    HttpStatusCode status,
+    bool stopsBatch
+) : InvalidOperationException(message)
+{
+    public HttpStatusCode Status { get; } = status;
+    public bool StopsBatch { get; } = stopsBatch;
+}
+
 public sealed class SteamClient : IDisposable
 {
     private readonly HttpClient http;
+    private readonly AchievementRequests<AchievementsResult> achievementRequests = new();
+    private DateTimeOffset retryAfter;
     private readonly string tokenFile;
     public SavedSession? Session { get; private set; }
 
@@ -97,62 +109,137 @@ public sealed class SteamClient : IDisposable
         CancellationToken cancellation = default
     )
     {
-        using var request = new HttpRequestMessage(
-            body is null ? HttpMethod.Get : HttpMethod.Post,
-            new Uri(ValidateServiceUrl(service), path)
-        );
-        if (authenticated)
-        {
-            if (
-                Session is null
+        var address = ValidateServiceUrl(service);
+        var session = Session;
+        if (
+            authenticated
+            && (
+                session is null
                 || !string.Equals(
-                    Session.ServiceUrl,
-                    ValidateServiceUrl(service).AbsoluteUri,
+                    session.ServiceUrl,
+                    address.AbsoluteUri,
                     StringComparison.OrdinalIgnoreCase
                 )
             )
-                throw new InvalidOperationException(
-                    I18n.T("Vincula Steam con este servicio antes de sincronizar.")
-                );
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Session.Token);
-        }
-        if (body is not null)
-            request.Content = JsonContent.Create(body);
-        using var response = await http.SendAsync(request, cancellation);
-        if (!response.IsSuccessStatusCode)
+        )
+            throw new InvalidOperationException(
+                I18n.T("Vincula Steam con este servicio antes de sincronizar.")
+            );
+        for (int attempt = 0; ; attempt++)
         {
-            string message = response.StatusCode switch
-            {
-                HttpStatusCode.Unauthorized => I18n.T(
-                    "La sesión ha caducado. Vuelve a vincular Steam."
-                ),
-                HttpStatusCode.TooManyRequests => I18n.T(
-                    "Demasiadas consultas. Espera un minuto y vuelve a intentarlo."
-                ),
-                HttpStatusCode.ServiceUnavailable => I18n.T(
-                    "El servicio de Steam todavía no está configurado o no está disponible."
-                ),
-                _ => I18n.T("No se pudo consultar Steam. Se conserva el último progreso guardado."),
-            };
+            cancellation.ThrowIfCancellationRequested();
+            if (authenticated && DateTimeOffset.UtcNow < retryAfter)
+                throw new AchievementServiceException(
+                    I18n.T("Demasiadas consultas. Espera un minuto y vuelve a intentarlo."),
+                    HttpStatusCode.TooManyRequests,
+                    true
+                );
+            using var request = new HttpRequestMessage(
+                body is null ? HttpMethod.Get : HttpMethod.Post,
+                new Uri(address, path)
+            );
+            if (authenticated)
+                request.Headers.Authorization = new AuthenticationHeaderValue(
+                    "Bearer",
+                    session!.Token
+                );
+            if (body is not null)
+                request.Content = JsonContent.Create(body);
             try
             {
-                using var error = JsonDocument.Parse(
-                    await response.Content.ReadAsStringAsync(cancellation)
-                );
-                if (
-                    error.RootElement.TryGetProperty("error", out var field)
-                    && field.GetString() is { Length: > 0 and < 300 } detail
-                )
+                using var response = await http.SendAsync(request, cancellation);
+                if (!response.IsSuccessStatusCode)
                 {
-                    if (I18n.TryTranslateKnown(detail, out var localized))
-                        message = localized;
+                    // Only idempotent reads get one bounded retry; authentication and rate failures never retry.
+                    if (
+                        body is null
+                        && attempt == 0
+                        && response.StatusCode
+                            is HttpStatusCode.BadGateway
+                                or HttpStatusCode.GatewayTimeout
+                    )
+                    {
+                        await Task.Delay(500, cancellation);
+                        continue;
+                    }
+                    string message = response.StatusCode switch
+                    {
+                        HttpStatusCode.Unauthorized => I18n.T(
+                            "La sesión ha caducado. Vuelve a vincular Steam."
+                        ),
+                        HttpStatusCode.TooManyRequests => I18n.T(
+                            "Demasiadas consultas. Espera un minuto y vuelve a intentarlo."
+                        ),
+                        HttpStatusCode.ServiceUnavailable => I18n.T(
+                            "El servicio de Steam todavía no está configurado o no está disponible."
+                        ),
+                        _ => I18n.T(
+                            "No se pudo consultar Steam. Se conserva el último progreso guardado."
+                        ),
+                    };
+                    bool global =
+                        response.StatusCode
+                        is HttpStatusCode.Unauthorized
+                            or HttpStatusCode.TooManyRequests
+                            or HttpStatusCode.ServiceUnavailable;
+                    try
+                    {
+                        using var error = JsonDocument.Parse(
+                            await response.Content.ReadAsStringAsync(cancellation)
+                        );
+                        if (
+                            error.RootElement.ValueKind == JsonValueKind.Object
+                            && error.RootElement.TryGetProperty("error", out var field)
+                            && field.ValueKind == JsonValueKind.String
+                            && field.GetString() is { Length: > 0 and < 300 } detail
+                            && I18n.TryTranslateKnown(detail, out var localized)
+                        )
+                        {
+                            message = localized;
+                            global |=
+                                detail
+                                    is "Steam no permite consultar tu biblioteca. Revisa la visibilidad de Detalles de juegos en Steam."
+                                        or "Steam no responde. Se conserva tu último progreso."
+                                        or "Se ha alcanzado el límite diario. Inténtalo mañana.";
+                        }
+                    }
+                    catch (JsonException) { }
+                    if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    {
+                        var delay =
+                            response.Headers.RetryAfter?.Delta
+                            ?? (response.Headers.RetryAfter?.Date - DateTimeOffset.UtcNow)
+                            ?? TimeSpan.FromMinutes(1);
+                        retryAfter = DateTimeOffset.UtcNow.AddSeconds(
+                            Math.Clamp(delay.TotalSeconds, 1, 300)
+                        );
+                    }
+                    throw new AchievementServiceException(message, response.StatusCode, global);
                 }
+                return await response.Content.ReadFromJsonAsync<T>(DataJson.Options, cancellation)
+                    ?? throw new InvalidDataException(I18n.T("Respuesta vacía del servicio."));
             }
-            catch (JsonException) { }
-            throw new InvalidOperationException(message);
+            catch (Exception error)
+                when (error is HttpRequestException
+                    || error is OperationCanceledException && !cancellation.IsCancellationRequested
+                )
+            {
+                if (body is null && attempt == 0)
+                {
+                    await Task.Delay(500, cancellation);
+                    continue;
+                }
+                throw new AchievementServiceException(
+                    I18n.T(
+                        error is HttpRequestException
+                            ? "Sin conexión. Puedes seguir usando tu biblioteca local."
+                            : "Se agotó el tiempo. Se conserva el progreso anterior."
+                    ),
+                    HttpStatusCode.GatewayTimeout,
+                    true
+                );
+            }
         }
-        return await response.Content.ReadFromJsonAsync<T>(DataJson.Options, cancellation)
-            ?? throw new InvalidDataException(I18n.T("Respuesta vacía del servicio."));
     }
 
     public Task<LoginStart> BeginLogin(string service, CancellationToken cancellation) =>
@@ -198,6 +285,7 @@ public sealed class SteamClient : IDisposable
             File.WriteAllBytes(temporary, protectedBytes);
             File.Move(temporary, tokenFile, true);
             Session = session;
+            retryAfter = default;
         }
         finally
         {
@@ -213,12 +301,28 @@ public sealed class SteamClient : IDisposable
         string service,
         int appId,
         CancellationToken cancellation
-    ) =>
-        Request<AchievementsResult>(
-            service,
-            $"v1/games/{appId}/achievements?lang={(I18n.IsEnglish ? "en" : "es")}",
-            cancellation: cancellation
+    )
+    {
+        if (appId <= 0)
+            throw new ArgumentException(
+                I18n.T("El identificador de Steam debe ser un número positivo.")
+            );
+        var session = Session;
+        string path = $"v1/games/{appId}/achievements?lang={(I18n.IsEnglish ? "en" : "es")}";
+        return achievementRequests.Run(
+            service + "|" + session?.Token + "|" + path,
+            async token =>
+            {
+                // The session cannot change while waiting for a concurrency slot.
+                if (Session != session)
+                    throw new OperationCanceledException(token);
+                var result = await Request<AchievementsResult>(service, path, cancellation: token);
+                AchievementData.Validate(result.Achievements);
+                return result;
+            },
+            cancellation
         );
+    }
 
     public async Task Disconnect()
     {

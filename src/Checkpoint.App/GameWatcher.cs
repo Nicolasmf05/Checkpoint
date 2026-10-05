@@ -211,7 +211,7 @@ public partial class MainWindow
         window.Closed += (_, _) => achievementWindows.Remove(game.Id);
     }
 
-    private readonly System.Collections.Generic.HashSet<Guid> refreshingAchievements = [];
+    private readonly System.Collections.Generic.Dictionary<Guid, Task> refreshingAchievements = [];
     private readonly System.Collections.Generic.Dictionary<
         Guid,
         DateTimeOffset
@@ -219,52 +219,45 @@ public partial class MainWindow
 
     internal void ResetAchievementRefresh() => achievementRefreshTimes.Clear();
 
-    internal async Task RefreshGameAchievements(Game game)
+    internal Task RefreshGameAchievements(Game game, bool automatic = false)
     {
-        if (shutdown.IsCancellationRequested || !refreshingAchievements.Add(game.Id))
-            return;
-        try
+        if (shutdown.IsCancellationRequested)
+            return Task.CompletedTask;
+        if (refreshingAchievements.TryGetValue(game.Id, out var pending))
+            return pending;
+        if (
+            automatic
+            && achievementRefreshTimes.TryGetValue(game.Id, out var last)
+            && DateTimeOffset.UtcNow - last < TimeSpan.FromSeconds(60)
+        )
+            return Task.CompletedTask;
+        var task = RefreshSingle();
+        refreshingAchievements[game.Id] = task;
+        return task;
+
+        async Task RefreshSingle()
         {
-            if (
-                achievementRefreshTimes.TryGetValue(game.Id, out var last)
-                && DateTimeOffset.UtcNow - last < TimeSpan.FromSeconds(60)
-            )
-                return;
-            achievementRefreshTimes[game.Id] = DateTimeOffset.UtcNow;
-            if (game.SteamAppId.HasValue && Steam.Session is not null)
-                await Sync(false, game);
-            if (game.RetroGameId is int id && Retro.Session is { } retroSession)
+            // Let the caller register the task before a synchronous fixture can complete it.
+            await Task.Yield();
+            try
             {
-                try
+                var result = await UpdateGameAchievements(game.Id, true, true, shutdown.Token);
+                if (result.Errors.Count == 0 && result.Changed)
+                    achievementRefreshTimes[game.Id] = DateTimeOffset.UtcNow;
+                if (!shutdown.IsCancellationRequested)
                 {
-                    var result = await Retro.Achievements(id, shutdown.Token);
-                    if (shutdown.IsCancellationRequested || Retro.Session != retroSession)
-                        return;
-                    var validation = new Game { Title = game.Title, RetroAchievements = result };
-                    GameRules.Validate(validation);
-                    var current = Games.FirstOrDefault(g => g.Id == game.Id);
-                    if (current is null || current.RetroGameId != id)
-                        return;
-                    current.RetroAchievements = result;
-                    Persist();
+                    if (result.Errors.Count > 0)
+                        Notice(I18n.Error(result.Errors[0]));
+                    if (result.Changed)
+                        SchedulePublications();
                     Refresh();
                 }
-                catch (Exception ex)
-                    when (ex
-                            is IOException
-                                or InvalidOperationException
-                                or OperationCanceledException
-                                or ArgumentException
-                    )
-                {
-                    if (!shutdown.IsCancellationRequested)
-                        Notice(I18n.Error(ex));
-                }
             }
-        }
-        finally
-        {
-            refreshingAchievements.Remove(game.Id);
+            catch (OperationCanceledException) when (shutdown.IsCancellationRequested) { }
+            finally
+            {
+                refreshingAchievements.Remove(game.Id);
+            }
         }
     }
 }

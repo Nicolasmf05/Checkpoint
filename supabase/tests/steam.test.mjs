@@ -489,3 +489,52 @@ test('hidden achievement descriptions fall back to player strings without changi
     'spanish',
   );
 });
+
+test('concurrent cache misses share library, definitions and progress requests', async () => {
+  const f = fixture(),
+    session = await f.login();
+  const results = await Promise.all(
+    Array.from({ length: 3 }, () => f.send('v1/games/620/achievements', undefined, session.token)),
+  );
+  assert.ok(results.every((r) => r.status === 200));
+  for (const method of ['GetOwnedGames', 'GetSchemaForGame', 'GetPlayerAchievements'])
+    assert.equal(f.calls.filter((c) => c.url.pathname.includes(method)).length, 1, method);
+});
+test('progress cache refreshes after one minute while definitions remain cached', async () => {
+  const options = { progress: [{ apiname: 'FIRST', achieved: 0 }] },
+    f = fixture(options),
+    session = await f.login();
+  const read = async () =>
+    (await (await f.send('v1/games/620/achievements', undefined, session.token)).json())
+      .achievements[0];
+  assert.equal((await read()).unlocked, false);
+  options.progress[0].achieved = 1;
+  f.advance(59000);
+  assert.equal((await read()).unlocked, false);
+  f.advance(2000);
+  assert.equal((await read()).unlocked, true);
+  assert.equal(f.calls.filter((c) => c.url.pathname.includes('GetSchemaForGame')).length, 1);
+  assert.equal(f.calls.filter((c) => c.url.pathname.includes('GetPlayerAchievements')).length, 2);
+});
+test('invalid definitions never become empty progress or poison the persistent schema cache', async () => {
+  const options = { definitions: {} },
+    f = fixture(options),
+    session = await f.login();
+  assert.equal((await f.send('v1/games/620/achievements', undefined, session.token)).status, 502);
+  assert.equal(
+    [...f.db.keys()].some((key) => key.startsWith('cache:schema:')),
+    false,
+  );
+  options.definitions = [{ name: 'FIRST', displayName: 'Recovered' }];
+  const response = await f.send('v1/games/620/achievements', undefined, session.token);
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).achievements[0].name, 'Recovered');
+});
+test('failed private progress is not cached and can recover immediately after privacy changes', async () => {
+  const options = { privateAchievements: true },
+    f = fixture(options),
+    session = await f.login();
+  assert.equal((await f.send('v1/games/620/achievements', undefined, session.token)).status, 403);
+  options.privateAchievements = false;
+  assert.equal((await f.send('v1/games/620/achievements', undefined, session.token)).status, 200);
+});

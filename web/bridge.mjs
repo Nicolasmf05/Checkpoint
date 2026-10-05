@@ -22,7 +22,12 @@ import {
 } from './model.mjs';
 import { BrowserStore } from './store.mjs';
 import { BrowserApi } from './api.mjs';
-import { reviewItems, runAchievementReview } from './review.mjs';
+import {
+  reviewItems,
+  runAchievementReview,
+  validateAchievements,
+  createAchievementSaver,
+} from './review.mjs';
 
 const [english, config] = await Promise.all(
   ['en.json', 'config.json'].map((path) =>
@@ -208,6 +213,9 @@ const errorText = (error) => {
     weak_password: 'Usa un nombre de 1 a 50 caracteres y una contraseña de al menos 8 caracteres.',
     unauthorized: 'La sesión no es válida. Vuelve a entrar en Checkpoint.',
     'steam-unauthorized': 'La sesión ha caducado. Vuelve a vincular Steam.',
+    offline: 'Sin conexión. Puedes seguir usando tu biblioteca local.',
+    timeout: 'Se agotó el tiempo. Se conserva el progreso anterior.',
+    'invalid-achievements': 'Los logros guardados no son válidos.',
     forbidden: 'No tienes permiso para consultar o cambiar estos datos.',
     rate: 'Demasiadas consultas. Espera antes de volver a intentarlo.',
     40001: 'El progreso cambió en otro equipo. Revisa el conflicto antes de publicar.',
@@ -787,11 +795,33 @@ function reviewStatus() {
     (r.firstError ? ' · ' + r.firstError.title + ': ' + errorText(r.firstError.error) : '')
   );
 }
+async function refreshSteamGame(id, session, signal) {
+  signal?.throwIfAborted();
+  if (api.steam !== session) throw new DOMException('Steam session changed', 'AbortError');
+  const target = game(id),
+    appId = target?.steamAppId;
+  if (!appId) return false;
+  const result = await api.steamRequest(
+    `v1/games/${appId}/achievements?lang=${data.settings.language}`,
+    undefined,
+    true,
+    signal,
+  );
+  signal?.throwIfAborted();
+  if (api.steam !== session) throw new DOMException('Steam session changed', 'AbortError');
+  const items = validateAchievements(result?.achievements),
+    current = game(id);
+  if (!current || current.steamAppId !== appId) return false;
+  current.achievements = items;
+  current.syncedAt = new Date().toISOString();
+  return true;
+}
 function startAchievementReview() {
   if (steamBusy || !api.steam) return;
   const ids = data.games.filter((g) => g.steamAppId).map((g) => g.id);
   if (!ids.length) return;
   const session = api.steam,
+    saver = createAchievementSaver(persist),
     r = {
       done: 0,
       total: ids.length,
@@ -810,42 +840,18 @@ function startAchievementReview() {
       await runAchievementReview(
         ids,
         async (id, signal) => {
-          if (api.steam !== session) {
-            r.controller.abort();
-            signal.throwIfAborted();
-          }
-          const target = game(id);
-          if (!target) {
+          const title = game(id)?.title || '';
+          try {
+            if (await refreshSteamGame(id, session, signal)) await saver.changed();
+          } catch (error) {
+            if (signal.aborted || error.name === 'AbortError') throw error;
+            r.errors++;
+            r.firstError ||= { title, error };
             r.done++;
             emit();
+            if (error.stopsBatch || storageConflict || error.message === 'local-conflict')
+              throw error;
             return;
-          }
-          const appId = target.steamAppId;
-          try {
-            const result = await api.steamRequest(
-              `v1/games/${appId}/achievements?lang=${data.settings.language}`,
-              undefined,
-              true,
-              signal,
-            );
-            signal.throwIfAborted();
-            if (api.steam !== session) {
-              r.controller.abort();
-              signal.throwIfAborted();
-            }
-            const current = game(id);
-            if (current && current.steamAppId === appId) {
-              current.achievements = normalize({
-                ...current,
-                achievements: result.achievements,
-              }).achievements;
-              current.syncedAt = new Date().toISOString();
-              await persist();
-            }
-          } catch (error) {
-            if (signal.aborted) throw error;
-            r.errors++;
-            r.firstError ||= { title: target.title, error };
           }
           r.done++;
           emit();
@@ -854,14 +860,21 @@ function startAchievementReview() {
       );
     } catch (error) {
       r.stopped = true;
-      if (!r.controller.signal.aborted) fail(error);
+      if (!r.controller.signal.aborted && error.name !== 'AbortError') fail(error);
     } finally {
+      try {
+        await saver.flush();
+      } catch (error) {
+        r.stopped = true;
+        fail(error);
+      }
       r.running = false;
       steamBusy = false;
       emit();
     }
   })();
 }
+
 function reviewAchievements(parent) {
   const ids = data.games
       .slice()
@@ -2324,41 +2337,42 @@ function shortcutSettings() {
   emit();
 }
 async function sync(single) {
-  if (steamBusy || !api.steam) return;
-  steamBusy = true;
+  if (!api.steam || (!single && steamBusy)) return;
+  const session = api.steam,
+    saver = createAchievementSaver(persist);
+  if (!single) steamBusy = true;
   if (navigation.current) navigation.current.error = '';
   emit();
+  let firstError = '';
   try {
-    if (!single) {
+    if (single) {
+      if (await refreshSteamGame(single, session)) await saver.changed();
+    } else {
       const library = await api.steamRequest('v1/library');
-      mergeLibrary(data.games, library.games || []);
+      if (api.steam !== session) return;
+      if (!Array.isArray(library?.games)) throw new RemoteError('remote');
+      mergeLibrary(data.games, library.games);
       if (!data.games.some((g) => g.tracked)) tab = 'library';
       await persist();
-    }
-    const selected = single
-      ? [game(single)].filter(Boolean)
-      : data.games
-          .filter((g) => g.tracked && g.steamAppId)
-          .sort((a, b) => (a.syncedAt || '').localeCompare(b.syncedAt || ''))
-          .slice(0, 20);
-    let firstError = '';
-    for (const current of selected) {
-      try {
-        const result = await api.steamRequest(
-          `v1/games/${current.steamAppId}/achievements?lang=${data.settings.language}`,
-        );
-        const target = game(current.id);
-        if (target) {
-          target.achievements = normalize({
-            ...target,
-            achievements: result.achievements,
-          }).achievements;
-          target.syncedAt = new Date().toISOString();
-          await persist();
-        }
-      } catch (error) {
-        firstError ||= current.title + ': ' + errorText(error);
-      }
+      const selected = data.games
+        .filter((g) => g.tracked && g.steamAppId)
+        .sort((a, b) => (a.syncedAt || '').localeCompare(b.syncedAt || ''))
+        .slice(0, 20);
+      await runAchievementReview(
+        selected.map((g) => g.id),
+        async (id, signal) => {
+          const title = game(id)?.title || '';
+          try {
+            if (await refreshSteamGame(id, session, signal)) await saver.changed();
+          } catch (error) {
+            if (signal.aborted || error.name === 'AbortError') throw error;
+            firstError ||= title + ': ' + errorText(error);
+            if (error.stopsBatch || storageConflict || error.message === 'local-conflict')
+              throw error;
+          }
+        },
+        new AbortController().signal,
+      );
     }
     notice = firstError
       ? T('Algunos logros no se pudieron actualizar. Se conserva el progreso anterior.') +
@@ -2367,12 +2381,18 @@ async function sync(single) {
       : T('Biblioteca y progreso de Steam actualizados.');
     if (firstError && navigation.current) navigation.current.error = notice;
   } catch (error) {
-    fail(error);
+    if (error.name !== 'AbortError') fail(error);
   } finally {
-    steamBusy = false;
+    try {
+      await saver.flush();
+    } catch (error) {
+      fail(error);
+    }
+    if (!single) steamBusy = false;
     emit();
   }
 }
+
 async function connectSteam() {
   const popup = window.open('about:blank', 'checkpoint-steam-login');
   const generation = ++loginGeneration;

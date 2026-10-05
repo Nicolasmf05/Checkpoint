@@ -32,6 +32,7 @@ void Reject(Action action, string name)
     }
     throw new Exception("FAILED: " + name);
 }
+await AchievementSyncTests.Run(Check);
 var reviewRelease = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 int reviewActive = 0,
     reviewPeak = 0,
