@@ -1,48 +1,141 @@
-// Selecciona el idioma de la página de presentación y recuerda la elección del visitante.
-
+// El idioma solo cambia la presentación y los enlaces. Nunca inicia la app ni una sesión.
 const english = {
+  skip: 'Skip to content',
+  navigation: 'Main navigation',
+  language: 'Language',
+  navLibrary: 'Library',
+  navProgress: 'Progress',
+  start: 'Get started',
+  menuOpen: 'Open menu',
+  menuClose: 'Close menu',
+  heroEyebrow: 'ONE GAME AT A TIME',
+  heroTitle: 'Less backlog.',
+  heroAccent: 'More play.',
   intro:
-    'A game list with cover art, goals and progress. Available in your browser and as a Windows app.',
+    'All your games. Your goals. Your next adventure.\nOne place to keep playing at your own pace.',
   open: 'Open Checkpoint',
   download: 'Download for Windows',
-  account:
-    'Your library works without an account. Sign in inside the app to connect with your Checkpoint friends.',
-  example: 'Example list',
-  game: 'Game',
-  state: 'Status',
-  achievements: 'Achievements',
+  account: 'Your library, without creating an account.',
+  libraryAlt:
+    'Checkpoint for Windows with a sample collection of Hollow Knight, Hades and Portal 2',
+  sample: 'Windows app · Sample collection',
+  libraryEyebrow: 'A PLACE FOR EVERY GAME',
+  libraryTitle: 'Your next adventure.',
+  libraryAccent: 'Always within reach.',
+  libraryText:
+    'From the game you have been meaning to start to that one last achievement. Organize your collection and decide what comes next.',
+  lists: 'A list for every moment.',
+  listsText:
+    'Create different lists. Keep track of what you are playing, what you have finished and what can wait.',
+  exampleStates: 'Example game statuses',
   playing: 'Playing',
   pending: 'Pending',
   finished: 'Story finished',
-  sample: 'Example data. Enter Checkpoint to open your own library.',
-  features: 'What you can do',
-  lists: 'Lists and progress',
-  listsText:
-    'Organize multiple lists, change game status and save notes, tasks and personal goals.',
+  goals: 'Your way forward.',
+  goalsText:
+    'Keep goals, tasks and notes in each game’s details. Return to your next session knowing exactly where you left off.',
+  goalsDetail: 'Story · Achievements · Personal goals',
+  views: 'Your collection, your way.',
+  viewsText:
+    'Cover art, a list or a grid. Choose how to browse your games and change your perspective whenever you like.',
+  viewsDetail: 'List · Compact · Grid',
+  progressEyebrow: 'EVERY SESSION COUNTS',
+  progressTitle: 'Small goals.',
+  progressAccent: 'Great stories.',
+  steamTitle: 'Your games already have a starting point.',
   steamText:
-    'Connect your account to import games and view achievements. Sync runs when the app opens and periodically.',
-  friends: 'Checkpoint friends',
+    'Link Steam to import your library and check your achievements. Checkpoint refreshes your progress when the app opens and periodically.',
+  steamNote: 'Your Steam game details must be public.',
+  friendsLabel: 'FRIENDS',
+  friends: 'Good games bring people together.',
   friendsText:
-    'Share progress with friends using your Checkpoint code. You can keep games private.',
-  windows: 'Windows app',
+    'Connect with friends using your Checkpoint code and share your progress. You choose which games to keep private.',
+  friendsNote: 'A Checkpoint account is optional for your library and required for friends.',
+  windowsEyebrow: 'CHECKPOINT FOR WINDOWS',
+  windowsTitle: 'On your desktop.',
+  windowsAccent: 'Part of your routine.',
   windowsText:
-    'Use a translucent window, Miniature mode and game detection to view pending achievements.',
-  data: 'Your browser data',
+    'A translucent window. A Miniature mode. Pending achievements when a game is detected. A companion that fits alongside your sessions.',
+  windowsDownload: 'Get Checkpoint for Windows',
+  requirements: 'Requirements and installation notes',
+  miniatureAlt: 'Checkpoint Miniature mode showing three games and their statuses',
+  miniatureCaption: 'Miniature mode · The essentials, close at hand.',
+  dataEyebrow: 'YOUR LIBRARY, YOUR PACE',
+  data: 'Your games.\nYour space.',
   dataText:
-    'Your library is saved in this browser. Import and export JSON backups. Your private library does not automatically sync between the web and Windows.',
+    'Your library is saved in this browser. You do not need an account to organize your games.',
+  backups:
+    'Export JSON backups to keep your data or move it elsewhere. Your private library does not automatically sync between the web and Windows.',
   guide: 'Read the web guide',
+  finalEyebrow: 'YOUR NEXT CHECKPOINT AWAITS',
+  finalTitle: 'Enjoy your\nnext session.',
+  finalAction: 'Start my collection',
+  finalNote: 'In your browser or on Windows. Your choice.',
   credit: 'Created by',
+  footerNavigation: 'Information',
+  privacy: 'Privacy',
   license: 'License',
+  title: 'Checkpoint — Your next session starts here',
+  description:
+    'Organize your games, track your achievements and enjoy your next session. Checkpoint, in your browser and on Windows.',
 };
-const nodes = [...document.querySelectorAll('[data-copy]')];
-const spanish = Object.fromEntries(nodes.map((node) => [node.dataset.copy, node.textContent]));
-function render(language) {
-  const en = language === 'en';
+const nodes = [...document.querySelectorAll('[data-copy], [data-copy-alt], [data-copy-aria]')];
+const spanish = Object.fromEntries(
+  nodes.map((node) => [
+    node.dataset.copy || node.dataset.copyAlt || node.dataset.copyAria,
+    node.dataset.copyAlt
+      ? node.alt
+      : node.dataset.copyAria
+        ? node.getAttribute('aria-label')
+        : node.innerText.trim(),
+  ]),
+);
+spanish.menuClose = 'Cerrar menú';
+spanish.title = document.title;
+spanish.description = document.querySelector('meta[name="description"]').content;
+const header = document.querySelector('.site-header');
+const menu = document.querySelector('.menu-toggle');
+let language = 'es';
+
+function setMenu(open, restoreFocus = false) {
+  header.classList.toggle('is-menu-open', open);
+  menu.setAttribute('aria-expanded', String(open));
+  menu.dataset.copyAria = open ? 'menuClose' : 'menuOpen';
+  menu.setAttribute('aria-label', (language === 'en' ? english : spanish)[menu.dataset.copyAria]);
+  if (restoreFocus) menu.focus();
+}
+function render(nextLanguage) {
+  language = nextLanguage === 'en' ? 'en' : 'es';
+  const copy = language === 'en' ? english : spanish;
   document.documentElement.lang = language;
-  for (const node of nodes) node.textContent = (en ? english : spanish)[node.dataset.copy];
-  document.querySelector('[data-open-app]').href = 'app.html#' + language;
-  document.querySelector('[data-guide]').href =
-    'https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/' + (en ? 'en/' : '') + 'WEB.md';
+  document.title = copy.title;
+  document.querySelector('meta[name="description"]').content = copy.description;
+  for (const node of nodes) {
+    const key = node.dataset.copy || node.dataset.copyAlt || node.dataset.copyAria;
+    if (node.dataset.copyAlt) node.alt = copy[key];
+    else if (node.dataset.copyAria) node.setAttribute('aria-label', copy[key]);
+    else {
+      // Conserva los saltos editoriales sin introducir HTML en las traducciones.
+      const lines = copy[key].split('\n');
+      node.replaceChildren();
+      lines.forEach((line, index) => {
+        if (index) node.append(document.createElement('br'));
+        node.append(document.createTextNode(line));
+      });
+    }
+  }
+  document.querySelectorAll('[data-open-app]').forEach((link) => {
+    link.href = 'app.html#' + language;
+  });
+  for (const image of document.querySelectorAll('[data-image-es]')) {
+    const source = language === 'en' ? image.dataset.imageEn : image.dataset.imageEs;
+    if (image.getAttribute('src') !== source) image.src = source;
+  }
+  const docs =
+    'https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/' + (language === 'en' ? 'en/' : '');
+  document.querySelector('[data-guide]').href = docs + 'WEB.md';
+  document.querySelector('[data-download-guide]').href = docs + 'DOWNLOAD-NOTES.md';
+  document.querySelector('[data-privacy-guide]').href = docs + 'PRIVACY.md';
   document
     .querySelectorAll('[data-language]')
     .forEach((button) =>
@@ -52,12 +145,36 @@ function render(language) {
     sessionStorage.setItem('checkpoint.presentation.language', language);
   } catch {}
 }
-let language = 'es';
 try {
   language = sessionStorage.getItem('checkpoint.presentation.language') || language;
 } catch {}
 if (['#es', '#en'].includes(location.hash)) language = location.hash.slice(1);
-render(language === 'en' ? 'en' : 'es');
+render(language);
 for (const button of document.querySelectorAll('[data-language]'))
   button.addEventListener('click', () => render(button.dataset.language));
+menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') !== 'true'));
+document.querySelector('.site-navigation').addEventListener('click', (event) => {
+  if (event.target.closest('a')) setMenu(false);
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') setMenu(false, true);
+});
+document.addEventListener('click', (event) => {
+  if (!header.contains(event.target)) setMenu(false);
+});
+matchMedia('(min-width: 761px)').addEventListener('change', () => setMenu(false));
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries)
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+    },
+    { threshold: 0.08 },
+  );
+  for (const node of document.querySelectorAll('.reveal')) observer.observe(node);
+  document.documentElement.classList.add('motion-ready');
+}
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});

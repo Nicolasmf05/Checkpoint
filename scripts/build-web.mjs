@@ -45,6 +45,14 @@ await cp(
 const detailFiles = (await readdir(path.join(out, detailAssets)))
   .sort()
   .map((file) => `${detailAssets}/${file}`);
+const presentationAssets = 'assets/presentation';
+await cp(path.join(root, 'web', presentationAssets), path.join(out, presentationAssets), {
+  recursive: true,
+});
+const presentationFiles = (await readdir(path.join(out, presentationAssets)))
+  .sort()
+  .map((file) => `${presentationAssets}/${file}`);
+const imageFiles = [...detailFiles, ...presentationFiles];
 const english = {
   ...JSON.parse(
     await readFile(path.join(root, 'src', 'Checkpoint.Core', 'Localization', 'en.json'), 'utf8'),
@@ -66,7 +74,7 @@ for (const file of [
   'shortcuts.mjs',
   'en.json',
   'config.json',
-  ...detailFiles,
+  ...imageFiles,
 ])
   hash.update(await readFile(path.join(out, file)));
 const revision = hash.digest('hex').slice(0, 16);
@@ -92,7 +100,7 @@ await writeFile(
     .replace('checkpoint-web-1', 'checkpoint-web-' + revision)
     .replace(
       'const assets = [',
-      'const assets = [' + detailFiles.map((file) => JSON.stringify(file)).join(',') + ',',
+      'const assets = [' + imageFiles.map((file) => JSON.stringify(file)).join(',') + ',',
     )
     .replace(/'([\w.-]+\.(?:mjs|js|css))'/g, (_, url) => "'" + url + '?v=' + revision + "'"),
 );

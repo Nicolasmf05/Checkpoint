@@ -298,6 +298,17 @@ try {
     'home opens the presentation without starting the app or signing in',
   );
   await page.screenshot({ path: path.join(evidence, 'web-presentation-es.png') });
+  check(
+    await page
+      .locator('[data-open-app]')
+      .evaluateAll((links) => links.every((link) => link.getAttribute('href') === 'app.html#es')),
+    'every presentation CTA opens the Spanish application',
+  );
+  await page.locator('.hero-showcase img').evaluate((image) => image.decode());
+  check(
+    await page.locator('.hero-showcase img').evaluate((image) => image.naturalWidth > 0),
+    'presentation loads the bundled product screenshot',
+  );
   await page.getByRole('button', { name: 'English', exact: true }).click();
   check(
     (await page.getByRole('link', { name: 'Open Checkpoint', exact: true }).isVisible()) &&
@@ -305,6 +316,47 @@ try {
     'presentation switches entirely to English',
   );
   await page.screenshot({ path: path.join(evidence, 'web-presentation-en.png') });
+  check(
+    (await page
+      .locator('[data-open-app]')
+      .evaluateAll((links) =>
+        links.every((link) => link.getAttribute('href') === 'app.html#en'),
+      )) &&
+      (await page.locator('.hero-showcase img').getAttribute('src')).endsWith('library-en.png') &&
+      (await page.locator('.hero-showcase img').getAttribute('alt')).startsWith(
+        'Checkpoint for Windows',
+      ) &&
+      (await page.locator('[data-privacy-guide]').getAttribute('href')).includes('/docs/en/'),
+    'English presentation updates all CTAs, screenshots, alt text and guides',
+  );
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.getByRole('button', { name: 'Open menu', exact: true }).click();
+  check(
+    (await page.locator('.site-navigation').isVisible()) &&
+      (await page.locator('.menu-toggle').getAttribute('aria-expanded')) === 'true',
+    'mobile presentation exposes navigation through an accessible disclosure',
+  );
+  await page.getByRole('button', { name: 'Español', exact: true }).click();
+  check(
+    (await page.locator('.menu-toggle').getAttribute('aria-label')) === 'Cerrar menú' &&
+      (await page.locator('.site-navigation a[href="#biblioteca"]').textContent()) === 'Biblioteca',
+    'changing language while the mobile menu is open preserves its accessible state',
+  );
+  await page.keyboard.press('Escape');
+  check(
+    !(await page.locator('.site-navigation').isVisible()) &&
+      (await page.locator('.menu-toggle').evaluate((node) => document.activeElement === node)),
+    'Escape closes mobile navigation and restores focus to its button',
+  );
+  await page.getByRole('button', { name: 'Abrir menú', exact: true }).click();
+  await page.locator('.site-navigation a[href="#biblioteca"]').click();
+  check(
+    (await page.locator('.menu-toggle').getAttribute('aria-expanded')) === 'false' &&
+      page.url().endsWith('#biblioteca'),
+    'mobile section navigation closes the menu without launching the application',
+  );
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
   await page.getByRole('button', { name: 'Español', exact: true }).click();
   await page.getByRole('link', { name: 'Abrir Checkpoint', exact: true }).click();
   await page.locator('.window').waitFor();
