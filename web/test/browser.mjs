@@ -332,6 +332,12 @@ try {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.getByRole('button', { name: 'Open menu', exact: true }).click();
   check(
+    (await page.locator('.hero-description').innerText())
+      .replace(/\s+/g, ' ')
+      .includes('Your next adventure. One place'),
+    'mobile editorial line breaks keep English sentences separated',
+  );
+  check(
     (await page.locator('.site-navigation').isVisible()) &&
       (await page.locator('.menu-toggle').getAttribute('aria-expanded')) === 'true',
     'mobile presentation exposes navigation through an accessible disclosure',
@@ -341,6 +347,12 @@ try {
     (await page.locator('.menu-toggle').getAttribute('aria-label')) === 'Cerrar menú' &&
       (await page.locator('.site-navigation a[href="#biblioteca"]').textContent()) === 'Biblioteca',
     'changing language while the mobile menu is open preserves its accessible state',
+  );
+  check(
+    (await page.locator('.hero-description').innerText())
+      .replace(/\s+/g, ' ')
+      .includes('aventura. Un lugar'),
+    'mobile editorial line breaks keep Spanish sentences separated',
   );
   await page.keyboard.press('Escape');
   check(
