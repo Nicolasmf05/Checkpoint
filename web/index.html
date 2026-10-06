@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
-    <meta name="theme-color" content="#fafafa" />
+    <meta name="theme-color" content="#090d12" />
     <meta
       name="description"
       content="Organiza tus juegos, sigue tus logros y disfruta de tu próxima partida. Checkpoint, en tu navegador y en Windows."
@@ -33,6 +33,7 @@
           data-copy-aria="navigation"
         >
           <a href="#biblioteca" data-copy="navLibrary">Biblioteca</a>
+          <a href="#experiencia" data-copy="navExperience">Experiencia</a>
           <a href="#progreso" data-copy="navProgress">Progreso</a>
           <a href="#windows">Windows</a>
           <a class="nav-cta" href="app.html#es" data-open-app data-copy="start">Empezar</a>
@@ -70,47 +71,56 @@
     </header>
     <main id="main">
       <section class="hero" aria-labelledby="intro-title">
-        <div class="hero-copy page-width">
-          <p class="eyebrow" data-copy="heroEyebrow">UN JUEGO CADA VEZ</p>
-          <h1 id="intro-title"
-            ><span data-copy="heroTitle">Menos pendientes.</span
-            ><span class="muted-title" data-copy="heroAccent">Más partidas.</span></h1
-          >
-          <p class="hero-description" data-copy="intro"
-            >Todos tus juegos. Tus objetivos. Tu próxima aventura.<br />Un lugar para seguir jugando
-            a tu ritmo.</p
-          >
-          <div class="actions">
-            <a class="button primary" href="app.html#es" data-open-app data-copy="open"
-              >Abrir Checkpoint</a
+        <div class="hero-layout page-width">
+          <div class="hero-copy">
+            <p class="eyebrow" data-copy="heroEyebrow">UN JUEGO CADA VEZ</p>
+            <h1 id="intro-title"
+              ><span data-copy="heroTitle">Tu próxima</span
+              ><span class="muted-title" data-copy="heroAccent">aventura.</span></h1
             >
-            <a
-              class="button secondary"
-              href="https://github.com/Nicolasmf05/Checkpoint/releases/latest"
-              data-copy="download"
-              >Descargar para Windows</a
+            <p class="hero-description" data-copy="intro"
+              >Todos tus juegos. Tus objetivos. Tu próxima aventura.<br />Un lugar para seguir
+              jugando a tu ritmo.</p
+            >
+            <div class="actions">
+              <a class="button primary" href="app.html#es" data-open-app data-copy="open"
+                >Abrir Checkpoint</a
+              >
+              <a
+                class="button secondary"
+                href="https://github.com/Nicolasmf05/Checkpoint/releases/latest"
+                data-copy="download"
+                >Descargar para Windows</a
+              >
+            </div>
+            <p class="hero-note" data-copy="account"
+              >Tu biblioteca, sin necesidad de crear una cuenta.</p
             >
           </div>
-          <p class="hero-note" data-copy="account"
-            >Tu biblioteca, sin necesidad de crear una cuenta.</p
-          >
+          <figure class="hero-showcase">
+            <div class="showcase-label" aria-hidden="true"
+              ><span>CHECKPOINT / WINDOWS</span><span>01</span></div
+            >
+            <div class="app-screen">
+              <img
+                src="assets/presentation/library-es.png"
+                data-image-es="assets/presentation/library-es.png"
+                data-image-en="assets/presentation/library-en.png"
+                alt="Checkpoint para Windows con una colección de ejemplo de Hollow Knight, Hades y Portal 2"
+                data-copy-alt="libraryAlt"
+                width="760"
+                height="800"
+                fetchpriority="high"
+              />
+            </div>
+            <figcaption data-copy="sample">App de Windows · Colección de ejemplo</figcaption>
+          </figure>
         </div>
-        <figure class="hero-showcase page-width">
-          <div class="app-screen">
-            <img
-              src="assets/presentation/library-es.png"
-              data-image-es="assets/presentation/library-es.png"
-              data-image-en="assets/presentation/library-en.png"
-              alt="Checkpoint para Windows con una colección de ejemplo de Hollow Knight, Hades y Portal 2"
-              data-copy-alt="libraryAlt"
-              width="760"
-              height="800"
-              fetchpriority="high"
-            />
-          </div>
-          <figcaption data-copy="sample">App de Windows · Colección de ejemplo</figcaption>
-        </figure>
       </section>
+      <div class="hero-footer page-width">
+        <span class="hero-platform">WEB / WINDOWS</span>
+        <a class="scroll-link" href="#experiencia" data-copy="explore">Explora Checkpoint</a>
+      </div>
       <section
         id="biblioteca"
         class="library-section section-space"
@@ -120,8 +130,8 @@
           <div class="section-heading reveal">
             <p class="eyebrow" data-copy="libraryEyebrow">DALE UN LUGAR A CADA JUEGO</p>
             <h2 id="library-title"
-              ><span data-copy="libraryTitle">Tu próxima aventura.</span
-              ><span class="muted-title" data-copy="libraryAccent">Siempre a mano.</span></h2
+              ><span data-copy="libraryTitle">Cada juego.</span
+              ><span class="muted-title" data-copy="libraryAccent">En su lugar.</span></h2
             >
             <p class="section-description" data-copy="libraryText"
               >De ese juego que llevas meses queriendo empezar al último logro que te falta. Ordena
@@ -167,6 +177,167 @@
                 >Lista · Compacta · Cuadrícula</div
               >
             </article>
+          </div>
+        </div>
+      </section>
+      <section
+        id="experiencia"
+        class="experience-section section-space"
+        aria-labelledby="experience-title"
+      >
+        <div class="page-width">
+          <div class="gallery-heading reveal">
+            <div class="section-heading">
+              <p class="eyebrow" data-copy="experienceEyebrow">ENCUENTRA TU PERSPECTIVA</p>
+              <h2 id="experience-title"
+                ><span data-copy="experienceTitle">Un espacio.</span
+                ><span class="muted-title" data-copy="experienceAccent"
+                  >Tres formas de verlo.</span
+                ></h2
+              >
+            </div>
+            <p class="gallery-intro" data-copy="experienceText"
+              >Tu biblioteca puede cambiar de forma. Elige una vista y descubre cómo encaja
+              contigo.</p
+            >
+          </div>
+          <div
+            class="gallery-tabs"
+            role="tablist"
+            aria-label="Vistas de Checkpoint"
+            data-copy-aria="galleryLabel"
+          >
+            <button
+              id="gallery-tab-grid"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="gallery-grid"
+              tabindex="0"
+              data-gallery-tab="grid"
+              data-copy="viewGrid"
+              >Cuadrícula</button
+            >
+            <button
+              id="gallery-tab-list"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="gallery-list"
+              tabindex="-1"
+              data-gallery-tab="list"
+              data-copy="viewList"
+              >Lista</button
+            >
+            <button
+              id="gallery-tab-mini"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="gallery-mini"
+              tabindex="-1"
+              data-gallery-tab="mini"
+              data-copy="viewMini"
+              >Miniatura</button
+            >
+          </div>
+          <div
+            id="gallery-grid"
+            class="gallery-panel"
+            role="tabpanel"
+            aria-labelledby="gallery-tab-grid"
+            tabindex="0"
+            data-view="grid"
+          >
+            <div class="gallery-image"
+              ><img
+                src="assets/presentation/library-es.png"
+                data-image-es="assets/presentation/library-es.png"
+                data-image-en="assets/presentation/library-en.png"
+                width="760"
+                height="800"
+                loading="lazy"
+                decoding="async"
+                alt="Vista de cuadrícula de Checkpoint con carátulas, estado y objetivos de cada juego"
+                data-copy-alt="galleryGridAlt"
+            /></div>
+            <div class="gallery-copy">
+              <span class="gallery-index" aria-hidden="true">01 / 03</span>
+              <h3 data-copy="galleryGridTitle">Una colección que apetece recorrer.</h3>
+              <p data-copy="galleryGridText"
+                >Las carátulas cuentan el principio de cada historia. Recorre tus juegos de un
+                vistazo y elige tu próxima partida.</p
+              >
+              <p class="small-note" data-copy="galleryGridNote"
+                >Vista de Windows · Colección de ejemplo</p
+              >
+            </div>
+          </div>
+          <div
+            id="gallery-list"
+            class="gallery-panel"
+            role="tabpanel"
+            aria-labelledby="gallery-tab-list"
+            tabindex="0"
+            data-view="list"
+            hidden
+          >
+            <div class="gallery-image"
+              ><img
+                src="assets/presentation/list.png"
+                data-image-es="assets/presentation/list.png"
+                data-image-en="assets/presentation/list.png"
+                width="510"
+                height="740"
+                loading="lazy"
+                decoding="async"
+                alt="Vista de lista de Checkpoint en español con Hollow Knight, Hades y Portal 2"
+                data-copy-alt="galleryListAlt"
+            /></div>
+            <div class="gallery-copy">
+              <span class="gallery-index" aria-hidden="true">02 / 03</span>
+              <h3 data-copy="galleryListTitle">Todo en orden. Nada de ruido.</h3>
+              <p data-copy="galleryListText"
+                >El juego, su estado y el siguiente objetivo. Una vista directa para centrarte en lo
+                que importa.</p
+              >
+              <p class="small-note" data-copy="galleryListNote"
+                >Vista de Windows · Ejemplo en español</p
+              >
+            </div>
+          </div>
+          <div
+            id="gallery-mini"
+            class="gallery-panel"
+            role="tabpanel"
+            aria-labelledby="gallery-tab-mini"
+            tabindex="0"
+            data-view="mini"
+            hidden
+          >
+            <div class="gallery-image"
+              ><img
+                src="assets/presentation/miniature-es.png"
+                data-image-es="assets/presentation/miniature-es.png"
+                data-image-en="assets/presentation/miniature-en.png"
+                width="300"
+                height="220"
+                loading="lazy"
+                decoding="async"
+                alt="Modo miniatura de Checkpoint con tres juegos y sus estados"
+                data-copy-alt="galleryMiniAlt"
+            /></div>
+            <div class="gallery-copy">
+              <span class="gallery-index" aria-hidden="true">03 / 03</span>
+              <h3 data-copy="galleryMiniTitle">Un pequeño espacio para tus grandes planes.</h3>
+              <p data-copy="galleryMiniText"
+                >Tus juegos y su estado, siempre cerca. El modo miniatura de Windows deja espacio en
+                el escritorio para todo lo demás.</p
+              >
+              <p class="small-note" data-copy="galleryMiniNote"
+                >Modo miniatura · Disponible en Windows</p
+              >
+            </div>
           </div>
         </div>
       </section>

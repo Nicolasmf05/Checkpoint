@@ -299,6 +299,14 @@ try {
   );
   await page.screenshot({ path: path.join(evidence, 'web-presentation-es.png') });
   check(
+    await page.evaluate(
+      () =>
+        getComputedStyle(document.documentElement).colorScheme === 'dark' &&
+        document.querySelector('meta[name="theme-color"]').content === '#090d12',
+    ),
+    'presentation uses its explicit dark theme independently of the application',
+  );
+  check(
     await page
       .locator('[data-open-app]')
       .evaluateAll((links) => links.every((link) => link.getAttribute('href') === 'app.html#es')),
@@ -330,6 +338,31 @@ try {
     'English presentation updates all CTAs, screenshots, alt text and guides',
   );
   await page.setViewportSize({ width: 320, height: 640 });
+  await page.getByRole('tab', { name: 'List', exact: true }).click();
+  await page.locator('#gallery-list img').scrollIntoViewIfNeeded();
+  await page.locator('#gallery-list img').evaluate((image) => image.decode());
+  check(
+    (await page.locator('#gallery-list').isVisible()) &&
+      !(await page.locator('#gallery-grid').isVisible()) &&
+      (await page.getByRole('tab', { name: 'List', exact: true }).getAttribute('aria-selected')) ===
+        'true',
+    'gallery selection exposes exactly its matching real product screenshot',
+  );
+  await page.getByRole('tab', { name: 'List', exact: true }).press('ArrowRight');
+  check(
+    (await page.locator('#gallery-mini').isVisible()) &&
+      (await page
+        .getByRole('tab', { name: 'Miniature', exact: true })
+        .evaluate((node) => document.activeElement === node)),
+    'gallery arrow navigation changes the panel and moves keyboard focus',
+  );
+  await page.getByRole('tab', { name: 'Miniature', exact: true }).press('Home');
+  check(
+    await page.locator('#gallery-grid').isVisible(),
+    'gallery Home key returns to the first view',
+  );
+  await page.getByRole('tab', { name: 'Grid', exact: true }).press('End');
+  check(await page.locator('#gallery-mini').isVisible(), 'gallery End key selects the last view');
   await page.getByRole('button', { name: 'Open menu', exact: true }).click();
   check(
     (await page.locator('.hero-description').innerText())
@@ -347,6 +380,14 @@ try {
     (await page.locator('.menu-toggle').getAttribute('aria-label')) === 'Cerrar menú' &&
       (await page.locator('.site-navigation a[href="#biblioteca"]').textContent()) === 'Biblioteca',
     'changing language while the mobile menu is open preserves its accessible state',
+  );
+  check(
+    (await page
+      .getByRole('tab', { name: 'Miniatura', exact: true })
+      .getAttribute('aria-selected')) === 'true' &&
+      (await page.locator('#gallery-mini h3').textContent()) ===
+        'Un pequeño espacio para tus grandes planes.',
+    'gallery selection survives language changes and hidden panels retain complete translations',
   );
   check(
     (await page.locator('.hero-description').innerText())
