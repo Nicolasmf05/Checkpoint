@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.29
+
+- The game sheet uses the host window width and reflows artwork, progress and services to match available space. Forms and metadata adapt without changing Miniature mode.
+
 ## 0.8.28
 
 - The Windows and browser apps now share the public website and game-sheet identity: Bagel Fat One headings, Inconsolata controls and copy, consistent panels, focus and all 22 existing palettes.

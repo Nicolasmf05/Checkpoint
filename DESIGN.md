@@ -296,3 +296,8 @@ Una lista con checkboxes nativos invita a probar la ficha. La tarea marcada se t
 - **Don't** inventar testimonios, cifras, integraciones o capacidades del producto.
 - **Don't** ocultar contenido detrás de animaciones o convertir la portada en una colección de efectos decorativos.
 - **Don't** recolorear capturas para aparentar que representan el tema seleccionado.
+
+
+### Window adaptation
+
+La ficha y los formularios ocupan el ancho disponible de la ventana. La ficha no tiene límite de 480px: usa consultas de su contenedor, apila a 450px o menos y organiza hero y servicios en dos columnas desde 1000px. La carátula conserva proporción y un máximo de 280px; los metadatos distribuyen columnas según el espacio. El contenido largo se desplaza verticalmente. Miniatura mantiene su geometría y comportamiento anteriores.

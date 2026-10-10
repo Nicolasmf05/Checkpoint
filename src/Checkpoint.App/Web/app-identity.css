@@ -803,3 +803,71 @@ kbd {
     min-height: 180px;
   }
 }
+
+/* Non-Miniature pages follow their host window, including inline Windows pages. */
+.dialog-page {
+  container: app-page / inline-size;
+  width: 100%;
+  min-width: 0;
+}
+.dialog-page > .type-dock,
+.game-detail-page {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+.dialog-page input,
+.dialog-page select,
+.dialog-page textarea,
+.dialog-page .type-row > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.game-detail-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(14px, 2cqi, 24px);
+  padding: clamp(14px, 2cqi, 28px);
+}
+.game-detail-hero {
+  grid-template-columns: minmax(0, min(32%, 280px)) minmax(0, 1fr) !important;
+  gap: clamp(15px, 2cqi, 24px);
+}
+.game-detail-sheet .cover-preview,
+.game-detail-cover-empty {
+  max-width: 280px;
+}
+.game-detail-sheet .game-detail-visibility {
+  aspect-ratio: auto;
+}
+.game-detail-services {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.game-detail-metadata {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+}
+@container app-page (min-width: 1000px) {
+  .game-detail-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .game-detail-main > :not(.game-detail-hero):not(.game-detail-services) {
+    grid-column: 1 / -1;
+  }
+}
+@container app-page (max-width: 450px) {
+  .game-detail-hero,
+  .game-detail-services {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .game-detail-hero > *,
+  .game-detail-services > * {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+  .game-detail-sheet .cover-preview,
+  .game-detail-cover-empty {
+    max-width: 174px;
+    justify-self: center;
+  }
+}

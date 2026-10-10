@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.29
+
+- La ficha de juego ocupa el ancho de la ventana y reorganiza carátula, progreso y servicios según el espacio disponible. Formularios y metadatos se adaptan sin cambiar el modo Miniatura.
+
 ## 0.8.28
 
 - La app de Windows y navegador comparte la identidad de la portada y la ficha: titulares Bagel Fat One, textos y controles Inconsolata, paneles y foco coherentes en los 22 temas existentes.
