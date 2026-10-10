@@ -1,113 +1,118 @@
-// El idioma solo cambia la presentación y los enlaces. Nunca inicia la app ni una sesión.
+import { themes } from './presentation-themes.mjs';
+
 const english = {
   skip: 'Skip to content',
   navigation: 'Main navigation',
   language: 'Language',
   navLibrary: 'Library',
-  navExperience: 'Experience',
-  navProgress: 'Progress',
-  start: 'Get started',
+  navExperience: 'Views',
+  navProgress: 'Achievements & friends',
+  theme: 'Theme',
+  darkTheme: 'Dark',
   menuOpen: 'Open menu',
   menuClose: 'Close menu',
-  heroEyebrow: 'ONE GAME AT A TIME',
-  heroTitle: 'Your next',
-  heroAccent: 'adventure.',
+  heroTitle: 'Where were\nyou?',
+  heroNote: 'A game collection that remembers.',
   intro:
-    'All your games. Your goals. Your next adventure.\nOne place to keep playing at your own pace.',
+    'That boss you still need to beat. The stubborn achievement.\nThe game you left halfway through. Keep track of where you stopped and come back when you feel like it.',
   open: 'Open Checkpoint',
   download: 'Download for Windows',
-  account: 'Your library, without creating an account.',
-  explore: 'Explore Checkpoint',
-  libraryAlt:
-    'Checkpoint for Windows with a sample collection of Hollow Knight, Hades and Portal 2',
-  sample: 'Windows app · Sample collection',
-  libraryEyebrow: 'A PLACE FOR EVERY GAME',
-  libraryTitle: 'Every game.',
-  libraryAccent: 'In its place.',
+  account: 'You don’t need an account to keep track of your games.',
+  coverAlt: 'Portal 2 cover art showing Atlas and P-body',
+  previewGoal: 'Goal: finish the achievements',
+  previewPlayed: 'Time played',
+  previewVisible: 'Visible',
+  previewVisibility: 'Friends only',
+  previewProgress: '9 of 10 achievements in this example',
+  previewAchievements: 'Achievements completed',
+  previewTasks: 'Tasks',
+  tryTask: 'Try checking one off',
+  previewTaskDone: 'Finish co-op mode',
+  previewTaskPending: 'Find all the secrets',
+  previewNotes: 'For the next session',
+  previewNote: 'One achievement left. Ask Dani if they’re up for it.',
+  sample: 'Example game details · The data is illustrative. Your games are saved in the app.',
+  libraryTitle: 'There’s time.\nThere are lots of games.',
   libraryText:
-    'From the game you have been meaning to start to that one last achievement. Organize your collection and decide what comes next.',
-  lists: 'A list for every moment.',
-  listsText:
-    'Create different lists. Keep track of what you are playing, what you have finished and what can wait.',
+    'You don’t have to finish everything. Keep what you’re playing close by and leave the rest for another day.',
   exampleStates: 'Example game statuses',
   playing: 'Playing',
   pending: 'Pending',
   finished: 'Story finished',
-  goals: 'Your way forward.',
+  lists: 'For now. For later.',
+  listsText:
+    'A list for what you’re playing. Another for recommendations. And the one that gets longer every time there’s a sale.',
+  goals: '“What was I doing?”',
   goalsText:
-    'Keep goals, tasks and notes in each game’s details. Return to your next session knowing exactly where you left off.',
-  goalsDetail: 'Story · Achievements · Personal goals',
-  views: 'Your collection, your way.',
+    'Write down that unbeaten boss, the missing collectible or something you wanted to try. Your future self will thank you.',
+  views: 'The covers count, too.',
   viewsText:
-    'Cover art, a list or a grid. Choose how to browse your games and change your perspective whenever you like.',
-  viewsDetail: 'List · Compact · Grid',
-  experienceEyebrow: 'FIND YOUR PERSPECTIVE',
-  experienceTitle: 'One space.',
-  experienceAccent: 'Three ways to see it.',
-  experienceText:
-    'Your library can take a different shape. Choose a view and see how it fits your routine.',
+    'Browse your collection in a grid, skim a list or keep a Miniature window on your Windows desktop.',
+  experienceTitle: 'Your collection,\nyour way.',
+  experienceText: 'Big cover art or a straightforward list. Try all three views.',
   galleryLabel: 'Checkpoint views',
   viewGrid: 'Grid',
   viewList: 'List',
   viewMini: 'Miniature',
   galleryGridAlt: 'Checkpoint grid view with cover art, game status and personal goals',
-  galleryGridTitle: 'A collection worth exploring.',
+  galleryGridTitle: 'The one with that cover.\nThat’s what I want to play.',
   galleryGridText:
-    'Every cover is the beginning of a story. Browse your games at a glance and choose your next session.',
-  galleryGridNote: 'Windows view · Sample collection',
+    'Sometimes a cover is all it takes to remember a game. Here they all are, with their status and what you still want to do.',
+  galleryGridNote: 'Windows screenshot · Sample collection',
   galleryListAlt: 'Checkpoint list view in Spanish with Hollow Knight, Hades and Portal 2',
-  galleryListTitle: 'All in order. Nothing in the way.',
+  galleryListTitle: 'A quick look\nbefore you play.',
   galleryListText:
-    'The game, its status and your next goal. A straightforward view that keeps your attention on what matters.',
-  galleryListNote: 'Windows view · Spanish example',
+    'The name, the status and the next goal. One after another, so you can find what you need without hunting around.',
+  galleryListNote: 'Windows screenshot · Spanish example',
   galleryMiniAlt: 'Checkpoint Miniature mode showing three games and their statuses',
-  galleryMiniTitle: 'A little space for your big plans.',
+  galleryMiniTitle: 'A little space\nbeside your game.',
   galleryMiniText:
-    'Your games and their status, close at hand. Windows Miniature mode leaves room on your desktop for everything else.',
+    'Keep your list in a small window while you do other things. Your games stay close without taking over the desktop.',
   galleryMiniNote: 'Miniature mode · Available on Windows',
-  progressEyebrow: 'EVERY SESSION COUNTS',
-  progressTitle: 'Small goals.',
-  progressAccent: 'Great stories.',
-  steamTitle: 'Your games already have a starting point.',
+  galleryThemeNote:
+    'These are real screenshots in their original theme. The selector changes this page and the example game details.',
+  progressTitle: 'One left.\nOr a few more.',
+  steamTitle: 'Don’t add them one by one.',
   steamText:
-    'Link Steam to import your library and check your achievements. Checkpoint refreshes your progress when the app opens and periodically.',
-  steamNote: 'Your Steam game details must be public.',
-  friendsLabel: 'FRIENDS',
-  friends: 'Good games bring people together.',
+    'Link Steam to import your games and check achievements. Progress refreshes when Checkpoint opens and periodically.',
+  steamNote: 'Your Steam game details need to be public.',
+  friendsLabel: 'Friends',
+  friends: '“What are you playing?”',
   friendsText:
-    'Connect with friends using your Checkpoint code and share your progress. You choose which games to keep private.',
-  friendsNote: 'A Checkpoint account is optional for your library and required for friends.',
-  windowsEyebrow: 'CHECKPOINT FOR WINDOWS',
-  windowsTitle: 'On your desktop.',
-  windowsAccent: 'Part of your routine.',
+    'Add friends with their Checkpoint code and share your progress. If you’d rather keep a game to yourself, make it private.',
+  friendsNote: 'You need a Checkpoint account to use friends.',
+  windowsTitle: 'Between Discord\nand your game.',
   windowsText:
-    'A translucent window. A Miniature mode. Pending achievements when a game is detected. A companion that fits alongside your sessions.',
-  windowsDownload: 'Get Checkpoint for Windows',
+    'Keep Checkpoint on your desktop, switch to Miniature mode and check pending achievements when it detects a game.',
+  windowsDownload: 'Download for Windows',
   requirements: 'Requirements and installation notes',
   miniatureAlt: 'Checkpoint Miniature mode showing three games and their statuses',
-  miniatureCaption: 'Miniature mode · The essentials, close at hand.',
-  dataEyebrow: 'YOUR LIBRARY, YOUR PACE',
-  data: 'Your games.\nYour space.',
+  miniatureCaption: 'The same collection, in a smaller window.',
+  data: 'Your games\nstay with you.',
   dataText:
-    'Your library is saved in this browser. You do not need an account to organize your games.',
+    'On the web, your collection is saved in this browser. You can start without signing up.',
   backups:
-    'Export JSON backups to keep your data or move it elsewhere. Your private library does not automatically sync between the web and Windows.',
-  guide: 'Read the web guide',
-  finalEyebrow: 'YOUR NEXT CHECKPOINT AWAITS',
-  finalTitle: 'Enjoy your\nnext session.',
-  finalAction: 'Start my collection',
-  finalNote: 'In your browser or on Windows. Your choice.',
+    'Make a JSON backup to keep it safe or move it elsewhere. Your private library does not automatically sync between the web and Windows.',
+  guide: 'How the web version works',
+  finalTitle: 'Keep track of where you were.\nThen keep playing.',
+  finalAction: 'Add your first game',
+  finalNote: 'Start with the one you’re playing now.',
   credit: 'Created by',
   footerNavigation: 'Information',
   privacy: 'Privacy',
   license: 'License',
-  title: 'Checkpoint — Your next session starts here',
+  title: 'Checkpoint — Where were you?',
   description:
-    'Organize your games, track your achievements and enjoy your next session. Checkpoint, in your browser and on Windows.',
+    'Your backlog, your achievements and where you left off. Organize your collection with Checkpoint, in your browser or on Windows.',
 };
+
+const root = document.documentElement;
+const header = document.querySelector('.site-header');
+const menu = document.querySelector('.menu-toggle');
+const themeSelect = document.querySelector('#presentation-theme');
+const galleryTabs = [...document.querySelectorAll('[data-gallery-tab]')];
 const nodes = [...document.querySelectorAll('[data-copy], [data-copy-alt], [data-copy-aria]')];
 function readCopy(node) {
-  // Conserva los saltos editoriales aunque un panel todavía esté oculto.
   const copy = node.cloneNode(true);
   copy.querySelectorAll('br').forEach((br) => br.replaceWith('\u0000'));
   return copy.textContent
@@ -128,10 +133,33 @@ const spanish = Object.fromEntries(
 spanish.menuClose = 'Cerrar menú';
 spanish.title = document.title;
 spanish.description = document.querySelector('meta[name="description"]').content;
-const header = document.querySelector('.site-header');
-const menu = document.querySelector('.menu-toggle');
-let language = 'es';
 
+const parameters = new URLSearchParams(location.search);
+let language = 'es';
+let themeId = 'dark';
+try {
+  language = sessionStorage.getItem('checkpoint.presentation.language') || language;
+} catch {}
+try {
+  themeId = localStorage.getItem('checkpoint.presentation.theme') || themeId;
+} catch {}
+if (['#es', '#en'].includes(location.hash)) language = location.hash.slice(1);
+if (['es', 'en'].includes(parameters.get('lang'))) language = parameters.get('lang');
+if (themes.some((theme) => theme.id === parameters.get('theme'))) themeId = parameters.get('theme');
+if (!themes.some((theme) => theme.id === themeId)) themeId = 'dark';
+let view =
+  galleryTabs.find((tab) => tab.dataset.galleryTab === parameters.get('view'))?.dataset
+    .galleryTab || 'grid';
+
+function updateUrl() {
+  const url = new URL(location.href);
+  url.searchParams.set('lang', language);
+  url.searchParams.set('theme', themeId);
+  url.searchParams.set('view', view);
+  // Los enlaces a secciones conservan su ancla; #es/#en se sustituyen por el idioma actual.
+  if (['#es', '#en'].includes(url.hash)) url.hash = language;
+  history.replaceState(null, '', url);
+}
 function setMenu(open, restoreFocus = false) {
   header.classList.toggle('is-menu-open', open);
   menu.setAttribute('aria-expanded', String(open));
@@ -139,10 +167,24 @@ function setMenu(open, restoreFocus = false) {
   menu.setAttribute('aria-label', (language === 'en' ? english : spanish)[menu.dataset.copyAria]);
   if (restoreFocus) menu.focus();
 }
+function updateDemo() {
+  const checked = [...document.querySelectorAll('.preview-tasks input')].filter(
+    (input) => input.checked,
+  ).length;
+  const number = new Intl.NumberFormat(language);
+  document.querySelector('[data-demo-tasks]').textContent =
+    language === 'en'
+      ? number.format(checked) + ' of 2 tasks completed'
+      : number.format(checked) + ' de 2 tareas completadas';
+  document.querySelector('[data-demo-hours]').textContent = number.format(11.5) + '\u00a0h';
+  document.querySelector('[data-demo-percent]').textContent = new Intl.NumberFormat(language, {
+    style: 'percent',
+  }).format(0.9);
+}
 function render(nextLanguage) {
   language = nextLanguage === 'en' ? 'en' : 'es';
   const copy = language === 'en' ? english : spanish;
-  document.documentElement.lang = language;
+  root.lang = language;
   document.title = copy.title;
   document.querySelector('meta[name="description"]').content = copy.description;
   for (const node of nodes) {
@@ -150,7 +192,6 @@ function render(nextLanguage) {
     if (node.dataset.copyAlt) node.alt = copy[key];
     else if (node.dataset.copyAria) node.setAttribute('aria-label', copy[key]);
     else {
-      // Conserva los saltos editoriales sin introducir HTML en las traducciones.
       const lines = copy[key].split('\n');
       node.replaceChildren();
       lines.forEach((line, index) => {
@@ -159,9 +200,8 @@ function render(nextLanguage) {
       });
     }
   }
-  document.querySelectorAll('[data-open-app]').forEach((link) => {
+  for (const link of document.querySelectorAll('[data-open-app]'))
     link.href = 'app.html#' + language;
-  });
   for (const image of document.querySelectorAll('[data-image-es]')) {
     const source = language === 'en' ? image.dataset.imageEn : image.dataset.imageEs;
     if (image.getAttribute('src') !== source) image.src = source;
@@ -171,22 +211,52 @@ function render(nextLanguage) {
   document.querySelector('[data-guide]').href = docs + 'WEB.md';
   document.querySelector('[data-download-guide]').href = docs + 'DOWNLOAD-NOTES.md';
   document.querySelector('[data-privacy-guide]').href = docs + 'PRIVACY.md';
-  document
-    .querySelectorAll('[data-language]')
-    .forEach((button) =>
-      button.setAttribute('aria-pressed', String(button.dataset.language === language)),
-    );
+  for (const button of document.querySelectorAll('[data-language]'))
+    button.setAttribute('aria-pressed', String(button.dataset.language === language));
+  themeSelect.replaceChildren(
+    ...themes.map((theme) => new Option(theme[language], theme.id, false, theme.id === themeId)),
+  );
+  updateDemo();
   try {
     sessionStorage.setItem('checkpoint.presentation.language', language);
   } catch {}
 }
-try {
-  language = sessionStorage.getItem('checkpoint.presentation.language') || language;
-} catch {}
-if (['#es', '#en'].includes(location.hash)) language = location.hash.slice(1);
+function applyTheme(id) {
+  const theme = themes.find((item) => item.id === id) || themes[0];
+  themeId = theme.id;
+  root.dataset.theme = theme.id;
+  root.dataset.scheme = theme.scheme;
+  document.querySelector('meta[name="theme-color"]').content = theme.background;
+  themeSelect.value = theme.id;
+  try {
+    localStorage.setItem('checkpoint.presentation.theme', theme.id);
+  } catch {}
+}
+function selectView(tab, focus = false) {
+  view = tab.dataset.galleryTab;
+  for (const item of galleryTabs) {
+    const selected = item === tab;
+    item.setAttribute('aria-selected', String(selected));
+    item.tabIndex = selected ? 0 : -1;
+    document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
+  }
+  if (focus) tab.focus();
+}
+
 render(language);
+applyTheme(themeId);
+selectView(galleryTabs.find((tab) => tab.dataset.galleryTab === view));
+themeSelect.addEventListener('change', () => {
+  applyTheme(themeSelect.value);
+  updateUrl();
+});
 for (const button of document.querySelectorAll('[data-language]'))
-  button.addEventListener('click', () => render(button.dataset.language));
+  button.addEventListener('click', () => {
+    render(button.dataset.language);
+    updateUrl();
+  });
+for (const input of document.querySelectorAll('.preview-tasks input'))
+  input.addEventListener('change', updateDemo);
 menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') !== 'true'));
 document.querySelector('.site-navigation').addEventListener('click', (event) => {
   if (event.target.closest('a')) setMenu(false);
@@ -198,18 +268,11 @@ document.addEventListener('click', (event) => {
   if (!header.contains(event.target)) setMenu(false);
 });
 matchMedia('(min-width: 901px)').addEventListener('change', () => setMenu(false));
-const galleryTabs = [...document.querySelectorAll('[data-gallery-tab]')];
-function selectView(tab, focus = false) {
-  for (const item of galleryTabs) {
-    const selected = item === tab;
-    item.setAttribute('aria-selected', String(selected));
-    item.tabIndex = selected ? 0 : -1;
-    document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
-  }
-  if (focus) tab.focus();
-}
 for (const tab of galleryTabs) {
-  tab.addEventListener('click', () => selectView(tab));
+  tab.addEventListener('click', () => {
+    selectView(tab);
+    updateUrl();
+  });
   tab.addEventListener('keydown', (event) => {
     const index = galleryTabs.indexOf(tab);
     let next;
@@ -221,20 +284,7 @@ for (const tab of galleryTabs) {
     else return;
     event.preventDefault();
     selectView(galleryTabs[next], true);
+    updateUrl();
   });
-}
-if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries)
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-    },
-    { threshold: 0.08 },
-  );
-  for (const node of document.querySelectorAll('.reveal')) observer.observe(node);
-  document.documentElement.classList.add('motion-ready');
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});

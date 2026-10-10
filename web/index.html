@@ -1,29 +1,37 @@
 <!doctype html>
-<!-- Presentación pública. La biblioteca y las sesiones siguen en app.html. -->
-<html lang="es">
+<html lang="es" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
-    <meta name="theme-color" content="#090d12" />
+    <meta name="theme-color" content="#202020" />
     <meta
       name="description"
-      content="Organiza tus juegos, sigue tus logros y disfruta de tu próxima partida. Checkpoint, en tu navegador y en Windows."
+      content="Tus juegos pendientes, tus logros y dónde te quedaste. Organiza tu colección con Checkpoint, en el navegador o en Windows."
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://cdn.cloudflare.steamstatic.com; connect-src 'self' https://fumdnvvvoiwoiziwtmsu.supabase.co; worker-src 'self'; manifest-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://cdn.cloudflare.steamstatic.com; connect-src 'self' https://fumdnvvvoiwoiziwtmsu.supabase.co; worker-src 'self'; manifest-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
-    <title>Checkpoint — Tu próxima partida empieza aquí</title>
+    <title>Checkpoint — ¿Por dónde ibas?</title>
+    <link rel="canonical" href="https://nicolasmf05.github.io/Checkpoint/" />
     <link rel="icon" href="icon.svg" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <link
+      rel="preload"
+      href="assets/game-details/BagelFatOne-Regular.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="presentation-themes.css" />
     <link rel="stylesheet" href="presentation.css" />
   </head>
   <body>
     <a class="skip-link" href="#main" data-copy="skip">Saltar al contenido</a>
     <header class="site-header">
-      <div class="header-inner">
-        <a class="brand" href="./" aria-label="Checkpoint"
+      <div class="header-inner page-width">
+        <a class="brand" href="./" aria-label="Checkpoint" translate="no"
           ><img src="icon.svg" alt="" width="32" height="32" /><span>checkpoint</span></a
         >
         <nav
@@ -33,12 +41,17 @@
           data-copy-aria="navigation"
         >
           <a href="#biblioteca" data-copy="navLibrary">Biblioteca</a>
-          <a href="#experiencia" data-copy="navExperience">Experiencia</a>
-          <a href="#progreso" data-copy="navProgress">Progreso</a>
+          <a href="#experiencia" data-copy="navExperience">Vistas</a>
+          <a href="#progreso" data-copy="navProgress">Logros y amigos</a>
           <a href="#windows">Windows</a>
-          <a class="nav-cta" href="app.html#es" data-open-app data-copy="start">Empezar</a>
         </nav>
         <div class="header-controls">
+          <div class="theme-control"
+            ><label for="presentation-theme" data-copy="theme">Tema</label
+            ><select id="presentation-theme" name="presentation-theme"
+              ><option value="dark" data-copy="darkTheme">Oscuro</option></select
+            ></div
+          >
           <div class="language-switch" role="group" aria-label="Idioma" data-copy-aria="language">
             <button
               type="button"
@@ -70,113 +83,162 @@
       </div>
     </header>
     <main id="main">
-      <section class="hero" aria-labelledby="intro-title">
-        <div class="hero-layout page-width">
-          <div class="hero-copy">
-            <p class="eyebrow" data-copy="heroEyebrow">UN JUEGO CADA VEZ</p>
-            <h1 id="intro-title"
-              ><span data-copy="heroTitle">Tu próxima</span
-              ><span class="muted-title" data-copy="heroAccent">aventura.</span></h1
-            >
+      <section class="hero page-width" aria-labelledby="intro-title">
+        <div class="hero-intro">
+          <div class="hero-copy"
+            ><h1 id="intro-title" data-copy="heroTitle">¿Por dónde<br />ibas?</h1
+            ><p class="hero-note" data-copy="heroNote">Tu colección de juegos, con memoria.</p></div
+          >
+          <div class="hero-actions">
             <p class="hero-description" data-copy="intro"
-              >Todos tus juegos. Tus objetivos. Tu próxima aventura.<br />Un lugar para seguir
-              jugando a tu ritmo.</p
+              >Ese jefe que te falta. El logro que se resiste.<br />El juego que dejaste a medias.
+              Guarda dónde te quedaste y vuelve cuando te apetezca.</p
             >
-            <div class="actions">
-              <a class="button primary" href="app.html#es" data-open-app data-copy="open"
+            <div class="actions"
+              ><a class="button primary" href="app.html#es" data-open-app data-copy="open"
                 >Abrir Checkpoint</a
-              >
-              <a
+              ><a
                 class="button secondary"
                 href="https://github.com/Nicolasmf05/Checkpoint/releases/latest"
                 data-copy="download"
                 >Descargar para Windows</a
-              >
-            </div>
-            <p class="hero-note" data-copy="account"
-              >Tu biblioteca, sin necesidad de crear una cuenta.</p
+              ></div
+            >
+            <p class="account-note" data-copy="account"
+              >No necesitas una cuenta para guardar tus juegos.</p
             >
           </div>
-          <figure class="hero-showcase">
-            <div class="showcase-label" aria-hidden="true"
-              ><span>CHECKPOINT / WINDOWS</span><span>01</span></div
-            >
-            <div class="app-screen">
-              <img
-                src="assets/presentation/library-es.png"
-                data-image-es="assets/presentation/library-es.png"
-                data-image-en="assets/presentation/library-en.png"
-                alt="Checkpoint para Windows con una colección de ejemplo de Hollow Knight, Hades y Portal 2"
-                data-copy-alt="libraryAlt"
-                width="760"
-                height="800"
-                fetchpriority="high"
-              />
-            </div>
-            <figcaption data-copy="sample">App de Windows · Colección de ejemplo</figcaption>
-          </figure>
         </div>
+        <figure class="hero-showcase">
+          <div class="game-preview">
+            <div class="preview-cover"
+              ><img
+                src="assets/presentation/portal2.jpg"
+                alt="Carátula de Portal 2 con los robots Atlas y P-body"
+                data-copy-alt="coverAlt"
+                width="300"
+                height="450"
+                fetchpriority="high"
+            /></div>
+            <div class="preview-detail">
+              <div class="preview-game-title"
+                ><h2 translate="no">Portal 2</h2><span>Steam · Valve</span></div
+              >
+              <p class="preview-goal" data-copy="previewGoal">Objetivo: completar los logros</p>
+              <div class="preview-stats">
+                <div class="stat-card"
+                  ><img
+                    class="ui-icon"
+                    src="assets/game-details/clock.png"
+                    alt=""
+                    width="25"
+                    height="25"
+                  /><strong data-demo-hours>11,5 h</strong
+                  ><span data-copy="previewPlayed">Tiempo jugado</span></div
+                >
+                <div class="stat-card"
+                  ><img
+                    class="ui-icon"
+                    src="assets/game-details/visibility.png"
+                    alt=""
+                    width="25"
+                    height="25"
+                  /><strong data-copy="previewVisible">Visible</strong
+                  ><span data-copy="previewVisibility">Solo amigos</span></div
+                >
+                <div class="stat-card achievement-card"
+                  ><img
+                    class="ui-icon"
+                    src="assets/game-details/achievement.png"
+                    alt=""
+                    width="25"
+                    height="25"
+                  /><strong data-demo-percent>90 %</strong
+                  ><div class="preview-progress"
+                    ><progress
+                      value="9"
+                      max="10"
+                      aria-label="9 de 10 logros en este ejemplo"
+                      data-copy-aria="previewProgress"
+                    ></progress
+                    ><span>9 / 10</span></div
+                  ><span data-copy="previewAchievements">Logros completados</span></div
+                >
+              </div>
+            </div>
+            <div class="preview-journal">
+              <div class="preview-task-heading"
+                ><h3 data-copy="previewTasks">Tareas</h3
+                ><span data-copy="tryTask">Prueba a marcar una</span></div
+              >
+              <div class="preview-tasks">
+                <label
+                  ><input type="checkbox" checked /><span data-copy="previewTaskDone"
+                    >Terminar el modo cooperativo</span
+                  ></label
+                >
+                <label
+                  ><input type="checkbox" /><span data-copy="previewTaskPending"
+                    >Encontrar todos los secretos</span
+                  ></label
+                >
+              </div>
+              <p class="task-result" aria-live="polite" aria-atomic="true" data-demo-tasks
+                >1 de 2 tareas completadas</p
+              >
+              <div class="preview-note"
+                ><h3 data-copy="previewNotes">Para la próxima partida</h3
+                ><p data-copy="previewNote"
+                  >Me falta el último logro. Preguntarle a Dani si se apunta.</p
+                ></div
+              >
+            </div>
+          </div>
+          <figcaption data-copy="sample"
+            >Ficha de ejemplo · Los datos son ilustrativos. Tus juegos se guardan en la
+            app.</figcaption
+          >
+        </figure>
       </section>
-      <div class="hero-footer page-width">
-        <span class="hero-platform">WEB / WINDOWS</span>
-        <a class="scroll-link" href="#experiencia" data-copy="explore">Explora Checkpoint</a>
-      </div>
       <section
         id="biblioteca"
         class="library-section section-space"
         aria-labelledby="library-title"
       >
-        <div class="page-width">
-          <div class="section-heading reveal">
-            <p class="eyebrow" data-copy="libraryEyebrow">DALE UN LUGAR A CADA JUEGO</p>
-            <h2 id="library-title"
-              ><span data-copy="libraryTitle">Cada juego.</span
-              ><span class="muted-title" data-copy="libraryAccent">En su lugar.</span></h2
+        <div class="page-width library-layout">
+          <div class="section-heading"
+            ><h2 id="library-title" data-copy="libraryTitle">Hay tiempo.<br />Hay muchos juegos.</h2
+            ><p class="section-description" data-copy="libraryText"
+              >No hace falta terminarlo todo. Ten a mano lo que estás jugando y deja el resto para
+              otro día.</p
+            ><div class="status-list" aria-label="Estados de ejemplo" data-copy-aria="exampleStates"
+              ><span class="status playing" data-copy="playing">Jugando</span
+              ><span class="status pending" data-copy="pending">Pendiente</span
+              ><span class="status finished" data-copy="finished">Historia terminada</span></div
+            ></div
+          >
+          <div class="library-features">
+            <article
+              ><h3 data-copy="lists">Para ahora. Para luego.</h3
+              ><p data-copy="listsText"
+                >Una lista con lo que estás jugando. Otra con lo que te han recomendado. Y esa que
+                crece cada vez que hay rebajas.</p
+              ></article
             >
-            <p class="section-description" data-copy="libraryText"
-              >De ese juego que llevas meses queriendo empezar al último logro que te falta. Ordena
-              tu colección y decide qué viene después.</p
+            <article
+              ><h3 data-copy="goals">«¿Qué estaba haciendo?»</h3
+              ><p data-copy="goalsText"
+                >Apunta ese jefe pendiente, el coleccionable que te falta o lo que querías probar.
+                Tu yo de dentro de un mes te lo agradecerá.</p
+              ></article
             >
-          </div>
-          <div class="feature-grid">
-            <article class="feature-card reveal">
-              <span class="feature-number" aria-hidden="true">01</span>
-              <h3 data-copy="lists">Una lista para cada momento.</h3>
-              <p data-copy="listsText"
-                >Organiza varias listas. Separa lo que estás jugando, lo que has terminado y lo que
-                puede esperar.</p
-              >
-              <div
-                class="status-list"
-                aria-label="Estados de ejemplo"
-                data-copy-aria="exampleStates"
-                ><span class="status playing" data-copy="playing">Jugando</span
-                ><span class="status pending" data-copy="pending">Pendiente</span
-                ><span class="status finished" data-copy="finished">Historia terminada</span></div
-              >
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-number" aria-hidden="true">02</span>
-              <h3 data-copy="goals">Tu manera de avanzar.</h3>
-              <p data-copy="goalsText"
-                >Guarda objetivos, tareas y notas en la ficha de cada juego. Retoma la partida
-                sabiendo exactamente dónde te quedaste.</p
-              >
-              <div class="feature-detail" data-copy="goalsDetail"
-                >Historia · Logros · Objetivos personales</div
-              >
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-number" aria-hidden="true">03</span>
-              <h3 data-copy="views">Tu colección, a tu gusto.</h3>
-              <p data-copy="viewsText"
-                >Carátulas, vista de lista o cuadrícula. Elige cómo ver tus juegos y cambia de
-                perspectiva cuando quieras.</p
-              >
-              <div class="feature-detail" data-copy="viewsDetail"
-                >Lista · Compacta · Cuadrícula</div
-              >
-            </article>
+            <article
+              ><h3 data-copy="views">Las carátulas también cuentan.</h3
+              ><p data-copy="viewsText"
+                >Mira tu colección en cuadrícula, repásala en una lista o deja una miniatura en el
+                escritorio de Windows.</p
+              ></article
+            >
           </div>
         </div>
       </section>
@@ -186,21 +248,13 @@
         aria-labelledby="experience-title"
       >
         <div class="page-width">
-          <div class="gallery-heading reveal">
-            <div class="section-heading">
-              <p class="eyebrow" data-copy="experienceEyebrow">ENCUENTRA TU PERSPECTIVA</p>
-              <h2 id="experience-title"
-                ><span data-copy="experienceTitle">Un espacio.</span
-                ><span class="muted-title" data-copy="experienceAccent"
-                  >Tres formas de verlo.</span
-                ></h2
-              >
-            </div>
-            <p class="gallery-intro" data-copy="experienceText"
-              >Tu biblioteca puede cambiar de forma. Elige una vista y descubre cómo encaja
-              contigo.</p
-            >
-          </div>
+          <div class="gallery-heading"
+            ><h2 id="experience-title" data-copy="experienceTitle"
+              >Tu colección,<br />a tu manera.</h2
+            ><p class="gallery-intro" data-copy="experienceText"
+              >Carátulas grandes o una lista al grano. Prueba las tres vistas.</p
+            ></div
+          >
           <div
             class="gallery-tabs"
             role="tablist"
@@ -248,8 +302,7 @@
             aria-labelledby="gallery-tab-grid"
             tabindex="0"
             data-view="grid"
-          >
-            <div class="gallery-image"
+            ><div class="gallery-image"
               ><img
                 src="assets/presentation/library-es.png"
                 data-image-es="assets/presentation/library-es.png"
@@ -259,20 +312,17 @@
                 loading="lazy"
                 decoding="async"
                 alt="Vista de cuadrícula de Checkpoint con carátulas, estado y objetivos de cada juego"
-                data-copy-alt="galleryGridAlt"
-            /></div>
-            <div class="gallery-copy">
-              <span class="gallery-index" aria-hidden="true">01 / 03</span>
-              <h3 data-copy="galleryGridTitle">Una colección que apetece recorrer.</h3>
-              <p data-copy="galleryGridText"
-                >Las carátulas cuentan el principio de cada historia. Recorre tus juegos de un
-                vistazo y elige tu próxima partida.</p
-              >
-              <p class="small-note" data-copy="galleryGridNote"
-                >Vista de Windows · Colección de ejemplo</p
-              >
-            </div>
-          </div>
+                data-copy-alt="galleryGridAlt" /></div
+            ><div class="gallery-copy"
+              ><h3 data-copy="galleryGridTitle">Ese de la portada.<br />Ese quiero jugar.</h3
+              ><p data-copy="galleryGridText"
+                >A veces basta con ver una carátula para acordarte de un juego. Aquí los tienes
+                todos, con su estado y lo que te queda por hacer.</p
+              ><p class="small-note" data-copy="galleryGridNote"
+                >Captura de Windows · Colección de ejemplo</p
+              ></div
+            ></div
+          >
           <div
             id="gallery-list"
             class="gallery-panel"
@@ -281,8 +331,7 @@
             tabindex="0"
             data-view="list"
             hidden
-          >
-            <div class="gallery-image"
+            ><div class="gallery-image"
               ><img
                 src="assets/presentation/list.png"
                 data-image-es="assets/presentation/list.png"
@@ -292,20 +341,17 @@
                 loading="lazy"
                 decoding="async"
                 alt="Vista de lista de Checkpoint en español con Hollow Knight, Hades y Portal 2"
-                data-copy-alt="galleryListAlt"
-            /></div>
-            <div class="gallery-copy">
-              <span class="gallery-index" aria-hidden="true">02 / 03</span>
-              <h3 data-copy="galleryListTitle">Todo en orden. Nada de ruido.</h3>
-              <p data-copy="galleryListText"
-                >El juego, su estado y el siguiente objetivo. Una vista directa para centrarte en lo
-                que importa.</p
-              >
-              <p class="small-note" data-copy="galleryListNote"
-                >Vista de Windows · Ejemplo en español</p
-              >
-            </div>
-          </div>
+                data-copy-alt="galleryListAlt" /></div
+            ><div class="gallery-copy"
+              ><h3 data-copy="galleryListTitle">Un repaso rápido<br />antes de jugar.</h3
+              ><p data-copy="galleryListText"
+                >El nombre, el estado y el siguiente objetivo. Todo seguido, para encontrar lo que
+                buscas sin dar vueltas.</p
+              ><p class="small-note" data-copy="galleryListNote"
+                >Captura de Windows · Ejemplo en español</p
+              ></div
+            ></div
+          >
           <div
             id="gallery-mini"
             class="gallery-panel"
@@ -314,8 +360,7 @@
             tabindex="0"
             data-view="mini"
             hidden
-          >
-            <div class="gallery-image"
+            ><div class="gallery-image"
               ><img
                 src="assets/presentation/miniature-es.png"
                 data-image-es="assets/presentation/miniature-es.png"
@@ -325,20 +370,21 @@
                 loading="lazy"
                 decoding="async"
                 alt="Modo miniatura de Checkpoint con tres juegos y sus estados"
-                data-copy-alt="galleryMiniAlt"
-            /></div>
-            <div class="gallery-copy">
-              <span class="gallery-index" aria-hidden="true">03 / 03</span>
-              <h3 data-copy="galleryMiniTitle">Un pequeño espacio para tus grandes planes.</h3>
-              <p data-copy="galleryMiniText"
-                >Tus juegos y su estado, siempre cerca. El modo miniatura de Windows deja espacio en
-                el escritorio para todo lo demás.</p
-              >
-              <p class="small-note" data-copy="galleryMiniNote"
+                data-copy-alt="galleryMiniAlt" /></div
+            ><div class="gallery-copy"
+              ><h3 data-copy="galleryMiniTitle">Un hueco al lado<br />de la partida.</h3
+              ><p data-copy="galleryMiniText"
+                >Deja tu lista en una ventana pequeña mientras haces otras cosas. Tus juegos siguen
+                a mano, sin ocupar todo el escritorio.</p
+              ><p class="small-note" data-copy="galleryMiniNote"
                 >Modo miniatura · Disponible en Windows</p
-              >
-            </div>
-          </div>
+              ></div
+            ></div
+          >
+          <p class="gallery-theme-note" data-copy="galleryThemeNote"
+            >Estas son capturas reales con su tema original. El selector cambia la portada y la
+            ficha de ejemplo.</p
+          >
         </div>
       </section>
       <section
@@ -346,68 +392,64 @@
         class="progress-section section-space"
         aria-labelledby="progress-title"
       >
-        <div class="page-width">
-          <div class="section-heading reveal">
-            <p class="eyebrow" data-copy="progressEyebrow">CADA PARTIDA CUENTA</p>
-            <h2 id="progress-title"
-              ><span data-copy="progressTitle">Pequeños objetivos.</span
-              ><span class="muted-title" data-copy="progressAccent">Grandes historias.</span></h2
+        <div class="page-width"
+          ><h2 id="progress-title" data-copy="progressTitle">Te queda uno.<br />O unos cuantos.</h2
+          ><div class="connection-grid">
+            <article class="connection-card"
+              ><div class="card-heading"
+                ><img src="assets/game-details/steam.png" alt="" width="28" height="28" /><h3
+                  >Steam</h3
+                ></div
+              ><div class="connection-body"
+                ><h4 data-copy="steamTitle">No los apuntes uno por uno.</h4
+                ><p data-copy="steamText"
+                  >Vincula Steam para importar tus juegos y consultar los logros. El progreso se
+                  actualiza al abrir Checkpoint y periódicamente.</p
+                ><p class="small-note" data-copy="steamNote"
+                  >Necesitas tener públicos los datos de juego en Steam.</p
+                ></div
+              ></article
             >
-          </div>
-          <div class="connection-grid">
-            <article class="connection-card reveal">
-              <div class="connection-label">STEAM</div>
-              <h3 data-copy="steamTitle">Tus juegos ya tienen un punto de partida.</h3>
-              <p data-copy="steamText"
-                >Vincula Steam para importar tu biblioteca y consultar tus logros. Checkpoint
-                actualiza el progreso al abrir la app y periódicamente.</p
-              >
-              <p class="small-note" data-copy="steamNote"
-                >Los datos de juego de Steam deben ser públicos.</p
-              >
-            </article>
-            <article class="connection-card reveal">
-              <div class="connection-label" data-copy="friendsLabel">AMIGOS</div>
-              <h3 data-copy="friends">Las buenas partidas se comparten.</h3>
-              <p data-copy="friendsText"
-                >Conecta con tus amigos mediante tu código de Checkpoint y comparte tus avances. Tú
-                eliges qué juegos mantener privados.</p
-              >
-              <p class="small-note" data-copy="friendsNote"
-                >La cuenta de Checkpoint es opcional para tu biblioteca y necesaria para amigos.</p
-              >
-            </article>
-          </div>
-        </div>
+            <article class="connection-card"
+              ><div class="card-heading"
+                ><img src="assets/game-details/visibility.png" alt="" width="25" height="25" /><h3
+                  data-copy="friendsLabel"
+                  >Amigos</h3
+                ></div
+              ><div class="connection-body"
+                ><h4 data-copy="friends">«¿Tú a qué estás jugando?»</h4
+                ><p data-copy="friendsText"
+                  >Añade a tus amigos con su código de Checkpoint y comparte tus avances. Si un
+                  juego prefieres guardártelo, puedes hacerlo privado.</p
+                ><p class="small-note" data-copy="friendsNote"
+                  >Para usar amigos necesitas una cuenta de Checkpoint.</p
+                ></div
+              ></article
+            >
+          </div></div
+        >
       </section>
       <section id="windows" class="windows-section section-space" aria-labelledby="windows-title">
-        <div class="page-width windows-layout">
-          <div class="windows-copy reveal">
-            <p class="eyebrow" data-copy="windowsEyebrow">CHECKPOINT PARA WINDOWS</p>
-            <h2 id="windows-title"
-              ><span data-copy="windowsTitle">En tu escritorio.</span
-              ><span class="muted-title" data-copy="windowsAccent">Dentro de tu rutina.</span></h2
-            >
-            <p class="section-description" data-copy="windowsText"
-              >Una ventana translúcida. Un modo miniatura. Tus logros pendientes al detectar un
-              juego. Un compañero que encuentra su sitio junto a tus partidas.</p
-            >
-            <a
-              class="button mint"
+        <div class="page-width windows-layout"
+          ><div class="windows-copy"
+            ><h2 id="windows-title" data-copy="windowsTitle">Entre Discord<br />y la partida.</h2
+            ><p class="section-description" data-copy="windowsText"
+              >Deja Checkpoint en el escritorio, cambia al modo miniatura y consulta los logros
+              pendientes cuando detecta un juego.</p
+            ><a
+              class="button primary"
               href="https://github.com/Nicolasmf05/Checkpoint/releases/latest"
               data-copy="windowsDownload"
-              >Conseguir Checkpoint para Windows</a
-            >
-            <a
+              >Descargar para Windows</a
+            ><a
               class="requirements-link"
               href="https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/DOWNLOAD-NOTES.md"
               data-download-guide
               data-copy="requirements"
               >Requisitos y notas de instalación</a
-            >
-          </div>
-          <figure class="miniature-showcase reveal">
-            <div class="miniature-frame"
+            ></div
+          ><figure class="miniature-showcase"
+            ><div class="miniature-frame"
               ><img
                 src="assets/presentation/miniature-es.png"
                 data-image-es="assets/presentation/miniature-es.png"
@@ -417,62 +459,53 @@
                 width="300"
                 height="220"
                 loading="lazy"
-                decoding="async"
-            /></div>
-            <figcaption data-copy="miniatureCaption"
-              >Modo miniatura · Lo esencial, siempre cerca.</figcaption
-            >
-          </figure>
-        </div>
+                decoding="async" /></div
+            ><figcaption data-copy="miniatureCaption"
+              >La misma colección, en una ventana pequeña.</figcaption
+            ></figure
+          ></div
+        >
       </section>
-      <section class="information section-space" aria-labelledby="data-title">
-        <div class="page-width information-layout">
-          <div class="reveal"
-            ><p class="eyebrow" data-copy="dataEyebrow">TU BIBLIOTECA, A TU RITMO</p
-            ><h2 id="data-title" data-copy="data">Tus juegos.<br />Tu espacio.</h2></div
-          >
-          <div class="information-copy reveal">
-            <p data-copy="dataText"
-              >Tu biblioteca se guarda en este navegador. No necesitas una cuenta para organizar tus
-              juegos.</p
-            >
-            <p class="small-note" data-copy="backups"
-              >Exporta copias JSON para conservar tus datos o trasladarlos. La biblioteca privada no
+      <section class="information section-space" aria-labelledby="data-title"
+        ><div class="page-width information-layout"
+          ><h2 id="data-title" data-copy="data">Tus juegos<br />se quedan contigo.</h2
+          ><div class="information-copy"
+            ><p data-copy="dataText"
+              >En la web, tu colección se guarda en este navegador. Puedes empezar sin
+              registrarte.</p
+            ><p class="small-note" data-copy="backups"
+              >Haz una copia JSON para conservarla o llevarla a otro sitio. La biblioteca privada no
               se sincroniza automáticamente entre la web y Windows.</p
-            >
-            <a
+            ><a
               class="text-link"
               href="https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/WEB.md"
               data-guide
               data-copy="guide"
-              >Leer la guía web</a
-            >
-          </div>
-        </div>
-      </section>
-      <section class="final-cta section-space" aria-labelledby="final-title">
-        <div class="page-width reveal">
-          <p class="eyebrow" data-copy="finalEyebrow">EL SIGUIENTE CHECKPOINT ES TUYO</p>
-          <h2 id="final-title" data-copy="finalTitle"
-            >Vuelve a disfrutar<br />de tu próxima partida.</h2
-          >
-          <a class="button primary" href="app.html#es" data-open-app data-copy="finalAction"
-            >Empezar mi colección</a
-          >
-          <p class="small-note" data-copy="finalNote">En tu navegador o en Windows. Tú eliges.</p>
-        </div>
-      </section>
+              >Cómo funciona la versión web</a
+            ></div
+          ></div
+        ></section
+      >
+      <section class="final-cta section-space" aria-labelledby="final-title"
+        ><div class="page-width"
+          ><h2 id="final-title" data-copy="finalTitle">Guarda dónde ibas.<br />Y sigue jugando.</h2
+          ><a class="button primary" href="app.html#es" data-open-app data-copy="finalAction"
+            >Añadir tu primer juego</a
+          ><p class="small-note" data-copy="finalNote"
+            >Empieza por el que estás jugando ahora.</p
+          ></div
+        ></section
+      >
     </main>
-    <footer class="site-footer">
-      <div class="page-width footer-inner">
-        <div class="footer-credit"
-          ><span class="footer-brand">checkpoint</span
+    <footer class="site-footer"
+      ><div class="page-width footer-inner"
+        ><div class="footer-credit"
+          ><span class="footer-brand" translate="no">checkpoint</span
           ><p
             ><span data-copy="credit">Creado por</span>
-            <a href="https://github.com/Nicolasmf05">Nicolasmf05</a></p
+            <a href="https://github.com/Nicolasmf05" translate="no">Nicolasmf05</a></p
           ></div
-        >
-        <nav aria-label="Información" data-copy-aria="footerNavigation"
+        ><nav aria-label="Información" data-copy-aria="footerNavigation"
           ><a
             href="https://github.com/Nicolasmf05/Checkpoint"
             target="_blank"
@@ -486,9 +519,9 @@
           ><a href="https://github.com/Nicolasmf05/Checkpoint/blob/main/LICENSE" data-copy="license"
             >Licencia</a
           ></nav
-        >
-      </div>
-    </footer>
+        ></div
+      ></footer
+    >
     <script type="module" src="presentation.mjs"></script>
   </body>
 </html>

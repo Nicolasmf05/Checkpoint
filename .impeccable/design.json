@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-10T22:47:16Z",
+  "title": "Design System: Checkpoint — portada pública",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Azul de Checkpoint"
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "Tinta del acento"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Carbón"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Blanco de lectura"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Gris de apoyo"
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Velo de panel"
+      },
+      "input": {
+        "role": "neutral",
+        "displayName": "Fondo de control"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Línea estructural"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Pregunta principal del hero; Bagel Fat One."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Titulares de sección; Bagel Fat One."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Contenido y explicaciones; Inconsolata."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadatos y pies de imagen."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Acciones principales."
+      },
+      "metric": {
+        "displayName": "Metric",
+        "purpose": "Cantidades de la ficha de ejemplo; números tabulares."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "button-feedback",
+        "value": "transform 160ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Desplazamiento de 2px en hover; vuelta al origen al pulsar. Desactivado con movimiento reducido."
+      },
+      {
+        "name": "intro-settle",
+        "value": "450ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Entrada única del titular desde translateY(10px), solo si se permite movimiento."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop-compact",
+        "value": "1100px"
+      },
+      {
+        "name": "mobile-navigation",
+        "value": "900px"
+      },
+      {
+        "name": "stacked-sections",
+        "value": "640px"
+      },
+      {
+        "name": "narrow-header",
+        "value": "380px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Acción primaria",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal sobre la superficie de la portada.",
+      "html": "<button type=\"button\" class=\"ds-button-primary\">Abrir Checkpoint</button>",
+      "css": ".ds-button-primary{display:inline-flex;justify-content:center;align-items:center;min-height:48px;max-width:100%;border-radius:5px;border:1px solid var(--line,#666666);padding:11px 16px;font:700 1rem/1.35 'Checkpoint Inconsolata',ui-monospace,monospace;text-align:center;cursor:pointer;transition:transform 160ms cubic-bezier(0.16,1,0.3,1);background:var(--accent,#8fb7df);color:var(--accent-text,#172536);border-color:var(--accent,#8fb7df)}.ds-button-primary:hover{transform:translateY(-2px)}.ds-button-primary:active{transform:translateY(0)}.ds-button-primary:focus-visible{outline:3px solid var(--text,#ededed);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}}"
+    },
+    {
+      "name": "Acción secundaria",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Acción alternativa con borde y fondo transparente.",
+      "html": "<button type=\"button\" class=\"ds-button-secondary\">Abrir Checkpoint</button>",
+      "css": ".ds-button-secondary{display:inline-flex;justify-content:center;align-items:center;min-height:48px;max-width:100%;border-radius:5px;border:1px solid var(--line,#666666);padding:11px 16px;font:700 1rem/1.35 'Checkpoint Inconsolata',ui-monospace,monospace;text-align:center;cursor:pointer;transition:transform 160ms cubic-bezier(0.16,1,0.3,1);background:transparent;color:var(--text,#ededed);border-color:var(--line,#666666)}.ds-button-secondary:hover{transform:translateY(-2px)}.ds-button-secondary:active{transform:translateY(0)}.ds-button-secondary:focus-visible{outline:3px solid var(--text,#ededed);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-button-secondary{transition:none}}"
+    },
+    {
+      "name": "Acción sobre acento",
+      "kind": "button",
+      "refersTo": "button-on-accent",
+      "description": "Par de colores invertido usado en hero y llamada final.",
+      "html": "<button type=\"button\" class=\"ds-button-on-accent\">Abrir Checkpoint</button>",
+      "css": ".ds-button-on-accent{display:inline-flex;justify-content:center;align-items:center;min-height:48px;max-width:100%;border-radius:5px;border:1px solid var(--line,#666666);padding:11px 16px;font:700 1rem/1.35 'Checkpoint Inconsolata',ui-monospace,monospace;text-align:center;cursor:pointer;transition:transform 160ms cubic-bezier(0.16,1,0.3,1);background:var(--accent-text,#172536);color:var(--accent,#8fb7df);border-color:var(--accent-text,#172536)}.ds-button-on-accent:hover{transform:translateY(-2px)}.ds-button-on-accent:active{transform:translateY(0)}.ds-button-on-accent:focus-visible{outline:3px solid var(--accent-text,#172536);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-button-on-accent{transition:none}}"
+    },
+    {
+      "name": "Selector de tema",
+      "kind": "input",
+      "refersTo": "theme-select",
+      "description": "Selector nativo con etiqueta visible; muestra opciones traducidas del catálogo compartido.",
+      "html": "<label class=\"ds-theme-label\" for=\"ds-theme-select\">Tema</label><select class=\"ds-theme-select\" id=\"ds-theme-select\"><option>Oscuro</option><option>Claro</option></select>",
+      "css": ".ds-theme-label{display:block;font:400 .875rem 'Checkpoint Inconsolata',ui-monospace,monospace;color:var(--muted,#b9b9b9);margin-bottom:2px}.ds-theme-select{min-height:36px;width:148px;max-width:100%;padding:4px 8px;border:1px solid var(--line,#666666);border-radius:5px;color:var(--text,#ededed);background:var(--input,#292929);font:400 .9375rem 'Checkpoint Inconsolata',ui-monospace,monospace;cursor:pointer}.ds-theme-select:focus-visible{outline:3px solid var(--text,#ededed);outline-offset:4px}"
+    },
+    {
+      "name": "Estado del juego",
+      "kind": "chip",
+      "refersTo": "status-chip-playing",
+      "description": "Etiqueta informativa del estado Jugando; no funciona como filtro.",
+      "html": "<span class=\"ds-status-playing\">Jugando</span>",
+      "css": ".ds-status-playing{display:inline-block;padding:6px 10px;border:1px solid var(--accent,#8fb7df);border-radius:5px;background:var(--accent,#8fb7df);color:var(--accent-text,#172536);font:400 .875rem 'Checkpoint Inconsolata',ui-monospace,monospace}"
+    },
+    {
+      "name": "Nota de partida",
+      "kind": "card",
+      "refersTo": "note-card",
+      "description": "Nota de ejemplo de lectura, con borde y encabezado Bagel.",
+      "html": "<section class=\"ds-note\"><h3>Para cuando vuelva</h3><p>Me quedé justo antes del siguiente puzle. Revisar la sala de la izquierda.</p></section>",
+      "css": ".ds-note{color:var(--text,#ededed);font-family:'Checkpoint Inconsolata',ui-monospace,monospace}.ds-note h3{margin:0 0 7px;font:400 1.15rem 'Checkpoint Bagel',sans-serif}.ds-note p{margin:0;padding:12px;border:1px solid var(--line,#666666);border-radius:5px;font-size:1rem;line-height:1.4}"
+    },
+    {
+      "name": "Navegación de secciones",
+      "kind": "nav",
+      "description": "Enlaces de la cabecera a bloques de contenido; se reorganizan dentro del menú móvil.",
+      "html": "<nav class=\"ds-navigation\" aria-label=\"Secciones\"><a href=\"#biblioteca\">Biblioteca</a><a href=\"#experiencia\">Vistas</a><a href=\"#windows\">Windows</a></nav>",
+      "css": ".ds-navigation{display:flex;flex-wrap:wrap;gap:22px;font:400 1rem 'Checkpoint Inconsolata',ui-monospace,monospace;color:var(--text,#ededed)}.ds-navigation a{padding:12px 0;color:inherit;text-decoration:none;text-underline-offset:.22em}.ds-navigation a:hover{color:var(--accent-ink,var(--accent,#8fb7df));text-decoration:underline}.ds-navigation a:focus-visible{outline:3px solid var(--text,#ededed);outline-offset:4px}",
+      "refersTo": "navigation"
+    },
+    {
+      "name": "Pestañas de vistas",
+      "kind": "nav",
+      "refersTo": "gallery-tab",
+      "description": "Galería de capturas: selección con acento y navegación de teclado en la implementación.",
+      "html": "<div class=\"ds-gallery-tabs\" role=\"tablist\" aria-label=\"Vistas de Checkpoint\"><button type=\"button\" role=\"tab\" aria-selected=\"true\" tabindex=\"0\">Cuadrícula</button><button type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Lista</button><button type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Miniatura</button></div>",
+      "css": ".ds-gallery-tabs{display:flex;flex-wrap:wrap;gap:8px}.ds-gallery-tabs button{min-height:44px;padding:9px 20px;border:1px solid var(--line,#666666);border-radius:5px;color:var(--text,#ededed);background:rgb(var(--surface,32 32 32));font:400 1.125rem 'Checkpoint Inconsolata',ui-monospace,monospace;cursor:pointer}.ds-gallery-tabs button:hover{border-color:var(--text,#ededed)}.ds-gallery-tabs button[aria-selected=true]{background:var(--accent,#8fb7df);color:var(--accent-text,#172536);border-color:var(--accent,#8fb7df)}.ds-gallery-tabs button:focus-visible{outline:3px solid var(--text,#ededed);outline-offset:4px}"
+    },
+    {
+      "name": "Tarea de ejemplo",
+      "kind": "custom",
+      "refersTo": "demo-task",
+      "description": "Checkbox nativo de la demo: tachado al marcar, foco de fila y datos sin persistencia en la colección.",
+      "html": "<div class=\"ds-task\"><label><input type=\"checkbox\" checked /><span>Terminar el modo cooperativo</span></label></div>",
+      "css": ".ds-task label{display:flex;align-items:center;gap:10px;min-height:48px;padding:12px;border:1px solid var(--line,#666666);border-radius:5px;color:var(--text,#ededed);font:400 1rem 'Checkpoint Inconsolata',ui-monospace,monospace;cursor:pointer}.ds-task label:hover{background:var(--input,#292929)}.ds-task input{flex:none;width:19px;height:19px;margin:0;accent-color:var(--accent-ink,var(--accent,#8fb7df));cursor:pointer}.ds-task input:checked+span{text-decoration:line-through;text-decoration-thickness:1px;color:var(--muted,#b9b9b9)}.ds-task label:focus-within{outline:2px solid var(--text,#ededed);outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La ficha de juego ampliada",
+    "overview": "La portada usa el lenguaje visual de Checkpoint para hablar a quien juega: letras redondeadas, cuerpo monoespaciado, carátulas y bloques reconocibles de tiempo, logros, tareas y notas. Su personalidad viene de los recursos del producto y de ejemplos concretos, con una voz cercana y sin promesas grandilocuentes.\n\nEste sistema describe exclusivamente la portada pública construida en `web/index.html`, `web/presentation.css` y `web/presentation.mjs`. Las pantallas de la aplicación conservan su propia autoridad visual; este documento no permite cambiar sus estilos ni publicar modificaciones locales pendientes. Los tokens del frontmatter representan el tema predeterminado `dark`. Las demás paletas se generan desde la aplicación, sin mantener una segunda colección de valores aquí.",
+    "keyCharacteristics": [
+      "Tipografía de la ficha: Bagel Fat One e Inconsolata, servidas desde el proyecto.",
+      "Fondos y acentos de los 22 temas existentes.",
+      "Cabeceras de color, tarjetas planas y bordes finos.",
+      "Carátulas y capturas reales, con datos de ejemplo identificados.",
+      "Controles nativos, foco visible y movimiento breve opcional."
+    ],
+    "rules": [
+      {
+        "name": "The Shared Palette Rule",
+        "body": "Los valores de los 22 temas proceden de los bloques de tema del CSS compartido de la aplicación. Se cambian en su fuente y se regeneran; no se duplican paletas en la portada ni en este documento.",
+        "section": "colors"
+      },
+      {
+        "name": "The Product Type Rule",
+        "body": "Bagel se reserva para titulares y cantidades; Inconsolata lleva el contenido operativo. Se conserva esta pareja porque forma parte de la referencia fijada por el usuario.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "El contenido se organiza con color, bordes y espacio. No se añade elevación como sustituto de una jerarquía clara.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do aplicar este sistema solo a la portada pública.",
+      "Do regenerar las paletas desde la fuente compartida y mantener nombres ES/EN coherentes.",
+      "Do conservar las fuentes, el logo, los iconos existentes y la atribución original de Checkpoint.",
+      "Do mostrar capturas reales y señalar los datos de ejemplo.",
+      "Do mantener controles nativos, foco visible, reflujo y movimiento reducido."
+    ],
+    "donts": [
+      "Don't extender estas reglas a las pantallas de la aplicación ni publicar cambios pendientes del colaborador.",
+      "Don't inventar testimonios, cifras, integraciones o capacidades del producto.",
+      "Don't ocultar contenido detrás de animaciones o convertir la portada en una colección de efectos decorativos.",
+      "Don't recolorear capturas para aparentar que representan el tema seleccionado."
+    ]
+  }
+}

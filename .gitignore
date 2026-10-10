@@ -4,6 +4,7 @@
 dist/
 artifacts/
 .qa/
+.impeccable/review/
 .git/
 *.key
 *.pem

@@ -66,10 +66,26 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() =>
-        caches
-          .match(event.request)
-          .then((cached) => cached || Promise.reject(new Error('offline'))),
-      ),
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        // History-only language/theme/view changes do not create a new cached page.
+        // Reuse only known documents; versioned assets must keep their exact URLs.
+        const scope = new URL('./', self.location.href);
+        const documents = [scope, new URL('index.html', scope), new URL('app.html', scope)];
+        if (
+          event.request.mode === 'navigate' &&
+          url.search &&
+          documents.some((document) => document.pathname === url.pathname)
+        ) {
+          const documentUrl = new URL(url.href);
+          documentUrl.search = '';
+          documentUrl.hash = '';
+          const cache = await caches.open(cacheName);
+          const document = await cache.match(documentUrl.href);
+          if (document) return document;
+        }
+        throw new Error('offline');
+      }),
   );
 });

@@ -302,7 +302,7 @@ try {
     await page.evaluate(
       () =>
         getComputedStyle(document.documentElement).colorScheme === 'dark' &&
-        document.querySelector('meta[name="theme-color"]').content === '#090d12',
+        document.querySelector('meta[name="theme-color"]').content === '#202020',
     ),
     'presentation uses its explicit dark theme independently of the application',
   );
@@ -312,10 +312,40 @@ try {
       .evaluateAll((links) => links.every((link) => link.getAttribute('href') === 'app.html#es')),
     'every presentation CTA opens the Spanish application',
   );
-  await page.locator('.hero-showcase img').evaluate((image) => image.decode());
+  await page.locator('.preview-cover img').evaluate((image) => image.decode());
   check(
-    await page.locator('.hero-showcase img').evaluate((image) => image.naturalWidth > 0),
-    'presentation loads the bundled product screenshot',
+    await page.locator('.preview-cover img').evaluate((image) => image.naturalWidth > 0),
+    'presentation loads the bundled game cover',
+  );
+  const presentationTheme = page.getByRole('combobox', { name: 'Tema', exact: true });
+  check(
+    (await presentationTheme.locator('option').count()) === 22,
+    'presentation offers all existing application themes',
+  );
+  await presentationTheme.selectOption('light');
+  check(
+    await page.evaluate(
+      () =>
+        getComputedStyle(document.documentElement).colorScheme === 'light' &&
+        new URL(location.href).searchParams.get('theme') === 'light',
+    ),
+    'theme selection updates the page and its shareable URL',
+  );
+  await page.reload();
+  check(
+    (await presentationTheme.inputValue()) === 'light',
+    'presentation theme selection survives reload',
+  );
+  await presentationTheme.selectOption('dark');
+  await page.locator('.preview-tasks input').nth(1).check();
+  check(
+    (await page.locator('[data-demo-tasks]').innerText()) === '2 de 2 tareas completadas',
+    'the illustrative task demo updates its completion count',
+  );
+  await page.locator('.preview-tasks input').nth(1).press('Space');
+  check(
+    (await page.locator('[data-demo-tasks]').innerText()) === '1 de 2 tareas completadas',
+    'the task demo responds to native keyboard input',
   );
   await page.getByRole('button', { name: 'English', exact: true }).click();
   check(
@@ -330,9 +360,9 @@ try {
       .evaluateAll((links) =>
         links.every((link) => link.getAttribute('href') === 'app.html#en'),
       )) &&
-      (await page.locator('.hero-showcase img').getAttribute('src')).endsWith('library-en.png') &&
-      (await page.locator('.hero-showcase img').getAttribute('alt')).startsWith(
-        'Checkpoint for Windows',
+      (await page.locator('#gallery-grid img').getAttribute('src')).endsWith('library-en.png') &&
+      (await page.locator('.preview-cover img').getAttribute('alt')).startsWith(
+        'Portal 2 cover art',
       ) &&
       (await page.locator('[data-privacy-guide]').getAttribute('href')).includes('/docs/en/'),
     'English presentation updates all CTAs, screenshots, alt text and guides',
@@ -367,7 +397,7 @@ try {
   check(
     (await page.locator('.hero-description').innerText())
       .replace(/\s+/g, ' ')
-      .includes('Your next adventure. One place'),
+      .includes('achievement. The game'),
     'mobile editorial line breaks keep English sentences separated',
   );
   check(
@@ -385,14 +415,14 @@ try {
     (await page
       .getByRole('tab', { name: 'Miniatura', exact: true })
       .getAttribute('aria-selected')) === 'true' &&
-      (await page.locator('#gallery-mini h3').textContent()) ===
-        'Un pequeño espacio para tus grandes planes.',
+      (await page.locator('#gallery-mini h3').innerText()).replace(/\s+/g, ' ') ===
+        'Un hueco al lado de la partida.',
     'gallery selection survives language changes and hidden panels retain complete translations',
   );
   check(
     (await page.locator('.hero-description').innerText())
       .replace(/\s+/g, ' ')
-      .includes('aventura. Un lugar'),
+      .includes('se resiste. El juego'),
     'mobile editorial line breaks keep Spanish sentences separated',
   );
   await page.keyboard.press('Escape');
@@ -1032,6 +1062,17 @@ try {
   await offlinePage.reload();
   await offlinePage.locator('.window').waitFor();
   check(true, 'the cached application opens offline after a first visit');
+  await offlinePage.goto(`http://127.0.0.1:${testPort}/Checkpoint/`);
+  await offlinePage.getByRole('button', { name: 'English', exact: true }).click();
+  await offlinePage.getByRole('combobox', { name: 'Theme', exact: true }).selectOption('forest');
+  await offlinePage.getByRole('tab', { name: 'List', exact: true }).click();
+  await offlinePage.reload();
+  check(
+    (await offlinePage.locator('#gallery-list').isVisible()) &&
+      (await offlinePage.locator('#presentation-theme').inputValue()) === 'forest' &&
+      (await offlinePage.locator('html').getAttribute('lang')) === 'en',
+    'a presentation URL with language, theme and view reloads offline',
+  );
   await offlineContext.close();
   await page.setViewportSize({ width: 1280, height: 900 });
   await click('My account');
