@@ -1,6 +1,6 @@
 ---
-name: 'Checkpoint — portada pública'
-description: 'Sistema visual de la portada web, inspirado en la ficha de juego existente. No regula las pantallas de la aplicación.'
+name: 'Checkpoint — identidad compartida'
+description: 'Sistema visual compartido por la portada y la aplicación web/Windows, basado en la ficha de juego existente.'
 colors:
   accent: '#8fb7df'
   accent-text: '#172536'
@@ -42,6 +42,54 @@ typography:
     fontSize: '1.7rem'
     fontWeight: 400
     lineHeight: 1.25
+  app-caption:
+    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontSize: '12px'
+    fontWeight: 400
+  app-summary:
+    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontSize: '13px'
+    fontWeight: 400
+  app-body:
+    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontSize: '15px'
+    fontWeight: 400
+  app-card-mobile:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '17px'
+    fontWeight: 400
+  app-card:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '19px'
+    fontWeight: 400
+  app-section-small:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '22px'
+    fontWeight: 400
+  app-editor:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '23px'
+    fontWeight: 400
+  app-section-short:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '24px'
+    fontWeight: 400
+  app-metric:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '25px'
+    fontWeight: 400
+  app-brand:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '26px'
+    fontWeight: 400
+  app-section:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '28px'
+    fontWeight: 400
+  app-headline:
+    fontFamily: "'Checkpoint Bagel', sans-serif"
+    fontSize: '30px'
+    fontWeight: 400
 rounded:
   sheet: '5px'
   screenshot: '8px'
@@ -113,7 +161,7 @@ components:
     textColor: '{colors.text}'
 ---
 
-# Design System: Checkpoint — portada pública
+# Design System: Checkpoint — identidad compartida
 
 ## Overview
 
@@ -121,7 +169,7 @@ components:
 
 La portada usa el lenguaje visual de Checkpoint para hablar a quien juega: letras redondeadas, cuerpo monoespaciado, carátulas y bloques reconocibles de tiempo, logros, tareas y notas. Su personalidad viene de los recursos del producto y de ejemplos concretos, con una voz cercana y sin promesas grandilocuentes.
 
-Este sistema describe exclusivamente la portada pública construida en `web/index.html`, `web/presentation.css` y `web/presentation.mjs`. Las pantallas de la aplicación conservan su propia autoridad visual; este documento no permite cambiar sus estilos ni publicar modificaciones locales pendientes. Los tokens del frontmatter representan el tema predeterminado `dark`. Las demás paletas se generan desde la aplicación, sin mantener una segunda colección de valores aquí.
+Este sistema cubre la portada pública y el renderizador común de la app web y Windows. La extensión autorizada se aplica en `src/Checkpoint.App/Web/app-identity.css`, cargada después de los estilos base. No incluye publicar ni revertir las modificaciones pendientes del colaborador ni el cambio pausado de logros de amigos. Los tokens del frontmatter representan el tema predeterminado `dark`. Las demás paletas se generan desde la aplicación, sin mantener una segunda colección de valores aquí.
 
 **Key Characteristics:**
 
@@ -172,6 +220,8 @@ Los titulares redondeados y las cantidades conectan la portada con la ficha. Inc
 
 **The Product Type Rule.** Bagel se reserva para titulares y cantidades; Inconsolata lleva el contenido operativo. Se conserva esta pareja porque forma parte de la referencia fijada por el usuario.
 
+En la app, los títulos operativos son fijos: marca 26px, sección 30px, formulario 23px y juego 19px (16px en cuadrícula). Los controles usan Inconsolata a 15px, con tamaños compactos explícitos de 12–14px. Bagel no sustituye etiquetas de formulario ni los nombres de Miniatura.
+
 ## Layout
 
 El contenedor público alcanza 1200px y deja 80px en total de margen horizontal en escritorio. Los bloques editoriales alternan dos columnas; la ficha de ejemplo usa tres: carátula, estadísticas y diario. Las separaciones de sección se reducen de 96px a 64px en móvil.
@@ -179,6 +229,8 @@ El contenedor público alcanza 1200px y deja 80px en total de margen horizontal 
 Los breakpoints implementados son 1100px, 900px, 640px y 380px. En 900px aparece el menú móvil y el diario pasa debajo de la carátula y los datos. En 640px el hero y las secciones se apilan, y el margen total del contenedor pasa a 32px. En 380px la cabecera divide marca y controles en dos filas, y la ficha pasa a una columna. Los textos y botones permiten reflujo sin depender de una altura fija.
 
 La navegación sticky mantiene el acceso a secciones, idioma y tema. Las anclas dejan un margen superior de 112px para que la cabecera no cubra su destino. La galería reserva dimensiones de imagen y muestra una única vista activa.
+
+La aplicación usa un contenedor flex con regiones de cabecera, navegación, filtros, filas virtualizadas y pie. Las filas mantienen 184px en lista, 126px en compacta y 274px en cuadrícula. En móvil (640px) el selector de lista ocupa una fila completa y los botones van debajo. Los formularios permiten scroll; la Miniatura conserva nombres y estados, sin carátulas ni cabecera.
 
 ## Elevation & Depth
 
@@ -208,6 +260,10 @@ Los estados son etiquetas informativas, no filtros. Un borde y el fondo del pane
 
 Las tarjetas del ejemplo muestran tiempo, visibilidad y progreso. Los paneles de conexión tienen una cabecera de acento y un cuerpo legible. Las notas se presentan como un bloque de texto con borde, sin apariencia de campo editable cuando no hay edición.
 
+### Shared App Layer
+
+`app-identity.css` es la única extensión de estilo del renderizador: botones/campos con radio de 5px, paneles con borde de 1px, navegación activa con acento, títulos Bagel y texto Inconsolata. Se conservan los archivos base del colaborador. Las tintas de enlaces y estados se mezclan con el texto de cada tema para mantener legibilidad; los iconos de la ficha se adaptan mediante máscaras o inversión según la paleta. La app no usa entradas decorativas: solo transiciones de controles de 160ms, desactivadas con movimiento reducido. En móviles estrechos el selector ocupa una fila completa; el shell permite desplazamiento y reserva 180px al área de juegos cuando la cabecera necesita varias filas.
+
 ### Inputs / Fields
 
 El selector de tema es un `select` nativo con etiqueta visible y opciones bilingües. Su ancho se reduce de 148px a 125px y 112px al estrechar el viewport; en la cabecera más pequeña ocupa el espacio disponible. Los controles nativos mantienen su teclado y comportamiento de plataforma.
@@ -228,7 +284,7 @@ Una lista con checkboxes nativos invita a probar la ficha. La tarea marcada se t
 
 ### Do:
 
-- **Do** aplicar este sistema solo a la portada pública.
+- **Do** aplicar la identidad común a la portada y al renderizador web/Windows; adaptar densidad a la tarea.
 - **Do** regenerar las paletas desde la fuente compartida y mantener nombres ES/EN coherentes.
 - **Do** conservar las fuentes, el logo, los iconos existentes y la atribución original de Checkpoint.
 - **Do** mostrar capturas reales y señalar los datos de ejemplo.
@@ -236,7 +292,7 @@ Una lista con checkboxes nativos invita a probar la ficha. La tarea marcada se t
 
 ### Don't:
 
-- **Don't** extender estas reglas a las pantallas de la aplicación ni publicar cambios pendientes del colaborador.
+- **Don't** publicar o revertir cambios pendientes del colaborador ni alterar el trabajo pausado de logros de amigos.
 - **Don't** inventar testimonios, cifras, integraciones o capacidades del producto.
 - **Don't** ocultar contenido detrás de animaciones o convertir la portada en una colección de efectos decorativos.
 - **Don't** recolorear capturas para aparentar que representan el tema seleccionado.

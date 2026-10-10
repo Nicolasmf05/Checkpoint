@@ -58,19 +58,19 @@ const english = {
   galleryGridTitle: 'The one with that cover.\nThat’s what I want to play.',
   galleryGridText:
     'Sometimes a cover is all it takes to remember a game. Here they all are, with their status and what you still want to do.',
-  galleryGridNote: 'Windows screenshot · Sample collection',
-  galleryListAlt: 'Checkpoint list view in Spanish with Hollow Knight, Hades and Portal 2',
+  galleryGridNote: 'Web app screenshot · Sample collection',
+  galleryListAlt: 'Checkpoint list view with Hollow Knight, Hades and Portal 2',
   galleryListTitle: 'A quick look\nbefore you play.',
   galleryListText:
     'The name, the status and the next goal. One after another, so you can find what you need without hunting around.',
-  galleryListNote: 'Windows screenshot · Spanish example',
+  galleryListNote: 'Web app screenshot · Sample collection',
   galleryMiniAlt: 'Checkpoint Miniature mode showing three games and their statuses',
   galleryMiniTitle: 'A little space\nbeside your game.',
   galleryMiniText:
     'Keep your list in a small window while you do other things. Your games stay close without taking over the desktop.',
   galleryMiniNote: 'Miniature mode · Available on Windows',
   galleryThemeNote:
-    'These are real screenshots in their original theme. The selector changes this page and the example game details.',
+    'Real app screenshots in the dark theme. The selector changes this page and the example game details.',
   progressTitle: 'One left.\nOr a few more.',
   steamTitle: 'Don’t add them one by one.',
   steamText:

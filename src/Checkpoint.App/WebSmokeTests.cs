@@ -118,6 +118,50 @@ public partial class MainWindow
                 ),
                 "useful shortcuts are visible and controls expose accessible key gestures"
             );
+            // Marketing evidence uses the same real renderer and the initial demo collection.
+            // Optional local covers keep screenshots deterministic without changing production data.
+            string? galleryCoverFolder = Environment.GetEnvironmentVariable(
+                "CHECKPOINT_GALLERY_COVERS"
+            );
+            if (!string.IsNullOrEmpty(galleryCoverFolder))
+                foreach (var item in Games)
+                {
+                    string source = Path.Combine(galleryCoverFolder, item.SteamAppId + ".jpg");
+                    if (File.Exists(source))
+                        item.CustomCover = Covers.Import(source);
+                }
+            double galleryOpacity = Preferences.BackgroundOpacity;
+            double galleryMiniWidth = Preferences.MiniatureWidth;
+            double galleryMiniHeight = Preferences.MiniatureHeight;
+            Preferences.BackgroundOpacity = 1;
+            Preferences.MiniatureWidth = 420;
+            Preferences.MiniatureHeight = 220;
+            Preferences.MiniatureView = true;
+            ApplyPreferences();
+            Refresh();
+            await Wait(() =>
+                Script(
+                    web!,
+                    "document.fonts.status==='loaded' && document.querySelectorAll('.minirow').length===3"
+                )
+            );
+            await Capture(web!, "css-gallery-miniature-es.png");
+            Preferences.Language = "en";
+            I18n.SetLanguage("en");
+            Refresh();
+            await Task.Delay(250);
+            await Capture(web!, "css-gallery-miniature-en.png");
+            Preferences.Language = "es";
+            I18n.SetLanguage("es");
+            Preferences.MiniatureView = false;
+            Preferences.BackgroundOpacity = galleryOpacity;
+            ApplyPreferences();
+            Preferences.MiniatureWidth = galleryMiniWidth;
+            Preferences.MiniatureHeight = galleryMiniHeight;
+            Refresh();
+            await Wait(() =>
+                Script(web!, "!window.checkpointState.mini && document.fonts.status==='loaded'")
+            );
             await Run("document.querySelector('.shortcut-button').click();");
             Check(
                 await Script(
@@ -162,7 +206,13 @@ public partial class MainWindow
                 new byte[] { 130, 210, 170, 255 },
                 4
             );
-            coverGame.CustomCover = Covers.SavePrepared(WebSurface.ImageBytes(fixture));
+            string? galleryCover = string.IsNullOrEmpty(galleryCoverFolder)
+                ? null
+                : Path.Combine(galleryCoverFolder, coverGame.SteamAppId + ".jpg");
+            coverGame.CustomCover =
+                galleryCover is not null && File.Exists(galleryCover)
+                    ? Covers.Import(galleryCover)
+                    : Covers.SavePrepared(WebSurface.ImageBytes(fixture));
             Persist();
             Refresh();
             await Wait(() =>
@@ -224,6 +274,10 @@ public partial class MainWindow
             ];
             Refresh();
             await Wait(() => Script(web, "!!document.querySelector('.achievement-link')"));
+            // Narrow windows virtualize this newly added game below the first visible rows.
+            await Run(
+                "document.querySelector('.viewport').scrollTop=document.querySelector('.rows').scrollHeight;"
+            );
             await Run(
                 "document.querySelector('[data-game=\""
                     + achievementFixture.Id
@@ -859,6 +913,14 @@ public partial class MainWindow
             await Run(
                 "document.dispatchEvent(new KeyboardEvent('keydown',{key:'PageUp',bubbles:true}));"
             );
+            // Native snapshots and virtualized scroll can finish after the key event.
+            // Wait for the actual destination instead of relying only on a fixed delay.
+            await Wait(() =>
+                Script(
+                    web,
+                    "document.activeElement.matches('.minirow') && !document.activeElement.textContent.includes('0999')"
+                )
+            );
             Check(
                 await Script(
                     web,
@@ -966,7 +1028,7 @@ public partial class MainWindow
             Check(
                 await Script(
                     notice,
-                    "getComputedStyle(document.querySelector('.dialog-page')).backgroundColor==='rgb(66, 40, 75)'"
+                    "getComputedStyle(document.querySelector('.dialog-page')).backgroundColor==='rgb(33, 19, 40)'"
                 ),
                 "app notices follow the chosen custom theme"
             );
@@ -997,6 +1059,15 @@ public partial class MainWindow
                 )
                 .WorkingArea;
             var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this);
+            await Wait(async () =>
+                IsFullWindow
+                && Math.Abs(Width - area.Width / dpi.DpiScaleX) < 2
+                && Math.Abs(Height - area.Height / dpi.DpiScaleY) < 2
+                && await Script(
+                    web,
+                    "window.checkpointState.opacity===1 && getComputedStyle(document.querySelector('.window')).borderRadius==='0px'"
+                )
+            );
             Check(
                 IsFullWindow
                     && Math.Abs(Width - area.Width / dpi.DpiScaleX) < 2

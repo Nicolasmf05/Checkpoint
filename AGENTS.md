@@ -15,3 +15,5 @@ Creator attribution is required by the current LICENSE. Original v0.8.5 and earl
 The owner develops Checkpoint with a collaborator. Preserve the collaborator’s existing edits; never overwrite or revert them. Do not modify graphic design, CSS, themes, colors, spacing, or visual styling. Functional fixes may change behavior and data binding while retaining the existing design. The unfinished friends-achievement visual change is paused: do not publish it or revert it without the owner’s instruction.
 
 Exception authorized by the owner: improve the game details sheet, including a clock card for playtime. Keep styling changes scoped to that sheet and preserve the collaborator’s design elsewhere.
+
+Owner-authorized extension: unify the full shared app renderer with the public website and game-sheet identity, and regenerate current screenshots. Keep this in the shared `app-identity.css` layer; preserve collaborator edits and continue excluding the paused friends-achievement change.

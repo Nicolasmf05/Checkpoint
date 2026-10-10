@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-10T22:47:16Z",
-  "title": "Design System: Checkpoint — portada pública",
+  "generatedAt": "2026-10-10T23:15:42.015034+00:00",
+  "title": "Design System: Checkpoint — identidad compartida",
   "extensions": {
     "colorMeta": {
       "accent": {
@@ -93,7 +93,27 @@
         "name": "narrow-header",
         "value": "380px"
       }
-    ]
+    ],
+    "appLayer": {
+      "source": "src/Checkpoint.App/Web/app-identity.css",
+      "mode": "operate",
+      "rowHeights": {
+        "list": 184,
+        "compact": 126,
+        "grid": 274
+      },
+      "radius": "5px",
+      "body": "15px Checkpoint Inconsolata",
+      "headings": {
+        "brand": "26px",
+        "section": "30px",
+        "form": "23px",
+        "game": "19px",
+        "gridGame": "16px"
+      },
+      "smallScreenCollection": "select occupies a full row at max-width640px",
+      "pausedWorkExcluded": true
+    }
   },
   "components": [
     {
@@ -171,7 +191,7 @@
   ],
   "narrative": {
     "northStar": "La ficha de juego ampliada",
-    "overview": "La portada usa el lenguaje visual de Checkpoint para hablar a quien juega: letras redondeadas, cuerpo monoespaciado, carátulas y bloques reconocibles de tiempo, logros, tareas y notas. Su personalidad viene de los recursos del producto y de ejemplos concretos, con una voz cercana y sin promesas grandilocuentes.\n\nEste sistema describe exclusivamente la portada pública construida en `web/index.html`, `web/presentation.css` y `web/presentation.mjs`. Las pantallas de la aplicación conservan su propia autoridad visual; este documento no permite cambiar sus estilos ni publicar modificaciones locales pendientes. Los tokens del frontmatter representan el tema predeterminado `dark`. Las demás paletas se generan desde la aplicación, sin mantener una segunda colección de valores aquí.",
+    "overview": "La portada usa el lenguaje visual de Checkpoint para hablar a quien juega: letras redondeadas, cuerpo monoespaciado, carátulas y bloques reconocibles de tiempo, logros, tareas y notas. Su personalidad viene de los recursos del producto y de ejemplos concretos, con una voz cercana y sin promesas grandilocuentes.\n\nEste sistema cubre la portada pública y el renderizador común de la app web y Windows. La extensión autorizada se aplica en `src/Checkpoint.App/Web/app-identity.css`, cargada después de los estilos base. No incluye publicar ni revertir las modificaciones pendientes del colaborador ni el cambio pausado de logros de amigos. Los tokens del frontmatter representan el tema predeterminado `dark`. Las demás paletas se generan desde la aplicación, sin mantener una segunda colección de valores aquí.",
     "keyCharacteristics": [
       "Tipografía de la ficha: Bagel Fat One e Inconsolata, servidas desde el proyecto.",
       "Fondos y acentos de los 22 temas existentes.",
@@ -197,14 +217,14 @@
       }
     ],
     "dos": [
-      "Do aplicar este sistema solo a la portada pública.",
+      "Do aplicar la identidad común a portada y renderizador web/Windows, adaptando la densidad a la tarea.",
       "Do regenerar las paletas desde la fuente compartida y mantener nombres ES/EN coherentes.",
       "Do conservar las fuentes, el logo, los iconos existentes y la atribución original de Checkpoint.",
       "Do mostrar capturas reales y señalar los datos de ejemplo.",
       "Do mantener controles nativos, foco visible, reflujo y movimiento reducido."
     ],
     "donts": [
-      "Don't extender estas reglas a las pantallas de la aplicación ni publicar cambios pendientes del colaborador.",
+      "Don't publicar/revertir cambios pendientes del colaborador ni alterar el trabajo pausado de logros de amigos.",
       "Don't inventar testimonios, cifras, integraciones o capacidades del producto.",
       "Don't ocultar contenido detrás de animaciones o convertir la portada en una colección de efectos decorativos.",
       "Don't recolorear capturas para aparentar que representan el tema seleccionado."

@@ -1,0 +1,677 @@
+{
+  "version": 1,
+  "promotedAt": "2026-10-10T23:28:13.761Z",
+  "fixture": "scripts/fixtures/gallery.mjs",
+  "fingerprint": "8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f",
+  "note": "Actual renderer captures; illustrative isolated data. Game artwork rights remain with its owners. Checkpoint originally created by Nicolasmf05.",
+  "images": [
+    {
+      "file": "docs/screenshots/readme-library-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "scene": "list",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "ed7ef1f8e8b2228c9b7321e3878ac84d0a9f63a72dcda41bfd4e5d13a482b68b",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "web/assets/presentation/list-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "scene": "list",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "ed7ef1f8e8b2228c9b7321e3878ac84d0a9f63a72dcda41bfd4e5d13a482b68b",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "web/assets/presentation/list.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "scene": "list",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "ed7ef1f8e8b2228c9b7321e3878ac84d0a9f63a72dcda41bfd4e5d13a482b68b",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "docs/screenshots/readme-grid-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "scene": "grid",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 920
+      },
+      "sha256": "3175218bd5e9a8e11b70f8699a86c93063311e043c68ac92509ec7a4b7711514",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene grid; language es; theme dark; viewport 900x920; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "web/assets/presentation/library-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "scene": "grid",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 920
+      },
+      "sha256": "3175218bd5e9a8e11b70f8699a86c93063311e043c68ac92509ec7a4b7711514",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene grid; language es; theme dark; viewport 900x920; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "docs/screenshots/readme-details-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "scene": "details",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "4fbfd23a2943410d96e09a394e03b93591172198720298447836ec7a159da60f",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene details; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "docs/screenshots/readme-library-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "scene": "list",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "90221b6cb44b5fab1a9234e78fe31c2cec58b27ea2b1e134b862a2c818068009",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language en; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "web/assets/presentation/list-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "scene": "list",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "90221b6cb44b5fab1a9234e78fe31c2cec58b27ea2b1e134b862a2c818068009",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language en; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "docs/screenshots/readme-grid-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "scene": "grid",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 920
+      },
+      "sha256": "a2796ff37ddf664762ede14f74c77888ac8525c734bea3564f924f8db455ef4e",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene grid; language en; theme dark; viewport 900x920; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "web/assets/presentation/library-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "scene": "grid",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 920
+      },
+      "sha256": "a2796ff37ddf664762ede14f74c77888ac8525c734bea3564f924f8db455ef4e",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene grid; language en; theme dark; viewport 900x920; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "docs/screenshots/readme-details-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "scene": "details",
+      "theme": "dark",
+      "viewport": {
+        "width": 900,
+        "height": 1200
+      },
+      "sha256": "1c1d95ebf1e86200b162daa6c27ee94c59da7944692d62e1dbfa4d5a7b7d354a",
+      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene details; language en; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 8cc11190e6b0f7e644cad4e169520da7f46f1ba92b2043fecd70eb14529a5c8f."
+    },
+    {
+      "file": "docs/screenshots/css-achievement-review-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "415a0d40b1a9df109d82d1deb426b93d86056ae2d87682454d6c44d5bdc420d0",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-achievement-review-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-achievements-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "504172895eb307a7fad7c855d889a18534538e0861f621dd7a59c84c3f61d44e",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-achievements-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-achievements-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "efebdb2a9479f488ced9c550d12d3bcfc3b84057030daa4ebe6d120762be8822",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-achievements-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-compact-light-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "cb3e7870ce8dd21ec3eef8239f279f86f3bc7b41a4ef6963134ad062b6bb4bc8",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-compact-light-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-configure-shortcuts-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "073bff4bc9ef6fb63458d08b7635487ddecf36de832237a6877a046625592a9a",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-configure-shortcuts-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-cover-review-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "6d57abc84cb2521a4bb1a22eaed2252452c4456aea9bf3dee54ccffd6a233875",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-cover-review-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-editor-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "eb78da0ac63de7d1f0a7c93d8fe3dceccf1160ac5cce540e90d49c0e5f2048e9",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-editor-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-friends-login-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "98384d4ca241673db5e4578c5328bbdf89eb96a7bb68c290eb8bf5752ab3a3e2",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-friends-login-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-full-window-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "f15bbb7c9277b13b745b7a257cac0bbf1e0fc94202562704ead846ed775cca0e",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-full-window-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-gallery-miniature-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "f641015feea2f1dddfe532b5ff44de3052781e6abb689f8f1c81e5b2341fef49",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-gallery-miniature-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "web/assets/presentation/miniature-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "f641015feea2f1dddfe532b5ff44de3052781e6abb689f8f1c81e5b2341fef49",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-gallery-miniature-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-gallery-miniature-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "b023ea4d98b3a80322f2b36bd542b1ce0031ce83bf8d252ef6961a0d6ee7a924",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-gallery-miniature-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "web/assets/presentation/miniature-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "b023ea4d98b3a80322f2b36bd542b1ce0031ce83bf8d252ef6961a0d6ee7a924",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-gallery-miniature-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-game-details-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "926b8257064d6d2d67af21d4b6be1f81449dde36fe2fe540768de7c9d1d7e4e6",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-game-details-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-game-menu-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "f2cd28e6fb84830ec405aa4c0e8e0617d2783aa278ca31a658444d334fe8e81a",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-game-menu-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-grid-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "1cf3872d6874acf803366c17ff5b6235308893d3284f4360f68170ff6fa14893",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-grid-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-igdb-cover-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "fd8eb6746676deda6f81397af52cfaafb7a38d6dbd12f060be38a4c56d1788f0",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-igdb-cover-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-list-details-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "4f7da84a55c168b68e64f19452855b0ffc0b25faf8a0dbce33180cac610a8b59",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-list-details-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-lists-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "14c93eff1a0cdb1e083f4e185799f1d94a3018cacc7a45f8bbd15c7f44a5f4b1",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-lists-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-miniature-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "b25a1156503c1c4f0576a818f00475189b62b59866de19a8032e3ff7493db4b0",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-miniature-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-miniature-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "6eaec37cadb1daf8621c8b9681adc0b9fa5968533fdd4d9138a892560a525729",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-miniature-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-miniature-library-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "84ce3ad29b1d9fd951d7d3e9a963c23e9fe3c66e4ea2541e15b387d1b086f7ca",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-miniature-library-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-notice-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "5b52cd0d5abb8c2d1650fe8a4acfda72f0ad06c8e38d43cb9fc3662bd8fca44b",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-notice-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-private-games-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "2ca865e3c6eec944cf1f842efcba233c12f8281c86f1d5e74c3d8b8a3d8a4ce9",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-private-games-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-settings-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "e314315ae284ba0161c6c656eb79a7a18203ff520b507de879af42b07f76c09e",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-settings-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-shortcuts-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "4143207a6f479264506878a938b37dfcee87192b9aae84870c3e724d80b60e97",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-shortcuts-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-shortcuts-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "2c7324eb6b339e2314389325847487c76935b8c9b019dd6fa84187ddcff77a15",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-shortcuts-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-amber-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "ca76ef5b9dfb964534e28b94a60405b59ecc7fb5fefc780b8cb065de52ef1aa2",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-amber-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-black-orange-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "04623f1b8c3a1afaf9857b230dc2150b5af06f6dd9631ebf98326b0f494ecd43",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-black-orange-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-black-red-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "49720fae8980cd59593d0a7689cf6f645da24ebc4ca51d206705aba3a7bee994",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-black-red-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-black-white-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "f437d1ff4888da00f23fde0d61f027d7126545b966abe5ed129b13b94b196f3e",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-black-white-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-blue-white-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "046e40613bc14bf7f5fecee10768d0205da1fcc5d04a5e82f2f70769fb61c324",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-blue-white-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-contrast-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "13ce09445e67813c9916eba43502a3d15d170726d0af8cdac8655a37e05473b5",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-contrast-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-coral-cream-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "80f55712db4ebb5924e09b8713825bff6f0e7ac17b4e5a8f37e820f25c34d372",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-coral-cream-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-cyber-purple-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "b130ea80dbc650e87a474cc2673dc627261e7197029ce069a2f37b058e1c56a9",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-cyber-purple-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-dark-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "f6a573079c6c5951d3afc2be7e68baab93d0aa4d82a6d5adc3ec8a8d79d3202f",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-dark-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-electric-blue-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "240aeebc196c46741e53bd0aa92fb410559bf220ea1ce96af3092ec214b8aa91",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-electric-blue-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-emerald-neutral-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "c5c5e14c209d701ca6d722b9f15d68804249d815efe163da608cfb93593f6845",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-emerald-neutral-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-forest-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "a0cdd8470aafda0492dc3a6e0a9ddc547722c7342f5dfa12374143362053220a",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-forest-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-indigo-gray-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "ea2a6e507c11efc7f707ef26ac5cdd1ae643cf8caaa1970a0cb56c927d8d28da",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-indigo-gray-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-light-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "2208e4670d37607c4a1d19867b39c15ed1e15c78c66426e00fffba1dd0cee250",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-light-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-midnight-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "1cd3cd68605e0610e8491fff842c691a3664896e0576c31421a6c45def2d2a53",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-midnight-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-navy-cyan-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "11a8bc78598c978abcdfaddbcb3acb52f1249c96ed27fa82fa78b40bc04b1bd5",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-navy-cyan-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-neon-lime-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "af28bd8da0ebf583ee6d2bd7514c9c2e237e21435c076fd072e690fa9d6f60fb",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-neon-lime-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-ocean-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "6ded5580cc5f568a7d5b9cffa2107e4921a64462b55bd1d731a9a9abc9f639df",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-ocean-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-orange-charcoal-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "59a3e0c1f69dc314dd0d41bcd82c7b4364d4a8fe8b3356ce013a36ecfa061f19",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-orange-charcoal-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-plum-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "56a8a374043d23e18ba16386696092582b693e592f191d131cbc43f3e2d7212b",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-plum-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-purple-dark-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "75c87ca52b8f9ef0db7ea7fa6666e02d59d0ff8d73bedd0da57c6df2908204de",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-purple-dark-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-settings-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "ac02993ef3b88f7ae22597b7a0daa7b4ca8a9e879218cdb1ef412007bb7526dc",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-settings-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-theme-synthwave-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "a9c3cf4420a67d645cce31e4181f62d8713b783c3571fde9d8387e0be4ba5f79",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-theme-synthwave-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-updates-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "4cf5ea8c6149d234d00060131f11fda81b6c86c8ea2c96e941f7c6da4166d3b0",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-updates-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-widget-en.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "en",
+      "sha256": "37a0065217a7122f57e168a9f48f6c53854c29e1fa8f1634662fbd005b26f68b",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-widget-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/css-widget-es.png",
+      "renderer": "Windows WebView2/CapturePreviewAsync",
+      "language": "es",
+      "sha256": "05c9a91ccbd7293803b21308dffe0e77a43f1d7e0109ed9aca2441b2fdc37cc6",
+      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-64bf1c5e39924d67a2ffcc6595b16ebe/render/css-widget-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-achievement-review-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "b0ec67f99cc178d73c01e1988da145eda29c36109bffa3a05f9628681e2c0e33",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-achievement-review-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-achievements-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "3502b42f734b6d2c227f4eebbd9bf2fb75e0474d6d3a125ef57e49cea5627e07",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-achievements-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-bulk-library-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "9800e412c1f70244392fc5ebb81d315b9d0e20b308f1e70422f3b57d1436c15d",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-bulk-library-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-cover-review-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "0a8a056f590001d6b7a466dfcc0bf3587f05e67caa28da309035b38535cb68dd",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-cover-review-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-friends-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "663ddd079bad9c8dddfa4a4fd882545965d03a6e0ca31316f179f96f50b70190",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-friends-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-game-details-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "e58e81be8ee125bcebaa23aed763983553a04162ff16044daf7e16845d68e53f",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-game-details-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-game-menu-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "77601d726ccd06002ef04485b29b955bb90dcefb7aa8443cc2125204e0b3b4fd",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-game-menu-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-igdb-cover-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "e9b404605ee0a97edc10e5a3c8b14bcd93d62ae1c906694f4021a2d13072f5fe",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-igdb-cover-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-library-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "a418f6681b410f967fe0deb8ea708ab579f7511b8dd6f61d8e05a3318985509c",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-library-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-list-details-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "158df5911e3f6a88c6c167eb0468a2c450f97fef9409a0305ccf08ea484ad938",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-list-details-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-lists-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "76b4d798011630442b08bf1afa3524c8748b69f93443aafe1768b4f62d5fda4f",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-lists-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-login-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "df2ad5abbde55e52ae19830e0af3863a51ae731aa56065191288cee2c02ef0a3",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-login-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-login-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "sha256": "8e1a603a50034a6c096eda416e83daaf5dee3aaa34283fc808bad590842d56bc",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-login-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-mobile-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "fc4fb53bc5a651571176e3b4afbb3ee841f9a13b7ffbbe9c3b5cdd60f6b82d93",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-mobile-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-presentation-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "794edc537236be452c87ab36c07b778741be46fbe3037ba7a10f69fe99757111",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-presentation-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-presentation-es.png",
+      "renderer": "Chromium/Playwright",
+      "language": "es",
+      "sha256": "bd5271d22cc44c2423a502fc9274f34ba4a471e0c76dda110f3c64f07ac806b9",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-presentation-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-presentation-mobile-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "b075ce0bf0e439265c806c599bb12862a46ea94d23b95db74123209cea40e184",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-presentation-mobile-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-primary-actions-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "6acd6fbb720f1b4c7e5662ca1cb6b92cd76804006a631e28d426837ea3696443",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-primary-actions-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-private-games-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "a1ee748089c00199b1b8ed7162f6ce56473ed07c68d476d397917b516859de25",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-private-games-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-responsive-1440-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "8e46fd17d9f83042522d692e0898b8154cf8d5dffb933bca700e2ffbe1b02b1a",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-responsive-1440-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-responsive-390-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "1ab415aaf6b2273682c212b791e795b5f21ae1aaa32e89f184872faf6ba42b38",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-responsive-390-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    },
+    {
+      "file": "docs/screenshots/web-shortcuts-en.png",
+      "renderer": "Chromium/Playwright",
+      "language": "en",
+      "sha256": "0d927ac952b34a8fb0ec510abf51ee5477cc109e5e8c6a908d073b3532b754b0",
+      "origin": "Checkpoint actual Chromium/Playwright screenshot from successful isolated regression tests (157 checks). Original evidence .qa/web-browser/web-shortcuts-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
+    }
+  ]
+}

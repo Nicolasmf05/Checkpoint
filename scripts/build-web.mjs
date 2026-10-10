@@ -139,6 +139,7 @@ for (const file of ['LICENSE', 'ATTRIBUTION.md', 'ATTRIBUTION.es.md'])
 for (const file of files) await copyFile(path.join(root, 'web', file), path.join(out, file));
 for (const [from, to] of [
   ['app.css', 'app.css'],
+  ['app-identity.css', 'app-identity.css'],
   ['app.js', 'ui.js'],
   ['ui-model.mjs', 'ui-model.mjs'],
   ['shortcuts.mjs', 'shortcuts.mjs'],
@@ -155,6 +156,15 @@ await cp(
 const detailFiles = (await readdir(path.join(out, detailAssets)))
   .sort()
   .map((file) => `${detailAssets}/${file}`);
+const identityAssets = 'assets/identity';
+await cp(
+  path.join(root, 'src', 'Checkpoint.App', 'Web', identityAssets),
+  path.join(out, identityAssets),
+  { recursive: true },
+);
+const identityFiles = (await readdir(path.join(out, identityAssets)))
+  .sort()
+  .map((file) => `${identityAssets}/${file}`);
 const presentationAssets = 'assets/presentation';
 await cp(path.join(root, 'web', presentationAssets), path.join(out, presentationAssets), {
   recursive: true,
@@ -162,7 +172,7 @@ await cp(path.join(root, 'web', presentationAssets), path.join(out, presentation
 const presentationFiles = (await readdir(path.join(out, presentationAssets)))
   .sort()
   .map((file) => `${presentationAssets}/${file}`);
-const imageFiles = [...detailFiles, ...presentationFiles];
+const imageFiles = [...identityFiles, ...detailFiles, ...presentationFiles];
 const english = {
   ...JSON.parse(
     await readFile(path.join(root, 'src', 'Checkpoint.Core', 'Localization', 'en.json'), 'utf8'),
@@ -182,6 +192,7 @@ for (const file of [
   ...generatedFiles,
   'ui.js',
   'app.css',
+  'app-identity.css',
   'ui-model.mjs',
   'shortcuts.mjs',
   'en.json',
@@ -200,7 +211,7 @@ for (const file of [...files, ...generatedFiles, 'ui.js', 'ui-model.mjs', 'short
   );
   if (file.endsWith('.html'))
     source = source.replace(
-      /((?:href|src)=")((?:app|web|presentation(?:-themes)?)\.css|(?:start|presentation)\.mjs)(")/g,
+      /((?:href|src)=")((?:app(?:-identity)?|web|presentation(?:-themes)?)\.css|(?:start|presentation)\.mjs)(")/g,
       (_, prefix, url, suffix) => prefix + url + '?v=' + revision + suffix,
     );
   await writeFile(path.join(out, file), source);

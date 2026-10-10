@@ -18,7 +18,7 @@ Checkpoint conserva estados, listas, tareas y notas por juego. La portada públi
 
 La biblioteca manual no requiere cuenta. Los amigos requieren una cuenta. Steam puede importar juegos y logros con los datos de juego públicos. La biblioteca privada no se sincroniza automáticamente entre web y Windows; se puede trasladar mediante JSON.
 
-Este encargo solo modifica la portada pública. Se preservan los cambios locales del colaborador y no se publica el trabajo pausado de logros de amigos. La publicación permanece en GitHub Pages. No se crea una nueva release de Windows.
+El encargo actual unifica el estilo de la portada y del renderizador compartido de la aplicación web y Windows, y renueva sus capturas reales. Se preservan los cambios locales del colaborador y no se publica el trabajo pausado de logros de amigos. La publicación permanece en GitHub Pages. La edición Windows se distribuye en una release estable completa tras verificar CI y paquetes.
 
 ## Brand Commitments
 

@@ -18,6 +18,7 @@ const assets = [
   'ui-model.mjs',
   'shortcuts.mjs',
   'app.css',
+  'app-identity.css',
   'web.css',
   'config.json',
   'en.json',

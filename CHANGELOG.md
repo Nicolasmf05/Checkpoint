@@ -2,6 +2,12 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.28
+
+- The Windows and browser apps now share the public website and game-sheet identity: Bagel Fat One headings, Inconsolata controls and copy, consistent panels, focus and all 22 existing palettes.
+- Library, list, compact and grid layouts, forms, settings, account, menus, game details and Miniature use one shared style layer without changing collection data or virtualized row geometry.
+- Current screenshots are captured from the real interfaces with local cover fixtures and bilingual example collections. Legacy WPF evidence is identified as historical.
+
 ## 0.8.27
 
 - Individual, automatic and full achievement updates share result application. Concurrent reads of the same game share one request; individual updates no longer disappear during another review. The one-minute throttle applies only to successful automatic refreshes.

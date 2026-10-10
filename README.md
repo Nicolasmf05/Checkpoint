@@ -33,7 +33,7 @@ When the Steam cover is missing, Checkpoint automatically applies an IGDB refere
 
 ## Screenshots
 
-Actual browser app, shown with the Light theme and a small example collection. Game states and playtime are illustrative; covers come from Steam. No personal accounts or test labels appear. [Full gallery](docs/en/SCREENSHOTS.md).
+Actual browser app in the Dark theme, with three isolated example games and local Steam covers. Progress, playtime and tasks are illustrative; no user account is connected. [Full gallery](docs/en/SCREENSHOTS.md).
 
 | Cover grid | Game details |
 | --- | --- |

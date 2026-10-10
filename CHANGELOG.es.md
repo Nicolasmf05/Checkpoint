@@ -2,6 +2,12 @@
 
 # Historial de cambios
 
+## 0.8.28
+
+- La app de Windows y navegador comparte la identidad de la portada y la ficha: titulares Bagel Fat One, textos y controles Inconsolata, paneles y foco coherentes en los 22 temas existentes.
+- Biblioteca, lista, compacta, cuadrícula, formularios, ajustes, cuenta, menús, fichas y Miniatura usan una capa visual común sin modificar los datos ni la geometría de las filas virtualizadas.
+- Capturas actuales de las interfaces reales, con carátulas locales y colecciones de ejemplo en ambos idiomas. Las evidencias WPF antiguas quedan identificadas como históricas.
+
 ## 0.8.27
 
 - La actualización individual, automática y el repaso comparten la aplicación de resultados. Las consultas simultáneas del mismo juego comparten una petición; actualizar un juego durante otro repaso ya no se ignora. El límite de un minuto se aplica solo a actualizaciones automáticas correctas.

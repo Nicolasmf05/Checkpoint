@@ -2,219 +2,62 @@
 
 **English** · [Español](../SCREENSHOTS.md)
 
-Current captures use actual WebView2 HTML/CSS through `CapturePreviewAsync` in isolated package tests. Older WPF captures below are archived examples. Games/users/progress are fixtures, HTTP replies are simulated, and private cover artwork uses a solid-color image. This is not real-account signup evidence.
+These images show the current interface: Bagel Fat One and Inconsolata typography and the game sheet's shared themes. Every capture uses the actual application with an isolated profile. Games, tasks, playtime and progress are examples; no personal account is connected.
 
-## README gallery
+## Example collection
 
-The README uses fresh captures of the real browser application with the Light theme, official Steam covers and three example games. Progress and playtime are illustrative. These captures do not show a signed-in account. Older automated captures below remain as historical validation evidence.
+README and presentation images are captured separately from functional tests. They use three games, the Dark theme and local Steam artwork owned by Team Cherry, Supergiant Games and Valve. Each scene has complete English and Spanish versions.
 
-![Example collection](../screenshots/readme-library-en.png)
+| List                                                  | Cover grid                                         |
+| ----------------------------------------------------- | -------------------------------------------------- |
+| ![English list](../screenshots/readme-library-en.png) | ![English grid](../screenshots/readme-grid-en.png) |
 
-## 0.8.6 — 22 themes
+![Portal 2 game details in English](../screenshots/readme-details-en.png)
 
-Fourteen new palettes, light and dark, with [all previews and colors](THEMES.md).
+**Miniature** is captured in actual Windows WebView2. It is not a browser-app simulation.
 
-![Checkpoint](../screenshots/css-theme-cyber-purple-en.png)
+![English Miniature with three games](../screenshots/css-gallery-miniature-en.png)
 
-## 0.8.5 — full game details
+## Windows
 
-Clicking a game opens its status, goal, achievements, notes and tasks, with direct editing/achievement actions. Miniature opens the same complete sheet. Isolated fixture data.
+The following captures come from package tests through `CapturePreviewAsync`. Service replies and some artwork are test fixtures; they do not demonstrate real-account access.
 
-![Checkpoint](../screenshots/css-game-details-en.png)
+| Collection                                                         | Settings                                        |
+| ------------------------------------------------------------------ | ----------------------------------------------- |
+| ![Windows collection in English](../screenshots/css-widget-en.png) | ![Settings](../screenshots/css-settings-en.png) |
 
-## 0.8.4 — IGDB cover proposals
+| Editor                                              | Shortcuts                                                 |
+| --------------------------------------------------- | --------------------------------------------------------- |
+| ![Spanish editor](../screenshots/css-editor-es.png) | ![English shortcuts](../screenshots/css-shortcuts-en.png) |
 
-Explicit preview approval and persistent rejection. Solid-color fixture artwork; [guide](IGDB.md).
+| Achievements                                                    | Achievement review                                                  |
+| --------------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![English achievements](../screenshots/css-achievements-en.png) | ![Achievement review](../screenshots/css-achievement-review-en.png) |
 
-![IGDB](../screenshots/css-igdb-cover-en.png)
-
-## 0.8.3 — leave Miniature with one click
-
-The **Exit miniature view** button sits above the list and restores the previous normal layout without a shortcut or context menu.
-
-![Miniature with a visible exit button](../screenshots/css-miniature-en.png)
-
-## 0.8.2 — achievement overview and descriptions
-
-Direct game-card access, prominent completion progress and per-achievement description toggles. Fixture data; [guide](ACHIEVEMENTS.md).
-
-![Windows achievement overview](../screenshots/css-achievements-focus-en.png)
-
-![Browser achievement description](../screenshots/web-achievements-en.png)
-
-## 0.8.1 — updater
-
-[Update flow and portable behavior](UPDATES.md). Actual CSS/WebView2 capture with an isolated library.
-
-![Windows updater](../screenshots/css-updates-en.png)
-
-## 0.8.0 — detection and achievements
-
-[Setup guide](ACHIEVEMENTS.md)
-
-![Checkpoint](../screenshots/css-achievements-en.png)
-
-## Responsive browser layout
-
-The browser app fills the current viewport automatically, without desktop size presets. These isolated test captures show wide and narrow browser sizes.
-
-![Wide browser](../screenshots/web-responsive-1440-en.png)
-
-![Narrow browser](../screenshots/web-responsive-390-en.png)
-
-## 0.7.6 — lists and privacy
-
-Windows and browser captures use isolated fixture games. Private games stay separate from normal/custom lists.
-
-| Windows list manager | Windows private games |
-| --- | --- |
+| Lists                                            | Private games                                             |
+| ------------------------------------------------ | --------------------------------------------------------- |
 | ![Manage lists](../screenshots/css-lists-en.png) | ![Private games](../screenshots/css-private-games-en.png) |
 
-| Browser list manager | Browser private games |
-| --- | --- |
-| ![Web lists](../screenshots/web-lists-en.png) | ![Web private games](../screenshots/web-private-games-en.png) |
+More views: [game details](../screenshots/css-game-details-en.png), [list details](../screenshots/css-list-details-en.png), [game menu](../screenshots/css-game-menu-en.png), [cover review](../screenshots/css-cover-review-en.png), [IGDB proposal](../screenshots/css-igdb-cover-en.png), [friends](../screenshots/css-friends-login-en.png), [updater](../screenshots/css-updates-en.png), [full window](../screenshots/css-full-window-en.png), [Light compact view](../screenshots/css-compact-light-en.png), [shortcut configuration](../screenshots/css-configure-shortcuts-en.png) and [notice](../screenshots/css-notice-en.png).
 
-## 0.7.4 — eight themes
+## All 22 themes
 
-Live palettes from the actual packaged application. Settings → Theme previews immediately; Save keeps the choice and Cancel restores the previous one.
+[Full palette and selector gallery](THEMES.md). Each image shows the theme applied to the actual application.
 
-| Dark | Light |
-| --- | --- |
-| ![Dark](../screenshots/css-theme-dark-en.png) | ![Light](../screenshots/css-theme-light-en.png) |
+![Cyber Purple theme](../screenshots/css-theme-cyber-purple-en.png)
 
-| Midnight | Ocean |
-| --- | --- |
-| ![Midnight](../screenshots/css-theme-midnight-en.png) | ![Ocean](../screenshots/css-theme-ocean-en.png) |
+## Browser and mobile
 
-| Forest | Plum |
-| --- | --- |
-| ![Forest](../screenshots/css-theme-forest-en.png) | ![Plum](../screenshots/css-theme-plum-en.png) |
+Actual Chromium controlled by Playwright. Steam and friends use simulated replies and all libraries are isolated from personal data.
 
-| Amber | High contrast |
-| --- | --- |
-| ![Amber](../screenshots/css-theme-amber-en.png) | ![High contrast](../screenshots/css-theme-contrast-en.png) |
+| Desktop                                                    | Mobile                                                      |
+| ---------------------------------------------------------- | ----------------------------------------------------------- |
+| ![Wide browser](../screenshots/web-responsive-1440-en.png) | ![Narrow browser](../screenshots/web-responsive-390-en.png) |
 
-![Theme selector](../screenshots/css-theme-settings-en.png)
+More views: [library](../screenshots/web-library-en.png), [game details](../screenshots/web-game-details-en.png), [achievements](../screenshots/web-achievements-en.png), [lists](../screenshots/web-lists-en.png), [private games](../screenshots/web-private-games-en.png), [friends](../screenshots/web-friends-en.png), [shortcuts](../screenshots/web-shortcuts-en.png), [mobile settings](../screenshots/web-mobile-en.png), [English sign-in](../screenshots/web-login-en.png) and [public presentation](../screenshots/web-presentation-en.png).
 
-## 0.7.3 — visible keyboard shortcuts
+## Regeneration and historical archive
 
-The bottom strip shows useful key gestures; F1 opens the complete guide. Miniature offers F1 and a context-menu entry.
+The [capture pipeline](../SCREENSHOT-PIPELINE.md) documents fixtures, staging, required evidence and promotion. Current images contain embedded provenance; each run's manifest records their SHA-256 checksums.
 
-![English keyboard shortcuts guide](../screenshots/css-shortcuts-en.png)
-
-## 0.7.1 — full window
-
-![Full window, 100% opacity](../screenshots/css-full-window-en.png)
-
-## 0.7.0 — current CSS interface
-
-![English widget](../screenshots/css-widget-en.png)
-
-| Friends login | Miniature |
-| --- | --- |
-| ![Friends](../screenshots/css-friends-login-en.png) | ![Miniature](../screenshots/css-miniature-en.png) |
-
-![Light compact view](../screenshots/css-compact-light-en.png)
-
-![Settings](../screenshots/css-settings-en.png)
-
-![English app notice](../screenshots/css-notice-en.png)
-
-Spanish captures: [widget](../screenshots/css-widget-es.png), [editor](../screenshots/css-editor-es.png), [Miniature](../screenshots/css-miniature-es.png).
-
-## Archived WPF interface (0.6.x)
-
-## English
-
-![Cover grid](../screenshots/widget-grid-wide-dark-en.png)
-
-| Account | Friend progress |
-| --- | --- |
-| ![Account form](../screenshots/widget-friends-login-en.png) | ![Friend progress](../screenshots/widget-friends-progress-en.png) |
-
-![English game editor](../screenshots/dialog-editor-en.png)
-
-![English settings](../screenshots/dialog-settings-en.png)
-
-## Spanish
-
-![Cover grid in Spanish](../screenshots/widget-grid-wide-dark.png)
-
-| List | Compact |
-| --- | --- |
-| ![Dark list](../screenshots/widget-dark.png) | ![Light compact view](../screenshots/widget-compact-light.png) |
-
-| Account | Friends |
-| --- | --- |
-| ![Spanish account form](../screenshots/widget-friends-login.png) | ![Spanish friend progress](../screenshots/widget-friends-progress.png) |
-
-![Spanish editor](../screenshots/dialog-editor.png)
-
-![Spanish settings](../screenshots/dialog-settings.png)
-
-Regenerate with `./scripts/Build.ps1 -Installer` on Windows. Output: `.qa/package-…/render`. Publish selected PNGs only, excluding libraries, sessions and local logs. See [validation](VALIDATION.md).
-
-## Lightweight mode — 0.6.3
-
-Covers are hidden while games and progress remain. This test capture uses Spanish; the setting is also available in English.
-
-![Lightweight mode, Spanish capture](../screenshots/widget-lightweight.png)
-
-## Miniature — 0.6.4
-
-Only name and state. Enable from Settings or F6; right-click to exit.
-
-![Miniature](../screenshots/widget-miniature-en.png)
-
-## Miniature game menu — 0.6.11
-
-The menu includes states, editing, search, adding and window settings; rows still show only name and state.
-
-![State menu](../screenshots/miniature-state-menu-en.png)
-
-## Keyboard in Miniature — 0.6.6
-
-The outline marks the focused row. Up/Down and Home/End select games; Enter/Space open the menu. Capture uses Spanish.
-
-![Keyboard focus](../screenshots/widget-miniature-keyboard.png)
-
-
-## Add from empty Miniature — 0.6.11
-
-Right-click the background → Add game, including with no rows. This native capture uses Spanish.
-
-![Empty Miniature menu, Spanish capture](../screenshots/miniature-empty-menu.png)
-
-
-## Page navigation — 0.6.12
-
-PageUp/PageDown adapt the jump to Miniature height. Native capture uses Spanish and a large sample collection.
-
-![Miniature page navigation, Spanish capture](../screenshots/widget-miniature-pages.png)
-
-
-## Larger text — 0.6.13
-
-Miniature with text size 18 and adapted rows. This native capture uses Spanish.
-
-![Miniature with larger text, Spanish capture](../screenshots/widget-miniature-large-text.png)
-
-## Notices in English
-
-![Notice with English text and button](../screenshots/dialog-notice-en.png)
-
-## Complete friend code
-
-![Account with the complete Checkpoint friend code](../screenshots/widget-friends-account-en.png)
-
-## Browser application
-
-Browser screenshots use fictional test accounts and simulated services.
-
-![Web library](../screenshots/web-library-en.png)
-
-![Configurable shortcuts](../screenshots/web-shortcuts-en.png)
-
-![Checkpoint friends](../screenshots/web-friends-en.png)
-
-![Narrow-screen settings](../screenshots/web-mobile-en.png)
+Older WPF images and two superseded achievement views are kept in an explicit [historical archive](../screenshots/archive/README.md). They do not represent the current design.
