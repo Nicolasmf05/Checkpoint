@@ -1401,7 +1401,7 @@ public partial class MainWindow
             Check(
                 await Script(
                     gameSheet,
-                    "(() => { const n=document.querySelector('.game-detail-metadata');if(!n)return false;const items=[...n.children];return items.length>=3&&new Set(items.map(item=>{const r=item.getBoundingClientRect();return r.x+','+r.y})).size===items.length&&document.fonts.check('35px \"Checkpoint Bagel\"')&&document.fonts.check('15px \"Checkpoint Inconsolata\"'); })()"
+                    "(() => { const n=document.querySelector('.game-detail-metadata');if(!n)return false;const items=[...n.children];return items.length>=3&&new Set(items.map(item=>{const r=item.getBoundingClientRect();return r.x+','+r.y})).size===items.length&&document.fonts.check('35px \"Checkpoint Bagel\"')&&document.fonts.check('15px \"Checkpoint Nunito\"'); })()"
                 ),
                 "Figma game sheet loads its local fonts and lays out each metadata item without overlap"
             );

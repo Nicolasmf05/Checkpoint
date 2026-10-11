@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Checkpoint Nunito';
+  src: url('assets/game-details/Nunito.ttf') format('truetype');
+  font-weight: 200 1000;
+  font-display: swap;
+}
 /* Shared identity for the browser app and Windows WebView2.
    Palette sources and virtualized row geometry stay in app.css/app.js. */
 :root {
@@ -5,7 +11,7 @@
   --identity-icon-invert: 1;
   --identity-focus: var(--accent-ink, var(--accent));
   --identity-link: color-mix(in srgb, var(--accent-ink, var(--accent)) 85%, var(--text));
-  font-family: 'Checkpoint Inconsolata', ui-monospace, monospace;
+  font-family: 'Checkpoint Nunito', ui-rounded, sans-serif;
   font-size: 15px;
   font-synthesis: none;
 }
@@ -20,6 +26,9 @@
 }
 body {
   line-height: 1.4;
+}
+.game-detail-page {
+  font-family: 'Checkpoint Nunito', ui-rounded, sans-serif;
 }
 ::selection {
   background: var(--accent);
@@ -390,6 +399,7 @@ kbd {
   width: 150px;
 }
 .window.mini {
+  font-family: 'Checkpoint Inconsolata', monospace;
   border-radius: var(--identity-radius);
   padding: 10px;
 }
@@ -608,7 +618,7 @@ kbd {
   outline-color: var(--identity-focus);
 }
 .game-detail-count {
-  font-family: 'Checkpoint Inconsolata', monospace;
+  font-family: 'Checkpoint Nunito', ui-rounded, sans-serif;
   font-size: 12px;
 }
 .game-detail-sheet .game-playtime .heading,

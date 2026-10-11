@@ -233,7 +233,7 @@ try {
     await page.evaluate(
       () =>
         document.fonts.check('30px "Checkpoint Bagel"') &&
-        document.fonts.check('15px "Checkpoint Inconsolata"'),
+        document.fonts.check('15px "Checkpoint Nunito"'),
     ),
     true,
   );

@@ -24,16 +24,16 @@ typography:
     lineHeight: 1.1
     letterSpacing: '-0.025em'
   body:
-    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontFamily: "'Checkpoint Nunito', ui-rounded, sans-serif"
     fontSize: '1.125rem'
     fontWeight: 400
     lineHeight: 1.55
   label:
-    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontFamily: "'Checkpoint Nunito', ui-rounded, sans-serif"
     fontSize: '0.875rem'
     fontWeight: 400
   control:
-    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontFamily: "'Checkpoint Nunito', ui-rounded, sans-serif"
     fontSize: '1rem'
     fontWeight: 700
     lineHeight: 1.35
@@ -43,15 +43,15 @@ typography:
     fontWeight: 400
     lineHeight: 1.25
   app-caption:
-    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontFamily: "'Checkpoint Nunito', ui-rounded, sans-serif"
     fontSize: '12px'
     fontWeight: 400
   app-summary:
-    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontFamily: "'Checkpoint Nunito', ui-rounded, sans-serif"
     fontSize: '13px'
     fontWeight: 400
   app-body:
-    fontFamily: "'Checkpoint Inconsolata', ui-monospace, monospace"
+    fontFamily: "'Checkpoint Nunito', ui-rounded, sans-serif"
     fontSize: '15px'
     fontWeight: 400
   app-card-mobile:
@@ -173,7 +173,7 @@ Este sistema cubre la portada pública y el renderizador común de la app web y 
 
 **Key Characteristics:**
 
-- Tipografía de la ficha: Bagel Fat One e Inconsolata, servidas desde el proyecto.
+- Tipografía de la ficha: Bagel Fat One e Nunito, servidas desde el proyecto.
 - Fondos y acentos de los 22 temas existentes.
 - Cabeceras de color, tarjetas planas y bordes finos.
 - Carátulas de ejemplo y vistas recreadas de la app, con datos ilustrativos identificados.
@@ -205,9 +205,9 @@ El tema oscuro combina un fondo gris carbón, texto claro y el azul suave de Che
 
 **Display Font:** Bagel Fat One, registrada como `Checkpoint Bagel`, con fallback sans-serif.
 
-**Body Font:** Inconsolata variable, registrada como `Checkpoint Inconsolata`, con fallbacks ui-monospace y monospace.
+**Body Font:** Nunito variable, registrada como `Checkpoint Nunito`, con fallbacks ui-monospace y monospace.
 
-Los titulares redondeados y las cantidades conectan la portada con la ficha. Inconsolata permite leer etiquetas, acciones y notas con el mismo tono directo del producto. Se conservan los archivos originales y sus licencias SIL Open Font License 1.1.
+Los titulares redondeados y las cantidades conectan la portada con la ficha. Nunito permite leer etiquetas, acciones y notas con el mismo tono directo del producto. Se conservan los archivos originales y sus licencias SIL Open Font License 1.1.
 
 ### Hierarchy
 
@@ -218,9 +218,9 @@ Los titulares redondeados y las cantidades conectan la portada con la ficha. Inc
 - **Control:** acciones principales con énfasis de peso, sin mayúsculas forzadas.
 - **Metric:** cantidades de la ficha de ejemplo, con números tabulares. Se ajustan al espacio disponible en cada breakpoint.
 
-**The Product Type Rule.** Bagel se reserva para titulares y cantidades; Inconsolata lleva el contenido operativo. Se conserva esta pareja porque forma parte de la referencia fijada por el usuario.
+**The Product Type Rule.** Bagel se reserva para titulares y cantidades; Nunito lleva el contenido operativo. Se conserva esta pareja porque forma parte de la referencia fijada por el usuario.
 
-En la app, los títulos operativos son fijos: marca 26px, sección 30px, formulario 23px y juego 19px (16px en cuadrícula). Los controles usan Inconsolata a 15px, con tamaños compactos explícitos de 12–14px. Bagel no sustituye etiquetas de formulario ni los nombres de Miniatura.
+En la app, los títulos operativos son fijos: marca 26px, sección 30px, formulario 23px y juego 19px (16px en cuadrícula). Los controles usan Nunito a 15px, con tamaños compactos explícitos de 12–14px. Bagel no sustituye etiquetas de formulario ni los nombres de Miniatura.
 
 ## Layout
 
@@ -262,7 +262,7 @@ Las tarjetas del ejemplo muestran tiempo, visibilidad y progreso. Los paneles de
 
 ### Shared App Layer
 
-`app-identity.css` es la única extensión de estilo del renderizador: botones/campos con radio de 5px, paneles con borde de 1px, navegación activa con acento, títulos Bagel y texto Inconsolata. Se conservan los archivos base del colaborador. Las tintas de enlaces y estados se mezclan con el texto de cada tema para mantener legibilidad; los iconos de la ficha se adaptan mediante máscaras o inversión según la paleta. La app no usa entradas decorativas: solo transiciones de controles de 160ms, desactivadas con movimiento reducido. En móviles estrechos el selector ocupa una fila completa; el shell permite desplazamiento y reserva 180px al área de juegos cuando la cabecera necesita varias filas.
+`app-identity.css` es la única extensión de estilo del renderizador: botones/campos con radio de 5px, paneles con borde de 1px, navegación activa con acento, títulos Bagel y texto Nunito. Se conservan los archivos base del colaborador. Las tintas de enlaces y estados se mezclan con el texto de cada tema para mantener legibilidad; los iconos de la ficha se adaptan mediante máscaras o inversión según la paleta. La app no usa entradas decorativas: solo transiciones de controles de 160ms, desactivadas con movimiento reducido. En móviles estrechos el selector ocupa una fila completa; el shell permite desplazamiento y reserva 180px al área de juegos cuando la cabecera necesita varias filas.
 
 ### Inputs / Fields
 
@@ -270,7 +270,7 @@ El selector de tema es un `select` nativo con etiqueta visible y opciones biling
 
 ### Navigation
 
-Los enlaces a secciones usan Inconsolata y subrayado en hover. El menú móvil comunica su estado con `aria-expanded`; Escape lo cierra y devuelve el foco. Idioma y tema permanecen accesibles fuera del menú de secciones.
+Los enlaces a secciones usan Nunito y subrayado en hover. El menú móvil comunica su estado con `aria-expanded`; Escape lo cierra y devuelve el foco. Idioma y tema permanecen accesibles fuera del menú de secciones.
 
 ### Gallery
 
@@ -305,3 +305,7 @@ La ficha ocupa la ventana y centra su contenido en un eje compartido de hasta 96
 ### Public product previews
 
 La portada recrea cuadrícula, lista y Miniatura con HTML semántico, carátulas de ejemplo y los mismos tokens de tema. Las vistas traducen su contenido y se adaptan al ancho sin escalar textos rasterizados. Se etiquetan como vistas recreadas; las capturas reales quedan en la documentación, no en la web pública.
+
+### Secondary type
+
+Nunito sustituye a Inconsolata en el texto y los controles de la portada y del renderizador compartido. Bagel Fat One permanece en los titulares. La familia variable se aloja localmente bajo SIL Open Font License; Miniatura conserva Inconsolata y su geometría anterior.

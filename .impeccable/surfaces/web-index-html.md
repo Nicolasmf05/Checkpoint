@@ -13,7 +13,7 @@ Alcance: `web/index.html`, portada de presentación. Modo Persuade. El usuario h
 
 THESIS: La portada es una ficha de juego ampliada: explica qué conserva Checkpoint mostrando carátula, tiempo, logros, tareas y notas. La identidad pertenece al producto.
 
-OWN-WORLD: Bagel Fat One para titulares y cantidades; Inconsolata para cuerpo y controles. Fondos y acentos exactos de los 22 temas de la app. Cabeceras de color, bordes de 1px, radio de 5px de la ficha y los mismos iconos.
+OWN-WORLD: Bagel Fat One para titulares y cantidades; Nunito para cuerpo y controles. Fondos y acentos exactos de los 22 temas de la app. Cabeceras de color, bordes de 1px, radio de 5px de la ficha y los mismos iconos.
 
 STORY: Recordar dónde se quedó una partida; probar una tarea de ejemplo; explorar las tres vistas reales; abrir la app o descargar Windows. Cuenta opcional y límites de almacenamiento explicados sin promesas inventadas.
 
@@ -26,3 +26,5 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 ## Confirmado por el usuario
 
 Español e inglés, selector de temas existentes, galería interactiva, móvil/escritorio, teclado, foco, reflujo, movimiento reducido, enlaces a app, Windows, documentación, privacidad y GitHub. Tipografía y composición de la ficha prevalecen sobre las recomendaciones genéricas de radio, monospace y componentes del playbook. Se mantienen fuentes OFL y recursos existentes; no hacen falta imágenes generadas.
+
+Secondary type update: Nunito for body and controls, Bagel Fat One for headings. Windows Miniature retains Inconsolata and its existing row geometry. Public previews are theme-aware HTML/CSS recreations, not screenshots.

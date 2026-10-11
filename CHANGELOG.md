@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.31
+
+- Nunito replaces the secondary typeface across the website and shared application renderer, pairing rounded readable text with Bagel Fat One headings. Miniature keeps its original typeface and layout.
+
 ## 0.8.30
 
 - The game sheet now uses a centered, bounded content axis with consistent spacing and alignment. Artwork, stats, services and metadata keep balanced proportions as the window resizes; Miniature is unchanged.

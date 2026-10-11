@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Checkpoint Nunito';
+  src: url('assets/game-details/Nunito.ttf') format('truetype');
+  font-weight: 200 1000;
+  font-display: swap;
+}
 /* La portada comparte las paletas y los recursos de la ficha, sin cargar los estilos de la app. */
 @font-face {
   font-family: 'Checkpoint Bagel';
@@ -12,7 +18,7 @@
   font-display: swap;
 }
 :root {
-  font-family: 'Checkpoint Inconsolata', ui-monospace, monospace;
+  font-family: 'Checkpoint Nunito', ui-rounded, sans-serif;
   font-size: 100%;
   line-height: 1.55;
   --bg: rgb(var(--surface, 32 32 32));

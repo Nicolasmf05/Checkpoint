@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.31
+
+- Nunito sustituye a la tipografía secundaria de la web y del renderizador compartido. Sus formas redondeadas acompañan los titulares de Bagel Fat One. Miniatura mantiene su tipografía y distribución anteriores.
+
 ## 0.8.30
 
 - La ficha centra el contenido con un ancho proporcionado y márgenes comunes. Carátula, estadísticas, servicios y metadatos mantienen una distribución equilibrada al redimensionar la ventana; Miniatura no cambia.
