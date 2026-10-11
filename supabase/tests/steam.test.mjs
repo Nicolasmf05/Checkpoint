@@ -85,7 +85,8 @@ function fixture(options = {}) {
       return options.recentUnavailable
         ? new Response('', { status: 503 })
         : Response.json({ response: { games: options.recentGames || [] } });
-    if (url.pathname.includes('GetSchemaForGame'))
+    if (url.pathname.includes('GetSchemaForGame')) {
+      if (options.schemaStatus) return new Response('', { status: options.schemaStatus });
       return Response.json({
         game: {
           availableGameStats: {
@@ -95,6 +96,9 @@ function fixture(options = {}) {
           },
         },
       });
+    }
+    if (url.pathname.includes('GetPlayerAchievements') && options.progressStatus)
+      return new Response(options.progressBody || '', { status: options.progressStatus });
     if (url.pathname.includes('GetPlayerAchievements'))
       return Response.json(
         options.privateAchievements
@@ -278,6 +282,60 @@ test('private libraries and private achievements produce errors rather than fabr
   const g = fixture({ privateAchievements: true }),
     t = await g.login();
   assert.equal((await g.send('v1/games/620/achievements', undefined, t.token)).status, 403);
+});
+test('Steam upstream failures distinguish service-key, privacy, schema and transient errors', async () => {
+  const invalidKey = fixture({ progressStatus: 401 }),
+    invalidKeySession = await invalidKey.login(),
+    keyResponse = await invalidKey.send(
+      'v1/games/620/achievements',
+      undefined,
+      invalidKeySession.token,
+    );
+  assert.equal(keyResponse.status, 503);
+  assert.match((await keyResponse.json()).error, /clave de Steam del servicio/);
+
+  const rejectedKey = fixture({
+      progressStatus: 403,
+      progressBody: 'Access denied. Verify your Steam Web API key.',
+    }),
+    rejectedKeySession = await rejectedKey.login(),
+    rejectedKeyResponse = await rejectedKey.send(
+      'v1/games/620/achievements',
+      undefined,
+      rejectedKeySession.token,
+    );
+  assert.equal(rejectedKeyResponse.status, 503);
+  assert.match((await rejectedKeyResponse.json()).error, /clave de Steam del servicio/);
+
+  const privateProgress = fixture({ progressStatus: 403 }),
+    privateSession = await privateProgress.login(),
+    privacyResponse = await privateProgress.send(
+      'v1/games/620/achievements',
+      undefined,
+      privateSession.token,
+    );
+  assert.equal(privacyResponse.status, 403);
+  assert.match((await privacyResponse.json()).error, /detalles de juegos de tu perfil/);
+
+  const unavailableSchema = fixture({ schemaStatus: 404 }),
+    schemaSession = await unavailableSchema.login(),
+    schemaResponse = await unavailableSchema.send(
+      'v1/games/620/achievements',
+      undefined,
+      schemaSession.token,
+    );
+  assert.equal(schemaResponse.status, 502);
+  assert.match((await schemaResponse.json()).error, /no ofrece definiciones de logros/);
+
+  const transient = fixture({ progressStatus: 503 }),
+    transientSession = await transient.login(),
+    transientResponse = await transient.send(
+      'v1/games/620/achievements',
+      undefined,
+      transientSession.token,
+    );
+  assert.equal(transientResponse.status, 502);
+  assert.match((await transientResponse.json()).error, /problema temporal/);
 });
 test('ownership is required; English and Spanish schemas and progress use separate caches', async () => {
   const f = fixture(),

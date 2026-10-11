@@ -103,11 +103,36 @@ export function createSteamHandler({
     }
     if (response.status === 429)
       throw new ApiError(429, 'Demasiadas consultas. Espera un minuto y vuelve a intentarlo.');
-    if (!response.ok)
-      throw new ApiError(
-        502,
-        'Steam no ha devuelto estos datos. Comprueba la privacidad de tus detalles de juegos.',
-      );
+    if (!response.ok) {
+      const progressRequest = path.includes('GetPlayerAchievements');
+      const upstreamError = (await response.clone().text()).slice(0, 2000);
+      const rejectedServiceKey =
+        response.status === 401 ||
+        /(?:steam\s*)?web\s*api\s*key|invalid\s+(?:steam\s+)?key/i.test(upstreamError);
+      if (rejectedServiceKey)
+        throw new ApiError(
+          503,
+          'La clave de Steam del servicio no es válida. La sincronización de logros no está disponible.',
+        );
+      if (response.status === 403 && progressRequest)
+        throw new ApiError(
+          403,
+          'Steam ha rechazado el acceso al progreso de logros. Comprueba que los detalles de juegos de tu perfil sean públicos.',
+        );
+      if (response.status === 403 && path.includes('GetSchemaForGame'))
+        throw new ApiError(
+          502,
+          'Steam ha rechazado la consulta de definiciones de logros para este juego. (HTTP 403)',
+        );
+      if (response.status === 404 && path.includes('GetSchemaForGame'))
+        throw new ApiError(
+          502,
+          'Steam no ofrece definiciones de logros para este juego. (HTTP 404)',
+        );
+      if (response.status >= 500)
+        throw new ApiError(502, 'Steam presenta un problema temporal. Se conserva el progreso.');
+      throw new ApiError(502, 'Steam ha rechazado la consulta de logros. Reinténtalo más tarde.');
+    }
     try {
       return await response.json();
     } catch {

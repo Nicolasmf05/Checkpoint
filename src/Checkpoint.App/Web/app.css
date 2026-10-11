@@ -1398,7 +1398,7 @@ button.accent:focus-visible {
   font-display: swap;
 }
 .dialog-page:has(.game-detail-page) {
-  background: #1a1c1b;
+  background: rgb(var(--surface));
 }
 .game-detail-page {
   max-width: 480px;
@@ -1406,9 +1406,9 @@ button.accent:focus-visible {
   margin: 0 auto;
   padding: 0;
   gap: 0;
-  background: white;
-  color: black;
-  color-scheme: light;
+  background: rgb(var(--surface));
+  color: var(--text);
+  color-scheme: inherit;
   font-family: "Checkpoint Inconsolata", monospace;
   font-size: 15px;
 }
@@ -1419,10 +1419,10 @@ button.accent:focus-visible {
 }
 .game-detail-sheet .type-card {
   margin: 0;
-  border: 1px solid black;
+  border: 1px solid var(--line);
   border-radius: 5px;
-  background: white;
-  color: black;
+  background: var(--panel);
+  color: var(--text);
   padding: 0;
   min-width: 0;
 }
@@ -1443,27 +1443,27 @@ button.accent:focus-visible {
   padding: 8px 10px;
   font-family: inherit;
   font-size: 14px;
-  border: 1px solid #ffffff80;
-  background: transparent;
-  color: white;
+  border: 1px solid color-mix(in srgb, var(--accent-text) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--text);
 }
 .game-detail-sheet .game-actions .type-button:not(.accent) {
-  border-color: #ffffff80;
-  background: transparent;
-  color: white;
+  border-color: color-mix(in srgb, var(--accent-text) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--text);
   font-size: 14px;
   font-weight: 600;
 }
 .game-detail-sheet .game-actions .accent {
-  background: white;
-  color: #1a1c1b;
-  border-color: white;
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
 }
 .game-detail-intro {
   min-height: 150px;
   padding: 20px 17px;
-  background: #1a1c1b;
-  color: white;
+  background: var(--accent);
+  color: var(--accent-text);
   justify-content: center;
   gap: 5px;
 }
@@ -1495,9 +1495,9 @@ button.accent:focus-visible {
   display: grid;
   place-items: center;
   aspect-ratio: 174 / 263;
-  background: #1a1c1b;
+  background: var(--panel);
   border-radius: 5px;
-  color: white;
+  color: var(--accent-text);
 }
 .game-detail-stats {
   display: grid;
@@ -1535,13 +1535,15 @@ button.accent:focus-visible {
   border: 0;
   border-radius: 0;
   aspect-ratio: 118 / 100;
-  background: url("assets/game-details/visibility-card.svg") center / contain no-repeat;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
 }
 .game-detail-sheet .game-playtime .heading,
 .game-detail-visibility .heading,
 .game-detail-sheet .game-detail-percent {
   margin: 0;
-  color: black;
+  color: var(--text);
   font-family: "Checkpoint Bagel", sans-serif;
   font-size: 30px;
   font-weight: 400;
@@ -1550,7 +1552,7 @@ button.accent:focus-visible {
 }
 .game-detail-sheet .game-playtime .type-text:last-child,
 .game-detail-visibility .type-text:last-child {
-  color: black;
+  color: var(--muted);
   font-size: 15px;
   white-space: nowrap;
 }
@@ -1581,16 +1583,16 @@ button.accent:focus-visible {
   width: auto;
   height: 11px;
   appearance: none;
-  border: 1px solid black;
+  border: 1px solid var(--line);
   border-radius: 5px;
   overflow: hidden;
-  background: white;
+  background: var(--input);
 }
 .game-detail-progress-line progress::-webkit-progress-bar {
-  background: white;
+  background: var(--input);
 }
 .game-detail-progress-line progress::-webkit-progress-value {
-  background: #00ff11;
+  background: var(--accent-ink, var(--accent));
   border-radius: 4px;
 }
 .game-detail-count {
@@ -1609,8 +1611,8 @@ button.accent:focus-visible {
 }
 .game-detail-sheet .game-detail-panel-heading {
   position: relative;
-  background: black;
-  color: white;
+  background: var(--accent);
+  color: var(--accent-text);
   padding: 2px 8px 3px 34px;
   min-height: 27px;
   font-size: 20px;
@@ -1670,8 +1672,8 @@ button.accent:focus-visible {
   border-radius: 10px;
   min-height: 30px;
   padding: 4px 7px;
-  background: black;
-  color: white;
+  background: var(--accent);
+  color: var(--accent-text);
   font-family: inherit;
   font-size: 18px;
   font-weight: 300;
@@ -1697,7 +1699,7 @@ button.accent:focus-visible {
 }
 .game-detail-list-items button {
   background: transparent;
-  color: black;
+  color: var(--text);
   border: 0;
   padding: 0;
   min-height: 19px;
@@ -1748,7 +1750,7 @@ button.accent:focus-visible {
   text-decoration: line-through;
 }
 .game-detail-task .type-check:has(input:focus-visible) {
-  outline: 2px solid #304838;
+  outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
 .game-detail-sheet .game-detail-notes {
@@ -1756,10 +1758,10 @@ button.accent:focus-visible {
   min-height: 150px;
   resize: vertical;
   padding: 10px;
-  border: 1px solid black;
+  border: 1px solid var(--line);
   border-radius: 5px;
-  background: white;
-  color: black;
+  background: var(--input);
+  color: var(--text);
   font-family: inherit;
   font-size: 15px;
 }
@@ -1776,14 +1778,14 @@ button.accent:focus-visible {
   font-size: 0;
 }
 .game-detail-additional {
-  background: black;
-  color: white;
+  background: rgb(var(--surface));
+  color: var(--text);
   padding: 24px 12px;
   gap: 22px;
 }
 .game-detail-sheet .game-detail-additional-title {
   padding: 0 8px 16px;
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid var(--line);
   font-family: "Checkpoint Bagel", sans-serif;
   font-weight: 400;
   font-size: 35px;
@@ -1839,11 +1841,11 @@ button.accent:focus-visible {
   padding: 12px 17px;
   margin: 0;
   justify-content: flex-end;
-  background: black;
+  background: rgb(var(--surface));
 }
 .game-detail-page button:focus-visible,
 .game-detail-page textarea:focus-visible {
-  outline: 2px solid #304838;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 @media (max-width: 450px) {

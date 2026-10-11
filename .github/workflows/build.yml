@@ -35,6 +35,9 @@ jobs:
         env:
           CHECKPOINT_SERVICE_URL: ${{ vars.CHECKPOINT_SERVICE_URL }}
         run: ./scripts/Build.ps1 -Installer -ServiceUrl $env:CHECKPOINT_SERVICE_URL
+      - name: Package source archive
+        shell: pwsh
+        run: ./scripts/Export-Source.ps1
       - name: Validate unsigned MSIX packaging preview
         shell: pwsh
         run: ./scripts/Build-MSIX.ps1 -Preview

@@ -275,7 +275,7 @@ internal static partial class Dialogs
                             continue;
                         title.Text = item.Title;
                         position.Text = I18n.T("Juego") + " " + (index + 1) + " / " + ids.Length;
-                        if (await owner.Covers.Get(item, true) is null)
+                        if (await owner.Covers.Get(item, allowWhenDisabled: true) is null)
                             break;
                         if (closed)
                             return;

@@ -2,6 +2,14 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.32
+
+- Available updates now open in a dedicated window when Checkpoint starts. Startup continues normally when there is no newer version.
+- Game sheets opened from Miniature load saved cover art. The full game sheet follows the active theme across backgrounds, cards, buttons and progress.
+- Achievement sync now distinguishes invalid service keys, privacy restrictions, unavailable game data and temporary failures; previous progress is preserved when Steam returns an error.
+- Window resizing batches pointer movement and avoids publishing a full state update for every movement. In narrow windows, controls move below the logo and the window mode selector takes up less space.
+- Navigation now includes a Spanish and English patch notes tab with recent changes.
+
 ## 0.8.31
 
 - Nunito replaces the secondary typeface across the website and shared application renderer, pairing rounded readable text with Bagel Fat One headings. Miniature keeps its original typeface and layout.

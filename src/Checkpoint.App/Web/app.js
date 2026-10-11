@@ -469,7 +469,7 @@ function frame() {
   const intro = el('section', 'intro');
   intro.append(el('h1'), el('div', 'summary'));
   const navigation = el('nav', 'navigation');
-  for (const name of ['list', 'library', 'friends', 'credits']) {
+  for (const name of ['list', 'library', 'friends', 'credits', 'patch-notes']) {
     const node = button('', 'tab', '', { value: name });
     node.dataset.tab = name;
     navigation.append(node);
@@ -525,22 +525,41 @@ function frame() {
   });
   const resize = el('div', 'resize');
   resize.setAttribute('aria-hidden', 'true');
-  let point;
+  let point,
+    resizeFrame = 0,
+    resizeDeltaX = 0,
+    resizeDeltaY = 0;
+  const flushResize = () => {
+    resizeFrame = 0;
+    const x = resizeDeltaX,
+      y = resizeDeltaY;
+    resizeDeltaX = 0;
+    resizeDeltaY = 0;
+    if (x || y) action('resize', { x, y });
+  };
+  const finishResize = () => {
+    if (resizeFrame) cancelAnimationFrame(resizeFrame);
+    flushResize();
+    point = undefined;
+  };
   resize.addEventListener('pointerdown', (e) => {
     if (state.locked) return;
     point = [e.screenX, e.screenY];
+    resizeDeltaX = 0;
+    resizeDeltaY = 0;
     resize.setPointerCapture(e.pointerId);
     e.preventDefault();
   });
   resize.addEventListener('pointermove', (e) => {
     if (!point) return;
-    const x = e.screenX - point[0],
-      y = e.screenY - point[1];
+    resizeDeltaX += e.screenX - point[0];
+    resizeDeltaY += e.screenY - point[1];
     point = [e.screenX, e.screenY];
-    if (x || y) action('resize', { x, y });
+    if (!resizeFrame) resizeFrame = requestAnimationFrame(flushResize);
   });
-  resize.addEventListener('pointerup', () => (point = undefined));
-  resize.addEventListener('lostpointercapture', () => (point = undefined));
+  resize.addEventListener('pointerup', finishResize);
+  resize.addEventListener('pointercancel', finishResize);
+  resize.addEventListener('lostpointercapture', finishResize);
   const collectionbar = el('div', 'collectionbar'),
     collections = el('select', 'collection-selector');
   collections.addEventListener('change', () => action('collection', { value: collections.value }));
@@ -645,10 +664,12 @@ function renderMain() {
     account.setAttribute('aria-label', state.labels.account);
     account.hidden = state.tab === 'friends' && !state.signedIn;
   }
-  host.querySelector('h1').textContent = state.labels[state.tab];
+  const tabLabel = state.tab === 'patch-notes' ? 'patchNotes' : state.tab;
+  host.querySelector('h1').textContent = state.labels[tabLabel];
   host.querySelector('.summary').textContent = state.summary;
   const collectionbar = host.querySelector('.collectionbar');
-  collectionbar.hidden = !state.collections || state.tab === 'friends';
+  collectionbar.hidden =
+    !state.collections || state.tab === 'friends' || state.tab === 'patch-notes';
   if (state.collections) {
     const selector = host.querySelector('.collection-selector');
     selector.replaceChildren();
@@ -680,7 +701,8 @@ function renderMain() {
     if (node.classList.contains('add')) node.textContent = '+ ' + label;
   });
   host.querySelectorAll('[data-tab]').forEach((node) => {
-    node.textContent = state.labels[node.dataset.tab];
+    const label = node.dataset.tab === 'patch-notes' ? 'patchNotes' : node.dataset.tab;
+    node.textContent = state.labels[label];
     node.classList.toggle('active', state.tab === node.dataset.tab);
   });
   const search = host.querySelector('#search');
@@ -727,6 +749,7 @@ function renderMain() {
   host.querySelector('[data-label="undo"]').hidden = !state.undo;
   host.querySelector('[data-label="sync"]').disabled = state.busy;
   host.querySelector('.resize').hidden = state.browser || state.locked || state.full;
+  host.querySelector('.searchbar').hidden = state.tab === 'patch-notes';
   host.querySelector('.dragstrip').hidden = state.browser || !state.mini;
   host.querySelector('[data-label="pin"]').textContent = state.pinned ? '◆' : '◇';
   host.querySelector('[data-label="view"]').textContent = state.mini
@@ -747,12 +770,34 @@ function renderMain() {
         content.querySelectorAll('button,input,select').forEach((node) => (node.disabled = true));
       viewport.replaceChildren(content);
     });
+  else if (state.tab === 'patch-notes') renderPatchNotes();
   else renderGames();
+}
+function renderPatchNotes() {
+  preserveTree(() => {
+    const viewport = root.querySelector('.viewport');
+    const content = el('div', 'patch-notes');
+    const heading = el('div', 'empty');
+    heading.append(
+      el('h2', '', state.labels.patchNotes),
+      el('p', '', state.labels.patchNotesIntro),
+    );
+    content.append(heading);
+    for (const patch of state.patchNotes || []) {
+      const section = el('section', 'empty');
+      section.append(el('h2', '', patch.version));
+      const items = el('ul');
+      for (const note of patch.items || []) items.append(el('li', '', note));
+      section.append(items);
+      content.append(section);
+    }
+    viewport.replaceChildren(content);
+  });
 }
 function renderSelection() {
   const bar = root.querySelector('.selectionbar');
   if (!bar) return;
-  bar.hidden = state.mini || state.tab === 'friends';
+  bar.hidden = state.mini || state.tab === 'friends' || state.tab === 'patch-notes';
   bar.replaceChildren();
   if (bar.hidden) return;
   const l = state.labels,
@@ -800,7 +845,8 @@ function renderSelection() {
 }
 // Dibuja únicamente las filas visibles; la selección conserva el identificador del juego, no su posición.
 function renderGames() {
-  if (!state || state.kind !== 'main' || state.tab === 'friends') return;
+  if (!state || state.kind !== 'main' || state.tab === 'friends' || state.tab === 'patch-notes')
+    return;
   const viewport = root.querySelector('.viewport');
   if (!viewport) return;
   if (!state.games.length && state.mini) {
@@ -1179,7 +1225,9 @@ window.chrome?.webview?.addEventListener('message', (event) => {
   window.checkpointState = state;
   for (const [key, id] of pending) if (id <= (state.ack || 0)) pending.delete(key);
   document.documentElement.lang = state.language;
-  document.documentElement.dataset.theme = state.theme || (state.light ? 'light' : 'dark');
+  if (state.theme) document.documentElement.dataset.theme = state.theme;
+  else if (typeof state.light === 'boolean')
+    document.documentElement.dataset.theme = state.light ? 'light' : 'dark';
   if (state.kind === 'dialog') {
     dialogMode = true;
     const build = () => {

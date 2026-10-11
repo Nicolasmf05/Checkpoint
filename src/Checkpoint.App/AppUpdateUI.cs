@@ -50,15 +50,13 @@ public partial class MainWindow
             return;
         try
         {
+            AvailableUpdate = await Updates.Check(CurrentVersion, UpdateRuntime, shutdown.Token);
+            if (shutdown.IsCancellationRequested)
+                return;
             Preferences.LastUpdateCheck = DateTimeOffset.UtcNow;
             Store.SaveSettings(Preferences);
-            AvailableUpdate = await Updates.Check(CurrentVersion, UpdateRuntime, shutdown.Token);
-            if (!shutdown.IsCancellationRequested && AvailableUpdate is { } update)
-                Notice(
-                    I18n.T("Hay una actualización de Checkpoint: ")
-                        + update.Version
-                        + I18n.T(". Abre Ajustes → Actualizaciones para instalarla.")
-                );
+            if (AvailableUpdate is not null)
+                Dialogs.AppUpdatesDialog(this);
         }
         catch (Exception ex)
             when (ex

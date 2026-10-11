@@ -120,7 +120,10 @@ internal static partial class Dialogs
                 {
                     try
                     {
-                        image.Source = await owner.Covers.Get(game);
+                        image.Source = await owner.Covers.Get(
+                            game,
+                            allowWhenDisabled: owner.Preferences.MiniatureView
+                        );
                         if (image.Source is not null)
                         {
                             image.Visibility = Visibility.Visible;

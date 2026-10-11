@@ -2,6 +2,14 @@
 
 # Historial de cambios
 
+## 0.8.32
+
+- Al iniciar Checkpoint, las actualizaciones disponibles se muestran en una ventana propia. El inicio normal no se interrumpe si no hay una versión nueva.
+- Las fichas abiertas desde Miniatura cargan las carátulas guardadas. La ficha completa adopta el tema activo en fondos, tarjetas, botones y progreso.
+- La sincronización de logros distingue errores de clave, privacidad, datos no disponibles y fallos temporales; conserva el progreso anterior si Steam no responde correctamente.
+- El redimensionamiento agrupa los movimientos del puntero y evita publicar una actualización por cada movimiento. En ventanas estrechas, los controles pasan debajo del logo y el selector de modo ocupa menos espacio.
+- La navegación incluye una pestaña de notas del parche en español e inglés con los cambios recientes.
+
 ## 0.8.31
 
 - Nunito sustituye a la tipografía secundaria de la web y del renderizador compartido. Sus formas redondeadas acompañan los titulares de Bagel Fat One. Miniatura mantiene su tipografía y distribución anteriores.

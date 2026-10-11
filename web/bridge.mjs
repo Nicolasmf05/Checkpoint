@@ -351,7 +351,10 @@ function snapshot() {
     search,
     filter,
     ack,
-    summary: `${data.games.filter((g) => tab === 'library' || inList(g, p.activeList)).length} ${T(tab === 'library' ? 'en Biblioteca' : 'en tu lista')} · ${data.games.filter((g) => (tab === 'library' || inList(g, p.activeList)) && g.status === 3).length} ${T('historias terminadas')}`,
+    summary:
+      tab === 'patch-notes'
+        ? T('Cambios recientes de Checkpoint')
+        : `${data.games.filter((g) => tab === 'library' || inList(g, p.activeList)).length} ${T(tab === 'library' ? 'en Biblioteca' : 'en tu lista')} · ${data.games.filter((g) => (tab === 'library' || inList(g, p.activeList)) && g.status === 3).length} ${T('historias terminadas')}`,
     connection: api.steam
       ? T('● Steam vinculado')
       : api.social
@@ -371,6 +374,36 @@ function snapshot() {
     ),
     examples: data.games.length === 0,
     undo: data.deleted.length > 0,
+    patchNotes: [
+      {
+        version: '0.8.32',
+        items: [
+          T(
+            'Al iniciar Checkpoint, las actualizaciones disponibles se muestran en una ventana propia. El inicio normal no se interrumpe si no hay una versión nueva.',
+          ),
+          T(
+            'Las fichas abiertas desde Miniatura cargan las carátulas guardadas. La ficha completa adopta el tema activo en fondos, tarjetas, botones y progreso.',
+          ),
+          T(
+            'La sincronización de logros distingue errores de clave, privacidad, datos no disponibles y fallos temporales; conserva el progreso anterior si Steam no responde correctamente.',
+          ),
+          T(
+            'El redimensionamiento agrupa los movimientos del puntero y evita publicar una actualización por cada movimiento. En ventanas estrechas, los controles pasan debajo del logo y el selector de modo ocupa menos espacio.',
+          ),
+          T(
+            'Checkpoint incluye una pestaña de notas del parche en español e inglés con los cambios recientes.',
+          ),
+        ],
+      },
+      {
+        version: '0.8.31',
+        items: [
+          T(
+            'Nunito sustituye a la tipografía secundaria de la web y del renderizador compartido. Sus formas redondeadas acompañan los titulares de Bagel Fat One. Miniatura mantiene su tipografía y distribución anteriores.',
+          ),
+        ],
+      },
+    ],
     labels: {
       account: T(api.social ? 'Mi cuenta' : 'Iniciar sesión'),
       title: T('Mi lista'),
@@ -379,6 +412,8 @@ function snapshot() {
       library: T('Biblioteca'),
       friends: T('Amigos'),
       credits: T('Créditos'),
+      patchNotes: T('Notas del parche'),
+      patchNotesIntro: T('Cambios recientes de Checkpoint'),
       add: T('Añadir juego'),
       settings: T('Ajustes'),
       hide: T('Cerrar menús o ayuda'),
@@ -3338,7 +3373,7 @@ async function command(message) {
         credits();
         return;
       }
-      if (['list', 'library', 'friends'].includes(message.value)) {
+      if (['list', 'library', 'friends', 'patch-notes'].includes(message.value)) {
         const home = message.value === tab;
         const savedList = data.settings.activeList;
         switchTab(message.value, home);

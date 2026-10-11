@@ -18,6 +18,7 @@ public partial class MainWindow
     private const string CoverOrigin = "https://checkpoint-images.invalid/";
     private WebSurface? web;
     private readonly WebControls friendControls = new();
+    private bool patchNotesVisible;
 
     private void StartWebInterface()
     {
@@ -69,12 +70,13 @@ public partial class MainWindow
             globalHotkey = hotkeyRegistered,
             lightweight = Preferences.LightweightMode,
             busy = syncing,
-            tab = friendsVisible ? "friends"
+            tab = patchNotesVisible ? "patch-notes"
+            : friendsVisible ? "friends"
             : allLibrary ? "library"
             : "list",
             search = Search.Text,
             filter = StatusFilter.SelectedIndex,
-            summary = Summary.Text,
+            summary = patchNotesVisible ? I18n.T("Cambios recientes de Checkpoint") : Summary.Text,
             notice = NoticeText.Text,
             connection = ConnectionText.Text,
             achievementReview = achievementReviewVisible
@@ -94,6 +96,41 @@ public partial class MainWindow
             miniEmpty = I18n.T("Esta lista no tiene juegos."),
             examples = Games.Count == 0,
             undo = DeletedGames.Count > 0,
+            patchNotes = new[]
+            {
+                new
+                {
+                    version = "0.8.32",
+                    items = new[]
+                    {
+                        I18n.T(
+                            "Al iniciar Checkpoint, las actualizaciones disponibles se muestran en una ventana propia. El inicio normal no se interrumpe si no hay una versión nueva."
+                        ),
+                        I18n.T(
+                            "Las fichas abiertas desde Miniatura cargan las carátulas guardadas. La ficha completa adopta el tema activo en fondos, tarjetas, botones y progreso."
+                        ),
+                        I18n.T(
+                            "La sincronización de logros distingue errores de clave, privacidad, datos no disponibles y fallos temporales; conserva el progreso anterior si Steam no responde correctamente."
+                        ),
+                        I18n.T(
+                            "El redimensionamiento agrupa los movimientos del puntero y evita publicar una actualización por cada movimiento. En ventanas estrechas, los controles pasan debajo del logo y el selector de modo ocupa menos espacio."
+                        ),
+                        I18n.T(
+                            "Checkpoint incluye una pestaña de notas del parche en español e inglés con los cambios recientes."
+                        ),
+                    },
+                },
+                new
+                {
+                    version = "0.8.31",
+                    items = new[]
+                    {
+                        I18n.T(
+                            "Nunito sustituye a la tipografía secundaria de la web y del renderizador compartido. Sus formas redondeadas acompañan los titulares de Bagel Fat One. Miniatura mantiene su tipografía y distribución anteriores."
+                        ),
+                    },
+                },
+            },
             labels = new
             {
                 title = I18n.T("Mi lista"),
@@ -102,6 +139,8 @@ public partial class MainWindow
                 library = I18n.T("Biblioteca"),
                 friends = I18n.T("Amigos"),
                 credits = I18n.T("Créditos"),
+                patchNotes = I18n.T("Notas del parche"),
+                patchNotesIntro = I18n.T("Cambios recientes de Checkpoint"),
                 add = I18n.T("Añadir juego"),
                 settings = I18n.T("Ajustes"),
                 hide = I18n.T("Ocultar widget"),
@@ -234,22 +273,30 @@ public partial class MainWindow
                 QueueCoverSuggestion(game);
                 break;
             case "window-mode":
+                patchNotesVisible = false;
                 if (message.GetProperty("value").TryGetInt32(out int mode))
                     SetWindowMode(mode);
                 break;
             case "tab":
                 switch (message.GetProperty("value").GetString())
                 {
+                    case "patch-notes":
+                        patchNotesVisible = true;
+                        break;
                     case "credits":
+                        patchNotesVisible = false;
                         Dialogs.Credits(this);
                         break;
                     case "friends":
+                        patchNotesVisible = false;
                         Click(FriendsButton);
                         break;
                     case "library":
+                        patchNotesVisible = false;
                         Click(LibraryButton);
                         break;
                     case "list":
+                        patchNotesVisible = false;
                         Click(TrackedButton);
                         break;
                 }

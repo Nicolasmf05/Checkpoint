@@ -463,6 +463,20 @@ try {
     (await page.getByRole('button', { name: 'Añadir juego', exact: true }).count()) > 0,
     'browser application starts in Spanish without an account',
   );
+  await click('Notas del parche');
+  const patchNotesState = await page.evaluate(() => ({
+    tab: window.checkpointState?.tab,
+    text: document.querySelector('.patch-notes')?.textContent,
+    searchHidden: document.querySelector('.searchbar')?.hidden,
+  }));
+  check(
+    patchNotesState.tab === 'patch-notes' &&
+      patchNotesState.text.includes('0.8.32') &&
+      patchNotesState.text.includes('El redimensionamiento agrupa') &&
+      patchNotesState.searchHidden,
+    'patch notes tab shows recent changes without collection filters',
+  );
+  await click('Mi lista');
   await click('Iniciar sesión');
   await page.getByRole('textbox', { name: 'Usuario de Checkpoint', exact: true }).waitFor();
   check(
@@ -542,6 +556,15 @@ try {
     (await page.locator('html').getAttribute('lang')) === 'en',
     'language switches the complete browser interface to English',
   );
+  await click('Patch notes');
+  check(
+    (await page.locator('.patch-notes').innerText()).includes('Recent Checkpoint updates') &&
+      (await page.locator('.patch-notes').innerText()).includes(
+        'Window resizing batches pointer movement',
+      ),
+    'patch notes are fully translated into English',
+  );
+  await click('My list');
   await click('Settings');
   const colors = new Set();
   for (const [i, id] of [

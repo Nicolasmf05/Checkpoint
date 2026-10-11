@@ -141,7 +141,11 @@ internal sealed class WebSurface : IDisposable
                                 )
                                     acknowledged = Math.Max(acknowledged, number);
                                 command(message);
-                                Publish();
+                                if (
+                                    !message.TryGetProperty("action", out var action)
+                                    || action.GetString() != "resize"
+                                )
+                                    Publish();
                             }
                             catch (Exception error)
                                 when (error

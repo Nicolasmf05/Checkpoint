@@ -395,8 +395,10 @@ kbd {
   font-size: 14px;
 }
 .window-mode {
-  font-size: 13px;
-  width: 150px;
+  font-size: 12px;
+  width: 135px;
+  min-height: 30px;
+  padding: 5px 8px;
 }
 .window.mini {
   font-family: 'Checkpoint Inconsolata', monospace;
@@ -634,6 +636,14 @@ kbd {
 .game-detail-steam-id::before,
 .game-detail-synced::before {
   filter: invert(calc(1 - var(--identity-icon-invert)));
+}
+@media (max-width: 760px) {
+  .header {
+    flex-wrap: wrap;
+  }
+  .brand {
+    flex: 1 0 100%;
+  }
 }
 @media (max-width: 640px) {
   .window:not(.mini),

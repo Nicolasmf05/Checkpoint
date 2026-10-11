@@ -111,6 +111,15 @@ public partial class MainWindow
                 ),
                 "CSS main navigation uses Spanish"
             );
+            await Run("document.querySelector('[data-tab=patch-notes]').click();");
+            Check(
+                await Script(
+                    web,
+                    "window.checkpointState.tab==='patch-notes'&&document.querySelector('.patch-notes').textContent.includes('0.8.32')&&document.querySelector('.searchbar').hidden"
+                ),
+                "Windows patch notes tab shows the current bilingual release notes"
+            );
+            await Run("document.querySelector('[data-tab=list]').click();");
             Check(
                 await Script(
                     web,
@@ -1425,6 +1434,19 @@ public partial class MainWindow
                     "document.body.innerText.includes('Game details') && document.body.innerText.includes('Private list fixture')"
                 ),
                 "a Miniature row opens the full game sheet by mouse without changing window mode"
+            );
+            await Wait(() =>
+                Script(
+                    gameSheet,
+                    "(() => { const image=document.querySelector('.game-detail-hero img.cover-preview'); return !!image && image.complete && image.naturalWidth>0; })()"
+                )
+            );
+            Check(
+                await Script(
+                    gameSheet,
+                    "(() => { const image=document.querySelector('.game-detail-hero img.cover-preview'); return !!image && image.complete && image.naturalWidth>0; })()"
+                ),
+                "game details loaded from Miniature display the saved cover"
             );
             await ScopedScript(
                 gameSheet,

@@ -196,9 +196,9 @@ public sealed class CoverCache : IDisposable
         File.Delete(Path.Combine(folder, name));
     }
 
-    public async Task<BitmapImage?> Get(Game game, bool review = false)
+    public async Task<BitmapImage?> Get(Game game, bool allowWhenDisabled = false)
     {
-        if (!enabled && !review)
+        if (!enabled && !allowWhenDisabled)
             return null;
         var custom = game.CustomCover;
         if (BackupFiles.IsCustomCoverName(custom))
@@ -221,7 +221,7 @@ public sealed class CoverCache : IDisposable
             return null;
         var work = inFlight.GetOrAdd(
             appId,
-            id => new Lazy<Task<BitmapImage?>>(() => Download(id, review))
+            id => new Lazy<Task<BitmapImage?>>(() => Download(id, allowWhenDisabled))
         );
         try
         {
@@ -233,7 +233,7 @@ public sealed class CoverCache : IDisposable
         }
     }
 
-    private async Task<BitmapImage?> Download(int appId, bool review)
+    private async Task<BitmapImage?> Download(int appId, bool allowWhenDisabled)
     {
         var path = Path.Combine(folder, appId + ".jpg");
         try
@@ -247,7 +247,7 @@ public sealed class CoverCache : IDisposable
                     return ReadCached(path);
                 foreach (var asset in new[] { "library_600x900.jpg", "header.jpg" })
                 {
-                    if (!enabled && !review)
+                    if (!enabled && !allowWhenDisabled)
                         return null;
                     using var response = await http.GetAsync(
                         $"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appId}/{asset}"
