@@ -834,6 +834,11 @@ kbd {
   gap: 16px;
   padding: 24px;
 }
+/* Native stack children carry default grid coordinates; keep document order. */
+.game-detail-main > * {
+  grid-column: 1 !important;
+  grid-row: auto !important;
+}
 .game-detail-intro,
 .game-detail-additional,
 .dialog-page .game-detail-page > .type-row {
