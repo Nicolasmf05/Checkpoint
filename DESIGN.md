@@ -300,4 +300,4 @@ Una lista con checkboxes nativos invita a probar la ficha. La tarea marcada se t
 
 ### Window adaptation
 
-La ficha y los formularios ocupan el ancho disponible de la ventana. La ficha no tiene límite de 480px: usa consultas de su contenedor, apila a 450px o menos y organiza hero y servicios en dos columnas desde 1000px. La carátula conserva proporción y un máximo de 280px; los metadatos distribuyen columnas según el espacio. El contenido largo se desplaza verticalmente. Miniatura mantiene su geometría y comportamiento anteriores.
+La ficha ocupa la ventana y centra su contenido en un eje compartido de hasta 960px. Cabecera, servicios, tareas, notas y metadatos comparten alineación y márgenes; hero y servicios permanecen en filas distintas para evitar columnas descompensadas. La carátula conserva su proporción y un máximo de 220px. Hasta 450px se apilan carátula, estadísticas y servicios. Los formularios se adaptan al ancho disponible y el contenido largo se desplaza verticalmente. Miniatura mantiene su geometría y comportamiento anteriores.

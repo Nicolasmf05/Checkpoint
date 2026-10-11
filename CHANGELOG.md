@@ -2,6 +2,10 @@
 
 **English** · [Español](CHANGELOG.es.md)
 
+## 0.8.30
+
+- The game sheet now uses a centered, bounded content axis with consistent spacing and alignment. Artwork, stats, services and metadata keep balanced proportions as the window resizes; Miniature is unchanged.
+
 ## 0.8.29
 
 - The game sheet uses the host window width and reflows artwork, progress and services to match available space. Forms and metadata adapt without changing Miniature mode.

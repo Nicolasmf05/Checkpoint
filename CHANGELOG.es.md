@@ -2,6 +2,10 @@
 
 # Historial de cambios
 
+## 0.8.30
+
+- La ficha centra el contenido con un ancho proporcionado y márgenes comunes. Carátula, estadísticas, servicios y metadatos mantienen una distribución equilibrada al redimensionar la ventana; Miniatura no cambia.
+
 ## 0.8.29
 
 - La ficha de juego ocupa el ancho de la ventana y reorganiza carátula, progreso y servicios según el espacio disponible. Formularios y metadatos se adaptan sin cambiar el modo Miniatura.
