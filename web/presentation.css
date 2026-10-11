@@ -610,16 +610,6 @@ figcaption {
   place-items: center;
   min-height: 430px;
 }
-.gallery-image img {
-  width: min(100%, 420px);
-  border-radius: 8px;
-}
-.gallery-panel[data-view='list'] img {
-  width: min(100%, 340px);
-}
-.gallery-panel[data-view='mini'] img {
-  width: min(100%, 360px);
-}
 .gallery-copy h3 {
   font-family: var(--display);
   font-size: clamp(1.9rem, 3vw, 2.65rem);
@@ -710,10 +700,6 @@ figcaption {
   align-items: center;
   justify-content: center;
   padding: 40px 30px;
-}
-.miniature-frame img {
-  width: min(100%, 360px);
-  border-radius: 10px;
 }
 .information-layout {
   display: grid;
@@ -1037,12 +1023,6 @@ figcaption {
   .gallery-image {
     min-height: 0;
   }
-  .gallery-image img {
-    width: min(100%, 350px);
-  }
-  .gallery-panel[data-view='list'] img {
-    width: min(100%, 300px);
-  }
   .gallery-copy > p {
     max-width: none;
   }
@@ -1109,5 +1089,230 @@ figcaption {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Recreated product views use the same live palette as the page and game sheet. */
+.app-mockup {
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--panel);
+  color: var(--text);
+  overflow: hidden;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+.mock-header,
+.mock-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.mock-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.mock-brand strong {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+.mock-brand img {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 0;
+}
+.mock-view-label {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.mock-toolbar {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.9375rem;
+}
+.mock-toolbar p {
+  font-weight: 700;
+}
+.mock-games {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+.mock-game {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.mock-grid .mock-game,
+.mock-grid .mock-game-copy {
+  display: flex;
+  flex-direction: column;
+}
+.mock-grid .mock-game-copy {
+  flex: 1;
+}
+.mock-grid h4 {
+  min-height: 2.3em;
+}
+.mock-grid .mock-progress {
+  margin-top: auto;
+  padding-top: 10px;
+}
+.mock-game .mock-cover {
+  width: 100%;
+  aspect-ratio: 174 / 263;
+  object-fit: cover;
+  border-radius: 0;
+}
+.mock-game-copy {
+  min-width: 0;
+  padding: 10px;
+}
+.mock-game h4 {
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+.mock-platform {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.mock-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+}
+.mock-state::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+.mock-state.playing::before {
+  background: currentColor;
+}
+.mock-game .mock-state {
+  margin-top: 10px;
+}
+.mock-goal {
+  margin-top: 10px;
+  font-size: 0.8125rem;
+}
+.mock-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mock-progress progress {
+  appearance: none;
+  min-width: 0;
+  flex: 1;
+  width: 100%;
+  height: 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.mock-progress progress::-webkit-progress-bar {
+  background: var(--bg);
+}
+.mock-progress progress::-webkit-progress-value {
+  background: var(--accent);
+}
+.mock-progress progress::-moz-progress-bar {
+  background: var(--accent);
+}
+.mock-list .mock-games {
+  grid-template-columns: minmax(0, 1fr);
+}
+.mock-list .mock-game {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+.mock-list .mock-cover {
+  height: 100%;
+  min-height: 130px;
+}
+.mock-list .mock-game-copy {
+  padding: 12px 14px;
+}
+.mock-list .mock-goal,
+.mock-list .mock-game .mock-state,
+.mock-list .mock-progress {
+  margin-top: 6px;
+}
+.mock-mini {
+  max-width: 400px;
+}
+.mock-mini-games {
+  list-style: none;
+  margin: 0;
+  padding: 6px 14px;
+}
+.mock-mini-games li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+}
+.mock-mini-games li + li {
+  border-top: 1px solid var(--line);
+}
+.mock-mini-games strong {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .mock-games {
+    gap: 8px;
+    padding: 10px;
+  }
+  .mock-game-copy {
+    padding: 8px;
+  }
+  .mock-game h4 {
+    font-size: 0.9375rem;
+  }
+  .mock-game .mock-state {
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+  .mock-state::before {
+    width: 5px;
+    height: 5px;
+    flex-basis: 5px;
+  }
+  .mock-goal {
+    font-size: 0.75rem;
+  }
+  .mock-header,
+  .mock-toolbar {
+    padding: 12px;
+  }
+  .miniature-frame {
+    padding-inline: 0;
   }
 }

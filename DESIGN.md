@@ -176,12 +176,12 @@ Este sistema cubre la portada pública y el renderizador común de la app web y 
 - Tipografía de la ficha: Bagel Fat One e Inconsolata, servidas desde el proyecto.
 - Fondos y acentos de los 22 temas existentes.
 - Cabeceras de color, tarjetas planas y bordes finos.
-- Carátulas y capturas reales, con datos de ejemplo identificados.
+- Carátulas de ejemplo y vistas recreadas de la app, con datos ilustrativos identificados.
 - Controles nativos, foco visible y movimiento breve opcional.
 
 ## Colors
 
-El tema oscuro combina un fondo gris carbón, texto claro y el azul suave de Checkpoint. La cabecera del hero y la llamada final usan el par acento/texto de acento; el resto de la página conserva superficies tranquilas para leer las funciones y ver capturas.
+El tema oscuro combina un fondo gris carbón, texto claro y el azul suave de Checkpoint. La cabecera del hero y la llamada final usan el par acento/texto de acento; el resto de la página conserva superficies tranquilas para leer las funciones y explorar las vistas de ejemplo.
 
 ### Primary
 
@@ -234,7 +234,7 @@ La aplicación usa un contenedor flex con regiones de cabecera, navegación, fil
 
 ## Elevation & Depth
 
-La portada es plana: no utiliza sombras de tarjetas, vidrio ni perspectiva. La jerarquía aparece mediante superficies de acento, paneles translúcidos, bordes y separación. Las capturas mantienen su contenido original y se colocan de frente; la página no simula un escritorio ni cambia el tema dentro de una imagen.
+La portada es plana: no utiliza sombras de tarjetas, vidrio ni perspectiva. La jerarquía aparece mediante superficies de acento, paneles, bordes y separación. Las recreaciones de la app se muestran de frente y comparten los colores del tema seleccionado.
 
 **The Flat Surface Rule.** El contenido se organiza con color, bordes y espacio. No se añade elevación como sustituto de una jerarquía clara.
 
@@ -242,7 +242,7 @@ La entrada del titular desplaza 10px durante 450ms, solo cuando se permite movim
 
 ## Shapes
 
-Los bloques de la ficha, botones, controles, pestañas, estados y notas comparten esquinas discretas. El borde de 1px usa la línea de cada tema. Las capturas tienen el radio de screenshot y la miniatura conserva un radio algo mayor; estas excepciones pertenecen a imágenes existentes y no cambian la forma de los controles.
+Los bloques de la ficha, botones, controles, pestañas, estados y notas comparten esquinas discretas. El borde de 1px usa la línea de cada tema. Las vistas recreadas emplean el mismo radio de 5px y proporciones propias de la app.
 
 El encabezado de la ficha redondea solo las esquinas superiores y su cuerpo solo las inferiores, para que se lean como una pieza. Las carátulas mantienen proporción vertical y recorte controlado.
 
@@ -274,7 +274,7 @@ Los enlaces a secciones usan Inconsolata y subrayado en hover. El menú móvil c
 
 ### Gallery
 
-Tres pestañas muestran cuadrícula, lista y miniatura con capturas reales. La pestaña activa usa el acento; las demás conservan fondo y borde. Flechas, Home y End cambian la vista y su foco. Los textos explican que las imágenes conservan su tema original. Tema, idioma y vista pueden restaurarse desde la URL.
+Tres pestañas muestran cuadrícula, lista y Miniatura recreadas con HTML/CSS. La pestaña activa usa el acento; las demás conservan fondo y borde. Flechas, Home y End cambian la vista y su foco. Las vistas siguen el tema y el idioma activos. Tema, idioma y vista se restauran desde la URL.
 
 ### Example tasks
 
@@ -287,7 +287,7 @@ Una lista con checkboxes nativos invita a probar la ficha. La tarea marcada se t
 - **Do** aplicar la identidad común a la portada y al renderizador web/Windows; adaptar densidad a la tarea.
 - **Do** regenerar las paletas desde la fuente compartida y mantener nombres ES/EN coherentes.
 - **Do** conservar las fuentes, el logo, los iconos existentes y la atribución original de Checkpoint.
-- **Do** mostrar capturas reales y señalar los datos de ejemplo.
+- **Do** usar recreaciones HTML/CSS en la portada, aplicarles la paleta activa y señalar los datos de ejemplo; conservar capturas reales para documentación y verificación.
 - **Do** mantener controles nativos, foco visible, reflujo y movimiento reducido.
 
 ### Don't:
@@ -301,3 +301,7 @@ Una lista con checkboxes nativos invita a probar la ficha. La tarea marcada se t
 ### Window adaptation
 
 La ficha ocupa la ventana y centra su contenido en un eje compartido de hasta 960px. Cabecera, servicios, tareas, notas y metadatos comparten alineación y márgenes; hero y servicios permanecen en filas distintas para evitar columnas descompensadas. La carátula conserva su proporción y un máximo de 220px. Hasta 450px se apilan carátula, estadísticas y servicios. Los formularios se adaptan al ancho disponible y el contenido largo se desplaza verticalmente. Miniatura mantiene su geometría y comportamiento anteriores.
+
+### Public product previews
+
+La portada recrea cuadrícula, lista y Miniatura con HTML semántico, carátulas de ejemplo y los mismos tokens de tema. Las vistas traducen su contenido y se adaptan al ancho sin escalar textos rasterizados. Se etiquetan como vistas recreadas; las capturas reales quedan en la documentación, no en la web pública.

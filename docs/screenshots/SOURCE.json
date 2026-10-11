@@ -19,46 +19,7 @@
       "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
     },
     {
-      "file": "web/assets/presentation/list-es.png",
-      "renderer": "Chromium/Playwright",
-      "language": "es",
-      "scene": "list",
-      "theme": "dark",
-      "viewport": {
-        "width": 900,
-        "height": 1200
-      },
-      "sha256": "4a0c65c8ca5a3daf5b24242cd0954ddc8a884376ed8f982081732319f9c10ca8",
-      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
-    },
-    {
-      "file": "web/assets/presentation/list.png",
-      "renderer": "Chromium/Playwright",
-      "language": "es",
-      "scene": "list",
-      "theme": "dark",
-      "viewport": {
-        "width": 900,
-        "height": 1200
-      },
-      "sha256": "4a0c65c8ca5a3daf5b24242cd0954ddc8a884376ed8f982081732319f9c10ca8",
-      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language es; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
-    },
-    {
       "file": "docs/screenshots/readme-grid-es.png",
-      "renderer": "Chromium/Playwright",
-      "language": "es",
-      "scene": "grid",
-      "theme": "dark",
-      "viewport": {
-        "width": 900,
-        "height": 920
-      },
-      "sha256": "da3d6192b05f174e3907c69fcbef84b2988614b924e082cccdb2859374d441da",
-      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene grid; language es; theme dark; viewport 900x920; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
-    },
-    {
-      "file": "web/assets/presentation/library-es.png",
       "renderer": "Chromium/Playwright",
       "language": "es",
       "scene": "grid",
@@ -97,33 +58,7 @@
       "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language en; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
     },
     {
-      "file": "web/assets/presentation/list-en.png",
-      "renderer": "Chromium/Playwright",
-      "language": "en",
-      "scene": "list",
-      "theme": "dark",
-      "viewport": {
-        "width": 900,
-        "height": 1200
-      },
-      "sha256": "bc1115d6848f58dc205c97626980c6fca7760b9c970ee43c9c6c1c7189e1a390",
-      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene list; language en; theme dark; viewport 900x1200; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
-    },
-    {
       "file": "docs/screenshots/readme-grid-en.png",
-      "renderer": "Chromium/Playwright",
-      "language": "en",
-      "scene": "grid",
-      "theme": "dark",
-      "viewport": {
-        "width": 900,
-        "height": 920
-      },
-      "sha256": "81113ab5204ce31c5f253189ef8cc759ec1bb90c1d050c74be1eed084db077cd",
-      "origin": "Checkpoint actual browser UI captured with Playwright Chromium; scene grid; language en; theme dark; viewport 900x920; three isolated illustrative games from scripts/fixtures/gallery.mjs, no user account/data. Local Steam cover fixtures: scripts/fixtures/covers/SOURCE.md. No AI image generation. App snapshot SHA-256 7aa8cd7e591db6fcd851da3d76e7a87df1161c897752546a37b5d68558dc2d06."
-    },
-    {
-      "file": "web/assets/presentation/library-en.png",
       "renderer": "Chromium/Playwright",
       "language": "en",
       "scene": "grid",
@@ -219,21 +154,7 @@
       "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-30b7028899d4443ea9ff4473740cf565/render/css-gallery-miniature-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
     },
     {
-      "file": "web/assets/presentation/miniature-en.png",
-      "renderer": "Windows WebView2/CapturePreviewAsync",
-      "language": "en",
-      "sha256": "aab82f73ebbfee8233502e45d9baaf579329cfac4d2d4e8ff849be1a5b72004a",
-      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-30b7028899d4443ea9ff4473740cf565/render/css-gallery-miniature-en.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
-    },
-    {
       "file": "docs/screenshots/css-gallery-miniature-es.png",
-      "renderer": "Windows WebView2/CapturePreviewAsync",
-      "language": "es",
-      "sha256": "c3103c785787c189ee419985277cd62cc4627f19d251cfcc6c0457e3eb2d2bd8",
-      "origin": "Checkpoint actual Windows WebView2/CapturePreviewAsync screenshot from successful isolated regression tests (152 checks). Original evidence .qa/web-package-30b7028899d4443ea9ff4473740cf565/render/css-gallery-miniature-es.png; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05."
-    },
-    {
-      "file": "web/assets/presentation/miniature-es.png",
       "renderer": "Windows WebView2/CapturePreviewAsync",
       "language": "es",
       "sha256": "c3103c785787c189ee419985277cd62cc4627f19d251cfcc6c0457e3eb2d2bd8",

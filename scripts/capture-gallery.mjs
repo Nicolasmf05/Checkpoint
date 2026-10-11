@@ -351,11 +351,7 @@ if (options['--promote-only']) {
         3,
         'Marketing collection must contain exactly three games',
       );
-      await capture('list', [
-        `docs/screenshots/readme-library-${language}.png`,
-        `web/assets/presentation/list-${language}.png`,
-        ...(language === 'es' ? ['web/assets/presentation/list.png'] : []),
-      ]);
+      await capture('list', [`docs/screenshots/readme-library-${language}.png`]);
       await page.evaluate(async () => {
         const { BrowserStore } = await import('./store.mjs');
         const store = await new BrowserStore().open();
@@ -365,10 +361,7 @@ if (options['--promote-only']) {
       });
       await page.setViewportSize({ width: 900, height: 920 });
       await page.reload();
-      await capture('grid', [
-        `docs/screenshots/readme-grid-${language}.png`,
-        `web/assets/presentation/library-${language}.png`,
-      ]);
+      await capture('grid', [`docs/screenshots/readme-grid-${language}.png`]);
       await page.locator('.game').filter({ hasText: 'Portal 2' }).locator('.game-title').click();
       await page.locator('.game-detail-sheet').waitFor();
       await page.setViewportSize({ width: 900, height: 1200 });
@@ -398,9 +391,7 @@ async function importEvidence(folder, renderer, reportName, prefix) {
     const language = /-es\.png$/.test(file) ? 'es' : 'en';
     const origin = `Checkpoint actual ${renderer} screenshot from successful isolated regression tests (${report.checks} checks). Original evidence ${relative(path.join(folder, file))}; illustrative test games and simulated service replies, no real user account. No AI image generation. Captured output promoted separately from marketing. Original creator Nicolasmf05.`;
     await embed(staged, origin);
-    const miniature = /^css-gallery-miniature-(es|en)\.png$/.exec(file);
     const destinations = [`docs/screenshots/${file}`];
-    if (miniature) destinations.push(`web/assets/presentation/miniature-${miniature[1]}.png`);
     manifest.images = manifest.images.filter((i) => i.file !== file);
     manifest.images.push({
       file,
@@ -444,8 +435,7 @@ if (options['--promote'] || options['--promote-only']) {
     for (const destination of entry.destinations) {
       confined(root, destination);
       assert.ok(
-        destination.startsWith('docs/screenshots/') ||
-          destination.startsWith('web/assets/presentation/'),
+        destination.startsWith('docs/screenshots/'),
         `Unexpected public target ${destination}`,
       );
     }

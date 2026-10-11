@@ -2,7 +2,7 @@
 // El hash del contenido versiona módulos y estilos para mantener coherente la caché del navegador.
 
 import { createHash } from 'node:crypto';
-import { readFile, mkdir, copyFile, writeFile, cp, readdir } from 'node:fs/promises';
+import { readFile, mkdir, copyFile, writeFile, cp, readdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
@@ -166,6 +166,17 @@ const identityFiles = (await readdir(path.join(out, identityAssets)))
   .sort()
   .map((file) => `${identityAssets}/${file}`);
 const presentationAssets = 'assets/presentation';
+// Remove obsolete public previews from the generated flat asset folder.
+const currentPresentationAssets = new Set(
+  await readdir(path.join(root, 'web', presentationAssets)),
+);
+try {
+  for (const file of await readdir(path.join(out, presentationAssets)))
+    if (!currentPresentationAssets.has(file))
+      await unlink(path.join(out, presentationAssets, file));
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
 await cp(path.join(root, 'web', presentationAssets), path.join(out, presentationAssets), {
   recursive: true,
 });

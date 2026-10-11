@@ -317,6 +317,11 @@ try {
     await page.locator('.preview-cover img').evaluate((image) => image.naturalWidth > 0),
     'presentation loads the bundled game cover',
   );
+  check(
+    (await page.locator('.app-mockup').count()) === 4 &&
+      (await page.locator('img[src*="presentation"][src$=".png"]').count()) === 0,
+    'presentation recreates each product view without raster UI screenshots',
+  );
   const presentationTheme = page.getByRole('combobox', { name: 'Tema', exact: true });
   check(
     (await presentationTheme.locator('option').count()) === 22,
@@ -330,6 +335,15 @@ try {
         new URL(location.href).searchParams.get('theme') === 'light',
     ),
     'theme selection updates the page and its shareable URL',
+  );
+  check(
+    await page.evaluate(() => {
+      const panel = getComputedStyle(document.querySelector('.game-preview')).backgroundColor;
+      return [...document.querySelectorAll('.app-mockup')].every(
+        (node) => getComputedStyle(node).backgroundColor === panel,
+      );
+    }),
+    'theme selection recolors every recreated view with the game-sheet palette',
   );
   await page.reload();
   check(
@@ -360,23 +374,25 @@ try {
       .evaluateAll((links) =>
         links.every((link) => link.getAttribute('href') === 'app.html#en'),
       )) &&
-      (await page.locator('#gallery-grid img').getAttribute('src')).endsWith('library-en.png') &&
+      (await page.locator('#gallery-grid .mock-toolbar').innerText()).includes('Your collection') &&
       (await page.locator('.preview-cover img').getAttribute('alt')).startsWith(
         'Portal 2 cover art',
       ) &&
       (await page.locator('[data-privacy-guide]').getAttribute('href')).includes('/docs/en/'),
-    'English presentation updates all CTAs, screenshots, alt text and guides',
+    'English presentation updates all CTAs, recreated views, alt text and guides',
   );
   await page.setViewportSize({ width: 320, height: 640 });
   await page.getByRole('tab', { name: 'List', exact: true }).click();
-  await page.locator('#gallery-list img').scrollIntoViewIfNeeded();
-  await page.locator('#gallery-list img').evaluate((image) => image.decode());
+  await page.locator('#gallery-list .app-mockup').scrollIntoViewIfNeeded();
+  await page
+    .locator('#gallery-list .mock-cover')
+    .evaluateAll((images) => Promise.all(images.map((image) => image.decode())));
   check(
     (await page.locator('#gallery-list').isVisible()) &&
       !(await page.locator('#gallery-grid').isVisible()) &&
       (await page.getByRole('tab', { name: 'List', exact: true }).getAttribute('aria-selected')) ===
         'true',
-    'gallery selection exposes exactly its matching real product screenshot',
+    'gallery selection exposes exactly its matching recreated product view',
   );
   await page.getByRole('tab', { name: 'List', exact: true }).press('ArrowRight');
   check(

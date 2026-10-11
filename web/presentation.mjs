@@ -37,6 +37,14 @@ const english = {
     'You don’t have to finish everything. Keep what you’re playing close by and leave the rest for another day.',
   exampleStates: 'Example game statuses',
   playing: 'Playing',
+  paused: 'Paused',
+  demoMyGames: 'My games',
+  demoCollection: 'Your collection',
+  demoGameCount: '3 games',
+  demoGoalStory: 'Goal: finish the story',
+  demoGoalAchievements: 'Goal: all achievements',
+  demoHollowProgress: 'Story: 45%',
+  demoHadesProgress: 'Story: 0%',
   pending: 'Pending',
   finished: 'Story finished',
   lists: 'For now. For later.',
@@ -58,19 +66,19 @@ const english = {
   galleryGridTitle: 'The one with that cover.\nThat’s what I want to play.',
   galleryGridText:
     'Sometimes a cover is all it takes to remember a game. Here they all are, with their status and what you still want to do.',
-  galleryGridNote: 'Web app screenshot · Sample collection',
+  galleryGridNote: 'Recreated view · Sample collection',
   galleryListAlt: 'Checkpoint list view with Hollow Knight, Hades and Portal 2',
   galleryListTitle: 'A quick look\nbefore you play.',
   galleryListText:
     'The name, the status and the next goal. One after another, so you can find what you need without hunting around.',
-  galleryListNote: 'Web app screenshot · Sample collection',
+  galleryListNote: 'Recreated view · Sample collection',
   galleryMiniAlt: 'Checkpoint Miniature mode showing three games and their statuses',
   galleryMiniTitle: 'A little space\nbeside your game.',
   galleryMiniText:
     'Keep your list in a small window while you do other things. Your games stay close without taking over the desktop.',
   galleryMiniNote: 'Miniature mode · Available on Windows',
   galleryThemeNote:
-    'Real app screenshots in the dark theme. The selector changes this page and the example game details.',
+    'Recreated views with example data. Your chosen theme applies to the whole page.',
   progressTitle: 'One left.\nOr a few more.',
   steamTitle: 'Don’t add them one by one.',
   steamText:
@@ -202,10 +210,6 @@ function render(nextLanguage) {
   }
   for (const link of document.querySelectorAll('[data-open-app]'))
     link.href = 'app.html#' + language;
-  for (const image of document.querySelectorAll('[data-image-es]')) {
-    const source = language === 'en' ? image.dataset.imageEn : image.dataset.imageEs;
-    if (image.getAttribute('src') !== source) image.src = source;
-  }
   const docs =
     'https://github.com/Nicolasmf05/Checkpoint/blob/main/docs/' + (language === 'en' ? 'en/' : '');
   document.querySelector('[data-guide]').href = docs + 'WEB.md';
